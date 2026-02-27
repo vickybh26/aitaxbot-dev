@@ -20,7 +20,7 @@ import {
   Home as HomeIcon
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import logoImage from "@assets/aitaxbot-logo-lovable.png";
+import logoImage from "@assets/aitaxbot-logo.png";
 import { ResponsiveAd, LeaderboardAd } from "@/components/AdBanner";
 import { trackPageView } from "@/lib/analytics";
 import { generateHomePageSchema } from "@/lib/structuredData";

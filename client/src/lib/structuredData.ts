@@ -54,7 +54,7 @@ export function generateOrganizationSchema() {
     "@id": "https://aitaxbot.in/#organization",
     "name": "AiTaxBot",
     "url": "https://aitaxbot.in",
-    "logo": "https://aitaxbot.in/attached_assets/logo_1753757110252.png",
+    "logo": "https://aitaxbot.in/images/aitaxbot-logo.png",
     "description": "India's premier AI-powered Income Tax filing platform offering tax calculators, investment tools, and crypto tax compliance.",
     "sameAs": [
       "https://twitter.com/aitaxbot"

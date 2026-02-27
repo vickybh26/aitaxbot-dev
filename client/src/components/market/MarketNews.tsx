@@ -211,7 +211,7 @@ export default function MarketNews({ onClose }: MarketNewsProps) {
                           className="w-full h-full object-cover rounded-md"
                           loading="lazy"
                           onError={(e) => {
-                            e.currentTarget.src = '/attached_assets/logo_1753757110252.png';
+                            e.currentTarget.src = '/images/aitaxbot-logo.png';
                           }}
                         />
                       </div>

@@ -95,7 +95,7 @@ export default function MutualFunds({ onClose }: MutualFundsProps) {
         {isLoading && (
           <div className="text-center py-8">
             <img 
-              src="/attached_assets/logo_1753757110252.png" 
+              src="/images/aitaxbot-logo.png" 
               alt="AiTaxBot Logo" 
               className="h-8 w-auto mx-auto mb-4 opacity-50"
             />
@@ -171,7 +171,7 @@ export default function MutualFunds({ onClose }: MutualFundsProps) {
         {filteredFunds && filteredFunds.length === 0 && !isLoading && (
           <div className="text-center py-8">
             <img 
-              src="/attached_assets/logo_1753757110252.png" 
+              src="/images/aitaxbot-logo.png" 
               alt="AiTaxBot Logo" 
               className="h-8 w-auto mx-auto mb-4 opacity-30"
             />

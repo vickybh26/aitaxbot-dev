@@ -6,7 +6,7 @@ export default function Footer() {
           <div>
             <div className="flex items-center space-x-3 mb-4">
               <img 
-                src="/attached_assets/aitaxbot-logo-lovable.png" 
+                src="/images/aitaxbot-logo.png" 
                 alt="AiTaxBot Logo" 
                 className="h-12 w-auto"
                 loading="lazy"
