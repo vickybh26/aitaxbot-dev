@@ -1,0 +1,54 @@
+# Dependencies
+node_modules
+
+# Build outputs
+dist
+server/public
+
+# Environment variables and secrets
+.env
+.env.local
+.env.development
+.env.production
+.env.*.local
+
+# Uploaded files and user data
+uploads/
+*.pdf
+
+# Firebase credentials
+firebase-adminsdk-*.json
+serviceAccountKey.json
+*-firebase-adminsdk-*.json
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+migrations/
+
+# IDE and OS files
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.log
+*.tar.gz
+vite.config.ts.*
+.replit
+replit.nix
+
+# Sensitive configuration
+config/credentials.json
+config/secrets.json
+# Replit internal state
+.local/
+.config/
+*.bin
+__pycache__/
+*.pyc
+*.pyo
