@@ -69,6 +69,7 @@ export default function PFCalculatorPage() {
         <meta property="og:title" content="PF Calculator India FY 2025-26 - EPF & PPF | AiTaxBot" />
         <meta property="og:description" content="Free PF Calculator for EPF, VPF and PPF. Calculate employee-employer contribution split, interest growth, and retirement corpus." />
         <meta property="og:url" content="https://aitaxbot.in/calculators/pf" />
+        <meta property="og:image" content="https://aitaxbot.in/images/aitaxbot-logo.png" />
         <meta property="og:type" content="website" />
 
         <script type="application/ld+json">

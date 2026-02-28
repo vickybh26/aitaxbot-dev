@@ -66,6 +66,7 @@ export default function SIPCalculatorPage() {
         <meta property="og:title" content="SIP Calculator India FY 2025-26 - Mutual Fund Returns | AiTaxBot" />
         <meta property="og:description" content="Free SIP Calculator India. Calculate Systematic Investment Plan mutual fund returns with compounding for wealth creation." />
         <meta property="og:url" content="https://aitaxbot.in/calculators/sip" />
+        <meta property="og:image" content="https://aitaxbot.in/images/aitaxbot-logo.png" />
         <meta property="og:type" content="website" />
         
         <script type="application/ld+json">

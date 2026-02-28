@@ -64,6 +64,7 @@ export default function Contact() {
         <meta property="og:description" content="Reach out to our team for assistance with tax calculations and financial planning tools." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://aitaxbot.in/contact" />
+        <meta property="og:image" content="https://aitaxbot.in/images/aitaxbot-logo.png" />
       </Helmet>
       
       <div className="min-h-screen bg-white">

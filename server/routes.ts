@@ -10,7 +10,6 @@ import accountingRoutes from "./accountingRoutes";
 import { getFirestore, verifyFirebaseToken } from "./firebase";
 import { TransactionalEmailsApi, TransactionalEmailsApiApiKeys } from '@getbrevo/brevo';
 import { seedTaxRates, getTaxSlabsForCalculation } from "./seedTaxRates";
-import { registerObjectStorageRoutes } from "./replit_integrations/object_storage";
 import { generateTaxComputationPDF, savePDFToStorage, type TaxComputationData } from "./pdfGenerator";
 
 // Configure multer for Firebase Storage uploads (store in memory)
@@ -140,8 +139,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Mount accounting routes
   app.use("/api/accounting", accountingRoutes);
   
-  // Register object storage routes
-  registerObjectStorageRoutes(app);
   
   // Seed tax rates on startup (only runs once if empty)
   seedTaxRates().catch(err => console.error("Tax rates seeding failed:", err));

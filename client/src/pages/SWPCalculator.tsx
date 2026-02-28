@@ -66,6 +66,7 @@ export default function SWPCalculatorPage() {
         <meta property="og:title" content="SWP Calculator India FY 2025-26 - Retirement Planning | AiTaxBot" />
         <meta property="og:description" content="Free SWP Calculator India for systematic withdrawals. See how long your corpus lasts with monthly withdrawals. Retirement income planning." />
         <meta property="og:url" content="https://aitaxbot.in/calculators/swp" />
+        <meta property="og:image" content="https://aitaxbot.in/images/aitaxbot-logo.png" />
         <meta property="og:type" content="website" />
         
         <script type="application/ld+json">

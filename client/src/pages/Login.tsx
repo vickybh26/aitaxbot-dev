@@ -47,9 +47,6 @@ export default function Login() {
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     try {
-      console.log('[Login] Starting Google sign-in popup...');
-      const result = await signInWithGoogle();
-      console.log('[Login] Google sign-in result:', result.user?.email);
       toast({ title: "Success", description: "Signed in with Google successfully!" });
       // Auth state will update automatically via onAuthStateChanged
       // The useEffect watching isAuthenticated will handle the redirect

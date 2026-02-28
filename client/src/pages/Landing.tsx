@@ -153,6 +153,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
         <meta property="og:description" content="AI-powered income tax calculator with ₹12L tax-free limit. Live market news, gold/silver rates, and financial calculators. Income Tax Act, 2025 ready." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://aitaxbot.in/" />
+        <meta property="og:image" content="https://aitaxbot.in/images/aitaxbot-logo.png" />
         
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="AiTaxBot - Income Tax Calculator India FY 2025-26 | AY 2026-27" />

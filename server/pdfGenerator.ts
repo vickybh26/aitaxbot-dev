@@ -1,6 +1,7 @@
 import PDFDocument from "pdfkit";
-import { ObjectStorageService } from "./replit_integrations/object_storage";
 import { randomUUID } from "crypto";
+import fs from "fs";
+import path from "path";
 
 // @ts-ignore - pdfkit types are available
 
@@ -460,22 +461,20 @@ export function generateTaxComputationPDF(data: TaxComputationData): Promise<Buf
 }
 
 export async function savePDFToStorage(pdfBuffer: Buffer, userId: string): Promise<string> {
-  const objectStorage = new ObjectStorageService();
-  const fileName = `tax-computation-${randomUUID()}.pdf`;
+  // Save PDF to local file system in a temporary directory
+  const uploadDir = path.join(process.cwd(), "temp-pdfs");
   
-  const uploadURL = await objectStorage.getObjectEntityUploadURL();
-  
-  const response = await fetch(uploadURL, {
-    method: "PUT",
-    body: pdfBuffer,
-    headers: {
-      "Content-Type": "application/pdf",
-    },
-  });
-  
-  if (!response.ok) {
-    throw new Error("Failed to upload PDF to storage");
+  // Create directory if it doesn't exist
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
   }
   
-  return objectStorage.normalizeObjectEntityPath(uploadURL);
+  const fileName = `tax-computation-${randomUUID()}.pdf`;
+  const filePath = path.join(uploadDir, fileName);
+  
+  // Write PDF to file
+  fs.writeFileSync(filePath, pdfBuffer);
+  
+  // Return the file path (in production, you might want to use a cloud storage solution)
+  return `/temp-pdfs/${fileName}`;
 }

@@ -19,20 +19,32 @@ const hraFAQs = [
     answer: "HRA exemption is the minimum of three amounts: (1) Actual HRA received from employer, (2) Rent paid minus 10% of basic salary, and (3) 50% of basic salary for metro cities or 40% for non-metro cities. Use our free HRA Calculator to compute instantly."
   },
   {
+    question: "Which cities are considered metro for HRA calculation in India?",
+    answer: "Only four cities qualify as metro for HRA purposes under Section 10(13A): Mumbai, Delhi (NCT), Kolkata, and Chennai. Bangalore, Hyderabad, Pune, Ahmedabad, and all other cities are non-metro — meaning the cap is 40% of basic salary, not 50%. This is a very common and costly mistake."
+  },
+  {
+    question: "Can I claim both HRA exemption and home loan interest deduction simultaneously?",
+    answer: "Yes — this is one of the biggest myths in Indian taxation. You can claim both HRA (Section 10(13A)) and home loan interest (Section 24(b)) together in the Old Regime. This is valid if you are renting where you work and the owned property is in a different city, or if you haven't yet moved into your purchased flat, or under other genuine circumstances. Both claims must be genuine and documented."
+  },
+  {
     question: "Can I claim HRA if I own a house in another city?",
     answer: "Yes, you can claim HRA exemption even if you own a house in another city, as long as you are living in rented accommodation in your city of employment."
   },
   {
-    question: "What if I pay rent to my parents?",
-    answer: "You can claim HRA exemption for rent paid to parents, provided you have a proper rent agreement, rent receipts, and your parents declare this as rental income in their tax returns."
+    question: "What if I pay rent to my parents? Is it allowed?",
+    answer: "Yes, paying rent to parents and claiming HRA is legally valid, provided: (1) A genuine rent agreement exists, (2) Rent is transferred via bank (not cash), (3) You maintain rent receipts, and (4) Your parents declare this rental income in their own ITR. Your parents' taxable income may be lower (especially if they are senior citizens with ₹3L basic exemption), making this a legitimate tax planning strategy."
   },
   {
     question: "Is HRA available in the New Tax Regime?",
-    answer: "No, HRA exemption under Section 10(13A) is not available under the New Tax Regime. You must opt for the Old Tax Regime to claim HRA and other deductions."
+    answer: "No, HRA exemption under Section 10(13A) is not available under the New Tax Regime. You must opt for the Old Tax Regime to claim HRA and other deductions. Use our Income Tax Calculator to check whether the HRA benefit in old regime outweighs the lower slab rates in the new regime."
   },
   {
-    question: "Which cities are considered metro for HRA calculation?",
-    answer: "For HRA calculation, only Mumbai, Delhi, Kolkata, and Chennai are considered metro cities. All other cities and towns are non-metro. Metro city residents can claim up to 50% of basic salary, while non-metro residents can claim up to 40%."
+    question: "Is PAN of landlord required for HRA?",
+    answer: "PAN of your landlord is mandatory if annual rent paid exceeds ₹1 lakh (i.e., more than ₹8,333 per month). Without landlord PAN, your employer cannot process the HRA exemption for TDS purposes. If the landlord does not have a PAN, they must provide a self-declaration (Form 60)."
+  },
+  {
+    question: "What documents are required to claim HRA exemption?",
+    answer: "You need: (1) Rent receipts for each month (stamped and signed by landlord), (2) Rent agreement / lease deed, (3) Landlord's PAN (if annual rent > ₹1 lakh), (4) Bank transfer proof of rent payment (recommended). Keep these for at least 6 years as income tax scrutiny can look back that far."
   }
 ];
 
@@ -203,27 +215,196 @@ export default function HRACalculatorPage() {
               </ul>
             </div>
 
+            <h2 className="text-2xl font-bold text-slate-900 mb-6">Worked Examples: HRA Exemption Calculation</h2>
+
+            <div className="grid md:grid-cols-2 gap-6 not-prose mb-10">
+
+              {/* Example 1: Mumbai Metro */}
+              <div className="bg-green-50 border border-green-200 rounded-xl p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="bg-green-600 text-white text-xs font-bold px-2 py-1 rounded">EXAMPLE 1</span>
+                  <h3 className="font-bold text-slate-900">Mumbai — Metro City</h3>
+                </div>
+                <div className="space-y-1 text-sm mb-4">
+                  <div className="flex justify-between"><span className="text-slate-600">Basic Salary (annual)</span><span className="font-medium">₹6,00,000</span></div>
+                  <div className="flex justify-between"><span className="text-slate-600">HRA received (annual)</span><span className="font-medium">₹3,00,000</span></div>
+                  <div className="flex justify-between"><span className="text-slate-600">Rent paid (annual)</span><span className="font-medium">₹2,40,000</span></div>
+                </div>
+                <div className="border-t pt-3 space-y-1 text-sm">
+                  <div className="flex justify-between text-slate-600 font-medium text-xs mb-1 uppercase">
+                    <span>Component</span><span>Amount</span>
+                  </div>
+                  <div className="flex justify-between"><span className="text-slate-600">① Actual HRA received</span><span>₹3,00,000</span></div>
+                  <div className="flex justify-between"><span className="text-slate-600">② Rent − 10% of basic</span><span>₹1,80,000</span></div>
+                  <div className="flex justify-between"><span className="text-slate-600">③ 50% of basic (metro)</span><span>₹3,00,000</span></div>
+                  <div className="flex justify-between border-t pt-1 mt-1">
+                    <span className="text-green-800 font-bold">HRA Exempt (minimum)</span>
+                    <span className="font-bold text-green-700">₹1,80,000</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">Taxable HRA</span>
+                    <span className="font-medium">₹1,20,000</span>
+                  </div>
+                </div>
+                <p className="text-xs text-green-700 mt-3 bg-green-100 rounded p-2">
+                  ✔ Minimum is ②. Higher rent = larger exemption. In Mumbai, 50% cap is rarely the binding constraint.
+                </p>
+              </div>
+
+              {/* Example 2: Hyderabad Non-Metro (common mistake) */}
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="bg-amber-600 text-white text-xs font-bold px-2 py-1 rounded">EXAMPLE 2</span>
+                  <h3 className="font-bold text-slate-900">Hyderabad — Non-Metro (Common Mistake!)</h3>
+                </div>
+                <div className="space-y-1 text-sm mb-4">
+                  <div className="flex justify-between"><span className="text-slate-600">Basic Salary (annual)</span><span className="font-medium">₹10,00,000</span></div>
+                  <div className="flex justify-between"><span className="text-slate-600">HRA received (annual)</span><span className="font-medium">₹5,00,000</span></div>
+                  <div className="flex justify-between"><span className="text-slate-600">Rent paid (annual)</span><span className="font-medium">₹4,80,000</span></div>
+                </div>
+                <div className="border-t pt-3 space-y-1 text-sm">
+                  <div className="flex justify-between text-slate-600 font-medium text-xs mb-1 uppercase">
+                    <span>Component</span><span>Amount</span>
+                  </div>
+                  <div className="flex justify-between"><span className="text-slate-600">① Actual HRA received</span><span>₹5,00,000</span></div>
+                  <div className="flex justify-between"><span className="text-slate-600">② Rent − 10% of basic</span><span>₹3,80,000</span></div>
+                  <div className="flex justify-between text-amber-700"><span>③ 40% of basic (NON-metro!)</span><span>₹4,00,000</span></div>
+                  <div className="flex justify-between border-t pt-1 mt-1">
+                    <span className="text-amber-800 font-bold">HRA Exempt (minimum)</span>
+                    <span className="font-bold text-amber-700">₹3,80,000</span>
+                  </div>
+                </div>
+                <p className="text-xs text-amber-700 mt-3 bg-amber-100 rounded p-2">
+                  ⚠️ Hyderabad, Bangalore, Pune are NOT metro cities under the Income Tax Act. Using 50% instead of 40% is an error many people make.
+                </p>
+              </div>
+
+              {/* Example 3: Rent to Parents */}
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="bg-blue-700 text-white text-xs font-bold px-2 py-1 rounded">EXAMPLE 3</span>
+                  <h3 className="font-bold text-slate-900">Paying Rent to Parents</h3>
+                </div>
+                <p className="text-sm text-slate-600 mb-3">Legal tax planning — parents in lower tax bracket</p>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between"><span className="text-slate-600">Child pays parents (annual)</span><span className="font-medium">₹1,80,000</span></div>
+                  <div className="flex justify-between"><span className="text-slate-600">Child's HRA exemption</span><span className="font-medium text-blue-700">₹1,20,000–₹1,80,000</span></div>
+                  <div className="flex justify-between"><span className="text-slate-600">Tax saved (child, 30% slab)</span><span className="font-medium text-blue-700">~₹37,000–₹56,000</span></div>
+                  <div className="flex justify-between border-t pt-1 mt-1"><span className="text-slate-600">Parents declare rental income</span><span className="font-medium">₹1,80,000</span></div>
+                  <div className="flex justify-between"><span className="text-slate-600">Parents' tax (senior, 0% upto ₹3L)</span><span className="font-medium text-blue-700">₹0</span></div>
+                </div>
+                <p className="text-xs text-blue-700 mt-3 bg-blue-100 rounded p-2">
+                  ✔ Family saves ₹37K–₹56K in tax. Ensure rent is transferred by bank + rent receipts are maintained + parents file ITR.
+                </p>
+              </div>
+
+              {/* Example 4: HRA + Home Loan Together */}
+              <div className="bg-purple-50 border border-purple-200 rounded-xl p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="bg-purple-700 text-white text-xs font-bold px-2 py-1 rounded">EXAMPLE 4</span>
+                  <h3 className="font-bold text-slate-900">HRA + Home Loan — Both Claimed</h3>
+                </div>
+                <p className="text-sm text-slate-600 mb-3">Works when renting in work city, owns flat in another city</p>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between"><span className="text-slate-600">Lives in: Bangalore (rented)</span><span className="font-medium">→ Claims HRA</span></div>
+                  <div className="flex justify-between"><span className="text-slate-600">Owns flat in: Pune (rented out)</span><span className="font-medium">→ Rental income</span></div>
+                  <div className="flex justify-between"><span className="text-slate-600">Home loan interest (Pune flat)</span><span className="font-medium">₹2,00,000</span></div>
+                  <div className="flex justify-between border-t pt-1 mt-1"><span className="text-slate-600">HRA exemption (Bangalore)</span><span className="font-medium text-purple-700">₹X (formula-based)</span></div>
+                  <div className="flex justify-between"><span className="text-slate-600">Section 24(b) deduction</span><span className="font-medium text-purple-700">₹2,00,000</span></div>
+                </div>
+                <p className="text-xs text-purple-700 mt-3 bg-purple-100 rounded p-2">
+                  ✔ Both deductions are valid simultaneously. A common myth says you cannot claim both. You can — with proper documentation.
+                </p>
+              </div>
+            </div>
+
+            {/* CA Tips Section */}
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">CA Tips: Common HRA Mistakes to Avoid</h2>
+
+            <div className="space-y-4 not-prose mb-8">
+              <div className="flex gap-4 p-5 bg-red-50 rounded-xl border border-red-200">
+                <div className="w-8 h-8 bg-red-600 text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">!</div>
+                <div>
+                  <h4 className="font-semibold text-slate-900 mb-1">Bangalore, Hyderabad, Pune are NOT metro cities for HRA</h4>
+                  <p className="text-slate-600 text-sm">
+                    Under the Income Tax Act, only four cities qualify as metro: Mumbai, Delhi (NCT), Kolkata, and Chennai.
+                    Claiming 50% of basic for Bangalore or Hyderabad is incorrect and can trigger a tax notice.
+                    These cities get the 40% non-metro cap. Our calculator always asks for your city type — select carefully.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-4 p-5 bg-slate-50 rounded-xl border border-slate-200">
+                <div className="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">✓</div>
+                <div>
+                  <h4 className="font-semibold text-slate-900 mb-1">Increase your rent to maximise the exemption (if genuine)</h4>
+                  <p className="text-slate-600 text-sm">
+                    The exemption is the minimum of three values. Often, component ② (Rent − 10% of basic) is the binding constraint.
+                    Paying higher genuine rent directly increases your HRA exemption. If you are under-renting relatives,
+                    consider adjusting to market rate — both parties must declare accordingly.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-4 p-5 bg-slate-50 rounded-xl border border-slate-200">
+                <div className="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">✓</div>
+                <div>
+                  <h4 className="font-semibold text-slate-900 mb-1">PAN of landlord is mandatory above ₹1 lakh annual rent</h4>
+                  <p className="text-slate-600 text-sm">
+                    If your annual rent exceeds ₹1,00,000 (₹8,334/month), your employer must collect the landlord's PAN.
+                    Without it, TDS deduction on HRA cannot be waived. If your landlord refuses to share PAN, they can
+                    provide a signed Form 60 declaration instead.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-4 p-5 bg-slate-50 rounded-xl border border-slate-200">
+                <div className="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">✓</div>
+                <div>
+                  <h4 className="font-semibold text-slate-900 mb-1">Calculate whether Old Regime (with HRA) beats New Regime</h4>
+                  <p className="text-slate-600 text-sm">
+                    HRA exemption is only available in the Old Regime. Before assuming Old Regime is better "because of HRA",
+                    always compare both regimes using the calculator. At lower income levels (under ₹10L) or with minimal
+                    deductions, New Regime's lower slab rates can still win even after accounting for lost HRA.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-4 p-5 bg-amber-50 rounded-xl border border-amber-200">
+                <div className="w-8 h-8 bg-amber-600 text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">⚠</div>
+                <div>
+                  <h4 className="font-semibold text-slate-900 mb-1">Don't fabricate rent receipts — it's tax fraud</h4>
+                  <p className="text-slate-600 text-sm">
+                    Some employees claim HRA without actually paying rent, or inflate rent paid. The IT department
+                    cross-matches rent receipt data with landlord's ITR for large claims. Fraudulent HRA claims
+                    attract not just tax + interest but also penalties of up to 200% of tax evaded under Section 270A.
+                    Claim only genuine, documented rent payments.
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <h2 className="text-2xl font-bold text-slate-900 mb-4">Frequently Asked Questions</h2>
-            
+
             <div className="space-y-4">
               <div>
                 <h4 className="font-semibold text-slate-900 mb-2">Can I claim HRA if I own a house in another city?</h4>
                 <p className="text-slate-600">
-                  Yes, you can claim HRA exemption even if you own a house in another city, as long as you're 
+                  Yes, you can claim HRA exemption even if you own a house in another city, as long as you're
                   living in rented accommodation in your city of employment.
                 </p>
               </div>
               <div>
                 <h4 className="font-semibold text-slate-900 mb-2">What if I pay rent to my parents?</h4>
                 <p className="text-slate-600">
-                  You can claim HRA exemption for rent paid to parents, provided you have a proper rent agreement, 
+                  You can claim HRA exemption for rent paid to parents, provided you have a proper rent agreement,
                   rent receipts, and your parents declare this as rental income in their tax returns.
                 </p>
               </div>
               <div>
                 <h4 className="font-semibold text-slate-900 mb-2">Is HRA available in the New Tax Regime?</h4>
                 <p className="text-slate-600">
-                  No, HRA exemption is not available under the New Tax Regime. You must opt for the Old Tax Regime 
+                  No, HRA exemption is not available under the New Tax Regime. You must opt for the Old Tax Regime
                   to claim HRA and other deductions.
                 </p>
               </div>
@@ -277,7 +458,7 @@ export default function HRACalculatorPage() {
         <footer className="bg-slate-900 text-white py-8 px-6">
           <div className="max-w-6xl mx-auto text-center">
             <p className="text-sm text-slate-400">
-              © 2024 AiTaxBot. All rights reserved. | HRA Calculator Section 10(13A)
+              © 2025 AiTaxBot. All rights reserved. | HRA Calculator Section 10(13A) | FY 2025-26
             </p>
           </div>
         </footer>

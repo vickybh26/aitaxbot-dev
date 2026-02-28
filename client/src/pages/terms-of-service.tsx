@@ -16,6 +16,8 @@ export default function TermsOfService() {
         <meta name="description" content="AiTaxBot Terms of Service. Usage guidelines, disclaimers, and legal agreements for our tax calculators, financial tools, and services." />
         <meta name="keywords" content="terms of service, user agreement, aitaxbot terms, legal disclaimer" />
         <link rel="canonical" href="https://aitaxbot.in/terms-of-service" />
+        <meta property="og:image" content="https://aitaxbot.in/images/aitaxbot-logo.png" />
+        <meta property="og:type" content="website" />
       </Helmet>
       
       <Header />

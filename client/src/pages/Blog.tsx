@@ -67,6 +67,7 @@ export default function Blog() {
         <meta property="og:description" content="Expert articles on taxation, investments, and financial planning for Indian taxpayers." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://aitaxbot.in/blog" />
+        <meta property="og:image" content="https://aitaxbot.in/images/aitaxbot-logo.png" />
       </Helmet>
       
       <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">

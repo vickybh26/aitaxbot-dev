@@ -15,6 +15,8 @@ export default function PrivacyPolicy() {
         <title>Privacy Policy - AiTaxBot</title>
         <meta name="description" content="AiTaxBot Privacy Policy - Learn how we collect, use, and protect your information, including cookie usage and Google AdSense data practices." />
         <link rel="canonical" href="https://aitaxbot.in/privacy-policy" />
+        <meta property="og:image" content="https://aitaxbot.in/images/aitaxbot-logo.png" />
+        <meta property="og:type" content="website" />
       </Helmet>
       <Header />
       <div className="min-h-screen bg-white">

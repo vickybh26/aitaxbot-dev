@@ -9,17 +9,20 @@ export interface BlogPost {
   tags: string[];
   readingTimeMinutes: number;
   heroImage: string;
-  schema: any;
-  disclaimer?: string;
-  bodySections: BlogSection[];
-}
-
-export interface BlogSection {
-  type: 'intro' | 'h2' | 'h3' | 'faq' | 'cta' | 'outro';
-  title?: string;
-  content_md?: string;
-  items?: { q: string; a: string }[];
-  internal_links?: { label: string; href: string }[];
+  schema: {
+    "@context": string;
+    "@type": string;
+    "headline": string;
+    "author": { "@type": string; "name": string };
+    "publisher": { "@type": string; "name": string };
+  };
+  bodySections: Array<{
+    type: string;
+    title?: string;
+    content_md?: string;
+    items?: Array<{ q: string; a: string }>;
+    internal_links?: Array<{ label: string; href: string }>;
+  }>;
 }
 
 export const blogPosts: BlogPost[] = [
@@ -1303,83 +1306,173 @@ export const blogPosts: BlogPost[] = [
   {
     slug: "new-vs-old-tax-regime-2025",
     status: "published",
-    metaTitle: "New vs Old Tax Regime 2025 | AI Tax Bot",
-    metaDescription: "Detailed comparison of the new and old income-tax regimes for FY 2024-25, including slab rates, deduction benefits and examples.",
-    keywords: ["new tax regime 2025", "old tax regime", "income tax slabs", "section 80C", "HRA"],
-    ogTitle: "How to Choose Between the New and Old Tax Regime in 2025",
-    ogDescription: "Complete guide to choosing the right tax regime with slab comparison and real examples.",
-    tags: ["tax", "salary", "planning"],
-    readingTimeMinutes: 10,
+    metaTitle: "New vs Old Tax Regime FY 2025-26 (AY 2026-27) | AiTaxBot",
+    metaDescription: "Complete comparison of New vs Old tax regime for FY 2025-26. Updated slabs, rebate up to ₹12L, marginal relief explained with real CA examples. Which saves you more tax?",
+    keywords: ["new tax regime 2025-26", "old tax regime", "income tax slabs FY 2025-26", "section 80C", "HRA", "marginal relief", "section 87A rebate", "tax regime comparison"],
+    ogTitle: "New vs Old Tax Regime FY 2025-26 — Which Saves You More? (With Marginal Relief)",
+    ogDescription: "Updated FY 2025-26 comparison with correct slabs, ₹12L zero-tax window, marginal relief examples and CA insights.",
+    tags: ["tax", "salary", "planning", "marginal relief", "FY 2025-26"],
+    readingTimeMinutes: 12,
     heroImage: "/images/tax-regime-comparison-2025.jpg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
-      "headline": "How to Choose Between the New and Old Tax Regime in 2025",
-      "author": {"@type": "Person", "name": "AI Tax Bot Editorial"},
-      "publisher": {"@type": "Organization", "name": "AI Tax Bot"}
+      "headline": "New vs Old Tax Regime FY 2025-26 — Complete Comparison with Marginal Relief",
+      "author": {"@type": "Person", "name": "AiTaxBot Editorial"},
+      "publisher": {"@type": "Organization", "name": "AiTaxBot"}
     },
     bodySections: [
       {
         type: "intro",
-        content_md: "Budget 2023 revamped the **new tax regime** to make it default from FY 2024-25. Yet, many salaried taxpayers wonder which saves more. Here's a full comparison."
+        content_md: "Budget 2025 made the **New Tax Regime the default** for FY 2025-26. With income up to **₹12 lakh completely tax-free** (after ₹75,000 standard deduction and ₹60,000 rebate), the calculus has shifted. But for taxpayers with significant HRA, 80C investments or home loans, the Old Regime can still win. Here is the complete, updated comparison — including **marginal relief**, which most calculators and articles get wrong."
       },
       {
         type: "h2",
-        title: "Current Slabs (FY 2024-25)",
-        content_md: "| Income Range | Old Regime | New Regime |\n|---------------|-------------|-------------|\n| 0–2.5 L | Nil | Nil |\n| 2.5–5 L | 5% | 5% |\n| 5–7.5 L | 20% | 10% |\n| 7.5–10 L | 20% | 15% |\n| 10–12.5 L | 30% | 20% |\n| 12.5–15 L | 30% | 25% |\n| Above 15 L | 30% | 30% |\n\n**Rebate under 87A:**\n- Old regime: Up to ₹12,500 if income ≤ ₹5L\n- New regime: Up to ₹25,000 if income ≤ ₹7L\n\n**Standard deduction:**\n- Old regime: ₹50,000 (salaried)\n- New regime: ₹50,000 (now available from FY 2023-24)"
+        title: "Updated Tax Slabs: FY 2025-26 (AY 2026-27)",
+        content_md: "### New Regime Slabs (Section 202, Income Tax Act 2025)\n\n| Income Range | Tax Rate |\n|---|---|\n| Up to ₹4 lakh | Nil |\n| ₹4L – ₹8L | 5% |\n| ₹8L – ₹12L | 10% |\n| ₹12L – ₹16L | 15% |\n| ₹16L – ₹20L | 20% |\n| ₹20L – ₹24L | 25% |\n| Above ₹24L | 30% |\n\n**Standard deduction (new regime):** ₹75,000 for salaried employees \n**Rebate (Section 156 / 87A):** Up to ₹60,000 if net taxable income ≤ ₹12 lakh → **Effective zero tax up to ₹12.75L gross salary**\n\n### Old Regime Slabs\n\n| Income Range | Tax Rate |\n|---|---|\n| Up to ₹2.5 lakh | Nil |\n| ₹2.5L – ₹5L | 5% |\n| ₹5L – ₹10L | 20% |\n| Above ₹10L | 30% |\n\n**Standard deduction (old regime):** ₹50,000 \n**Rebate (Section 87A):** Up to ₹12,500 if income ≤ ₹5L\n\n*Note: 4% Health & Education Cess applies on income tax + surcharge under both regimes.*"
       },
       {
         type: "h2",
-        title: "Key Deductions/Exemptions Comparison",
-        content_md: "**Available in Old Regime ONLY:**\n\n**Section 80C:** ₹1.5L (PPF, ELSS, insurance, tuition fees, home loan principal)\n**Section 80D:** ₹25K-₹100K (health insurance)\n**HRA:** House rent allowance exemption\n**LTA:** Leave travel allowance\n**Home loan interest:** ₹2L (Section 24b)\n**NPS additional:** ₹50K (80CCD1B)\n\n**Available in BOTH regimes:**\n- Standard deduction: ₹50,000\n- Professional tax\n- Employer's NPS contribution\n\n**New regime:** Cannot claim most deductions/exemptions"
-      },
-      {
-        type: "h3",
-        title: "Example 1: Fresh Graduate (₹6L income)",
-        content_md: "**Scenario:** No investments, staying with parents\n\n**Old Regime:**\n- Gross income: ₹6,00,000\n- Less: Standard deduction: ₹50,000\n- Taxable: ₹5,50,000\n- Tax: ₹30,000\n- Rebate: ₹12,500 (not fully applicable)\n- **Final tax: ₹17,500**\n\n**New Regime:**\n- Taxable (with std ded): ₹5,50,000\n- Tax: ₹17,500\n- Rebate: ₹17,500 (fully applicable)\n- **Final tax: ₹0**\n\n**Winner: New regime** (saves ₹17,500)"
-      },
-      {
-        type: "h3",
-        title: "Example 2: Mid-Career (₹12L income)",
-        content_md: "**Scenario:** HRA ₹3L/year, 80C investments ₹1.5L\n\n**Old Regime:**\n- Gross: ₹12,00,000\n- Less: HRA exempt (₹1,50,000) + Std ded (₹50,000) + 80C (₹1,50,000)\n- Taxable: ₹8,50,000\n- **Tax: ₹85,000**\n\n**New Regime:**\n- Gross: ₹12,00,000\n- Less: Std ded only (₹50,000)\n- Taxable: ₹11,50,000\n- **Tax: ₹1,30,000**\n\n**Winner: Old regime** (saves ₹45,000)"
-      },
-      {
-        type: "h3",
-        title: "Example 3: Senior Professional (₹20L income)",
-        content_md: "**Scenario:** Max deductions - HRA ₹4L, 80C ₹1.5L, 80D ₹25K, home loan interest ₹2L, NPS ₹50K\n\n**Old Regime:**\n- Gross: ₹20,00,000\n- Less: Total deductions ₹8,25,000\n- Taxable: ₹11,75,000\n- **Tax: ₹2,17,500** (+ cess)\n\n**New Regime:**\n- Gross: ₹20,00,000\n- Less: Std ded ₹50,000\n- Taxable: ₹19,50,000\n- **Tax: ₹3,22,500** (+ cess)\n\n**Winner: Old regime** (saves ~₹1,05,000)"
+        title: "The ₹12 Lakh Zero-Tax Window — And the Marginal Relief Misconception",
+        content_md: "This is the most misunderstood part of FY 2025-26 taxation. Let's clear it up.\n\n**If your net taxable income is exactly ₹12 lakh:** Tax = ₹60,000, Rebate = ₹60,000. **Net tax = Zero.** ✔\n\n**If your net taxable income is ₹12.1 lakh (₹10,000 over the limit):**\n- Tax without rebate = ₹61,500\n- Without marginal relief: ₹61,500 × 1.04 (cess) = **₹63,960** — this is what people fear\n- **With marginal relief (law-mandated):** Tax capped at ₹10,000 (the extra income over ₹12L) + 4% cess = **₹10,400**\n\n**Marginal relief saves ₹53,560 at ₹12.1L income.** The extra tax you pay is ONLY on the extra income earned above ₹12L. This protection continues until approximately ₹12.7L taxable income, after which normal rates fully apply.\n\n### How Marginal Relief Works (The Principle)\n\nMarginal relief ensures: **Additional tax ≤ Additional income over threshold**\n\nThis applies at five key points:\n1. ₹12L — rebate cliff (new regime)\n2. ₹50L — 10% surcharge threshold\n3. ₹1 Crore — 15% surcharge threshold\n4. ₹2 Crore — 25% surcharge threshold\n5. ₹5 Crore — 37% surcharge threshold (old regime)\n\n**Our calculator applies marginal relief automatically at all these thresholds.**"
       },
       {
         type: "h2",
-        title: "Decision Framework",
-        content_md: "**Choose NEW regime if:**\n✅ Income ≤ ₹7.5 lakh\n✅ No house rent paid (no HRA)\n✅ No investments in 80C instruments\n✅ No home loan\n✅ Prefer simplicity over tax planning\n\n**Choose OLD regime if:**\n✅ Paying house rent (claiming HRA)\n✅ Investing ₹1.5L+ in PPF/ELSS/insurance\n✅ Have home loan (interest deduction)\n✅ Contributing to NPS\n✅ Income > ₹10 lakh with deductions"
+        title: "Key Deductions: Old vs New Regime",
+        content_md: "**Available in Old Regime ONLY:**\n\n| Deduction | Section | Max Amount |\n|---|---|---|\n| Investments (PPF, ELSS, LIC, home loan principal) | 80C | ₹1,50,000 |\n| Health insurance | 80D | ₹25,000–₹1,00,000 |\n| Home loan interest | 24(b) | ₹2,00,000 |\n| NPS (additional) | 80CCD(1B) | ₹50,000 |\n| HRA exemption | 10(13A) | Actual/formula |\n| Leave travel allowance | 10(5) | Actual |\n\n**Available in BOTH regimes:**\n- Standard deduction: ₹75,000 (new) / ₹50,000 (old) for salaried\n- Professional tax deduction\n- Employer's NPS contribution (80CCD(2)) — up to 14% of basic in new regime\n\n**Rule of thumb:** If your eligible deductions exceed ₹3.75 lakh (at ~₹15L income), Old Regime usually wins."
       },
       {
         type: "h3",
-        title: "How to Switch",
-        content_md: "**Salaried employees:**\n- Inform employer at start of FY for correct TDS\n- Can switch every year\n- Choose regime while filing ITR\n\n**Business/Professional:**\n- Once opted for new regime, cannot switch back\n- Choose carefully\n\n**Key:** Calculate tax under BOTH regimes annually before deciding"
+        title: "Example 1: Young Professional — ₹9 Lakh Income",
+        content_md: "**Scenario:** Staying with parents, no HRA, no investments yet\n\n| | Old Regime | New Regime |\n|---|---|---|\n| Gross Income | ₹9,00,000 | ₹9,00,000 |\n| Standard Deduction | ₹50,000 | ₹75,000 |\n| 80C / HRA | Nil | Nil |\n| **Taxable Income** | **₹8,50,000** | **₹8,25,000** |\n| Tax | ₹1,07,500 | ₹37,500 |\n| Cess (4%) | ₹4,300 | ₹1,500 |\n| **Total Tax** | **₹1,11,800** | **₹39,000** |\n\n**Winner: New Regime** (saves ₹72,800). Without deductions, the new regime's lower slab rates dominate."
+      },
+      {
+        type: "h3",
+        title: "Example 2: Mid-Career Salaried — ₹15 Lakh Income",
+        content_md: "**Scenario:** HRA ₹3L/year (₹1.5L exempt), 80C full ₹1.5L\n\n| | Old Regime | New Regime |\n|---|---|---|\n| Gross Income | ₹15,00,000 | ₹15,00,000 |\n| Standard Deduction | ₹50,000 | ₹75,000 |\n| HRA exempt | ₹1,50,000 | Nil |\n| 80C | ₹1,50,000 | Nil |\n| **Taxable Income** | **₹11,50,000** | **₹14,25,000** |\n| Tax | ₹2,17,500 | ₹2,46,250 |\n| Cess (4%) | ₹8,700 | ₹9,850 |\n| **Total Tax** | **₹2,26,200** | **₹2,56,100** |\n\n**Winner: Old Regime** (saves ₹29,900). With HRA + full 80C utilisation, old regime edges ahead."
+      },
+      {
+        type: "h3",
+        title: "Example 3: Senior Professional — ₹20 Lakh Income (Max Deductions)",
+        content_md: "**Scenario:** HRA ₹4L (₹2L exempt), 80C ₹1.5L, 80D ₹25K, NPS ₹50K, Home loan interest ₹2L\n\n| | Old Regime | New Regime |\n|---|---|---|\n| Gross Income | ₹20,00,000 | ₹20,00,000 |\n| Standard Deduction | ₹50,000 | ₹75,000 |\n| HRA + all deductions | ₹6,25,000 | Nil |\n| **Taxable Income** | **₹13,25,000** | **₹19,25,000** |\n| Tax | ₹2,67,500 | ₹3,38,750 |\n| Cess (4%) | ₹10,700 | ₹13,550 |\n| **Total Tax** | **₹2,78,200** | **₹3,52,300** |\n\n**Winner: Old Regime** (saves ₹74,100). Maximising all deductions creates a clear advantage.\n\n**Key insight:** The crossover point at ₹20L is approximately ₹5L+ in deductions. Use the calculator to find your exact breakeven."
+      },
+      {
+        type: "h2",
+        title: "Decision Framework: Which Regime Should You Choose?",
+        content_md: "**Choose NEW Regime if:**\n✅ Taxable income ≤ ₹12L (after ₹75K std deduction) — you pay zero tax\n✅ Income between ₹12L–₹15L with minimal deductions (< ₹2L)\n✅ No HRA (renting + claiming exemption)\n✅ No home loan interest deduction\n✅ Prefer simplicity over tax planning\n✅ Your 80C investments are for wealth building (not tax saving)\n\n**Choose OLD Regime if:**\n✅ Paying significant rent and claiming HRA\n✅ Investing ₹1.5L in PPF/ELSS/LIC\n✅ Have home loan (claiming ₹2L interest deduction)\n✅ Contributing to NPS (extra ₹50K under 80CCD(1B))\n✅ Income > ₹12L and total eligible deductions > ₹3–4 lakh\n✅ Medical insurance for self + parents (₹50K-₹75K combined 80D)\n\n**The rule of thumb:** At ₹15L income, if your total deductions (beyond standard deduction) exceed ₹3 lakh, Old Regime usually saves more. Use the calculator to get your exact numbers."
+      },
+      {
+        type: "h3",
+        title: "How to Switch Regimes",
+        content_md: "**Salaried employees:**\n- Inform your employer at the start of the financial year for correct TDS deduction\n- If you miss this, you can switch when filing your ITR\n- You can switch every year (no restrictions)\n\n**Business owners / professionals:**\n- Once you opt out of the new regime, switching back requires fresh Form 10-IEA\n- Practically: you get only one switch back to old regime in a lifetime\n- Choose carefully if you have business income\n\n**Deadline:** Your tax regime choice for FY 2025-26 must be made before the ITR filing deadline (July 31, 2026 for individuals without audit)."
       },
       {
         type: "cta",
-        content_md: "Compare both regimes instantly with our **Tax Calculator** and make the right choice.",
+        content_md: "Don't guess — compute your exact tax under both regimes with our **free Income Tax Calculator**. Enter your income, HRA, and 80C deductions and see the winner instantly.",
         internal_links: [
-          {"label": "Income Tax Calculator", "href": "/tax-calculator"},
+          {"label": "Income Tax Calculator FY 2025-26", "href": "/calculators/income-tax"},
           {"label": "HRA Calculator", "href": "/calculators/hra"}
         ]
       },
       {
         type: "faq",
         items: [
-          {"q": "Which regime is better for ₹10 lakh salary?", "a": "Depends on deductions. With full HRA + 80C, old regime saves more. Without deductions, new regime may be better."},
-          {"q": "Can I claim standard deduction in new regime?", "a": "Yes, from FY 2023-24 onwards, ₹50,000 standard deduction is available in new regime too."},
-          {"q": "Do I need to file ITR if tax is zero under new regime?", "a": "If gross income > ₹2.5L or want to carry forward losses, yes. Otherwise optional but recommended."}
+          {"q": "If my income is ₹12.5 lakh, do I lose the full rebate?", "a": "No — marginal relief applies. At ₹12.5L taxable income, your tax is approximately ₹52,000 (not ₹70,200). The law ensures your tax increase cannot exceed the income increase above ₹12L. Marginal relief fully protects you until about ₹12.7L taxable income."},
+          {"q": "Which regime is better for ₹10 lakh salary?", "a": "With gross salary of ₹10L in new regime: standard deduction ₹75K → taxable ₹9.25L → tax ₹52,500 + cess = ₹54,600. In old regime with just 80C of ₹1.5L: taxable ₹8L → tax ₹75,000 + cess = ₹78,000. New regime wins at ₹10L without major deductions. If you have HRA + full 80C, old regime may be closer — use the calculator."},
+          {"q": "Can I claim standard deduction in the new regime?", "a": "Yes. From FY 2023-24 onwards, ₹50,000 standard deduction was extended to the new regime. From FY 2024-25, this was further enhanced to ₹75,000 for salaried employees in the new regime — higher than the ₹50,000 available in the old regime."},
+          {"q": "What is the effective zero-tax salary limit in FY 2025-26?", "a": "For salaried employees in the new regime: gross salary of ₹12,75,000. After ₹75,000 standard deduction, taxable income = ₹12,00,000. Tax on ₹12L = ₹60,000. Full rebate of ₹60,000 applies. Net tax = Zero."},
+          {"q": "Do I need to file ITR if tax is zero under the new regime?", "a": "If gross income exceeds ₹2.5 lakh, filing is advisable (and mandatory for TDS refunds, carry-forward of losses, loan applications, and visa purposes). Even if no tax is payable, filing ITR is good practice."}
         ]
       },
       {
         type: "outro",
-        content_md: "There's no universal answer—the best regime depends on your deductions and investments. Calculate both scenarios annually, plan investments accordingly, and optimize your tax liability legally."
+        content_md: "There is no single 'better' regime — the answer depends on your income, deductions, and life stage. For most taxpayers under ₹12.75L gross salary, the New Regime now delivers zero tax with no effort. For higher incomes with significant deductions, the Old Regime often wins. Calculate both every year before April, and remember: **marginal relief is your friend** — crossing a threshold by a small amount never costs you more than that extra income."
       }
     ]
-  }
+  },
+  {
+    slug: "marginal-relief-income-tax-guide",
+    status: "published",
+    metaTitle: "Marginal Relief on Income Tax: Complete Guide for ₹12L–₹5Cr Earners | AiTaxBot",
+    metaDescription: "What is marginal relief in income tax? How does it work at ₹12L, ₹50L, ₹1Cr, ₹2Cr and ₹5Cr thresholds? Detailed CA guide with worked examples, surcharge rates and tax-saving strategies.",
+    keywords: ["marginal relief income tax", "surcharge on income tax", "marginal relief 50 lakh", "marginal relief 12 lakh", "income tax surcharge thresholds", "tax planning high income", "marginal relief calculation"],
+    ogTitle: "Marginal Relief on Income Tax — Most Calculators Get This Wrong",
+    ogDescription: "If your income is ₹12.1 lakh, your tax is ₹10,400 — not ₹63,960. Here's how marginal relief works at every threshold, with CA-verified examples.",
+    tags: ["tax", "marginal relief", "surcharge", "high income", "CA tips"],
+    readingTimeMinutes: 14,
+    heroImage: "/images/marginal-relief-guide.jpg",
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Marginal Relief on Income Tax: Complete Guide for FY 2025-26",
+      "author": {"@type": "Person", "name": "AiTaxBot Editorial"},
+      "publisher": {"@type": "Organization", "name": "AiTaxBot"}
+    },
+    bodySections: [
+      {
+        type: "intro",
+        content_md: "Every year, thousands of Indian taxpayers make one of two costly mistakes: either they **avoid earning more** because they fear crossing a tax threshold, or they **overpay tax** because their accountant didn't apply marginal relief correctly. Both mistakes are preventable.\n\nMarginal relief is a safeguard built into Indian income tax law that ensures **your additional tax liability can never exceed your additional income** when you cross a key threshold. This guide explains exactly how it works — with precise calculations at every threshold — and what it means for your tax planning in FY 2025-26."
+      },
+      {
+        type: "h2",
+        title: "What is Marginal Relief? (The Simple Explanation)",
+        content_md: "Imagine you earn ₹12,00,000 taxable income in the new regime. Your tax is ₹60,000, which is fully cancelled by the Section 87A rebate. **Net tax = Zero.**\n\nNow imagine you earn ₹12,01,000 — just ₹1,000 more. Without any protection, you would suddenly owe ₹62,550 in tax (no rebate for income above ₹12L). That would mean earning ₹1,000 more costs you ₹62,550 in additional tax — a 6,255% marginal rate. Obviously absurd.\n\n**This is exactly what marginal relief prevents.**\n\nThe law states: when your income crosses a threshold, the **extra tax you pay cannot exceed the extra income you earned** over that threshold.\n\nSo at ₹12,01,000:\n- Extra income = ₹1,000\n- Extra tax (with marginal relief) = ₹1,000 + 4% cess = ₹1,040\n- NOT ₹62,550\n\n**Formula:** Tax = min(Tax without relief, Tax at threshold + excess income × (1 + cess rate))"
+      },
+      {
+        type: "h2",
+        title: "The Five Marginal Relief Thresholds in FY 2025-26",
+        content_md: "Marginal relief applies at every point where a cliff-edge tax event occurs:\n\n| Threshold | What Triggers | Without Relief | With Relief |\n|---|---|---|---|\n| ₹12 Lakh | Rebate (Section 87A) expires | Tax jumps from ₹0 to ₹60,000+ | Tax = only excess over ₹12L |\n| ₹50 Lakh | 10% surcharge applies | Tax jumps by ~10-11% of income tax | Tax increase ≤ extra income |\n| ₹1 Crore | 15% surcharge applies | Tax jumps by ~5% of income tax | Tax increase ≤ extra income |\n| ₹2 Crore | 25% surcharge applies | Tax jumps by ~10% of income tax | Tax increase ≤ extra income |\n| ₹5 Crore | 37% surcharge (old regime) | Significant jump | Tax increase ≤ extra income |\n\n*Note: Under the new regime, surcharge is capped at 25% even for income above ₹5 crore. The 37% surcharge applies only under the old regime.*"
+      },
+      {
+        type: "h3",
+        title: "Threshold 1: The ₹12 Lakh Rebate Cliff (New Regime)",
+        content_md: "**What happens:** The Section 87A / Section 156 rebate (up to ₹60,000) is available only if net taxable income ≤ ₹12 lakh. Cross this by ₹1, and the entire rebate disappears.\n\n**Marginal relief in action:**\n\n| Taxable Income | Tax (no relief) | Tax (with marginal relief) | Marginal relief saves |\n|---|---|---|---|\n| ₹12,00,000 | ₹0 (full rebate) | ₹0 | — |\n| ₹12,10,000 | ₹63,960 | ₹10,400 | ₹53,560 |\n| ₹12,25,000 | ₹66,300 | ₹26,000 | ₹40,300 |\n| ₹12,50,000 | ₹70,200 | ₹52,000 | ₹18,200 |\n| ₹12,70,000 | ₹73,320 | ₹72,800 | ₹520 |\n| ₹12,75,000 | ₹74,100 | ₹74,100 | ₹0 (relief exhausted) |\n\n**Marginal relief exhausts at approximately ₹12.7 lakh.** Above this, the regular tax computation is already lower than the relief cap, so normal rates apply fully.\n\n**The takeaway:** Do NOT fear earning ₹10,000–₹70,000 above ₹12 lakh. Your effective tax rate stays reasonable throughout this range due to marginal relief."
+      },
+      {
+        type: "h3",
+        title: "Threshold 2: The ₹50 Lakh Surcharge Cliff",
+        content_md: "When your total income crosses ₹50 lakh, a **10% surcharge** is levied on your income tax. This creates a significant jump that marginal relief addresses.\n\n**Example (New Regime, no special income):**\n\nAt ₹50,00,000 taxable income:\n- Income tax: ₹10,80,000 (on income above slabs)\n- Surcharge: Nil\n- Cess (4%): ₹43,200\n- **Total tax: ₹11,23,200**\n\nAt ₹50,10,000 taxable income (₹10,000 more):\n- Income tax: ₹10,83,000\n- Surcharge (10%): ₹1,08,300\n- Total without cess: ₹11,91,300\n- Cess (4%): ₹47,652\n- **Without relief: ₹12,38,952** (extra tax = ₹1,15,752 — on just ₹10,000 extra income!)\n- **With marginal relief: ₹11,23,200 + ₹10,400 = ₹11,33,600**\n\nMarginal relief saves ₹1,05,352 when income is just ₹10,000 over ₹50 lakh.\n\n**Important:** Marginal relief at the ₹50L threshold persists for a larger income band than the ₹12L threshold, due to the large tax quantum involved. As income rises further above ₹50L, the relief gradually diminishes until the surcharge-inclusive rate is less punishing than the relief cap."
+      },
+      {
+        type: "h3",
+        title: "Threshold 3: The ₹1 Crore Surcharge Cliff",
+        content_md: "At ₹1 crore, surcharge jumps from 10% to 15% — an additional 5 percentage points on top of existing surcharge.\n\n**At ₹1,00,00,000 taxable income (new regime):**\n- Income tax: ₹28,80,000 (approx)\n- Surcharge (10%): ₹2,88,000\n- Cess (4%): ₹1,26,720\n- **Total: ₹32,94,720**\n\n**At ₹1,00,10,000 taxable income (₹10,000 more):**\n- Income tax: ₹28,83,000\n- Surcharge (15%): ₹4,32,450\n- Without relief + cess: ₹34,53,588\n- Extra tax without relief: ₹1,58,868\n- **With marginal relief:** Extra tax = ₹10,400\n- **Total: ₹33,05,120**\n\nMarginal relief applies here too — you do not suddenly owe ₹1.58 lakh more tax just for earning ₹10,000 more.\n\n**Surcharge rates summary:**\n- ₹50L–₹1Cr: 10% surcharge\n- ₹1Cr–₹2Cr: 15% surcharge\n- ₹2Cr–₹5Cr: 25% surcharge\n- Above ₹5Cr: 37% (old regime) / 25% (new regime — capped)"
+      },
+      {
+        type: "h2",
+        title: "Does Marginal Relief Apply to Capital Gains?",
+        content_md: "**Important caveat:** Marginal relief works differently when your income includes special-rate incomes like capital gains.\n\n**LTCG (Long Term Capital Gains on equity):** Taxed at 12.5% above ₹1.25L. This income is **NOT eligible** for the Section 87A rebate, even if your total income is under ₹12 lakh.\n\n**STCG (Short Term Capital Gains on equity):** Taxed at 20%.\n\n**For surcharge purposes:** Capital gains are included in total income for determining which surcharge slab applies. However, the surcharge on LTCG/STCG is calculated separately from surcharge on normal income.\n\n**Practical implication:** If your salary is ₹11L and you have LTCG of ₹3L:\n- Normal income + LTCG = ₹14L total (over ₹12L)\n- No rebate available (includes capital gains)\n- Tax = salary tax + LTCG tax (at 12.5%)\n- Marginal relief may or may not apply depending on computation\n\n**Always use a proper calculator for mixed income scenarios.**"
+      },
+      {
+        type: "h2",
+        title: "Tax Planning Around Marginal Relief Thresholds",
+        content_md: "**Should you try to stay under a threshold?**\n\nBecause marginal relief protects you near thresholds, **there is usually no benefit in artificially restricting your income** to stay just under ₹12L, ₹50L, etc. The relief ensures you are no worse off than someone earning exactly at the threshold.\n\nHowever, **proactive tax planning before March 31** can help:\n\n**For the ₹12L threshold:**\n- Maximise employer NPS contribution (80CCD(2)) — available in new regime, reduces taxable income\n- Consider timing of variable pay / bonus\n- Check if voluntary NPS or other eligible deductions can bring taxable income under ₹12L\n\n**For the ₹50L threshold:**\n- Consider splitting income with spouse through legitimate means (salary, interest income on loans)\n- Invest in tax-free bonds for exempt interest income\n- Review timing of asset sales (defer to next FY if just over threshold)\n- Employer NPS contribution up to 14% of basic salary reduces total income\n\n**For the ₹1Cr+ thresholds:**\n- Restructure business income vs salary\n- HUF (Hindu Undivided Family) can hold separate assets and income\n- Charitable donations under 80G (old regime) can reduce taxable income\n- These thresholds require professional CA consultation for holistic planning\n\n**Warning:** Tax evasion (hiding income) is illegal. All the strategies above involve legitimate, disclosed tax planning within the law."
+      },
+      {
+        type: "cta",
+        content_md: "See exactly how marginal relief reduces your tax liability with the **AiTaxBot Income Tax Calculator** — one of the few free calculators that correctly applies marginal relief at all five thresholds.",
+        internal_links: [
+          {"label": "Income Tax Calculator (with Marginal Relief)", "href": "/calculators/income-tax"},
+          {"label": "New vs Old Regime Comparison", "href": "/blog/new-vs-old-tax-regime-2025"}
+        ]
+      },
+      {
+        type: "faq",
+        items: [
+          {"q": "What is marginal relief in income tax with an example?", "a": "Marginal relief ensures your extra tax does not exceed your extra income when you cross a threshold. Example: At ₹12 lakh taxable income, tax is zero (rebate). At ₹12.1 lakh, without relief tax would be ₹63,960 — but with marginal relief, tax is only ₹10,400 (= ₹10,000 extra income + 4% cess). Relief = ₹53,560."},
+          {"q": "Does marginal relief apply to surcharge?", "a": "Yes. Marginal relief applies at all surcharge thresholds: ₹50 lakh (10% surcharge), ₹1 crore (15%), ₹2 crore (25%), and ₹5 crore (37% under old regime / 25% under new regime). At each threshold, your additional tax due to surcharge cannot exceed the additional income earned over the threshold."},
+          {"q": "How is marginal relief calculated?", "a": "Marginal relief = Max(0, Tax at income Y − [Tax at threshold + (Y − threshold)]). In simpler terms: if your tax increase due to crossing a threshold is more than your extra income, relief = that excess amount. Your final tax = Tax at income Y − Marginal relief."},
+          {"q": "Does marginal relief apply to the old tax regime?", "a": "Yes, marginal relief applies to both Old and New tax regimes at surcharge thresholds (₹50L, ₹1Cr, ₹2Cr, ₹5Cr). The ₹12L rebate-based marginal relief is specific to the New Regime as the Old Regime has a different and smaller rebate (₹12,500 up to ₹5L income)."},
+          {"q": "Can I claim marginal relief myself in my ITR?", "a": "Yes. When filing your ITR, the tax computation should automatically apply marginal relief. If using ITR software or a CA, ensure marginal relief is reflected in the tax payable figure. AiTaxBot's calculator shows the relief applied so you know the correct advance tax and final tax liability."},
+          {"q": "Is it worth earning less to avoid the ₹50 lakh surcharge?", "a": "Generally no — because marginal relief protects you near the threshold. If your income is ₹51 lakh, your extra tax over the ₹50L case is just ₹10,400 (approximately), not ₹1.15 lakh. However, if you have a choice between ₹49.5L and ₹55L income (a large gap), the ₹55L will obviously result in higher tax, so plan accordingly."}
+        ]
+      },
+      {
+        type: "outro",
+        content_md: "Marginal relief is one of the most underutilised and misunderstood provisions in Indian income tax law. As a taxpayer, understanding it means you will never again lose sleep over earning slightly more than a threshold. As a tax professional, applying it correctly is simply good practice.\n\nThe key messages: crossing ₹12 lakh by a small amount costs you a small amount — not a fortune. Crossing ₹50 lakh by ₹10,000 costs you ₹10,400 — not ₹1.15 lakh. The law is designed to be fair, and marginal relief is how that fairness is enforced."
+      }
+    ]
+  },
 ];
 
 export function getBlogPost(slug: string): BlogPost | undefined {

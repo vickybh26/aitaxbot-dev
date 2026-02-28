@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -83,6 +84,12 @@ export default function AccountingDashboard() {
   }
 
   return (
+    <>
+      <Helmet>
+        <title>GST Accounting & Invoicing | AiTaxBot</title>
+        <meta name="description" content="Manage GST invoicing, sales register, purchase register and accounting for your business with AiTaxBot." />
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
     <div className="container mx-auto p-6">
       <div className="mb-8">
         <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
@@ -170,5 +177,6 @@ export default function AccountingDashboard() {
         </TabsContent>
       </Tabs>
     </div>
+    </>
   );
 }

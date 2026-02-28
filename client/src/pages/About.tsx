@@ -20,6 +20,7 @@ export default function About() {
         <meta property="og:description" content="Making taxes simple and accessible for all Indians. Free AI-powered calculators and financial tools." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://aitaxbot.in/about" />
+        <meta property="og:image" content="https://aitaxbot.in/images/aitaxbot-logo.png" />
       </Helmet>
       
       <div className="min-h-screen bg-white">
