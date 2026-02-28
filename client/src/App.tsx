@@ -13,7 +13,6 @@ import Login from "@/pages/Login";
 import Dashboard from "@/pages/Dashboard";
 import Blog from "@/pages/Blog";
 import BlogPost from "@/pages/BlogPost";
-import MarketData from "@/pages/MarketData";
 import AccountingDashboard from "@/pages/accounting/AccountingDashboard";
 import About from "@/pages/About";
 import Contact from "@/pages/Contact";
@@ -74,7 +73,6 @@ function Router() {
         </Route>
         <Route path="/blog" component={Blog} />
         <Route path="/blog/:slug" component={BlogPost} />
-        <Route path="/market-data" component={MarketData} />
         <Route path="/accounting" component={AccountingDashboard} />
         <Route path="/calculators" component={Calculators} />
         <Route path="/calculators/income-tax" component={IncomeTaxCalculator} />

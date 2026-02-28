@@ -201,13 +201,13 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                       <Calculator className="mr-2 h-5 w-5" />
                       Calculate Tax Now
                     </Button>
-                    <Button 
+                    <Button
                       variant="outline"
-                      onClick={() => window.location.href = "/market-data"}
+                      onClick={() => window.location.href = "/blog"}
                       className="border-2 border-persian-blue-600 text-persian-blue-600 hover:bg-persian-blue-600 hover:text-white px-6 py-5 rounded-xl"
                     >
-                      <BarChart3 className="mr-2 h-4 w-4" />
-                      Market Data
+                      <Newspaper className="mr-2 h-4 w-4" />
+                      Tax Guides
                     </Button>
                   </div>
                 </div>
@@ -455,8 +455,8 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                       <Newspaper className="h-5 w-5 text-blue-600" />
                       Market News
                     </h3>
-                    <a 
-                      href="/market-data" 
+                    <a
+                      href="/blog"
                       className="text-xs text-persian-blue-600 hover:underline flex items-center gap-1"
                     >
                       View All

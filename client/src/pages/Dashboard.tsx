@@ -6,7 +6,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { trackPageView } from "@/lib/analytics";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ResponsiveAd, LeaderboardAd } from "@/components/AdBanner";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Calculator, 
@@ -290,10 +289,10 @@ export default function Dashboard() {
       bgGradient: "from-green-500 to-green-600"
     },
     {
-      title: "Market Data",
-      description: "Real-time Indian stock market data and analytics",
+      title: "Tax Blog",
+      description: "Expert CA articles on tax planning and savings",
       icon: TrendingUp,
-      link: "/market-data",
+      link: "/blog",
       color: "text-purple-600",
       bgGradient: "from-purple-500 to-purple-600"
     },
@@ -402,10 +401,6 @@ export default function Dashboard() {
           ))}
         </div>
 
-        {/* Ad after Stats */}
-        <div className="mb-8 flex justify-center">
-          <ResponsiveAd />
-        </div>
 
         {/* Saved Tax Calculations */}
         <div className="mb-8">
@@ -586,10 +581,6 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        {/* Ad at Bottom of Dashboard */}
-        <div className="mt-8 flex justify-center">
-          <LeaderboardAd />
-        </div>
       </div>
     </div>
     </>

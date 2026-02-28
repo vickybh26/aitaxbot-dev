@@ -85,8 +85,8 @@ export default function NotFound() {
                   Income Tax Calculator
                 </Link>
                 {" "}or{" "}
-                <Link href="/market-data" className="text-blue-600 hover:underline font-medium">
-                  Live Market Data
+                <Link href="/blog" className="text-blue-600 hover:underline font-medium">
+                  Read our Blog
                 </Link>
               </p>
             </div>

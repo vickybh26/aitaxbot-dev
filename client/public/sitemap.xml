@@ -10,12 +10,6 @@
   
   <!-- Main Features -->
   <url>
-    <loc>https://aitaxbot.in/market-data</loc>
-    <lastmod>2026-02-04</lastmod>
-    <changefreq>hourly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
     <loc>https://aitaxbot.in/accounting</loc>
     <lastmod>2026-02-04</lastmod>
     <changefreq>weekly</changefreq>

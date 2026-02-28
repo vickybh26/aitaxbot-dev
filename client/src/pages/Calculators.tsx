@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import { trackPageView } from '@/lib/analytics';
 import { FAQSchema } from '@/components/faq-schema';
 import AuthorBox from '@/components/AuthorBox';
+import { ResponsiveAd } from '@/components/AdBanner';
 import {
   generateBreadcrumbSchema,
   generateOrganizationSchema
@@ -291,6 +292,11 @@ export default function Calculators() {
         <FAQSchema faqs={hubFAQs} />
 
         <AuthorBox />
+
+        {/* Ad Unit */}
+        <div className="max-w-6xl mx-auto px-6 py-4 flex justify-center">
+          <ResponsiveAd />
+        </div>
 
         <section className="py-16 px-6 bg-slate-50">
           <div className="max-w-4xl mx-auto text-center">

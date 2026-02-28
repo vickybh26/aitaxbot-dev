@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { FAQSchema } from '@/components/faq-schema';
 import AuthorBox from '@/components/AuthorBox';
+import { ResponsiveAd, RectangleAd } from '@/components/AdBanner';
 
 const pfFAQs = [
   {
@@ -1019,6 +1020,12 @@ export default function PFCalculatorPage() {
         <FAQSchema faqs={pfFAQs} />
 
         <AuthorBox />
+
+        {/* Ad Units */}
+        <div className="max-w-6xl mx-auto px-6 py-4 flex flex-col items-center gap-4">
+          <ResponsiveAd />
+          <RectangleAd />
+        </div>
 
         {/* Related Calculators - Topic Cluster */}
         <section className="py-12 px-6 bg-slate-50">

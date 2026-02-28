@@ -5,7 +5,7 @@ import { trackButtonClick } from "@/lib/analytics";
 import { useAuth } from "@/contexts/AuthContext";
 import { logout } from "@/lib/firebase";
 import logoImage from "@assets/aitaxbot-logo-lovable.png";
-import { Menu, X, Calculator, BarChart3, LogOut, User, LayoutDashboard } from "lucide-react";
+import { Menu, X, Calculator, LogOut, User, LayoutDashboard } from "lucide-react";
 
 interface HeaderProps {
   showModal?: (modalType: string) => void;
@@ -68,15 +68,6 @@ export default function Header({ showModal }: HeaderProps = {}) {
                 Dashboard
               </Link>
             )}
-            <Link 
-              href="/market-data"
-              onClick={() => trackButtonClick('Market Data', 'Header Navigation')}
-              className="text-slate-600 hover:text-slate-900 font-medium transition-colors flex items-center"
-              data-testid="link-header-market-data"
-            >
-              <BarChart3 className="w-4 h-4 mr-1" />
-              Market
-            </Link>
             <Link 
               href="/calculators"
               onClick={() => trackButtonClick('Calculators', 'Header Navigation')}
@@ -179,16 +170,6 @@ export default function Header({ showModal }: HeaderProps = {}) {
                   <LayoutDashboard className="w-4 h-4 mr-2" />Dashboard
                 </Link>
               )}
-              <Link 
-                href="/market-data"
-                onClick={() => {
-                  trackButtonClick('Market Data', 'Mobile Header');
-                  setMobileMenuOpen(false);
-                }}
-                className="block text-slate-600 hover:text-slate-900 font-medium py-2 flex items-center"
-              >
-                <BarChart3 className="w-4 h-4 mr-2" />Market Data
-              </Link>
               <Link 
                 href="/calculators"
                 onClick={() => {

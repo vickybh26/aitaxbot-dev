@@ -12,6 +12,7 @@ import {
 
 import { FAQSchema } from '@/components/faq-schema';
 import AuthorBox from '@/components/AuthorBox';
+import { ResponsiveAd, RectangleAd } from '@/components/AdBanner';
 
 const sipFAQs = [
   {
@@ -268,6 +269,12 @@ export default function SIPCalculatorPage() {
         <FAQSchema faqs={sipFAQs} />
 
         <AuthorBox />
+
+        {/* Ad Units */}
+        <div className="max-w-6xl mx-auto px-6 py-4 flex flex-col items-center gap-4">
+          <ResponsiveAd />
+          <RectangleAd />
+        </div>
 
         {/* Related Investment Calculators - Topic Cluster */}
         <section className="py-12 px-6 bg-slate-50">
