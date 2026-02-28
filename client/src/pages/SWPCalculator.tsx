@@ -44,14 +44,14 @@ export default function SWPCalculatorPage() {
   const calculatorSchema = generateCalculatorSchema({
     name: "SWP Calculator - Systematic Withdrawal Plan",
     description: "Free SWP Calculator to plan systematic withdrawals from mutual funds. Calculate how long your corpus will last with regular monthly withdrawals. Perfect for retirement planning.",
-    url: "https://aitaxbot.in/calculators/swp",
+    url: "https://aitaxbot.co.in/calculators/swp",
     applicationCategory: "FinanceApplication"
   });
 
   const breadcrumbSchema = generateBreadcrumbSchema([
-    { name: "Home", url: "https://aitaxbot.in/" },
-    { name: "Calculators", url: "https://aitaxbot.in/calculators" },
-    { name: "SWP Calculator", url: "https://aitaxbot.in/calculators/swp" }
+    { name: "Home", url: "https://aitaxbot.co.in/" },
+    { name: "Calculators", url: "https://aitaxbot.co.in/calculators" },
+    { name: "SWP Calculator", url: "https://aitaxbot.co.in/calculators/swp" }
   ]);
 
   const organizationSchema = generateOrganizationSchema();
@@ -62,11 +62,11 @@ export default function SWPCalculatorPage() {
         <title>SWP Calculator India FY 2025-26 - Retirement Planning | AiTaxBot</title>
         <meta name="description" content="Free SWP Calculator India for systematic withdrawals. See how long your corpus lasts with monthly withdrawals. Ideal for retirement income planning." />
         <meta name="keywords" content="SWP calculator, systematic withdrawal plan, retirement planning, mutual fund withdrawal, monthly income calculator, pension planning, corpus calculator India" />
-        <link rel="canonical" href="https://aitaxbot.in/calculators/swp" />
+        <link rel="canonical" href="https://aitaxbot.co.in/calculators/swp" />
         <meta property="og:title" content="SWP Calculator India FY 2025-26 - Retirement Planning | AiTaxBot" />
         <meta property="og:description" content="Free SWP Calculator India for systematic withdrawals. See how long your corpus lasts with monthly withdrawals. Retirement income planning." />
-        <meta property="og:url" content="https://aitaxbot.in/calculators/swp" />
-        <meta property="og:image" content="https://aitaxbot.in/images/aitaxbot-logo.png" />
+        <meta property="og:url" content="https://aitaxbot.co.in/calculators/swp" />
+        <meta property="og:image" content="https://aitaxbot.co.in/images/aitaxbot-logo.png" />
         <meta property="og:type" content="website" />
         
         <script type="application/ld+json">

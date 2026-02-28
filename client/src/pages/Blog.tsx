@@ -61,13 +61,13 @@ export default function Blog() {
         <title>Tax & Finance Blog - Investment Tips, Tax Updates</title>
         <meta name="description" content="Expert articles on Indian taxation, investments, SIP planning, crypto tax, GST filing, and financial strategies. Stay updated with latest tax news and money-saving tips." />
         <meta name="keywords" content="tax blog, investment articles, financial planning India, crypto tax, GST guide, SIP tips, tax saving strategies" />
-        <link rel="canonical" href="https://aitaxbot.in/blog" />
+        <link rel="canonical" href="https://aitaxbot.co.in/blog" />
         
         <meta property="og:title" content="AiTaxBot Blog - Tax & Investment Insights" />
         <meta property="og:description" content="Expert articles on taxation, investments, and financial planning for Indian taxpayers." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://aitaxbot.in/blog" />
-        <meta property="og:image" content="https://aitaxbot.in/images/aitaxbot-logo.png" />
+        <meta property="og:url" content="https://aitaxbot.co.in/blog" />
+        <meta property="og:image" content="https://aitaxbot.co.in/images/aitaxbot-logo.png" />
       </Helmet>
       
       <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">

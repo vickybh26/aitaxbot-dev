@@ -3,134 +3,134 @@
 
   <!-- Homepage -->
   <url>
-    <loc>https://aitaxbot.in/</loc>
-    <lastmod>2026-02-26</lastmod>
+    <loc>https://aitaxbot.co.in/</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
 
   <!-- Calculators Hub -->
   <url>
-    <loc>https://aitaxbot.in/calculators</loc>
-    <lastmod>2026-02-26</lastmod>
+    <loc>https://aitaxbot.co.in/calculators</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.95</priority>
   </url>
 
   <!-- Income Tax Calculator - Most Important Page -->
   <url>
-    <loc>https://aitaxbot.in/calculators/income-tax</loc>
-    <lastmod>2026-02-26</lastmod>
+    <loc>https://aitaxbot.co.in/calculators/income-tax</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.95</priority>
   </url>
 
   <!-- HRA Calculator -->
   <url>
-    <loc>https://aitaxbot.in/calculators/hra</loc>
-    <lastmod>2026-02-26</lastmod>
+    <loc>https://aitaxbot.co.in/calculators/hra</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
   </url>
 
   <!-- SIP Calculator -->
   <url>
-    <loc>https://aitaxbot.in/calculators/sip</loc>
-    <lastmod>2026-02-26</lastmod>
+    <loc>https://aitaxbot.co.in/calculators/sip</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
   </url>
 
   <!-- SWP Calculator -->
   <url>
-    <loc>https://aitaxbot.in/calculators/swp</loc>
-    <lastmod>2026-02-26</lastmod>
+    <loc>https://aitaxbot.co.in/calculators/swp</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.80</priority>
   </url>
 
   <!-- PF Calculator -->
   <url>
-    <loc>https://aitaxbot.in/calculators/pf</loc>
-    <lastmod>2026-02-26</lastmod>
+    <loc>https://aitaxbot.co.in/calculators/pf</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.80</priority>
   </url>
 
   <!-- Blog Listing -->
   <url>
-    <loc>https://aitaxbot.in/blog</loc>
-    <lastmod>2026-02-26</lastmod>
+    <loc>https://aitaxbot.co.in/blog</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.90</priority>
   </url>
 
   <!-- Market Data -->
   <url>
-    <loc>https://aitaxbot.in/market-data</loc>
-    <lastmod>2026-02-26</lastmod>
+    <loc>https://aitaxbot.co.in/market-data</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>hourly</changefreq>
     <priority>0.80</priority>
   </url>
 
   <!-- Accounting -->
   <url>
-    <loc>https://aitaxbot.in/accounting</loc>
-    <lastmod>2026-02-26</lastmod>
+    <loc>https://aitaxbot.co.in/accounting</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
   </url>
 
   <!-- About -->
   <url>
-    <loc>https://aitaxbot.in/about</loc>
-    <lastmod>2026-02-26</lastmod>
+    <loc>https://aitaxbot.co.in/about</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
 
   <!-- Contact -->
   <url>
-    <loc>https://aitaxbot.in/contact</loc>
-    <lastmod>2026-02-26</lastmod>
+    <loc>https://aitaxbot.co.in/contact</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.60</priority>
   </url>
 
   <!-- Policy Pages -->
   <url>
-    <loc>https://aitaxbot.in/privacy-policy</loc>
-    <lastmod>2026-02-26</lastmod>
+    <loc>https://aitaxbot.co.in/privacy-policy</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.50</priority>
   </url>
 
   <url>
-    <loc>https://aitaxbot.in/terms-of-service</loc>
-    <lastmod>2026-02-26</lastmod>
+    <loc>https://aitaxbot.co.in/terms-of-service</loc>
+    <lastmod>2026-02-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.50</priority>
   </url>
 
   <!-- Blog Posts -->
-  <url><loc>https://aitaxbot.in/blog/types-of-investments-in-india-beginners-guide</loc><lastmod>2026-02-26</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
-  <url><loc>https://aitaxbot.in/blog/best-investment-options-india-2025</loc><lastmod>2026-02-26</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
-  <url><loc>https://aitaxbot.in/blog/risk-profile-explained</loc><lastmod>2026-02-26</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
-  <url><loc>https://aitaxbot.in/blog/taxation-in-india-complete-guide</loc><lastmod>2026-02-26</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
-  <url><loc>https://aitaxbot.in/blog/cryptocurrency-investments-india-2025</loc><lastmod>2026-02-26</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
-  <url><loc>https://aitaxbot.in/blog/alternative-investments-gold-silver-beyond</loc><lastmod>2026-02-26</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
-  <url><loc>https://aitaxbot.in/blog/tax-saving-investments-80c-and-beyond</loc><lastmod>2026-02-26</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
-  <url><loc>https://aitaxbot.in/blog/mutual-funds-vs-stocks-which-is-better</loc><lastmod>2026-02-26</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
-  <url><loc>https://aitaxbot.in/blog/long-term-investing-power-of-compounding</loc><lastmod>2026-02-26</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
-  <url><loc>https://aitaxbot.in/blog/portfolio-rebalancing-guide</loc><lastmod>2026-02-26</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
-  <url><loc>https://aitaxbot.in/blog/sip-calculator-guide-mutual-fund-investments</loc><lastmod>2026-02-26</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
-  <url><loc>https://aitaxbot.in/blog/hra-exemption-metro-vs-non-metro</loc><lastmod>2026-02-26</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
-  <url><loc>https://aitaxbot.in/blog/elss-vs-ppf-vs-nps-tax-saving-comparison</loc><lastmod>2026-02-26</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
-  <url><loc>https://aitaxbot.in/blog/gst-filing-guide-small-businesses</loc><lastmod>2026-02-26</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
-  <url><loc>https://aitaxbot.in/blog/emergency-fund-planning-guide</loc><lastmod>2026-02-26</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
-  <url><loc>https://aitaxbot.in/blog/index-funds-vs-active-mutual-funds</loc><lastmod>2026-02-26</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
-  <url><loc>https://aitaxbot.in/blog/capital-gains-tax-stocks-mutual-funds</loc><lastmod>2026-02-26</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
-  <url><loc>https://aitaxbot.in/blog/retirement-planning-by-age</loc><lastmod>2026-02-26</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
-  <url><loc>https://aitaxbot.in/blog/new-vs-old-tax-regime-2025</loc><lastmod>2026-02-26</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://aitaxbot.co.in/blog/types-of-investments-in-india-beginners-guide</loc><lastmod>2026-02-28</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://aitaxbot.co.in/blog/best-investment-options-india-2025</loc><lastmod>2026-02-28</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://aitaxbot.co.in/blog/risk-profile-explained</loc><lastmod>2026-02-28</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://aitaxbot.co.in/blog/taxation-in-india-complete-guide</loc><lastmod>2026-02-28</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://aitaxbot.co.in/blog/cryptocurrency-investments-india-2025</loc><lastmod>2026-02-28</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://aitaxbot.co.in/blog/alternative-investments-gold-silver-beyond</loc><lastmod>2026-02-28</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://aitaxbot.co.in/blog/tax-saving-investments-80c-and-beyond</loc><lastmod>2026-02-28</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://aitaxbot.co.in/blog/mutual-funds-vs-stocks-which-is-better</loc><lastmod>2026-02-28</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://aitaxbot.co.in/blog/long-term-investing-power-of-compounding</loc><lastmod>2026-02-28</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://aitaxbot.co.in/blog/portfolio-rebalancing-guide</loc><lastmod>2026-02-28</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://aitaxbot.co.in/blog/sip-calculator-guide-mutual-fund-investments</loc><lastmod>2026-02-28</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://aitaxbot.co.in/blog/hra-exemption-metro-vs-non-metro</loc><lastmod>2026-02-28</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://aitaxbot.co.in/blog/elss-vs-ppf-vs-nps-tax-saving-comparison</loc><lastmod>2026-02-28</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://aitaxbot.co.in/blog/gst-filing-guide-small-businesses</loc><lastmod>2026-02-28</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://aitaxbot.co.in/blog/emergency-fund-planning-guide</loc><lastmod>2026-02-28</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://aitaxbot.co.in/blog/index-funds-vs-active-mutual-funds</loc><lastmod>2026-02-28</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://aitaxbot.co.in/blog/capital-gains-tax-stocks-mutual-funds</loc><lastmod>2026-02-28</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://aitaxbot.co.in/blog/retirement-planning-by-age</loc><lastmod>2026-02-28</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://aitaxbot.co.in/blog/new-vs-old-tax-regime-2025</loc><lastmod>2026-02-28</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
 
 </urlset>

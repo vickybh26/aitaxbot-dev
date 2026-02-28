@@ -43,7 +43,7 @@ export const blogPosts: BlogPost[] = [
       "headline": "Types of Investments in India: A Beginner's Guide to Smart Wealth Building",
       "author": {"@type": "Person", "name": "AI Tax Bot Editorial"},
       "publisher": {"@type": "Organization", "name": "AI Tax Bot"},
-      "mainEntityOfPage": "https://aitaxbot.in/blog/types-of-investments-in-india-beginners-guide"
+      "mainEntityOfPage": "https://aitaxbot.co.in/blog/types-of-investments-in-india-beginners-guide"
     },
     bodySections: [
       {
@@ -95,7 +95,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         type: "cta",
-        content_md: "**Next step:** Estimate your risk profile and compare after-tax returns with our free tools on **[aitaxbot.in](https://aitaxbot.in)**. Start with the Risk Profiler and Tax-Adjusted Return Calculator.",
+        content_md: "**Next step:** Estimate your risk profile and compare after-tax returns with our free tools on **[aitaxbot.co.in](https://aitaxbot.co.in)**. Start with the Risk Profiler and Tax-Adjusted Return Calculator.",
         internal_links: [
           {"label": "Income Tax Calculator", "href": "/tax-calculator"},
           {"label": "SIP Calculator", "href": "/calculators/sip"},

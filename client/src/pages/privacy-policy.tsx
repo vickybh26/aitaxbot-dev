@@ -14,8 +14,8 @@ export default function PrivacyPolicy() {
       <Helmet>
         <title>Privacy Policy - AiTaxBot</title>
         <meta name="description" content="AiTaxBot Privacy Policy - Learn how we collect, use, and protect your information, including cookie usage and Google AdSense data practices." />
-        <link rel="canonical" href="https://aitaxbot.in/privacy-policy" />
-        <meta property="og:image" content="https://aitaxbot.in/images/aitaxbot-logo.png" />
+        <link rel="canonical" href="https://aitaxbot.co.in/privacy-policy" />
+        <meta property="og:image" content="https://aitaxbot.co.in/images/aitaxbot-logo.png" />
         <meta property="og:type" content="website" />
       </Helmet>
       <Header />
@@ -215,7 +215,7 @@ export default function PrivacyPolicy() {
                 <li><strong>Right to Withdraw Consent:</strong> Withdraw consent for cookie usage at any time</li>
               </ul>
               <p className="text-gray-700 mt-4">
-                To exercise these rights, please contact us at <a href="mailto:info@aitaxbot.in" className="text-persian-blue-600 hover:underline">info@aitaxbot.in</a>.
+                To exercise these rights, please contact us at <a href="mailto:info@aitaxbot.co.in" className="text-persian-blue-600 hover:underline">info@aitaxbot.co.in</a>.
               </p>
             </section>
 
@@ -278,15 +278,15 @@ export default function PrivacyPolicy() {
               <div className="bg-gray-50 rounded-lg p-6">
                 <p className="text-gray-800 font-medium mb-2">📧 Email:</p>
                 <p className="mb-4">
-                  <a href="mailto:info@aitaxbot.in" className="text-persian-blue-600 hover:text-persian-blue-700 transition-colors text-lg" data-testid="link-contact-email">
-                    info@aitaxbot.in
+                  <a href="mailto:info@aitaxbot.co.in" className="text-persian-blue-600 hover:text-persian-blue-700 transition-colors text-lg" data-testid="link-contact-email">
+                    info@aitaxbot.co.in
                   </a>
                 </p>
                 
                 <p className="text-gray-800 font-medium mb-2">🌐 Website:</p>
                 <p className="mb-4">
-                  <a href="https://aitaxbot.in" className="text-persian-blue-600 hover:text-persian-blue-700 transition-colors" data-testid="link-website">
-                    aitaxbot.in
+                  <a href="https://aitaxbot.co.in" className="text-persian-blue-600 hover:text-persian-blue-700 transition-colors" data-testid="link-website">
+                    aitaxbot.co.in
                   </a>
                 </p>
                 

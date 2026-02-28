@@ -10,7 +10,7 @@ interface SEOHeadProps {
   noIndex?: boolean;
 }
 
-const BASE_URL = "https://aitaxbot.in";
+const BASE_URL = "https://aitaxbot.co.in";
 
 export function SEOHead({
   title,

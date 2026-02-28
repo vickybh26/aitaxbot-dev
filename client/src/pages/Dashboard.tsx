@@ -214,7 +214,7 @@ export default function Dashboard() {
     doc.setFontSize(8);
     doc.setTextColor(150);
     doc.text(`Generated on ${new Date().toLocaleDateString('en-IN')}`, 20, y);
-    doc.text('www.aitaxbot.in', pageWidth - 20, y, { align: 'right' });
+    doc.text('www.aitaxbot.co.in', pageWidth - 20, y, { align: 'right' });
 
     doc.save(`tax-calculation-fy-${calc.financialYear}.pdf`);
   };
@@ -340,7 +340,7 @@ export default function Dashboard() {
         <title>My Dashboard - AiTaxBot Personal Finance Hub</title>
         <meta name="description" content="Access your personal tax calculations, manage invoices, track clients, and view financial analytics. Comprehensive dashboard for Indian tax and financial management." />
         <meta name="keywords" content="tax dashboard, personal finance, invoice management, client tracking, tax analytics" />
-        <link rel="canonical" href="https://aitaxbot.in/dashboard" />
+        <link rel="canonical" href="https://aitaxbot.co.in/dashboard" />
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
       

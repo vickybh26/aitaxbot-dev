@@ -12,6 +12,7 @@ import {
 import { AlertCircle, Sparkles } from 'lucide-react';
 import { FAQSchema } from '@/components/faq-schema';
 import AuthorBox from '@/components/AuthorBox';
+import { ResponsiveAd, RectangleAd } from '@/components/AdBanner';
 
 const incomeTaxFAQs = [
   {
@@ -56,14 +57,14 @@ export default function IncomeTaxCalculatorPage() {
   const calculatorSchema = generateCalculatorSchema({
     name: "Income Tax Calculator FY 2025-26 (AY 2026-27)",
     description: "Free Income Tax Calculator for FY 2025-26 (AY 2026-27). Compare Old vs New tax regime, calculate Section 87A rebate and marginal relief.",
-    url: "https://aitaxbot.in/calculators/income-tax",
+    url: "https://aitaxbot.co.in/calculators/income-tax",
     applicationCategory: "FinanceApplication"
   });
 
   const breadcrumbSchema = generateBreadcrumbSchema([
-    { name: "Home", url: "https://aitaxbot.in/" },
-    { name: "Calculators", url: "https://aitaxbot.in/calculators" },
-    { name: "Income Tax Calculator", url: "https://aitaxbot.in/calculators/income-tax" }
+    { name: "Home", url: "https://aitaxbot.co.in/" },
+    { name: "Calculators", url: "https://aitaxbot.co.in/calculators" },
+    { name: "Income Tax Calculator", url: "https://aitaxbot.co.in/calculators/income-tax" }
   ]);
 
   const organizationSchema = generateOrganizationSchema();
@@ -74,10 +75,10 @@ export default function IncomeTaxCalculatorPage() {
         <title>Income Tax Calculator India FY 2025-26 (AY 2026-27) | AiTaxBot</title>
         <meta name="description" content="Free Income Tax Calculator for FY 2025-26 (AY 2026-27). Compare Old vs New regime, Section 87A rebate & marginal relief. Latest tax slabs & deductions." />
         <meta name="keywords" content="income tax calculator, tax calculator India, FY 2025-26, AY 2026-27, old vs new regime, section 87a rebate, marginal relief, tax calculation, income tax slab" />
-        <link rel="canonical" href="https://aitaxbot.in/calculators/income-tax" />
+        <link rel="canonical" href="https://aitaxbot.co.in/calculators/income-tax" />
         <meta property="og:title" content="Income Tax Calculator India FY 2025-26 (AY 2026-27) | AiTaxBot" />
         <meta property="og:description" content="Free Income Tax Calculator for FY 2025-26 (AY 2026-27). Compare Old vs New regime, Section 87A rebate & marginal relief." />
-        <meta property="og:url" content="https://aitaxbot.in/calculators/income-tax" />
+        <meta property="og:url" content="https://aitaxbot.co.in/calculators/income-tax" />
         <meta property="og:type" content="website" />
         
         <script type="application/ld+json">
@@ -445,7 +446,21 @@ export default function IncomeTaxCalculatorPage() {
 
         <FAQSchema faqs={incomeTaxFAQs} />
 
+        {/* Ad — between FAQ schema and author box */}
+        <section className="py-4 px-6 bg-white">
+          <div className="max-w-6xl mx-auto">
+            <ResponsiveAd />
+          </div>
+        </section>
+
         <AuthorBox />
+
+        {/* Ad — after author box, before related calculators */}
+        <section className="py-4 px-6 bg-slate-50">
+          <div className="max-w-6xl mx-auto flex justify-center">
+            <RectangleAd />
+          </div>
+        </section>
 
         {/* Related Tax Calculators - Topic Cluster */}
         <section className="py-12 px-6 bg-slate-50">

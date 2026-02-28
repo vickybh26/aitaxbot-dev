@@ -44,14 +44,14 @@ export default function SIPCalculatorPage() {
   const calculatorSchema = generateCalculatorSchema({
     name: "SIP Calculator - Systematic Investment Plan",
     description: "Free SIP Calculator to estimate mutual fund returns. Calculate your Systematic Investment Plan (SIP) returns with compounding for long-term wealth creation.",
-    url: "https://aitaxbot.in/calculators/sip",
+    url: "https://aitaxbot.co.in/calculators/sip",
     applicationCategory: "FinanceApplication"
   });
 
   const breadcrumbSchema = generateBreadcrumbSchema([
-    { name: "Home", url: "https://aitaxbot.in/" },
-    { name: "Calculators", url: "https://aitaxbot.in/calculators" },
-    { name: "SIP Calculator", url: "https://aitaxbot.in/calculators/sip" }
+    { name: "Home", url: "https://aitaxbot.co.in/" },
+    { name: "Calculators", url: "https://aitaxbot.co.in/calculators" },
+    { name: "SIP Calculator", url: "https://aitaxbot.co.in/calculators/sip" }
   ]);
 
   const organizationSchema = generateOrganizationSchema();
@@ -62,11 +62,11 @@ export default function SIPCalculatorPage() {
         <title>SIP Calculator India FY 2025-26 - Mutual Fund Returns | AiTaxBot</title>
         <meta name="description" content="Free SIP Calculator India. Calculate Systematic Investment Plan (SIP) mutual fund returns with compounding. Plan monthly investments for wealth creation." />
         <meta name="keywords" content="SIP calculator, systematic investment plan, mutual fund calculator, SIP returns, monthly investment, compound interest, wealth creation, investment planning India" />
-        <link rel="canonical" href="https://aitaxbot.in/calculators/sip" />
+        <link rel="canonical" href="https://aitaxbot.co.in/calculators/sip" />
         <meta property="og:title" content="SIP Calculator India FY 2025-26 - Mutual Fund Returns | AiTaxBot" />
         <meta property="og:description" content="Free SIP Calculator India. Calculate Systematic Investment Plan mutual fund returns with compounding for wealth creation." />
-        <meta property="og:url" content="https://aitaxbot.in/calculators/sip" />
-        <meta property="og:image" content="https://aitaxbot.in/images/aitaxbot-logo.png" />
+        <meta property="og:url" content="https://aitaxbot.co.in/calculators/sip" />
+        <meta property="og:image" content="https://aitaxbot.co.in/images/aitaxbot-logo.png" />
         <meta property="og:type" content="website" />
         
         <script type="application/ld+json">

@@ -14,13 +14,13 @@ export default function About() {
         <title>About Us - AiTaxBot Tax Calculator & Financial Tools</title>
         <meta name="description" content="Learn about AiTaxBot's mission to make tax calculation and financial planning easy for Indian taxpayers. AI-powered tools for income tax, SIP, SWP, and HRA calculations." />
         <meta name="keywords" content="about aitaxbot, tax calculator company, Indian tax tools, financial planning India" />
-        <link rel="canonical" href="https://aitaxbot.in/about" />
+        <link rel="canonical" href="https://aitaxbot.co.in/about" />
         
         <meta property="og:title" content="About AiTaxBot - Smart Tax Solutions for India" />
         <meta property="og:description" content="Making taxes simple and accessible for all Indians. Free AI-powered calculators and financial tools." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://aitaxbot.in/about" />
-        <meta property="og:image" content="https://aitaxbot.in/images/aitaxbot-logo.png" />
+        <meta property="og:url" content="https://aitaxbot.co.in/about" />
+        <meta property="og:image" content="https://aitaxbot.co.in/images/aitaxbot-logo.png" />
       </Helmet>
       
       <div className="min-h-screen bg-white">

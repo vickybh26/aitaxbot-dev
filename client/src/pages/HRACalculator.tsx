@@ -12,6 +12,7 @@ import {
 import { AlertCircle } from 'lucide-react';
 import { FAQSchema } from '@/components/faq-schema';
 import AuthorBox from '@/components/AuthorBox';
+import { ResponsiveAd, RectangleAd } from '@/components/AdBanner';
 
 const hraFAQs = [
   {
@@ -56,14 +57,14 @@ export default function HRACalculatorPage() {
   const calculatorSchema = generateCalculatorSchema({
     name: "HRA Calculator - House Rent Allowance Exemption",
     description: "Free HRA Calculator to compute House Rent Allowance tax exemption under Section 10(13A) for metro and non-metro cities in India.",
-    url: "https://aitaxbot.in/calculators/hra",
+    url: "https://aitaxbot.co.in/calculators/hra",
     applicationCategory: "FinanceApplication"
   });
 
   const breadcrumbSchema = generateBreadcrumbSchema([
-    { name: "Home", url: "https://aitaxbot.in/" },
-    { name: "Calculators", url: "https://aitaxbot.in/calculators" },
-    { name: "HRA Calculator", url: "https://aitaxbot.in/calculators/hra" }
+    { name: "Home", url: "https://aitaxbot.co.in/" },
+    { name: "Calculators", url: "https://aitaxbot.co.in/calculators" },
+    { name: "HRA Calculator", url: "https://aitaxbot.co.in/calculators/hra" }
   ]);
 
   const organizationSchema = generateOrganizationSchema();
@@ -74,10 +75,10 @@ export default function HRACalculatorPage() {
         <title>HRA Calculator India FY 2025-26 - Section 10(13A) | AiTaxBot</title>
         <meta name="description" content="Free HRA Calculator for FY 2025-26 (AY 2026-27). Compute House Rent Allowance exemption under Section 10(13A) for metro & non-metro cities in India." />
         <meta name="keywords" content="HRA calculator, house rent allowance, section 10 13a, HRA exemption, HRA deduction, metro HRA, non-metro HRA, rent calculator India" />
-        <link rel="canonical" href="https://aitaxbot.in/calculators/hra" />
+        <link rel="canonical" href="https://aitaxbot.co.in/calculators/hra" />
         <meta property="og:title" content="HRA Calculator India FY 2025-26 - Section 10(13A) | AiTaxBot" />
         <meta property="og:description" content="Free HRA Calculator FY 2025-26. Compute House Rent Allowance exemption under Section 10(13A) for metro & non-metro cities in India." />
-        <meta property="og:url" content="https://aitaxbot.in/calculators/hra" />
+        <meta property="og:url" content="https://aitaxbot.co.in/calculators/hra" />
         <meta property="og:type" content="website" />
         
         <script type="application/ld+json">
@@ -414,7 +415,21 @@ export default function HRACalculatorPage() {
 
         <FAQSchema faqs={hraFAQs} />
 
+        {/* Ad — between FAQ schema and author box */}
+        <section className="py-4 px-6 bg-white">
+          <div className="max-w-6xl mx-auto">
+            <ResponsiveAd />
+          </div>
+        </section>
+
         <AuthorBox />
+
+        {/* Ad — after author box */}
+        <section className="py-4 px-6 bg-slate-50">
+          <div className="max-w-6xl mx-auto flex justify-center">
+            <RectangleAd />
+          </div>
+        </section>
 
         {/* Related Tax Calculators - Topic Cluster */}
         <section className="py-12 px-6 bg-slate-50">

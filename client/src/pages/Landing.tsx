@@ -147,13 +147,13 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
         <title>AiTaxBot - Income Tax Calculator India FY 2025-26 | AY 2026-27</title>
         <meta name="description" content="AI tax calculator India AY 2026-27. Compare old vs new regime, ₹12L tax-free under Section 202. Free SIP, SWP, HRA, PF calculators. Live gold rates." />
         <meta name="keywords" content="income tax calculator, tax calculator India, AI tax calculator, new tax regime, old tax regime, SIP calculator, SWP calculator, HRA calculator, PF calculator, EPF calculator, provident fund, AY 2026-27, AY 2027-28, Income Tax Act 2025, gold rates, market news, commodity prices" />
-        <link rel="canonical" href="https://aitaxbot.in/" />
+        <link rel="canonical" href="https://aitaxbot.co.in/" />
         
         <meta property="og:title" content="AiTaxBot - Income Tax Calculator India FY 2025-26 | AY 2026-27" />
         <meta property="og:description" content="AI-powered income tax calculator with ₹12L tax-free limit. Live market news, gold/silver rates, and financial calculators. Income Tax Act, 2025 ready." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://aitaxbot.in/" />
-        <meta property="og:image" content="https://aitaxbot.in/images/aitaxbot-logo.png" />
+        <meta property="og:url" content="https://aitaxbot.co.in/" />
+        <meta property="og:image" content="https://aitaxbot.co.in/images/aitaxbot-logo.png" />
         
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="AiTaxBot - Income Tax Calculator India FY 2025-26 | AY 2026-27" />

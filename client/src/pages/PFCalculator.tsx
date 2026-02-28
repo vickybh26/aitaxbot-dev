@@ -47,14 +47,14 @@ export default function PFCalculatorPage() {
   const calculatorSchema = generateCalculatorSchema({
     name: "PF Calculator - EPF, VPF & PPF Contribution Calculator",
     description: "Free Provident Fund Calculator to estimate EPF, VPF and PPF contributions, employer split, interest growth and retirement corpus for Indian employees.",
-    url: "https://aitaxbot.in/calculators/pf",
+    url: "https://aitaxbot.co.in/calculators/pf",
     applicationCategory: "FinanceApplication"
   });
 
   const breadcrumbSchema = generateBreadcrumbSchema([
-    { name: "Home", url: "https://aitaxbot.in/" },
-    { name: "Calculators", url: "https://aitaxbot.in/calculators" },
-    { name: "PF Calculator", url: "https://aitaxbot.in/calculators/pf" }
+    { name: "Home", url: "https://aitaxbot.co.in/" },
+    { name: "Calculators", url: "https://aitaxbot.co.in/calculators" },
+    { name: "PF Calculator", url: "https://aitaxbot.co.in/calculators/pf" }
   ]);
 
   const organizationSchema = generateOrganizationSchema();
@@ -65,11 +65,11 @@ export default function PFCalculatorPage() {
         <title>PF Calculator India FY 2025-26 - EPF & PPF | AiTaxBot</title>
         <meta name="description" content="Free PF Calculator for FY 2025-26. Calculate EPF, VPF and PPF contributions with employer split breakdown, 8.25% interest growth, and retirement corpus projection." />
         <meta name="keywords" content="PF calculator, EPF calculator, provident fund calculator, PPF calculator, VPF calculator, EPF interest rate 2025-26, PF contribution, employer PF, employee PF, PF withdrawal rules" />
-        <link rel="canonical" href="https://aitaxbot.in/calculators/pf" />
+        <link rel="canonical" href="https://aitaxbot.co.in/calculators/pf" />
         <meta property="og:title" content="PF Calculator India FY 2025-26 - EPF & PPF | AiTaxBot" />
         <meta property="og:description" content="Free PF Calculator for EPF, VPF and PPF. Calculate employee-employer contribution split, interest growth, and retirement corpus." />
-        <meta property="og:url" content="https://aitaxbot.in/calculators/pf" />
-        <meta property="og:image" content="https://aitaxbot.in/images/aitaxbot-logo.png" />
+        <meta property="og:url" content="https://aitaxbot.co.in/calculators/pf" />
+        <meta property="og:image" content="https://aitaxbot.co.in/images/aitaxbot-logo.png" />
         <meta property="og:type" content="website" />
 
         <script type="application/ld+json">

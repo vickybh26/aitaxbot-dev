@@ -15,8 +15,8 @@ export default function TermsOfService() {
         <title>Terms of Service - AiTaxBot Usage Agreement</title>
         <meta name="description" content="AiTaxBot Terms of Service. Usage guidelines, disclaimers, and legal agreements for our tax calculators, financial tools, and services." />
         <meta name="keywords" content="terms of service, user agreement, aitaxbot terms, legal disclaimer" />
-        <link rel="canonical" href="https://aitaxbot.in/terms-of-service" />
-        <meta property="og:image" content="https://aitaxbot.in/images/aitaxbot-logo.png" />
+        <link rel="canonical" href="https://aitaxbot.co.in/terms-of-service" />
+        <meta property="og:image" content="https://aitaxbot.co.in/images/aitaxbot-logo.png" />
         <meta property="og:type" content="website" />
       </Helmet>
       
@@ -32,7 +32,7 @@ export default function TermsOfService() {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">Acceptance of Terms</h2>
               <p className="text-gray-700 mb-4">
-                By accessing and using AiTaxBot (aitaxbot.in), you accept and agree to be bound by the terms 
+                By accessing and using AiTaxBot (aitaxbot.co.in), you accept and agree to be bound by the terms 
                 and provision of this agreement.
               </p>
             </section>
@@ -161,8 +161,8 @@ export default function TermsOfService() {
                 For questions about these Terms of Service, contact us at:
               </p>
               <ul className="text-gray-700">
-                <li><strong>Email:</strong> info@aitaxbot.in</li>
-                <li><strong>Website:</strong> aitaxbot.in</li>
+                <li><strong>Email:</strong> info@aitaxbot.co.in</li>
+                <li><strong>Website:</strong> aitaxbot.co.in</li>
                 <li><strong>Business Hours:</strong> Monday-Friday, 9 AM - 6 PM IST</li>
               </ul>
             </section>

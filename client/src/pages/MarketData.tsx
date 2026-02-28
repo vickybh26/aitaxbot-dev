@@ -283,12 +283,12 @@ export default function MarketData() {
         <title>Stock Market Data India - Live NSE, BSE, Nifty Prices</title>
         <meta name="description" content="Real-time Indian stock data, NSE BSE indices, Nifty 50, top gainers/losers, gold/silver rates, market news. Track stocks & commodities." />
         <meta name="keywords" content="stock market India, NSE live, BSE prices, Nifty 50, Sensex, market data, gold rates, silver prices, top gainers, stock analysis" />
-        <link rel="canonical" href="https://aitaxbot.in/market-data" />
+        <link rel="canonical" href="https://aitaxbot.co.in/market-data" />
         
         <meta property="og:title" content="Live Indian Stock Market Data - NSE, BSE, Nifty" />
         <meta property="og:description" content="Track real-time stock prices, market indices, commodities, and get the latest financial news for Indian markets." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://aitaxbot.in/market-data" />
+        <meta property="og:url" content="https://aitaxbot.co.in/market-data" />
       </Helmet>
       
       <div className="container mx-auto px-4 py-8 max-w-7xl">

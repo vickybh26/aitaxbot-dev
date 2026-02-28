@@ -150,8 +150,8 @@ export default function Calculators() {
   }, []);
 
   const breadcrumbSchema = generateBreadcrumbSchema([
-    { name: "Home", url: "https://aitaxbot.in/" },
-    { name: "Financial Calculators", url: "https://aitaxbot.in/calculators" }
+    { name: "Home", url: "https://aitaxbot.co.in/" },
+    { name: "Financial Calculators", url: "https://aitaxbot.co.in/calculators" }
   ]);
 
   const organizationSchema = generateOrganizationSchema();
@@ -162,10 +162,10 @@ export default function Calculators() {
         <title>Free Tax & Financial Calculators India FY 2025-26 | AiTaxBot</title>
         <meta name="description" content="Free tax & financial calculators for India, updated for FY 2025-26 (AY 2026-27). Income Tax, HRA, SIP, SWP & PF calculators. Reviewed by Chartered Accountant." />
         <meta name="keywords" content="tax calculators india, income tax calculator, HRA calculator, SIP calculator, SWP calculator, PF calculator, EPF calculator, financial planning tools india, FY 2025-26" />
-        <link rel="canonical" href="https://aitaxbot.in/calculators" />
+        <link rel="canonical" href="https://aitaxbot.co.in/calculators" />
         <meta property="og:title" content="Free Tax & Financial Calculators India FY 2025-26 | AiTaxBot" />
         <meta property="og:description" content="Free tax & financial calculators for India. Income Tax, HRA, SIP, SWP & PF calculators updated for FY 2025-26. Reviewed by CA." />
-        <meta property="og:url" content="https://aitaxbot.in/calculators" />
+        <meta property="og:url" content="https://aitaxbot.co.in/calculators" />
         <meta property="og:type" content="website" />
 
         <script type="application/ld+json">

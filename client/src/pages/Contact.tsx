@@ -56,15 +56,15 @@ export default function Contact() {
     <>
       <Helmet>
         <title>Contact Us - AiTaxBot Support & Inquiries</title>
-        <meta name="description" content="Get in touch with AiTaxBot for tax calculator support, questions, or feedback. Email: info@aitaxbot.in | Phone: +91 78998 69036 | Bengaluru, India" />
+        <meta name="description" content="Get in touch with AiTaxBot for tax calculator support, questions, or feedback. Email: info@aitaxbot.co.in | Phone: +91 78998 69036 | Bengaluru, India" />
         <meta name="keywords" content="contact aitaxbot, tax calculator support, customer support India, tax help" />
-        <link rel="canonical" href="https://aitaxbot.in/contact" />
+        <link rel="canonical" href="https://aitaxbot.co.in/contact" />
         
         <meta property="og:title" content="Contact AiTaxBot - Tax Calculator Support" />
         <meta property="og:description" content="Reach out to our team for assistance with tax calculations and financial planning tools." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://aitaxbot.in/contact" />
-        <meta property="og:image" content="https://aitaxbot.in/images/aitaxbot-logo.png" />
+        <meta property="og:url" content="https://aitaxbot.co.in/contact" />
+        <meta property="og:image" content="https://aitaxbot.co.in/images/aitaxbot-logo.png" />
       </Helmet>
       
       <div className="min-h-screen bg-white">
@@ -88,11 +88,11 @@ export default function Contact() {
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">Email</h3>
                     <a 
-                      href="mailto:info@aitaxbot.in" 
+                      href="mailto:info@aitaxbot.co.in" 
                       className="text-persian-blue-600 hover:text-persian-blue-700 transition-colors"
                       data-testid="link-email"
                     >
-                      info@aitaxbot.in
+                      info@aitaxbot.co.in
                     </a>
                   </div>
                 </div>
