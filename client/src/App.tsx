@@ -24,6 +24,7 @@ import HRACalculator from "@/pages/HRACalculator";
 import SIPCalculator from "@/pages/SIPCalculator";
 import SWPCalculator from "@/pages/SWPCalculator";
 import PFCalculator from "@/pages/PFCalculator";
+import NPSCalculator from "@/pages/NPSCalculator";
 import NotFound from "@/pages/not-found";
 
 function ProtectedRoute({ component: Component }: { component: any }) {
@@ -80,6 +81,7 @@ function Router() {
         <Route path="/calculators/sip" component={SIPCalculator} />
         <Route path="/calculators/swp" component={SWPCalculator} />
         <Route path="/calculators/pf" component={PFCalculator} />
+        <Route path="/calculators/nps" component={NPSCalculator} />
         <Route path="/about" component={About} />
         <Route path="/contact" component={Contact} />
         <Route path="/privacy-policy" component={PrivacyPolicy} />

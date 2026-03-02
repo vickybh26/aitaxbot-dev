@@ -100,6 +100,19 @@ const investmentCalculators = [
       'Year-wise corpus growth table',
       'Early withdrawal tax guide'
     ]
+  },
+  {
+    title: 'NPS Calculator',
+    description: 'Calculate your National Pension System corpus, monthly pension and tax savings including the exclusive ₹50,000 extra deduction under Section 80CCD(1B).',
+    icon: TrendingUp,
+    link: '/calculators/nps',
+    color: 'violet',
+    features: [
+      'Section 80CCD(1B) +₹50,000 saving',
+      'Employer contribution (80CCD2)',
+      'Lump sum + monthly pension split',
+      'NPS vs PPF vs EPF comparison'
+    ]
   }
 ];
 
