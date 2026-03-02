@@ -11,8 +11,8 @@ export default function AuthorBox() {
           </div>
           <div>
             <p className="text-sm text-slate-500 mb-1">Prepared and reviewed by</p>
-            <p className="text-lg font-semibold text-slate-900">Vikrant Bhargav</p>
-            <p className="text-sm text-slate-600">Chartered Accountant (CA)</p>
+            <p className="text-lg font-semibold text-slate-900">AiTaxBot Expert Team</p>
+            <p className="text-sm text-slate-600">Chartered Accountants & Tax Professionals</p>
             <Link href="/about" className="text-sm text-persian-blue-600 hover:text-persian-blue-700 underline mt-1 inline-block">
               About the author
             </Link>

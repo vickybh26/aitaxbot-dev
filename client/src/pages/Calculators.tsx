@@ -24,7 +24,7 @@ const hubFAQs = [
   },
   {
     question: "Who reviews the calculator accuracy?",
-    answer: "All calculators are prepared and reviewed by Vikrant Bhargav, a Chartered Accountant (CA), to ensure compliance with Indian tax laws and financial regulations."
+    answer: "All calculators are prepared and reviewed by our team of Chartered Accountants (CAs) and tax professionals to ensure compliance with Indian tax laws and financial regulations."
   },
   {
     question: "Which calculator should I use first?",

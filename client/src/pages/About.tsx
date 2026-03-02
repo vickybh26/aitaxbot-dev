@@ -116,13 +116,13 @@ export default function About() {
               <div className="bg-persian-blue-50 rounded-lg p-8 border border-persian-blue-200">
                 <div className="flex items-start gap-6">
                   <div className="w-20 h-20 bg-persian-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-2xl font-bold text-persian-blue-600">VB</span>
+                    <span className="text-2xl font-bold text-persian-blue-600">CA</span>
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-1">Vikrant Bhargav</h3>
-                    <p className="text-persian-blue-700 font-semibold mb-3">Chartered Accountant (CA)</p>
+                    <h3 className="text-xl font-bold text-gray-900 mb-1">AiTaxBot Expert Team</h3>
+                    <p className="text-persian-blue-700 font-semibold mb-3">Chartered Accountants & Tax Professionals</p>
                     <p className="text-gray-700 leading-relaxed">
-                      Vikrant Bhargav is a qualified Chartered Accountant and the founder of AiTaxBot. With deep expertise in Indian taxation, financial planning, and regulatory compliance, Vikrant built AiTaxBot to help everyday taxpayers navigate India's complex tax system with confidence. Every calculator, tool, and article on this platform is personally reviewed and verified by him to ensure accuracy with the latest Income Tax Act provisions.
+                      AiTaxBot is built and maintained by a team of qualified Chartered Accountants and tax professionals with deep expertise in Indian taxation, financial planning, and regulatory compliance. Our mission is to help everyday taxpayers navigate India's complex tax system with confidence. Every calculator, tool, and article on this platform is reviewed and verified by our team to ensure accuracy with the latest Income Tax Act provisions.
                     </p>
                   </div>
                 </div>
