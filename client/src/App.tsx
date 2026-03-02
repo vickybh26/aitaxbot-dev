@@ -25,6 +25,11 @@ import SIPCalculator from "@/pages/SIPCalculator";
 import SWPCalculator from "@/pages/SWPCalculator";
 import PFCalculator from "@/pages/PFCalculator";
 import NPSCalculator from "@/pages/NPSCalculator";
+import NRICorner from "@/pages/NRICorner";
+import DTAACalculator from "@/pages/nri/DTAACalculator";
+import NRONREComparison from "@/pages/nri/NRONREComparison";
+import NRIIncomeTaxCalculator from "@/pages/nri/NRIIncomeTaxCalculator";
+import RepatriationPlanner from "@/pages/nri/RepatriationPlanner";
 import NotFound from "@/pages/not-found";
 
 function ProtectedRoute({ component: Component }: { component: any }) {
@@ -82,6 +87,11 @@ function Router() {
         <Route path="/calculators/swp" component={SWPCalculator} />
         <Route path="/calculators/pf" component={PFCalculator} />
         <Route path="/calculators/nps" component={NPSCalculator} />
+        <Route path="/nri" component={NRICorner} />
+        <Route path="/nri/dtaa-calculator" component={DTAACalculator} />
+        <Route path="/nri/nro-nre-comparison" component={NRONREComparison} />
+        <Route path="/nri/income-tax-calculator" component={NRIIncomeTaxCalculator} />
+        <Route path="/nri/repatriation-planner" component={RepatriationPlanner} />
         <Route path="/about" component={About} />
         <Route path="/contact" component={Contact} />
         <Route path="/privacy-policy" component={PrivacyPolicy} />

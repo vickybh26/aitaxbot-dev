@@ -5,7 +5,7 @@ import { trackButtonClick } from "@/lib/analytics";
 import { useAuth } from "@/contexts/AuthContext";
 import { logout } from "@/lib/firebase";
 import logoImage from "@assets/aitaxbot-logo-lovable.png";
-import { Menu, X, Calculator, LogOut, User, LayoutDashboard } from "lucide-react";
+import { Menu, X, Calculator, LogOut, User, LayoutDashboard, Globe } from "lucide-react";
 
 interface HeaderProps {
   showModal?: (modalType: string) => void;
@@ -77,7 +77,16 @@ export default function Header({ showModal }: HeaderProps = {}) {
               <Calculator className="w-4 h-4 mr-1" />
               Calculators
             </Link>
-            <Link 
+            <Link
+              href="/nri"
+              onClick={() => trackButtonClick('NRI Corner', 'Header Navigation')}
+              className="text-slate-600 hover:text-slate-900 font-medium transition-colors flex items-center"
+              data-testid="link-header-nri"
+            >
+              <Globe className="w-4 h-4 mr-1" />
+              NRI
+            </Link>
+            <Link
               href="/accounting"
               onClick={() => trackButtonClick('Accounting', 'Header Navigation')}
               className="text-slate-600 hover:text-slate-900 font-medium transition-colors"
@@ -180,7 +189,17 @@ export default function Header({ showModal }: HeaderProps = {}) {
               >
                 <Calculator className="w-4 h-4 mr-2" />Calculators
               </Link>
-              <Link 
+              <Link
+                href="/nri"
+                onClick={() => {
+                  trackButtonClick('NRI Corner', 'Mobile Header');
+                  setMobileMenuOpen(false);
+                }}
+                className="block text-slate-600 hover:text-slate-900 font-medium py-2 flex items-center"
+              >
+                <Globe className="w-4 h-4 mr-2" />NRI Corner
+              </Link>
+              <Link
                 href="/accounting"
                 onClick={() => {
                   trackButtonClick('Accounting', 'Mobile Header');
