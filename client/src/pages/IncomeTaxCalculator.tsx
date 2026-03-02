@@ -192,7 +192,7 @@ export default function IncomeTaxCalculatorPage() {
                   <li className="flex gap-2"><span className="text-blue-600 font-bold">✓</span> Rebate up to ₹60,000 (income ≤ ₹12L)</li>
                   <li className="flex gap-2"><span className="text-blue-600 font-bold">✓</span> Simple, fewer deduction claims</li>
                   <li className="flex gap-2"><span className="text-red-600 font-bold">✗</span> No HRA, home loan, 80C deductions</li>
-                  <li className="flex gap-2"><span className="text-red-600 font-bold">✗</span> Better only if income > ₹15L with few deductions</li>
+                  <li className="flex gap-2"><span className="text-red-600 font-bold">✗</span> Better only if income &gt; ₹15L with few deductions</li>
                 </ul>
               </div>
 
