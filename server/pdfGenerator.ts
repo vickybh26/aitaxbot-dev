@@ -28,11 +28,13 @@ interface SalaryBreakdown {
 interface Deductions {
   section80C?: number;
   section80D?: number;
-  section80G?: number;
   section80E?: number;
   section80TTA?: number;
-  nps80CCD1B?: number;
+  section80CCD1B?: number;  // NPS additional contribution
+  nps80CCD1B?: number;      // Legacy alias — kept for backward compat
+  section80G?: number;
   homeLoanInterest?: number;
+  lta?: number;
   otherDeductions?: number;
   totalDeductions: number;
 }
@@ -314,21 +316,46 @@ export function generateTaxComputationPDF(data: TaxComputationData): Promise<Buf
         y += 15;
       }
 
-      if (data.deductions.nps80CCD1B) {
-        doc.font("Helvetica").text("Section 80CCD(1B) (NPS)", leftCol + 15, y);
-        doc.text(formatNumber(data.deductions.nps80CCD1B), colAmount, y, { width: 80, align: "right" });
+      const npsAmount = data.deductions.section80CCD1B || data.deductions.nps80CCD1B;
+      if (npsAmount) {
+        doc.font("Helvetica").text("Section 80CCD(1B) (NPS – Additional)", leftCol + 15, y);
+        doc.text(formatNumber(npsAmount), colAmount, y, { width: 80, align: "right" });
         y += 15;
       }
 
       if (data.deductions.section80TTA) {
-        doc.font("Helvetica").text("Section 80TTA (Savings Interest)", leftCol + 15, y);
+        doc.font("Helvetica").text("Section 80TTA (Savings Bank Interest)", leftCol + 15, y);
         doc.text(formatNumber(data.deductions.section80TTA), colAmount, y, { width: 80, align: "right" });
+        y += 15;
+      }
+
+      if (data.deductions.section80E) {
+        doc.font("Helvetica").text("Section 80E (Education Loan Interest)", leftCol + 15, y);
+        doc.text(formatNumber(data.deductions.section80E), colAmount, y, { width: 80, align: "right" });
+        y += 15;
+      }
+
+      if (data.deductions.section80G) {
+        doc.font("Helvetica").text("Section 80G (Donations)", leftCol + 15, y);
+        doc.text(formatNumber(data.deductions.section80G), colAmount, y, { width: 80, align: "right" });
         y += 15;
       }
 
       if (data.deductions.homeLoanInterest) {
         doc.font("Helvetica").text("Section 24(b) (Home Loan Interest)", leftCol + 15, y);
         doc.text(formatNumber(data.deductions.homeLoanInterest), colAmount, y, { width: 80, align: "right" });
+        y += 15;
+      }
+
+      if (data.deductions.lta) {
+        doc.font("Helvetica").text("LTA – Leave Travel Allowance", leftCol + 15, y);
+        doc.text(formatNumber(data.deductions.lta), colAmount, y, { width: 80, align: "right" });
+        y += 15;
+      }
+
+      if (data.deductions.otherDeductions) {
+        doc.font("Helvetica").text("Other Deductions", leftCol + 15, y);
+        doc.text(formatNumber(data.deductions.otherDeductions), colAmount, y, { width: 80, align: "right" });
         y += 15;
       }
 

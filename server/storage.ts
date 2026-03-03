@@ -171,6 +171,23 @@ export class FirestoreStorage implements IStorage {
   async upsertUser(userData: UpsertUser): Promise<User> {
     const userId = userData.id || randomUUID();
     const docRef = this.db.collection('users').doc(userId);
+    const existingDoc = await docRef.get();
+
+    if (existingDoc.exists) {
+      // User already exists — only update fields managed by the auth provider.
+      // NEVER overwrite user-edited fields (firstName, lastName, mobile, gender,
+      // occupation, city, state, isProfileComplete) so profile edits are preserved.
+      const authUpdate: Partial<User> & { updatedAt: Date } = {
+        email: userData.email || existingDoc.data()!.email,
+        profileImageUrl: userData.profileImageUrl || existingDoc.data()!.profileImageUrl,
+        authProvider: (userData as any).authProvider || existingDoc.data()!.authProvider || 'google',
+        updatedAt: new Date(),
+      };
+      await docRef.update(authUpdate);
+      return { id: userId, ...existingDoc.data(), ...authUpdate } as User;
+    }
+
+    // New user — initialise all fields from the auth token payload.
     const user: User = {
       id: userId,
       email: userData.email || null,
@@ -183,11 +200,11 @@ export class FirestoreStorage implements IStorage {
       city: (userData as any).city || null,
       state: (userData as any).state || null,
       authProvider: (userData as any).authProvider || 'google',
-      isProfileComplete: (userData as any).isProfileComplete || false,
-      createdAt: userData.createdAt || new Date(),
+      isProfileComplete: false,
+      createdAt: new Date(),
       updatedAt: new Date(),
     };
-    await docRef.set(user, { merge: true });
+    await docRef.set(user);
     return user;
   }
 

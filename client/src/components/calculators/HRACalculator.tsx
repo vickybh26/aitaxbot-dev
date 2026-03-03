@@ -8,8 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { AlertTriangle, Calculator, FileText, Lightbulb, X } from 'lucide-react';
+import { AlertTriangle, Calculator, FileText, Lightbulb, Save, X } from 'lucide-react';
 import LoadingState from '@/components/ui/loading-state';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 
 interface HRACalculatorProps {
   onClose?: () => void;
@@ -40,6 +42,8 @@ interface AIRecommendation {
 }
 
 export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProps = {}) {
+  const { user, getIdToken } = useAuth();
+  const { toast } = useToast();
   const [basicSalary, setBasicSalary] = useState<number>(600000);
   const [hraReceived, setHraReceived] = useState<number>(240000);
   const [actualRentPaid, setActualRentPaid] = useState<number>(300000);
@@ -48,6 +52,7 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
   const [recommendations, setRecommendations] = useState<AIRecommendation[]>([]);
   const [activeTab, setActiveTab] = useState<string>("calculator");
   const [isCalculating, setIsCalculating] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
   const calculateHRA = async () => {
     setIsCalculating(true);
@@ -149,6 +154,45 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
     setResult(null);
     setRecommendations([]);
     setActiveTab("calculator");
+  };
+
+  const saveCalculation = async () => {
+    if (!result || !user) {
+      toast({ title: "Please log in to save calculations", variant: "destructive" });
+      return;
+    }
+    setIsSaving(true);
+    try {
+      const token = await getIdToken();
+      if (!token) throw new Error("No token");
+
+      const response = await fetch('/api/tax-calculations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          calculationType: 'hra',
+          assessmentYear: new Date().getFullYear() + '-' + (new Date().getFullYear() + 1),
+          inputData: { basicSalary, hraReceived, actualRentPaid, cityType },
+          oldRegimeResult: {
+            hraExemption: result.hraExemption,
+            taxableHRA: result.taxableHRA,
+            exemptionPercentage: result.exemptionPercentage,
+            breakdown: result.calculationBreakdown,
+          },
+        }),
+      });
+
+      if (!response.ok) throw new Error('Save failed');
+
+      toast({ title: "HRA calculation saved!", description: "Your calculation has been saved to your account." });
+    } catch {
+      toast({ title: "Failed to save calculation", variant: "destructive" });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -329,8 +373,8 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
                         <Progress value={result.exemptionPercentage} className="h-2" />
                       </div>
                       
-                      {onApplyHRA && (
-                        <div className="mt-4">
+                      <div className={`mt-4 ${onApplyHRA ? 'grid grid-cols-1 sm:grid-cols-2 gap-3' : ''}`}>
+                        {onApplyHRA && (
                           <Button
                             onClick={() => onApplyHRA(result.hraExemption)}
                             className="w-full bg-green-600 hover:bg-green-700 text-white font-medium"
@@ -338,8 +382,24 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
                           >
                             Apply HRA Exemption to Tax Calculator
                           </Button>
-                        </div>
-                      )}
+                        )}
+                        <Button
+                          onClick={saveCalculation}
+                          disabled={isSaving || !user}
+                          variant="outline"
+                          className="w-full border-persian-blue-400 text-persian-blue-600 hover:bg-persian-blue-50"
+                          data-testid="button-save-hra-calculation"
+                        >
+                          {isSaving ? (
+                            <LoadingState message="Saving..." />
+                          ) : (
+                            <>
+                              <Save className="w-4 h-4 mr-2" />
+                              Save Calculation
+                            </>
+                          )}
+                        </Button>
+                      </div>
                     </CardContent>
                   </Card>
 

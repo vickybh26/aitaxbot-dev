@@ -87,6 +87,12 @@ export default function TaxCalculator({ onClose }: TaxCalculatorProps = {}) {
     otherIncome: '',
     section80C: '',
     section80D: '',
+    section80E: '',
+    section80TTA: '',
+    section80CCD1B: '',
+    section80G: '',
+    homeLoanInterest: '',
+    lta: '',
     hraReceived: '',
     rentPaid: '',
     isMetroCity: false,
@@ -211,13 +217,22 @@ export default function TaxCalculator({ onClose }: TaxCalculatorProps = {}) {
 
     // Total deductions
     let totalDeductions = 0;
-    const section80C = parseFloat(formData.section80C) || 0;
+    const section80C = Math.min(parseFloat(formData.section80C) || 0, 150000);
     const section80D = parseFloat(formData.section80D) || 0;
+    const section80E = parseFloat(formData.section80E) || 0;  // No upper cap
+    const section80TTA = Math.min(parseFloat(formData.section80TTA) || 0, 10000); // Savings interest cap ₹10k
+    const section80CCD1B = Math.min(parseFloat(formData.section80CCD1B) || 0, 50000); // NPS extra cap ₹50k
+    const section80G = parseFloat(formData.section80G) || 0;  // Donations (qualifying amounts)
+    const homeLoanInterest = Math.min(parseFloat(formData.homeLoanInterest) || 0, 200000); // Sec 24(b) cap ₹2L
+    const lta = parseFloat(formData.lta) || 0;  // LTA exemption under old regime
     const otherDeductions = parseFloat(formData.otherDeductions) || 0;
 
     if (regime === 'old') {
-      totalDeductions = section80C + section80D + hraExemption + otherDeductions + standardDeduction;
+      totalDeductions = section80C + section80D + section80E + section80TTA +
+        section80CCD1B + section80G + homeLoanInterest + lta +
+        hraExemption + otherDeductions + standardDeduction;
     } else {
+      // New regime: only standard deduction (₹75,000) applies
       totalDeductions = standardDeduction;
     }
 
@@ -366,6 +381,12 @@ export default function TaxCalculator({ onClose }: TaxCalculatorProps = {}) {
         totalIncome: oldRegimeResult.grossIncome,
         section80C: parseFloat(formData.section80C) || 0,
         section80D: parseFloat(formData.section80D) || 0,
+        section80E: parseFloat(formData.section80E) || 0,
+        section80TTA: parseFloat(formData.section80TTA) || 0,
+        section80CCD1B: parseFloat(formData.section80CCD1B) || 0,
+        section80G: parseFloat(formData.section80G) || 0,
+        homeLoanInterest: parseFloat(formData.homeLoanInterest) || 0,
+        lta: parseFloat(formData.lta) || 0,
         hraReceived: parseFloat(formData.hraReceived) || 0,
         rentPaid: parseFloat(formData.rentPaid) || 0,
         isMetroCity: formData.isMetroCity,
@@ -393,6 +414,12 @@ export default function TaxCalculator({ onClose }: TaxCalculatorProps = {}) {
       otherIncome: '',
       section80C: '',
       section80D: '',
+      section80E: '',
+      section80TTA: '',
+      section80CCD1B: '',
+      section80G: '',
+      homeLoanInterest: '',
+      lta: '',
       hraReceived: '',
       rentPaid: '',
       isMetroCity: false,
@@ -488,10 +515,11 @@ export default function TaxCalculator({ onClose }: TaxCalculatorProps = {}) {
 
       const computationData = {
         personalInfo: {
-          name: user?.displayName || 'Taxpayer',
-          pan: '',
+          name: user?.displayName || `${userProfile?.firstName || ''} ${userProfile?.lastName || ''}`.trim() || 'Taxpayer',
+          pan: '',  // PAN not stored in profile yet — placeholder for future doc upload
           status: 'Individual',
           ageGroup: formData.ageGroup,
+          residencyStatus: 'Resident',
         },
         assessmentYear,
         financialYear: formData.financialYear,
@@ -516,9 +544,21 @@ export default function TaxCalculator({ onClose }: TaxCalculatorProps = {}) {
         deductions: selectedRegime === 'old' ? {
           section80C: parseFloat(formData.section80C) || 0,
           section80D: parseFloat(formData.section80D) || 0,
+          section80E: parseFloat(formData.section80E) || 0,
+          section80TTA: parseFloat(formData.section80TTA) || 0,
+          section80CCD1B: parseFloat(formData.section80CCD1B) || 0,
+          section80G: parseFloat(formData.section80G) || 0,
+          homeLoanInterest: parseFloat(formData.homeLoanInterest) || 0,
+          lta: parseFloat(formData.lta) || 0,
           otherDeductions: parseFloat(formData.otherDeductions) || 0,
-          totalDeductions: (parseFloat(formData.section80C) || 0) + 
-                           (parseFloat(formData.section80D) || 0) + 
+          totalDeductions: (parseFloat(formData.section80C) || 0) +
+                           (parseFloat(formData.section80D) || 0) +
+                           (parseFloat(formData.section80E) || 0) +
+                           (parseFloat(formData.section80TTA) || 0) +
+                           (parseFloat(formData.section80CCD1B) || 0) +
+                           (parseFloat(formData.section80G) || 0) +
+                           (parseFloat(formData.homeLoanInterest) || 0) +
+                           (parseFloat(formData.lta) || 0) +
                            (parseFloat(formData.otherDeductions) || 0),
         } : undefined,
         taxBreakdown: {
@@ -870,6 +910,78 @@ export default function TaxCalculator({ onClose }: TaxCalculatorProps = {}) {
                       value={formData.section80D}
                       onChange={(e) => updateFormData('section80D', e.target.value)}
                       data-testid="input-section-80d"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="section-80e">Section 80E (Student Loan Interest)</Label>
+                    <Input
+                      id="section-80e"
+                      type="number"
+                      placeholder="No upper limit"
+                      value={formData.section80E}
+                      onChange={(e) => updateFormData('section80E', e.target.value)}
+                      data-testid="input-section-80e"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="section-80tta">Section 80TTA (Savings Bank Interest, max ₹10,000)</Label>
+                    <Input
+                      id="section-80tta"
+                      type="number"
+                      placeholder="Max ₹10,000"
+                      value={formData.section80TTA}
+                      onChange={(e) => updateFormData('section80TTA', e.target.value)}
+                      data-testid="input-section-80tta"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="section-80ccd1b">Section 80CCD(1B) – NPS (max ₹50,000)</Label>
+                    <Input
+                      id="section-80ccd1b"
+                      type="number"
+                      placeholder="Max ₹50,000"
+                      value={formData.section80CCD1B}
+                      onChange={(e) => updateFormData('section80CCD1B', e.target.value)}
+                      data-testid="input-section-80ccd1b"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="section-80g">Section 80G (Donations)</Label>
+                    <Input
+                      id="section-80g"
+                      type="number"
+                      placeholder="Eligible donation amount"
+                      value={formData.section80G}
+                      onChange={(e) => updateFormData('section80G', e.target.value)}
+                      data-testid="input-section-80g"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="home-loan-interest">Section 24(b) – Home Loan Interest (max ₹2,00,000)</Label>
+                    <Input
+                      id="home-loan-interest"
+                      type="number"
+                      placeholder="Max ₹2,00,000"
+                      value={formData.homeLoanInterest}
+                      onChange={(e) => updateFormData('homeLoanInterest', e.target.value)}
+                      data-testid="input-home-loan-interest"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="lta">LTA – Leave Travel Allowance (Old Regime)</Label>
+                    <Input
+                      id="lta"
+                      type="number"
+                      placeholder="Actual LTA claimed"
+                      value={formData.lta}
+                      onChange={(e) => updateFormData('lta', e.target.value)}
+                      data-testid="input-lta"
                     />
                   </div>
 
