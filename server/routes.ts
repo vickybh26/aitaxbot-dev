@@ -381,17 +381,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const { firstName, lastName, mobile, gender, occupation, city, state } = req.body;
-      
-      const updatedUser = await storage.updateUser(decodedToken.uid, {
-        firstName,
-        lastName,
-        mobile,
-        gender,
-        occupation,
-        city,
-        state,
-        isProfileComplete: !!(firstName && lastName && mobile)
-      });
+
+      // Build update object — strip undefined values because Firestore rejects them
+      const profileUpdate: Record<string, any> = {};
+      if (firstName !== undefined) profileUpdate.firstName = firstName;
+      if (lastName !== undefined) profileUpdate.lastName = lastName;
+      if (mobile !== undefined) profileUpdate.mobile = mobile;
+      if (gender !== undefined) profileUpdate.gender = gender;
+      if (occupation !== undefined) profileUpdate.occupation = occupation;
+      if (city !== undefined) profileUpdate.city = city;
+      if (state !== undefined) profileUpdate.state = state;
+      profileUpdate.isProfileComplete = !!(firstName && lastName && mobile);
+
+      const updatedUser = await storage.updateUser(decodedToken.uid, profileUpdate as any);
       
       res.json(updatedUser);
     } catch (error) {
