@@ -19,6 +19,19 @@ import { getFirestore, verifyFirebaseToken, admin } from "./firebase";
 const router = Router();
 
 // ─────────────────────────────────────────────
+// Simple in-memory cache (avoids re-scanning Firestore on every admin page load)
+// ─────────────────────────────────────────────
+const cache = new Map<string, { data: any; expiresAt: number }>();
+function getCache<T>(key: string): T | null {
+  const entry = cache.get(key);
+  if (!entry || Date.now() > entry.expiresAt) return null;
+  return entry.data as T;
+}
+function setCache(key: string, data: any, ttlMs: number) {
+  cache.set(key, { data, expiresAt: Date.now() + ttlMs });
+}
+
+// ─────────────────────────────────────────────
 // Middleware — verify Firebase token + admin level
 // ─────────────────────────────────────────────
 
@@ -70,59 +83,52 @@ router.get("/me", adminL3, async (req: any, res) => {
 
 router.get("/stats", adminL3, async (req: any, res) => {
   try {
+    // Cache stats for 5 minutes — avoids re-running 6 Firestore queries on every dashboard load
+    const cached = getCache<object>("admin:stats");
+    if (cached) return res.json(cached);
+
     const db = getFirestore();
-
-    // Total registered users
-    const usersSnap = await db.collection("users").count().get();
-    const totalUsers = usersSnap.data().count;
-
-    // New users in last 7 days
-    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    const newUsersSnap = await db
-      .collection("users")
-      .where("createdAt", ">=", sevenDaysAgo)
-      .count()
-      .get();
-    const newUsersWeek = newUsersSnap.data().count;
-
-    // New users in last 30 days
+    const sevenDaysAgo  = new Date(Date.now() -  7 * 24 * 60 * 60 * 1000);
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-    const newUsersMonthSnap = await db
-      .collection("users")
-      .where("createdAt", ">=", thirtyDaysAgo)
-      .count()
-      .get();
-    const newUsersMonth = newUsersMonthSnap.data().count;
 
-    // Total calculation count
-    const counterDoc = await db.collection("counters").doc("taxCalculations").get();
-    const totalCalculations = counterDoc.exists ? (counterDoc.data()?.count ?? 0) : 0;
+    // Run all count queries in parallel — each uses Firestore count aggregation (no doc reads)
+    const [
+      usersSnap,
+      newUsersWeekSnap,
+      newUsersMonthSnap,
+      completedSnap,
+      counterDoc,
+      trendSnap,
+    ] = await Promise.all([
+      db.collection("users").count().get(),
+      db.collection("users").where("createdAt", ">=", sevenDaysAgo).count().get(),
+      db.collection("users").where("createdAt", ">=", thirtyDaysAgo).count().get(),
+      db.collection("users").where("isProfileComplete", "==", true).count().get(),
+      db.collection("counters").doc("taxCalculations").get(),
+      // Fetch only createdAt field for trend — minimises bytes transferred
+      db.collection("users")
+        .where("createdAt", ">=", thirtyDaysAgo)
+        .orderBy("createdAt", "asc")
+        .select("createdAt")
+        .get(),
+    ]);
 
-    // Profile completion rate
-    const completeSnap = await db
-      .collection("users")
-      .where("isProfileComplete", "==", true)
-      .count()
-      .get();
-    const completedProfiles = completeSnap.data().count;
-    const profileCompletionRate =
-      totalUsers > 0 ? Math.round((completedProfiles / totalUsers) * 100) : 0;
+    const totalUsers         = usersSnap.data().count;
+    const newUsersWeek       = newUsersWeekSnap.data().count;
+    const newUsersMonth      = newUsersMonthSnap.data().count;
+    const completedProfiles  = completedSnap.data().count;
+    const totalCalculations  = counterDoc.exists ? (counterDoc.data()?.count ?? 0) : 0;
+    const profileCompletionRate = totalUsers > 0
+      ? Math.round((completedProfiles / totalUsers) * 100) : 0;
 
-    // Signups per day for last 30 days (for trend chart)
-    const thirtyDaysUsers = await db
-      .collection("users")
-      .where("createdAt", ">=", thirtyDaysAgo)
-      .orderBy("createdAt", "asc")
-      .get();
-
+    // Build 30-day trend
     const signupsByDay: Record<string, number> = {};
-    thirtyDaysUsers.docs.forEach((doc) => {
-      const createdAt = doc.data().createdAt?.toDate?.() ?? new Date(doc.data().createdAt);
+    trendSnap.docs.forEach((doc) => {
+      const raw = doc.data().createdAt;
+      const createdAt = raw?.toDate?.() ?? new Date(raw);
       const dateKey = createdAt.toISOString().split("T")[0];
       signupsByDay[dateKey] = (signupsByDay[dateKey] ?? 0) + 1;
     });
-
-    // Fill in missing days with 0
     const signupTrend = [];
     for (let i = 29; i >= 0; i--) {
       const d = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
@@ -130,15 +136,12 @@ router.get("/stats", adminL3, async (req: any, res) => {
       signupTrend.push({ date: dateKey, signups: signupsByDay[dateKey] ?? 0 });
     }
 
-    res.json({
-      totalUsers,
-      newUsersWeek,
-      newUsersMonth,
-      totalCalculations,
-      completedProfiles,
-      profileCompletionRate,
-      signupTrend,
-    });
+    const result = {
+      totalUsers, newUsersWeek, newUsersMonth, totalCalculations,
+      completedProfiles, profileCompletionRate, signupTrend,
+    };
+    setCache("admin:stats", result, 5 * 60 * 1000); // 5 min TTL
+    res.json(result);
   } catch (err) {
     console.error("[Admin] Stats error:", err);
     res.status(500).json({ error: "Failed to fetch stats" });
@@ -151,8 +154,17 @@ router.get("/stats", adminL3, async (req: any, res) => {
 
 router.get("/analytics", adminL3, async (req: any, res) => {
   try {
+    // Cache for 1 hour — analytics don't need to be real-time
+    const cached = getCache<object>("admin:analytics");
+    if (cached) return res.json(cached);
+
     const db = getFirestore();
-    const usersSnap = await db.collection("users").get();
+
+    // Only fetch the 3 fields we need — dramatically reduces bytes read from Firestore
+    const usersSnap = await db
+      .collection("users")
+      .select("occupation", "state", "authProvider")
+      .get();
 
     const occupationCount: Record<string, number> = {};
     const stateCount: Record<string, number> = {};
@@ -160,11 +172,11 @@ router.get("/analytics", adminL3, async (req: any, res) => {
 
     usersSnap.docs.forEach((doc) => {
       const d = doc.data();
-      const occ = d.occupation || "Not specified";
-      const state = d.state || "Not specified";
-      const provider = d.authProvider || "email";
-      occupationCount[occ] = (occupationCount[occ] ?? 0) + 1;
-      stateCount[state] = (stateCount[state] ?? 0) + 1;
+      const occ      = d.occupation  || "Not specified";
+      const state    = d.state       || "Not specified";
+      const provider = d.authProvider || "google";
+      occupationCount[occ]   = (occupationCount[occ]   ?? 0) + 1;
+      stateCount[state]       = (stateCount[state]       ?? 0) + 1;
       providerCount[provider] = (providerCount[provider] ?? 0) + 1;
     });
 
@@ -174,11 +186,13 @@ router.get("/analytics", adminL3, async (req: any, res) => {
         .sort((a, b) => b.value - a.value)
         .slice(0, 10);
 
-    res.json({
-      occupation: toChartArr(occupationCount),
-      states: toChartArr(stateCount),
+    const result = {
+      occupation:    toChartArr(occupationCount),
+      states:        toChartArr(stateCount),
       authProviders: toChartArr(providerCount),
-    });
+    };
+    setCache("admin:analytics", result, 60 * 60 * 1000); // 1 hr TTL
+    res.json(result);
   } catch (err) {
     console.error("[Admin] Analytics error:", err);
     res.status(500).json({ error: "Failed to fetch analytics" });
@@ -373,7 +387,11 @@ router.delete("/users/:id/notes/:noteId", adminL1, async (req: any, res) => {
 router.get("/export/users", adminL2, async (req: any, res) => {
   try {
     const db = getFirestore();
-    const snap = await db.collection("users").orderBy("createdAt", "desc").get();
+    // Only fetch fields written to the CSV — avoids loading profileImageUrl, large fields, etc.
+    const snap = await db.collection("users")
+      .orderBy("createdAt", "desc")
+      .select("email","firstName","lastName","mobile","gender","occupation","city","state","authProvider","isProfileComplete","tags","createdAt")
+      .get();
     const users = snap.docs.map((d) => ({ id: d.id, ...d.data() } as any));
 
     const header = [
@@ -422,23 +440,11 @@ router.get("/export/users", adminL2, async (req: any, res) => {
 // GET /api/admin/tags — list of all unique tags in use
 // ─────────────────────────────────────────────
 
-router.get("/tags", adminL3, async (req: any, res) => {
-  try {
-    const db = getFirestore();
-    const snap = await db.collection("users").where("tags", "!=", []).get();
-    const tagSet = new Set<string>();
-    snap.docs.forEach((d) => {
-      const tags = d.data().tags ?? [];
-      tags.forEach((t: string) => tagSet.add(t));
-    });
-    // Always include default tag suggestions
-    const defaults = ["High Value", "Lead", "CA Client", "Follow Up", "VIP", "Inactive", "Referred"];
-    defaults.forEach((t) => tagSet.add(t));
-    res.json({ tags: Array.from(tagSet).sort() });
-  } catch (err) {
-    console.error("[Admin] Tags error:", err);
-    res.status(500).json({ error: "Failed to fetch tags" });
-  }
+router.get("/tags", adminL3, async (_req: any, res) => {
+  // Tags are a fixed predefined set — no Firestore scan needed.
+  // Custom tags added to users are surfaced in the users list directly.
+  const defaults = ["High Value", "Lead", "CA Client", "Follow Up", "VIP", "Inactive", "Referred"];
+  res.json({ tags: defaults.sort() });
 });
 
 export default router;

@@ -20,53 +20,36 @@ const router = express.Router();
 router.get("/dashboard/stats", authenticateFirebaseToken, async (req: AuthenticatedRequest, res) => {
   try {
     const userId = req.userId!;
-    
-    // Get counts
+
+    // Step 1: fetch firms (single query)
     const firms = await storage.getFirms(userId);
-    const firmsCount = firms.length;
-    
-    // Get all invoices across all firms
-    let totalInvoices = 0;
+    const firmIds = firms.map((f) => f.id);
+
+    // Step 2: fetch invoices + clients for ALL firms in parallel (batch, not serial loop)
+    const [allInvoicesArrays, allClientsArrays, taxProfiles] = await Promise.all([
+      Promise.all(firmIds.map((id) => storage.getInvoices(id))),
+      Promise.all(firmIds.map((id) => storage.getClients(id))),
+      storage.getUserTaxProfiles(userId).catch(() => []),
+    ]);
+
+    const allInvoices = allInvoicesArrays.flat();
+    const totalClients = allClientsArrays.flat().length;
+
     let totalRevenue = 0;
     let paidInvoices = 0;
-    
-    for (const firm of firms) {
-      const invoices = await storage.getInvoices(firm.id);
-      totalInvoices += invoices.length;
-      
-      for (const invoice of invoices) {
-        totalRevenue += parseFloat(invoice.grandTotal || "0");
-        if (invoice.paymentStatus === "paid") {
-          paidInvoices++;
-        }
-      }
+    for (const inv of allInvoices) {
+      totalRevenue += parseFloat((inv.grandTotal as string) || "0");
+      if (inv.paymentStatus === "paid") paidInvoices++;
     }
-    
-    // Get all clients across all firms
-    let totalClients = 0;
-    for (const firm of firms) {
-      const clients = await storage.getClients(firm.id);
-      totalClients += clients.length;
-    }
-    
-    // Get tax profiles count (tax calculations done)
-    let taxCalculations = 0;
-    try {
-      const taxProfiles = await storage.getUserTaxProfiles(userId);
-      taxCalculations = taxProfiles.length;
-    } catch (error: any) {
-      // Index might not exist yet, ignore gracefully
-      console.log("Tax profiles query needs index, defaulting to 0");
-    }
-    
+
     res.json({
-      firmsCount,
-      invoicesCount: totalInvoices,
+      firmsCount: firms.length,
+      invoicesCount: allInvoices.length,
       clientsCount: totalClients,
       totalRevenue: totalRevenue.toFixed(2),
       paidInvoices,
-      unpaidInvoices: totalInvoices - paidInvoices,
-      taxCalculations
+      unpaidInvoices: allInvoices.length - paidInvoices,
+      taxCalculations: taxProfiles.length,
     });
   } catch (error: any) {
     console.error("Error fetching dashboard stats:", error);
@@ -78,49 +61,51 @@ router.get("/dashboard/stats", authenticateFirebaseToken, async (req: Authentica
 router.get("/dashboard/activities", authenticateFirebaseToken, async (req: AuthenticatedRequest, res) => {
   try {
     const userId = req.userId!;
-    const activities: any[] = [];
-    
-    // Get user's firms
+
+    // Step 1: firms (1 query)
     const firms = await storage.getFirms(userId);
-    
-    // Get recent invoices (limit to 10 most recent)
-    const recentInvoices: any[] = [];
-    for (const firm of firms) {
-      const invoices = await storage.getInvoices(firm.id);
-      for (const invoice of invoices) {
-        const client = await storage.getClient(invoice.clientId);
-        recentInvoices.push({
-          ...invoice,
-          firmName: firm.firmName,
-          clientName: client?.clientName || "Unknown Client"
-        });
-      }
-    }
-    
-    // Sort by date and take most recent
-    recentInvoices.sort((a, b) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    const firmMap = new Map(firms.map((f) => [f.id, f]));
+
+    // Step 2: all invoices for all firms in parallel (N queries → 1 per firm, all at once)
+    const invoiceArrays = await Promise.all(firms.map((f) => storage.getInvoices(f.id)));
+    const allInvoices = invoiceArrays.flat();
+
+    // Step 3: sort & take top 10 invoices before fetching clients
+    allInvoices.sort((a, b) =>
+      new Date(b.createdAt as string).getTime() - new Date(a.createdAt as string).getTime()
     );
-    
-    // Add invoice activities
-    for (const invoice of recentInvoices.slice(0, 5)) {
+    const topInvoices = allInvoices.slice(0, 10);
+
+    // Step 4: fetch only the unique clients we actually need (de-duplicated batch)
+    const uniqueClientIds = [...new Set(topInvoices.map((i) => i.clientId).filter(Boolean))];
+    const clientDocs = await Promise.all(uniqueClientIds.map((id) => storage.getClient(id as string)));
+    const clientMap = new Map(
+      clientDocs.filter(Boolean).map((c) => [c!.id, c!])
+    );
+
+    // Build activity list
+    const activities: any[] = [];
+
+    for (const invoice of topInvoices.slice(0, 5)) {
+      const client = clientMap.get(invoice.clientId as string);
+      const firm   = firmMap.get(invoice.firmId);
       activities.push({
         type: "invoice",
         title: `Generated Invoice ${invoice.invoiceNumber}`,
-        description: `Client: ${invoice.clientName} - Amount: ₹${parseFloat(invoice.grandTotal || "0").toLocaleString('en-IN')}`,
+        description: `Client: ${client?.clientName ?? "Unknown"} — ₹${parseFloat((invoice.grandTotal as string) || "0").toLocaleString("en-IN")}`,
         time: invoice.createdAt || new Date(),
         icon: "FileText",
-        color: "text-green-600"
+        color: "text-green-600",
+        firmName: firm?.firmName,
       });
     }
-    
-    // Add firm creation activities
-    const recentFirms = [...firms].sort((a, b) => {
-      const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-      const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-      return timeB - timeA;
-    }).slice(0, 3);
-    
+
+    const recentFirms = [...firms]
+      .sort((a, b) =>
+        new Date(b.createdAt as string).getTime() - new Date(a.createdAt as string).getTime()
+      )
+      .slice(0, 3);
+
     for (const firm of recentFirms) {
       activities.push({
         type: "firm",
@@ -128,17 +113,14 @@ router.get("/dashboard/activities", authenticateFirebaseToken, async (req: Authe
         description: firm.gstin ? `GSTIN: ${firm.gstin}` : "Firm registration",
         time: firm.createdAt || new Date(),
         icon: "Building2",
-        color: "text-orange-600"
+        color: "text-orange-600",
       });
     }
-    
-    // Sort all activities by time
-    activities.sort((a, b) => {
-      const timeA = a.time ? new Date(a.time).getTime() : 0;
-      const timeB = b.time ? new Date(b.time).getTime() : 0;
-      return timeB - timeA;
-    });
-    
+
+    activities.sort((a, b) =>
+      new Date(b.time).getTime() - new Date(a.time).getTime()
+    );
+
     res.json(activities.slice(0, 10));
   } catch (error: any) {
     console.error("Error fetching dashboard activities:", error);
