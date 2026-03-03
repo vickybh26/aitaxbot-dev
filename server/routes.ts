@@ -11,6 +11,7 @@ import { getFirestore, verifyFirebaseToken } from "./firebase";
 import { TransactionalEmailsApi, TransactionalEmailsApiApiKeys } from '@getbrevo/brevo';
 import { seedTaxRates, getTaxSlabsForCalculation } from "./seedTaxRates";
 import { generateTaxComputationPDF, savePDFToStorage, type TaxComputationData } from "./pdfGenerator";
+import { geminiTaxService, type TaxAdviceInput } from "./geminiTaxService";
 
 // Configure multer for Firebase Storage uploads (store in memory)
 const upload = multer({
@@ -238,6 +239,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // ==========================================
+  // AI TAX ADVISOR API
+  // ==========================================
+
+  // POST /api/ai/tax-advice — Gemini-powered personalized tips after calculation
+  app.post("/api/ai/tax-advice", async (req, res) => {
+    try {
+      const input: TaxAdviceInput = req.body;
+      if (!input || typeof input.totalIncome !== 'number') {
+        return res.status(400).json({ error: "Invalid input" });
+      }
+      const advice = await geminiTaxService.getTaxAdvice(input);
+      res.json(advice);
+    } catch (error) {
+      console.error("Error getting AI tax advice:", error);
+      res.status(500).json({ error: "Failed to generate tax advice" });
+    }
+  });
+
+  // POST /api/ai/dashboard-insights — Short AI insights for the dashboard
+  app.post("/api/ai/dashboard-insights", async (req, res) => {
+    try {
+      const insights = await geminiTaxService.getDashboardInsights(req.body);
+      res.json({ insights });
+    } catch (error) {
+      console.error("Error getting dashboard insights:", error);
+      res.status(500).json({ error: "Failed to generate insights" });
+    }
+  });
+
   // ==========================================
   // USER PROFILE API
   // ==========================================

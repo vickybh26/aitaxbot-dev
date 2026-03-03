@@ -12,10 +12,24 @@ import { LoadingState } from '@/components/ui/loading-state';
 import Modal from '@/components/ui/modal';
 import { formatCurrency } from '@/lib/utils';
 import { LastUpdated } from '@/components/ui/last-updated';
-import { Download, Save, Loader2 } from 'lucide-react';
+import { Download, Save, Loader2, Sparkles, TrendingDown, AlertTriangle, Info } from 'lucide-react';
 import jsPDF from 'jspdf';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+
+interface AiTip {
+  title: string;
+  detail: string;
+  potentialSaving?: number;
+  section?: string;
+  priority: 'high' | 'medium' | 'low';
+}
+interface AiAdvice {
+  tips: AiTip[];
+  savingsScore: number;
+  maxPossibleSaving: number;
+  summary: string;
+}
 
 // Types for tax calculation
 interface TaxBreakdown {
@@ -58,8 +72,10 @@ export default function TaxCalculator({ onClose }: TaxCalculatorProps = {}) {
   const [isCalculating, setIsCalculating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [result, setResult] = useState<BothRegimesResult | null>(null);
-  
-  const { user, getIdToken } = useAuth();
+  const [aiAdvice, setAiAdvice] = useState<AiAdvice | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+
+  const { user, userProfile, getIdToken } = useAuth();
   const { toast } = useToast();
   
   // Form state
@@ -332,6 +348,39 @@ export default function TaxCalculator({ onClose }: TaxCalculatorProps = {}) {
     setResult(bothRegimesResult);
     setActiveTab('results');
     setIsCalculating(false);
+
+    // Fetch AI advice asynchronously (non-blocking)
+    setAiAdvice(null);
+    setAiLoading(true);
+    fetch('/api/ai/tax-advice', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        occupation: userProfile?.occupation || '',
+        ageGroup: formData.ageGroup,
+        salaryIncome: parseFloat(formData.salaryIncome) || 0,
+        housePropertyIncome: parseFloat(formData.housePropertyIncome) || 0,
+        businessIncome: parseFloat(formData.businessIncome) || 0,
+        capitalGainsIncome: parseFloat(formData.capitalGainsIncome) || 0,
+        otherIncome: parseFloat(formData.otherIncome) || 0,
+        totalIncome: oldRegimeResult.grossIncome,
+        section80C: parseFloat(formData.section80C) || 0,
+        section80D: parseFloat(formData.section80D) || 0,
+        hraReceived: parseFloat(formData.hraReceived) || 0,
+        rentPaid: parseFloat(formData.rentPaid) || 0,
+        isMetroCity: formData.isMetroCity,
+        otherDeductions: parseFloat(formData.otherDeductions) || 0,
+        oldRegimeTax: oldRegimeResult.totalTax,
+        newRegimeTax: newRegimeResult.totalTax,
+        recommendedRegime,
+        taxSavings: savings,
+        financialYear: formData.financialYear,
+      })
+    })
+      .then(r => r.json())
+      .then(data => setAiAdvice(data))
+      .catch(() => setAiAdvice(null))
+      .finally(() => setAiLoading(false));
   };
 
   const resetCalculator = () => {
@@ -1112,6 +1161,94 @@ export default function TaxCalculator({ onClose }: TaxCalculatorProps = {}) {
             <div className="text-center py-12">
               <i className="fas fa-chart-pie text-4xl text-neutral-300 mb-4"></i>
               <p className="text-readable-light">Complete the calculation to see detailed results</p>
+            </div>
+          )}
+
+          {/* ── AI TAX ADVISOR PANEL ── */}
+          {result && (
+            <div className="mt-6">
+              {aiLoading ? (
+                <Card className="p-5 border-2 border-purple-100 bg-gradient-to-r from-purple-50 to-indigo-50">
+                  <div className="flex items-center gap-3 text-purple-700">
+                    <Sparkles className="w-5 h-5 animate-pulse" />
+                    <span className="font-semibold">AI Tax Advisor is analysing your profile…</span>
+                    <Loader2 className="w-4 h-4 animate-spin ml-auto" />
+                  </div>
+                </Card>
+              ) : aiAdvice && aiAdvice.tips?.length > 0 ? (
+                <Card className="p-5 border-2 border-purple-100 bg-gradient-to-br from-purple-50 to-indigo-50">
+                  {/* Header */}
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <div className="bg-purple-600 rounded-lg p-1.5">
+                        <Sparkles className="w-4 h-4 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-purple-900 text-sm">AI Tax Advisor</h3>
+                        <p className="text-purple-600 text-xs">Powered by Gemini AI • Personalised for you</p>
+                      </div>
+                    </div>
+                    {aiAdvice.maxPossibleSaving > 0 && (
+                      <div className="text-right">
+                        <div className="text-xs text-purple-600">Potential extra savings</div>
+                        <div className="text-lg font-bold text-green-600">₹{aiAdvice.maxPossibleSaving.toLocaleString('en-IN')}</div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Summary */}
+                  <div className="bg-white/70 rounded-lg p-3 mb-4 border border-purple-100">
+                    <p className="text-sm text-slate-700 italic">"{aiAdvice.summary}"</p>
+                  </div>
+
+                  {/* Savings score */}
+                  <div className="mb-4">
+                    <div className="flex justify-between text-xs text-purple-700 mb-1">
+                      <span>Tax Optimisation Score</span>
+                      <span className="font-bold">{aiAdvice.savingsScore}/100</span>
+                    </div>
+                    <div className="h-2 bg-purple-100 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all duration-700 ${aiAdvice.savingsScore >= 80 ? 'bg-green-500' : aiAdvice.savingsScore >= 50 ? 'bg-amber-500' : 'bg-red-500'}`}
+                        style={{ width: `${aiAdvice.savingsScore}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Tips */}
+                  <div className="space-y-3">
+                    {aiAdvice.tips.map((tip, i) => (
+                      <div key={i} className={`bg-white rounded-lg p-3 border ${tip.priority === 'high' ? 'border-red-200' : tip.priority === 'medium' ? 'border-amber-200' : 'border-gray-200'}`}>
+                        <div className="flex items-start gap-2">
+                          <div className="mt-0.5 shrink-0">
+                            {tip.priority === 'high' ? <AlertTriangle className="w-4 h-4 text-red-500" /> :
+                             tip.priority === 'medium' ? <TrendingDown className="w-4 h-4 text-amber-500" /> :
+                             <Info className="w-4 h-4 text-blue-500" />}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between gap-2 flex-wrap">
+                              <p className="text-sm font-semibold text-slate-800">{tip.title}</p>
+                              <div className="flex items-center gap-1.5 shrink-0">
+                                {tip.section && (
+                                  <span className="text-xs bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded font-medium">{tip.section}</span>
+                                )}
+                                {tip.potentialSaving && tip.potentialSaving > 0 && (
+                                  <span className="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-bold">Save ₹{tip.potentialSaving.toLocaleString('en-IN')}</span>
+                                )}
+                              </div>
+                            </div>
+                            <p className="text-xs text-slate-600 mt-1 leading-relaxed">{tip.detail}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <p className="text-xs text-purple-500 mt-3 text-center">
+                    💡 Complete your profile for more personalised AI recommendations
+                  </p>
+                </Card>
+              ) : null}
             </div>
           )}
         </TabsContent>
