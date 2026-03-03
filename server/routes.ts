@@ -356,9 +356,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const user = await storage.getUser(decodedToken.uid);
       if (!user) {
-        return res.status(404).json({ error: "User not found" });
+        // User not in Firestore yet (race condition on first login) —
+        // return a minimal profile built from the Firebase Auth token
+        const nameParts = (decodedToken.name || "").split(" ");
+        return res.json({
+          id: decodedToken.uid,
+          email: decodedToken.email || "",
+          firstName: nameParts[0] || "",
+          lastName: nameParts.slice(1).join(" ") || "",
+          profileImageUrl: decodedToken.picture || null,
+          mobile: "",
+          occupation: "",
+          city: "",
+          state: "",
+          isProfileComplete: false,
+          authProvider: "google",
+          tags: [],
+          createdAt: new Date().toISOString(),
+        });
       }
-      
+
       res.json(user);
     } catch (error) {
       console.error("Error getting user profile:", error);

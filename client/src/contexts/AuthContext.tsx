@@ -58,25 +58,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const token = await firebaseUser.getIdToken();
 
-      // Check if this is an admin account first
-      const adminRes = await fetch('/api/admin/me', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (adminRes.ok) {
-        const adminData = await adminRes.json();
-        setAdminLevel(adminData.level);
-        // Admin accounts do NOT sync to users collection
-        return;
-      }
+      // Check admin status — runs in parallel with profile sync, doesn't block it
+      fetch('/api/admin/me', { headers: { 'Authorization': `Bearer ${token}` } })
+        .then(r => r.ok ? r.json() : null)
+        .then(data => setAdminLevel(data ? data.level : null))
+        .catch(() => setAdminLevel(null));
 
-      setAdminLevel(null);
-
-      // Sync user to Firestore (creates on first login, updates on subsequent)
+      // Always sync user profile (admins are also users — they have a profile too)
       await fetch('/api/user/sync', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      // Fetch full profile
       const res = await fetch('/api/user/profile', {
         headers: { 'Authorization': `Bearer ${token}` }
       });

@@ -5,7 +5,7 @@ import { trackButtonClick } from "@/lib/analytics";
 import { useAuth } from "@/contexts/AuthContext";
 import { logout } from "@/lib/firebase";
 import logoImage from "@assets/aitaxbot-logo-lovable.png";
-import { Menu, X, Calculator, LogOut, User, LayoutDashboard, Globe } from "lucide-react";
+import { Menu, X, Calculator, LogOut, User, LayoutDashboard, Globe, Shield } from "lucide-react";
 
 interface HeaderProps {
   showModal?: (modalType: string) => void;
@@ -13,7 +13,7 @@ interface HeaderProps {
 
 export default function Header({ showModal }: HeaderProps = {}) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, adminLevel } = useAuth();
   const [currentPath] = useLocation();
   
   const getLoginUrl = () => {
@@ -136,6 +136,16 @@ export default function Header({ showModal }: HeaderProps = {}) {
                   <User className="w-4 h-4 mr-1" />
                   Profile
                 </Link>
+                {adminLevel !== null && (
+                  <Link
+                    href="/admin"
+                    className="text-indigo-600 hover:text-indigo-800 font-medium transition-colors flex items-center"
+                    data-testid="link-header-admin"
+                  >
+                    <Shield className="w-4 h-4 mr-1" />
+                    Admin
+                  </Link>
+                )}
                 <Button
                   onClick={handleLogout}
                   variant="ghost"
@@ -193,6 +203,15 @@ export default function Header({ showModal }: HeaderProps = {}) {
                   >
                     <User className="w-4 h-4 mr-2" />My Profile
                   </Link>
+                  {adminLevel !== null && (
+                    <Link
+                      href="/admin"
+                      onClick={() => { setMobileMenuOpen(false); }}
+                      className="block text-indigo-600 hover:text-indigo-800 font-medium py-2 flex items-center"
+                    >
+                      <Shield className="w-4 h-4 mr-2" />Admin Panel
+                    </Link>
+                  )}
                 </>
               )}
               <Link 
