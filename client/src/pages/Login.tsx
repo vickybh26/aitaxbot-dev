@@ -47,15 +47,16 @@ export default function Login() {
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     try {
+      await signInWithGoogle();
       toast({ title: "Success", description: "Signed in with Google successfully!" });
       // Auth state will update automatically via onAuthStateChanged
       // The useEffect watching isAuthenticated will handle the redirect
     } catch (error: any) {
       console.error('[Login] Google sign-in error:', error);
-      toast({ 
-        title: "Error", 
-        description: sanitizeAuthError(error), 
-        variant: "destructive" 
+      toast({
+        title: "Error",
+        description: sanitizeAuthError(error),
+        variant: "destructive"
       });
     } finally {
       setIsLoading(false);
