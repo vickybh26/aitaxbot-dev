@@ -74,15 +74,27 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
   });
 
   // Metal Prices Query (Gold & Silver)
-  const { 
-    data: metalPrices, 
-    isLoading: metalPricesLoading 
+  const {
+    data: metalPrices,
+    isLoading: metalPricesLoading
   } = useQuery<MetalPricesData>({
     queryKey: ['/api/metal-prices'],
     refetchInterval: false, // Fixed update times on server, no client refresh
     refetchOnWindowFocus: false,
     staleTime: 8 * 60 * 60 * 1000, // 8 hours - match server cache
   });
+
+  // Live calculation counter from Firestore
+  const { data: calcStatsData } = useQuery<{ count: number }>({
+    queryKey: ['/api/stats/calculations-count'],
+    refetchInterval: false,
+    refetchOnWindowFocus: false,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+  const calcCount = calcStatsData?.count ?? 0;
+  const calcCountDisplay = calcCount > 0
+    ? `${calcCount.toLocaleString('en-IN')}+ calculations done`
+    : null;
 
   const showModal = (modalType: string) => {
     if (setActiveModal) {
@@ -229,6 +241,12 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                       <span className="text-blue-500 font-bold text-base">✓</span>
                       <span>FY 2025-26 &amp; Income Tax Act 2025 ready</span>
                     </div>
+                    {calcCountDisplay && (
+                      <div className="flex items-center gap-1.5 text-sm text-slate-600">
+                        <span className="text-orange-500 font-bold text-base">📊</span>
+                        <span><strong className="text-orange-600">{calcCountDisplay}</strong></span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </section>

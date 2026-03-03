@@ -7,7 +7,7 @@ import path from "path";
 import fs from "fs";
 import crypto from "crypto";
 import accountingRoutes from "./accountingRoutes";
-import { getFirestore, verifyFirebaseToken } from "./firebase";
+import { getFirestore, verifyFirebaseToken, admin } from "./firebase";
 import { TransactionalEmailsApi, TransactionalEmailsApiApiKeys } from '@getbrevo/brevo';
 import { seedTaxRates, getTaxSlabsForCalculation } from "./seedTaxRates";
 import { generateTaxComputationPDF, savePDFToStorage, type TaxComputationData } from "./pdfGenerator";
@@ -252,9 +252,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       const advice = await geminiTaxService.getTaxAdvice(input);
       res.json(advice);
+
+      // Fire-and-forget: increment calculation counter in Firestore
+      try {
+        const db = getFirestore();
+        await db.collection('counters').doc('taxCalculations').set(
+          { count: admin.firestore.FieldValue.increment(1), updatedAt: new Date() },
+          { merge: true }
+        );
+      } catch (counterErr) {
+        // Non-critical — don't fail the main request
+        console.warn('[Stats] Failed to increment calculation counter:', counterErr);
+      }
     } catch (error) {
       console.error("Error getting AI tax advice:", error);
       res.status(500).json({ error: "Failed to generate tax advice" });
+    }
+  });
+
+  // GET /api/stats/calculations-count — public, returns how many tax calculations have been done
+  app.get("/api/stats/calculations-count", async (req, res) => {
+    try {
+      const db = getFirestore();
+      const doc = await db.collection('counters').doc('taxCalculations').get();
+      const count = doc.exists ? (doc.data()?.count ?? 0) : 0;
+      res.json({ count });
+    } catch (error) {
+      console.error("[Stats] Error fetching calculation count:", error);
+      res.json({ count: 0 }); // Fail silently — don't break the landing page
     }
   });
 
