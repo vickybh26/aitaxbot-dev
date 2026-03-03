@@ -7,7 +7,7 @@
  *   Level 3 (Viewer)      — read-only: users list + analytics; no CRM writes
  *
  * Admin accounts are created MANUALLY in Firestore:
- *   Collection: admins / Doc ID: Firebase UID
+ *   Collection: admin / Doc ID: Firebase UID
  *   { level: 1|2|3, name: "...", email: "...", createdAt: Timestamp }
  *
  * Admin UIDs must NOT exist in the `users` collection (separate accounts).
@@ -33,7 +33,7 @@ async function requireAdmin(req: any, res: any, next: any, minLevel = 1) {
     if (!decoded) return res.status(401).json({ error: "Invalid token" });
 
     const db = getFirestore();
-    const adminDoc = await db.collection("admins").doc(decoded.uid).get();
+    const adminDoc = await db.collection("admin").doc(decoded.uid).get();
     if (!adminDoc.exists) {
       return res.status(403).json({ error: "Not an admin account" });
     }
