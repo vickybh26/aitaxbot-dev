@@ -26,6 +26,7 @@ interface AuthContextType {
   loading: boolean;
   isAuthenticated: boolean;
   isProfileComplete: boolean;
+  adminLevel: number | null; // null = not admin; 1/2/3 = admin level
   getIdToken: () => Promise<string | null>;
   refreshProfile: () => Promise<void>;
 }
@@ -36,6 +37,7 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   isAuthenticated: false,
   isProfileComplete: false,
+  adminLevel: null,
   getIdToken: async () => null,
   refreshProfile: async () => {},
 });
@@ -46,6 +48,7 @@ const INACTIVITY_TIMEOUT = 30 * 60 * 1000;
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [adminLevel, setAdminLevel] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
   const lastActivityRef = useRef<number>(Date.now());
@@ -54,6 +57,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const syncUserProfile = async (firebaseUser: User) => {
     try {
       const token = await firebaseUser.getIdToken();
+
+      // Check if this is an admin account first
+      const adminRes = await fetch('/api/admin/me', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (adminRes.ok) {
+        const adminData = await adminRes.json();
+        setAdminLevel(adminData.level);
+        // Admin accounts do NOT sync to users collection
+        return;
+      }
+
+      setAdminLevel(null);
+
       // Sync user to Firestore (creates on first login, updates on subsequent)
       await fetch('/api/user/sync', {
         method: 'POST',
@@ -172,6 +189,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await syncUserProfile(firebaseUser);
       } else {
         setUserProfile(null);
+        setAdminLevel(null);
         if (inactivityTimerRef.current) {
           clearTimeout(inactivityTimerRef.current);
         }
@@ -199,6 +217,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loading,
     isAuthenticated: !!user,
     isProfileComplete: userProfile?.isProfileComplete ?? false,
+    adminLevel,
     getIdToken,
     refreshProfile,
   };

@@ -7,6 +7,7 @@ import path from "path";
 import fs from "fs";
 import crypto from "crypto";
 import accountingRoutes from "./accountingRoutes";
+import adminRoutes from "./adminRoutes";
 import { getFirestore, verifyFirebaseToken, admin } from "./firebase";
 import { TransactionalEmailsApi, TransactionalEmailsApiApiKeys } from '@getbrevo/brevo';
 import { seedTaxRates, getTaxSlabsForCalculation } from "./seedTaxRates";
@@ -139,6 +140,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Mount accounting routes
   app.use("/api/accounting", accountingRoutes);
+
+  // Mount admin routes
+  app.use("/api/admin", adminRoutes);
   
   
   // Seed tax rates on startup (only runs once if empty)

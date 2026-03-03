@@ -31,6 +31,9 @@ import NRONREComparison from "@/pages/nri/NRONREComparison";
 import NRIIncomeTaxCalculator from "@/pages/nri/NRIIncomeTaxCalculator";
 import RepatriationPlanner from "@/pages/nri/RepatriationPlanner";
 import Profile from "@/pages/Profile";
+import AdminDashboard from "@/pages/admin/AdminDashboard";
+import AdminUsers from "@/pages/admin/AdminUsers";
+import AdminAnalytics from "@/pages/admin/AdminAnalytics";
 import NotFound from "@/pages/not-found";
 
 function ProtectedRoute({ component: Component }: { component: any }) {
@@ -63,12 +66,62 @@ function ProtectedRoute({ component: Component }: { component: any }) {
   return <Component />;
 }
 
+// Admin-only route — requires adminLevel to be set (1, 2, or 3)
+function AdminRoute({ component: Component, minLevel = 3 }: { component: any; minLevel?: number }) {
+  const { isAuthenticated, adminLevel, loading } = useAuth();
+  const [, setLocation] = useLocation();
+
+  useEffect(() => {
+    if (!loading) {
+      if (!isAuthenticated) {
+        setLocation("/login");
+      } else if (adminLevel === null) {
+        // Logged in but not an admin — redirect home
+        setLocation("/");
+      }
+    }
+  }, [isAuthenticated, adminLevel, loading, setLocation]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-slate-900">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-persian-blue-400" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated || adminLevel === null || adminLevel > minLevel) {
+    return null;
+  }
+
+  return <Component />;
+}
+
 function Router() {
   const [activeModal, setActiveModal] = useState<string | null>(null);
-  
+  const [location] = useLocation();
+
   const showModal = (modalType: string) => {
     setActiveModal(modalType);
   };
+
+  // Admin pages use their own AdminLayout — skip the main site Layout
+  const isAdminRoute = location.startsWith("/admin");
+  if (isAdminRoute) {
+    return (
+      <Switch>
+        <Route path="/admin">
+          {() => <AdminRoute component={AdminDashboard} minLevel={3} />}
+        </Route>
+        <Route path="/admin/users">
+          {() => <AdminRoute component={AdminUsers} minLevel={3} />}
+        </Route>
+        <Route path="/admin/analytics">
+          {() => <AdminRoute component={AdminAnalytics} minLevel={3} />}
+        </Route>
+      </Switch>
+    );
+  }
 
   return (
     <Layout showModal={showModal}>
