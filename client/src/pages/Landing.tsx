@@ -211,26 +211,23 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                     </Button>
                   </div>
 
-                  {/* Social proof */}
-                  <div className="flex flex-wrap items-center gap-6 mt-8 pt-6 border-t border-slate-200/60">
-                    <div className="flex items-center gap-2">
-                      <div className="flex -space-x-2">
-                        {['bg-blue-400','bg-green-400','bg-purple-400','bg-pink-400'].map((c,i) => (
-                          <div key={i} className={`w-7 h-7 rounded-full ${c} border-2 border-white flex items-center justify-center text-white text-xs font-bold`}>
-                            {['R','S','A','V'][i]}
-                          </div>
-                        ))}
-                      </div>
-                      <span className="text-sm text-slate-600"><strong className="text-slate-900">50,000+</strong> taxpayers</span>
+                  {/* Trust signals — honest early-stage */}
+                  <div className="flex flex-wrap items-center gap-4 mt-8 pt-6 border-t border-slate-200/60">
+                    <div className="flex items-center gap-1.5 text-sm text-slate-600">
+                      <span className="text-green-500 font-bold text-base">✓</span>
+                      <span>100% Free — no signup needed for calculators</span>
                     </div>
-                    <div className="flex items-center gap-1.5">
-                      <div className="flex">
-                        {[1,2,3,4,5].map(s => <span key={s} className="text-amber-400 text-sm">★</span>)}
-                      </div>
-                      <span className="text-sm text-slate-600"><strong className="text-slate-900">4.8</strong> rating</span>
+                    <div className="flex items-center gap-1.5 text-sm text-slate-600">
+                      <span className="text-green-500 font-bold text-base">✓</span>
+                      <span>Built &amp; reviewed by Chartered Accountants</span>
                     </div>
-                    <div className="text-sm text-slate-600">
-                      <strong className="text-green-600">₹120 Cr+</strong> tax savings calculated
+                    <div className="flex items-center gap-1.5 text-sm text-slate-600">
+                      <span className="text-purple-500 font-bold text-base">✦</span>
+                      <span>Powered by <strong className="text-purple-700">Gemini AI</strong></span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-sm text-slate-600">
+                      <span className="text-blue-500 font-bold text-base">✓</span>
+                      <span>FY 2025-26 &amp; Income Tax Act 2025 ready</span>
                     </div>
                   </div>
                 </div>
