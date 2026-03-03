@@ -238,18 +238,19 @@ export class FirestoreStorage implements IStorage {
       }
 
       const fieldsToTrack = ['firstName', 'lastName', 'mobile', 'gender', 'occupation', 'city', 'state', 'email'];
-      
+
       for (const field of fieldsToTrack) {
         const oldValue = (currentUser as any)[field];
         const newValue = (data as any)[field];
-        
+
         if (newValue !== undefined && oldValue !== newValue) {
-          await this.createProfileLog({
+          // Non-fatal — audit log failure must never block the actual profile update
+          this.createProfileLog({
             userId: id,
             fieldChanged: field,
             oldValue: oldValue?.toString() || null,
             newValue: newValue?.toString() || null,
-          });
+          }).catch(err => console.warn('[Storage] Profile log write failed (non-fatal):', err));
         }
       }
 
