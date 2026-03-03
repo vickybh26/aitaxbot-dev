@@ -39,15 +39,10 @@ migrations/
 *.log
 *.tar.gz
 vite.config.ts.*
-.replit
-replit.nix
 
 # Sensitive configuration
 config/credentials.json
 config/secrets.json
-# Replit internal state
-.local/
-.config/
 *.bin
 __pycache__/
 *.pyc

@@ -108,9 +108,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     '/blank-5': '/',
     '/upload': '/',
     '/document-upload': '/',
-    
-    // Removed pages
-    '/algo-trading': '/',
   };
   
   // Apply redirects middleware
@@ -122,8 +119,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     next();
   });
   
-  // Mock authentication middleware (temporary - for development/testing)
-  // In production, this should be replaced with real Replit Auth
+  // Mock authentication middleware for accounting module (sets req.user for legacy routes)
   app.use((req: any, res, next) => {
     // For now, set a mock user for all requests
     // This allows the accounting module to work without full auth setup
