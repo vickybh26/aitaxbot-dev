@@ -7,11 +7,12 @@ import { trackPageView } from "@/lib/analytics";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { 
-  Calculator, 
-  FileText, 
-  TrendingUp, 
-  Building2, 
+import ProfileCompletionModal from "@/components/ProfileCompletionModal";
+import {
+  Calculator,
+  FileText,
+  TrendingUp,
+  Building2,
   BookOpen,
   ArrowRight,
   User,
@@ -22,7 +23,8 @@ import {
   Download,
   Trash2,
   Calendar,
-  CheckCircle
+  CheckCircle,
+  AlertCircle
 } from "lucide-react";
 import jsPDF from 'jspdf';
 
@@ -65,10 +67,19 @@ interface TaxCalculationHistory {
 }
 
 export default function Dashboard() {
-  const { user, getIdToken } = useAuth();
+  const { user, userProfile, isProfileComplete, getIdToken } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+
+  // Show profile completion modal once for new users
+  useEffect(() => {
+    if (userProfile && !isProfileComplete) {
+      const dismissed = sessionStorage.getItem('profileModalDismissed');
+      if (!dismissed) setShowProfileModal(true);
+    }
+  }, [userProfile, isProfileComplete]);
 
   useEffect(() => {
     trackPageView('/dashboard', 'User Dashboard - AiTaxBot');
@@ -343,42 +354,53 @@ export default function Dashboard() {
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
       
+      {showProfileModal && (
+        <ProfileCompletionModal onClose={() => {
+          sessionStorage.setItem('profileModalDismissed', '1');
+          setShowProfileModal(false);
+        }} />
+      )}
+
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
       <div className="container mx-auto px-4 py-8">
-        {/* Welcome Section */}
+
+        {/* Welcome Banner */}
         <div className="mb-8">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="h-16 w-16 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white text-2xl font-bold">
-              {user?.displayName?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U'}
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white mb-4 flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex items-center gap-4">
+              {user?.photoURL ? (
+                <img src={user.photoURL} alt="Avatar" className="w-14 h-14 rounded-full border-2 border-white/40" />
+              ) : (
+                <div className="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center text-2xl font-bold">
+                  {(userProfile?.firstName || user?.email || 'U')[0].toUpperCase()}
+                </div>
+              )}
+              <div>
+                <h1 className="text-2xl font-bold">
+                  Welcome back, {userProfile?.firstName || user?.displayName?.split(' ')?.[0] || 'there'}!
+                </h1>
+                <p className="text-blue-100 text-sm">{user?.email}</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                Hello {user?.displayName?.split(' ')?.[0] || user?.email?.split('@')?.[0] || 'User'}! Welcome to Your AiTaxBot Dashboard
-              </h1>
-              <p className="text-gray-600">
-                {user?.email || 'User'}
-              </p>
+            <Link href="/profile">
+              <Button variant="outline" size="sm" className="bg-white/10 border-white/30 text-white hover:bg-white/20">
+                <User className="w-4 h-4 mr-1" /> My Profile
+              </Button>
+            </Link>
+          </div>
+
+          {/* Profile completion nudge */}
+          {!isProfileComplete && (
+            <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2 text-amber-800">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span className="text-sm font-medium">Complete your profile to get personalised tax tips and faster support.</span>
+              </div>
+              <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white shrink-0" onClick={() => setShowProfileModal(true)}>
+                Complete Now
+              </Button>
             </div>
-          </div>
-          
-          <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-3">Your Personalized Financial Control Center</h2>
-            <p className="text-gray-700 mb-3">
-              Welcome to your comprehensive financial management dashboard at AiTaxBot. This centralized hub provides you with complete visibility 
-              and control over your tax calculations, GST invoicing, client management, and financial analytics. Our platform is designed to streamline 
-              your tax compliance workflow while providing real-time insights into your business performance.
-            </p>
-            <p className="text-gray-700 mb-3">
-              Track your tax calculations across old and new regimes, manage client invoices with GST compliance, and monitor your revenue streams 
-              all from one intuitive interface. The dashboard automatically aggregates data from all your activities, giving you instant access to 
-              critical metrics like total revenue, pending invoices, client counts, and tax optimization opportunities.
-            </p>
-            <p className="text-gray-700">
-              Access powerful tools including our advanced tax calculator with regime comparison, GST-compliant invoice generator, Indian stock 
-              market data integration, and comprehensive tax blog with latest updates. Whether you're a freelancer, small business owner, or 
-              accounting professional, AiTaxBot provides the tools you need to manage finances efficiently and stay compliant with Indian tax regulations.
-            </p>
-          </div>
+          )}
         </div>
 
         {/* Quick Stats */}

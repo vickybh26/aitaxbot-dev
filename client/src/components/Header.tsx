@@ -127,16 +127,26 @@ export default function Header({ showModal }: HeaderProps = {}) {
               Tax Calculator
             </Link>
             {isAuthenticated ? (
-              <Button 
-                onClick={handleLogout}
-                variant="ghost"
-                size="sm"
-                className="text-slate-600 hover:text-slate-900"
-                data-testid="button-logout"
-              >
-                <LogOut className="w-4 h-4 mr-1" />
-                Logout
-              </Button>
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/profile"
+                  className="text-slate-600 hover:text-slate-900 font-medium transition-colors flex items-center"
+                  data-testid="link-header-profile"
+                >
+                  <User className="w-4 h-4 mr-1" />
+                  Profile
+                </Link>
+                <Button
+                  onClick={handleLogout}
+                  variant="ghost"
+                  size="sm"
+                  className="text-slate-600 hover:text-slate-900"
+                  data-testid="button-logout"
+                >
+                  <LogOut className="w-4 h-4 mr-1" />
+                  Logout
+                </Button>
+              </div>
             ) : (
               <Link 
                 href={getLoginUrl()}
@@ -168,16 +178,22 @@ export default function Header({ showModal }: HeaderProps = {}) {
           <div className="px-6 py-4">
             <div className="space-y-3">
               {isAuthenticated && (
-                <Link 
-                  href="/dashboard"
-                  onClick={() => {
-                    trackButtonClick('Dashboard', 'Mobile Header');
-                    setMobileMenuOpen(false);
-                  }}
-                  className="block text-slate-600 hover:text-slate-900 font-medium py-2 flex items-center"
-                >
-                  <LayoutDashboard className="w-4 h-4 mr-2" />Dashboard
-                </Link>
+                <>
+                  <Link
+                    href="/dashboard"
+                    onClick={() => { trackButtonClick('Dashboard', 'Mobile Header'); setMobileMenuOpen(false); }}
+                    className="block text-slate-600 hover:text-slate-900 font-medium py-2 flex items-center"
+                  >
+                    <LayoutDashboard className="w-4 h-4 mr-2" />Dashboard
+                  </Link>
+                  <Link
+                    href="/profile"
+                    onClick={() => { setMobileMenuOpen(false); }}
+                    className="block text-slate-600 hover:text-slate-900 font-medium py-2 flex items-center"
+                  >
+                    <User className="w-4 h-4 mr-2" />My Profile
+                  </Link>
+                </>
               )}
               <Link 
                 href="/calculators"

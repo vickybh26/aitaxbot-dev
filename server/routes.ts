@@ -241,7 +241,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ==========================================
   // USER PROFILE API
   // ==========================================
-  
+
+  // Sync user on login — creates or updates user record from Firebase token
+  app.post("/api/user/sync", async (req, res) => {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+      const token = authHeader.split(' ')[1];
+      const decodedToken = await verifyFirebaseToken(token);
+      if (!decodedToken) {
+        return res.status(401).json({ error: "Invalid token" });
+      }
+
+      // Split displayName into first/last if available
+      const displayName = decodedToken.name || '';
+      const nameParts = displayName.trim().split(' ');
+      const firstName = nameParts[0] || null;
+      const lastName = nameParts.slice(1).join(' ') || null;
+
+      const user = await storage.upsertUser({
+        id: decodedToken.uid,
+        email: decodedToken.email || null,
+        firstName,
+        lastName,
+        profileImageUrl: decodedToken.picture || null,
+        authProvider: decodedToken.firebase?.sign_in_provider || 'email',
+        isProfileComplete: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as any);
+
+      res.json(user);
+    } catch (error) {
+      console.error("Error syncing user:", error);
+      res.status(500).json({ error: "Failed to sync user" });
+    }
+  });
+
   // Get user profile
   app.get("/api/user/profile", async (req, res) => {
     try {

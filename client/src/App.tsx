@@ -30,6 +30,7 @@ import DTAACalculator from "@/pages/nri/DTAACalculator";
 import NRONREComparison from "@/pages/nri/NRONREComparison";
 import NRIIncomeTaxCalculator from "@/pages/nri/NRIIncomeTaxCalculator";
 import RepatriationPlanner from "@/pages/nri/RepatriationPlanner";
+import Profile from "@/pages/Profile";
 import NotFound from "@/pages/not-found";
 
 function ProtectedRoute({ component: Component }: { component: any }) {
@@ -79,6 +80,9 @@ function Router() {
         </Route>
         <Route path="/blog" component={Blog} />
         <Route path="/blog/:slug" component={BlogPost} />
+        <Route path="/profile">
+          {() => <ProtectedRoute component={Profile} />}
+        </Route>
         <Route path="/accounting" component={AccountingDashboard} />
         <Route path="/calculators" component={Calculators} />
         <Route path="/calculators/income-tax" component={IncomeTaxCalculator} />
