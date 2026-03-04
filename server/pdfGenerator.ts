@@ -240,15 +240,38 @@ function generateDetailedComparisonPDF(data: TaxComputationData): Promise<Buffer
        .text("NEW REGIME", COL_NEW, y + 6, { width: C3, align: "center" });
     y += 20;
 
+    // True gross income = salary + all other income sources (BEFORE any deductions)
+    // This is the same for both regimes — the regime only affects which deductions are allowed
+    const trueGrossOld = OLD.grossSalary
+      + (OLD.rentalIncome     || 0)
+      + (OLD.capitalGainsLTCG || 0)
+      + (OLD.capitalGainsSTC  || 0)
+      + (OLD.dividendIncome   || 0)
+      + (OLD.otherIncome      || 0);
+    const trueGrossNew = NEW.grossSalary
+      + (NEW.rentalIncome     || 0)
+      + (NEW.capitalGainsLTCG || 0)
+      + (NEW.capitalGainsSTC  || 0)
+      + (NEW.dividendIncome   || 0)
+      + (NEW.otherIncome      || 0);
+
+    // All deductions per regime (Sec 16 exemptions + Chapter VI-A)
+    const totalDeductionsOld = OLD.standardDeduction
+      + (OLD.hraExemption  || 0)
+      + (OLD.ltaExemption  || 0)
+      + (OLD.professionalTax || 0)
+      + OLD.totalChapterVIA;
+    const totalDeductionsNew = NEW.standardDeduction;   // new regime: only Sec 16 std deduction
+
     const summaryRows: Array<[string, number, number, boolean?]> = [
-      ["Gross Income", OLD.grossTotalIncome, NEW.grossTotalIncome],
-      ["Total Deductions", OLD.totalChapterVIA + OLD.standardDeduction, NEW.standardDeduction],
-      ["Taxable Income", OLD.taxableIncome, NEW.taxableIncome],
-      ["Income Tax (Before Cess)", OLD.incomeTax, NEW.incomeTax],
-      ["Less: Rebate u/s 87A", OLD.rebate87A, NEW.rebate87A],
-      ["Add: Health & Education Cess (4%)", OLD.cess, NEW.cess],
-      ["NET TAX PAYABLE", OLD.totalTax, NEW.totalTax, true],
-      ["Monthly TDS (÷ 12)", OLD.monthlyTDS, NEW.monthlyTDS, true],
+      ["Gross Income",                       trueGrossOld,       trueGrossNew],
+      ["Total Deductions",                   totalDeductionsOld, totalDeductionsNew],
+      ["Taxable Income",                     OLD.taxableIncome,  NEW.taxableIncome],
+      ["Income Tax (Before Cess)",           OLD.incomeTax,      NEW.incomeTax],
+      ["Less: Rebate u/s 87A",               OLD.rebate87A,      NEW.rebate87A],
+      ["Add: Health & Education Cess (4%)",  OLD.cess,           NEW.cess],
+      ["NET TAX PAYABLE",                    OLD.totalTax,       NEW.totalTax,    true],
+      ["Monthly TDS (÷ 12)",                 OLD.monthlyTDS,     NEW.monthlyTDS,  true],
     ];
 
     summaryRows.forEach(([label, oldVal, newVal, bold], i) => {
@@ -265,14 +288,25 @@ function generateDetailedComparisonPDF(data: TaxComputationData): Promise<Buffer
          .text(label as string, L + 6, y + 4, { width: C1 - 6 });
       doc.fillColor(oldColor).font(fnt).fontSize(9)
          .text(fmt(oldVal as number), COL_OLD, y + 4, { width: C2, align: "right" });
-      doc.fillColor(newColor).font(fnt).fontSize(9)
-         .text(fmt(newVal as number), COL_NEW, y + 4, { width: C3, align: "right" });
 
-      // Recommended marker
-      if (bold && label === "NET TAX PAYABLE") {
-        const markerX = rec === "new" ? COL_NEW + C3 + 4 : COL_OLD + C2 + 4;
-        doc.fillColor(GREEN).fontSize(8).text("◀ Best", markerX - 30, y + 4);
+      // For NET TAX PAYABLE: squeeze "✓ Best" into the recommended column
+      // to avoid text overflowing outside the table boundary
+      if (bold && label === "NET TAX PAYABLE" && rec === "new") {
+        // Draw value left-aligned with a small gap, then "✓" badge at right edge
+        doc.fillColor(newColor).font(fnt).fontSize(9)
+           .text(fmt(newVal as number), COL_NEW, y + 4, { width: C3 - 28, align: "right" });
+        doc.fillColor(GREEN).font("Helvetica-Bold").fontSize(7.5)
+           .text("✓ Best", COL_NEW + C3 - 26, y + 5, { width: 26, align: "right" });
+      } else if (bold && label === "NET TAX PAYABLE" && rec === "old") {
+        doc.fillColor(newColor).font(fnt).fontSize(9)
+           .text(fmt(newVal as number), COL_NEW, y + 4, { width: C3, align: "right" });
+        doc.fillColor(GREEN).font("Helvetica-Bold").fontSize(7.5)
+           .text("✓ Best", COL_OLD + C2 - 26, y + 5, { width: 26, align: "right" });
+      } else {
+        doc.fillColor(newColor).font(fnt).fontSize(9)
+           .text(fmt(newVal as number), COL_NEW, y + 4, { width: C3, align: "right" });
       }
+
       y += ROW_H;
     });
 
