@@ -78,17 +78,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h2",
         title: "Tax & Liquidity Lens (High-Level)",
-        content_md: "### Investment Types at a Glance
-
-| Type | Examples | Risk | Return Potential | Liquidity | Lock-in |
-|---|---|---|---|---|---|
-| Equity | Nifty 50 index, ELSS, large-cap funds | High | 10–15% (LT) | High | ELSS: 3 yr; others: none |
-| Debt | FD, PPF, bonds, debt funds | Low–Medium | 5–8% | Medium–High | PPF: 15 yr; FD: varies |
-| Gold | SGBs, Gold ETFs, digital gold | Medium | 7–10% (LT) | Medium–High | SGB: 8 yr; ETF: none |
-| Real Estate | Direct property, REITs | Medium | 7–12% | Very Low | Years; REITs: none |
-| International | US equity ETFs, global funds | Medium–High | 8–14% | Medium | None |
-
-*Tax rules evolve — use AiTaxBot calculators for up-to-date after-tax return comparisons.*"
+        content_md: "### Investment Types at a Glance\n\n| Type | Examples | Risk | Return Potential | Liquidity | Lock-in |\n|---|---|---|---|---|---|\n| Equity | Nifty 50 index, ELSS, large-cap funds | High | 10–15% (LT) | High | ELSS: 3 yr; others: none |\n| Debt | FD, PPF, bonds, debt funds | Low–Medium | 5–8% | Medium–High | PPF: 15 yr; FD: varies |\n| Gold | SGBs, Gold ETFs, digital gold | Medium | 7–10% (LT) | Medium–High | SGB: 8 yr; ETF: none |\n| Real Estate | Direct property, REITs | Medium | 7–12% | Very Low | Years; REITs: none |\n| International | US equity ETFs, global funds | Medium–High | 8–14% | Medium | None |\n\n*Tax rules evolve — use AiTaxBot calculators for up-to-date after-tax return comparisons.*"
       },
       {
         type: "h3",
@@ -183,21 +173,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h3",
         title: "How to Choose",
-        content_md: "### 2025 Investment Options at a Glance
-
-| Option | Role | Risk | Expected Return | Lock-in | Ideal For |
-|---|---|---|---|---|---|
-| Nifty 50 Index Fund | Growth core | High | 10–13% (LT) | None | All investors |
-| Flexi/Multicap Fund | Growth active | High | 11–15% (LT) | None | Experienced investors |
-| FD / Short-term Debt | Stability | Very Low | 6–8% | Varies | Short-term goals |
-| PPF | Retirement debt | Very Low | ~7.1% | 15 years | Conservative / retirement |
-| Sovereign Gold Bond | Hedge + interest | Medium | 8–10% | 8 years | Diversification |
-| Gold ETF | Hedge liquid | Medium | 7–9% | None | Active traders |
-| NPS Tier I | Retirement | Medium | 9–12% | Till age 60 | Salaried with tax benefit |
-| REIT / InvIT | Income | Medium | 7–9% yield | None | Income seekers |
-| International Fund | Geographic hedge | Medium–High | 8–13% | None | Diversified portfolios |
-
-*Match each option to a role — then verify taxes, costs, and liquidity before allocating.*"
+        content_md: "### 2025 Investment Options at a Glance\n\n| Option | Role | Risk | Expected Return | Lock-in | Ideal For |\n|---|---|---|---|---|---|\n| Nifty 50 Index Fund | Growth core | High | 10–13% (LT) | None | All investors |\n| Flexi/Multicap Fund | Growth active | High | 11–15% (LT) | None | Experienced investors |\n| FD / Short-term Debt | Stability | Very Low | 6–8% | Varies | Short-term goals |\n| PPF | Retirement debt | Very Low | ~7.1% | 15 years | Conservative / retirement |\n| Sovereign Gold Bond | Hedge + interest | Medium | 8–10% | 8 years | Diversification |\n| Gold ETF | Hedge liquid | Medium | 7–9% | None | Active traders |\n| NPS Tier I | Retirement | Medium | 9–12% | Till age 60 | Salaried with tax benefit |\n| REIT / InvIT | Income | Medium | 7–9% yield | None | Income seekers |\n| International Fund | Geographic hedge | Medium–High | 8–13% | None | Diversified portfolios |\n\n*Match each option to a role — then verify taxes, costs, and liquidity before allocating.*"
       },
       {
         type: "cta",
@@ -262,18 +238,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h3",
         title: "Turning Profile into Allocation",
-        content_md: "### Model Allocations by Risk Profile
-
-| Profile | Equity | Debt | Gold / Alts | Time Horizon | Typical Investor |
-|---|---|---|---|---|---|
-| Conservative | 20–30% | 60–70% | 5–10% | < 5 years | Retirees, near-term goals |
-| Moderate | 45–55% | 35–45% | 5–10% | 5–10 years | Mid-career, balanced goals |
-| Balanced Growth | 60–65% | 25–30% | 5–10% | 7–12 years | 30s–40s with long horizon |
-| Aggressive | 75–80% | 10–20% | 5% | 10+ years | Young investors, high tolerance |
-
-- Use a **glide path**: reduce equity allocation by 1–2% per year as you approach your goal
-- Rebalance annually or when allocation drifts ±5% from target
-- Measure capacity and tolerance separately — use the lower of the two"
+        content_md: "### Model Allocations by Risk Profile\n\n| Profile | Equity | Debt | Gold / Alts | Time Horizon | Typical Investor |\n|---|---|---|---|---|---|\n| Conservative | 20–30% | 60–70% | 5–10% | < 5 years | Retirees, near-term goals |\n| Moderate | 45–55% | 35–45% | 5–10% | 5–10 years | Mid-career, balanced goals |\n| Balanced Growth | 60–65% | 25–30% | 5–10% | 7–12 years | 30s–40s with long horizon |\n| Aggressive | 75–80% | 10–20% | 5% | 10+ years | Young investors, high tolerance |\n\n- Use a **glide path**: reduce equity allocation by 1–2% per year as you approach your goal\n- Rebalance annually or when allocation drifts ±5% from target\n- Measure capacity and tolerance separately — use the lower of the two"
       },
       {
         type: "cta",
@@ -327,18 +292,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h2",
         title: "Capital Gains Basics",
-        content_md: "### Capital Gains Quick Reference — FY 2025-26
-
-| Asset Class | Short-Term (STCG) | Holding for LTCG | LTCG Rate |
-|---|---|---|---|
-| Listed equity shares | 20% (≤ 12 months) | > 12 months | 12.5% above ₹1.25L |
-| Equity mutual funds | 20% (≤ 12 months) | > 12 months | 12.5% above ₹1.25L |
-| Debt mutual funds | Slab rate (≤ 24 months) | > 24 months | 12.5% (no indexation) |
-| Real estate | Slab rate (≤ 24 months) | > 24 months | 12.5% (no indexation) |
-| Gold / physical | Slab rate (≤ 24 months) | > 24 months | 12.5% (no indexation) |
-| Sovereign Gold Bonds | N/A (held to maturity) | — | Exempt on maturity |
-
-*Note: 4% cess applies. Budget 2024 removed indexation for most assets. Verify latest provisions before filing.*"
+        content_md: "### Capital Gains Quick Reference — FY 2025-26\n\n| Asset Class | Short-Term (STCG) | Holding for LTCG | LTCG Rate |\n|---|---|---|---|\n| Listed equity shares | 20% (≤ 12 months) | > 12 months | 12.5% above ₹1.25L |\n| Equity mutual funds | 20% (≤ 12 months) | > 12 months | 12.5% above ₹1.25L |\n| Debt mutual funds | Slab rate (≤ 24 months) | > 24 months | 12.5% (no indexation) |\n| Real estate | Slab rate (≤ 24 months) | > 24 months | 12.5% (no indexation) |\n| Gold / physical | Slab rate (≤ 24 months) | > 24 months | 12.5% (no indexation) |\n| Sovereign Gold Bonds | N/A (held to maturity) | — | Exempt on maturity |\n\n*Note: 4% cess applies. Budget 2024 removed indexation for most assets. Verify latest provisions before filing.*"
       },
       {
         type: "h2",
@@ -475,22 +429,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h3",
         title: "Allocation Playbook",
-        content_md: "### Alternatives Comparison
-
-| Alternative | Form | Role | Risk | Return | Liquidity |
-|---|---|---|---|---|---|
-| Gold | SGB, ETF, digital | Inflation hedge, crisis buffer | Medium | 7–10% (LT) | High (ETF) |
-| Silver | ETF, e-silver | Industrial + inflation hedge | High | 8–12% (volatile) | High (ETF) |
-| REIT | Exchange-listed | Real estate income | Medium | 7–9% yield | High |
-| InvIT | Exchange-listed | Infrastructure income | Medium | 8–10% yield | Medium |
-| International Equity | MF/ETF | Geographic diversification | Medium–High | 8–13% | Medium |
-| Commodities | MF/ETF | Inflation cyclical play | High | Variable | Medium |
-
-**Suggested caps for retail portfolios:**
-- Gold/Silver: 5–10%
-- REITs/InvITs: 5%
-- International equity: 5–10%
-- Commodities: 0–3% (optional)"
+        content_md: "### Alternatives Comparison\n\n| Alternative | Form | Role | Risk | Return | Liquidity |\n|---|---|---|---|---|---|\n| Gold | SGB, ETF, digital | Inflation hedge, crisis buffer | Medium | 7–10% (LT) | High (ETF) |\n| Silver | ETF, e-silver | Industrial + inflation hedge | High | 8–12% (volatile) | High (ETF) |\n| REIT | Exchange-listed | Real estate income | Medium | 7–9% yield | High |\n| InvIT | Exchange-listed | Infrastructure income | Medium | 8–10% yield | Medium |\n| International Equity | MF/ETF | Geographic diversification | Medium–High | 8–13% | Medium |\n| Commodities | MF/ETF | Inflation cyclical play | High | Variable | Medium |\n\n**Suggested caps for retail portfolios:**\n- Gold/Silver: 5–10%\n- REITs/InvITs: 5%\n- International equity: 5–10%\n- Commodities: 0–3% (optional)"
       },
       {
         type: "cta",
@@ -538,20 +477,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h2",
         title: "80C (Illustrative Instruments)",
-        content_md: "### Section 80C Instruments — FY 2025-26 (Limit: ₹1,50,000)
-
-| Instrument | Type | Lock-in | Returns | Risk | Best For |
-|---|---|---|---|---|---|
-| ELSS | Equity mutual fund | 3 years | 12–15% (market) | High | Wealth + tax |
-| PPF | Govt debt scheme | 15 years | ~7.1% (fixed) | Nil | Safety + retirement |
-| EPF | Mandatory PF | Till retirement | ~8.15% (fixed) | Nil | Salaried employees |
-| NSC | Post office bond | 5 years | ~7.7% (fixed) | Nil | Conservative savers |
-| SCSS | Senior citizens | 5 years | ~8.2% (fixed) | Nil | Senior citizens only |
-| 5-yr FD | Bank FD | 5 years | 6–7.5% (fixed) | Very Low | Capital safety |
-| Home Loan Principal | Repayment | None | N/A | N/A | Home loan borrowers |
-| Life Insurance | LIC/ULIP premium | Varies | 5–12% | Low–High | Protection + savings |
-
-*ELSS gives the shortest lock-in (3 years) among equity instruments and is the only 80C option with market-linked growth potential.*"
+        content_md: "### Section 80C Instruments — FY 2025-26 (Limit: ₹1,50,000)\n\n| Instrument | Type | Lock-in | Returns | Risk | Best For |\n|---|---|---|---|---|---|\n| ELSS | Equity mutual fund | 3 years | 12–15% (market) | High | Wealth + tax |\n| PPF | Govt debt scheme | 15 years | ~7.1% (fixed) | Nil | Safety + retirement |\n| EPF | Mandatory PF | Till retirement | ~8.15% (fixed) | Nil | Salaried employees |\n| NSC | Post office bond | 5 years | ~7.7% (fixed) | Nil | Conservative savers |\n| SCSS | Senior citizens | 5 years | ~8.2% (fixed) | Nil | Senior citizens only |\n| 5-yr FD | Bank FD | 5 years | 6–7.5% (fixed) | Very Low | Capital safety |\n| Home Loan Principal | Repayment | None | N/A | N/A | Home loan borrowers |\n| Life Insurance | LIC/ULIP premium | Varies | 5–12% | Low–High | Protection + savings |\n\n*ELSS gives the shortest lock-in (3 years) among equity instruments and is the only 80C option with market-linked growth potential.*"
       },
       {
         type: "h2",
@@ -561,17 +487,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h2",
         title: "NPS Benefits & Retirement Focus",
-        content_md: "### NPS Tax Benefits Summary
-
-| Deduction | Section | Limit | Available In |
-|---|---|---|---|
-| Employee contribution | 80CCD(1) | Part of ₹1.5L 80C limit | Both regimes |
-| Extra voluntary contribution | 80CCD(1B) | ₹50,000 additional | Old regime only |
-| Employer NPS contribution | 80CCD(2) | 14% of basic (new regime) / 10% (old) | Both regimes |
-
-**Total maximum NPS benefit (old regime):** ₹1,50,000 (within 80C) + ₹50,000 (80CCD1B) + employer NPS = potentially ₹3L+ in deductions
-
-*NPS requires 40% of corpus to purchase annuity at withdrawal. Treat as a **retirement** vehicle, not a short-term tax play.*"
+        content_md: "### NPS Tax Benefits Summary\n\n| Deduction | Section | Limit | Available In |\n|---|---|---|---|\n| Employee contribution | 80CCD(1) | Part of ₹1.5L 80C limit | Both regimes |\n| Extra voluntary contribution | 80CCD(1B) | ₹50,000 additional | Old regime only |\n| Employer NPS contribution | 80CCD(2) | 14% of basic (new regime) / 10% (old) | Both regimes |\n\n**Total maximum NPS benefit (old regime):** ₹1,50,000 (within 80C) + ₹50,000 (80CCD1B) + employer NPS = potentially ₹3L+ in deductions\n\n*NPS requires 40% of corpus to purchase annuity at withdrawal. Treat as a **retirement** vehicle, not a short-term tax play.*"
       },
       {
         type: "h3",
@@ -686,21 +602,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h2",
         title: "What Is Compounding?",
-        content_md: "Earning returns on your returns — the longer you stay invested, the more powerful this effect becomes.
-
-### ₹1 Lakh Invested Once at 12% Annual Return
-
-| Year | Value |
-|---|---|
-| 1 | ₹1,12,000 |
-| 5 | ₹1,76,234 |
-| 10 | ₹3,10,585 |
-| 15 | ₹5,47,357 |
-| 20 | ₹9,64,629 |
-| 25 | ₹17,00,006 |
-| 30 | ₹29,95,992 |
-
-*The curve is exponential, not linear — the last 10 years do more work than the first 20.*"
+        content_md: "Earning returns on your returns — the longer you stay invested, the more powerful this effect becomes.\n\n### ₹1 Lakh Invested Once at 12% Annual Return\n\n| Year | Value |\n|---|---|\n| 1 | ₹1,12,000 |\n| 5 | ₹1,76,234 |\n| 10 | ₹3,10,585 |\n| 15 | ₹5,47,357 |\n| 20 | ₹9,64,629 |\n| 25 | ₹17,00,006 |\n| 30 | ₹29,95,992 |\n\n*The curve is exponential, not linear — the last 10 years do more work than the first 20.*"
       },
       {
         type: "h2",
@@ -710,20 +612,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h2",
         title: "Rupee Cost Averaging (SIPs)",
-        content_md: "Invest a fixed amount regularly regardless of market levels. You automatically buy more units when prices are low and fewer when high — smoothing your average cost.
-
-### ₹10,000/month SIP — Projected Corpus at 12%
-
-| Investment Period | Total Invested | Estimated Corpus | Gain |
-|---|---|---|---|
-| 5 years | ₹6,00,000 | ₹8,16,697 | ₹2,16,697 |
-| 10 years | ₹12,00,000 | ₹23,23,391 | ₹11,23,391 |
-| 15 years | ₹18,00,000 | ₹50,45,763 | ₹32,45,763 |
-| 20 years | ₹24,00,000 | ₹99,91,479 | ₹75,91,479 |
-| 25 years | ₹30,00,000 | ₹1,89,76,351 | ₹1,59,76,351 |
-| 30 years | ₹36,00,000 | ₹3,52,99,138 | ₹3,16,99,138 |
-
-*Try our SIP Calculator to model your actual monthly amount and target year.*"
+        content_md: "Invest a fixed amount regularly regardless of market levels. You automatically buy more units when prices are low and fewer when high — smoothing your average cost.\n\n### ₹10,000/month SIP — Projected Corpus at 12%\n\n| Investment Period | Total Invested | Estimated Corpus | Gain |\n|---|---|---|---|\n| 5 years | ₹6,00,000 | ₹8,16,697 | ₹2,16,697 |\n| 10 years | ₹12,00,000 | ₹23,23,391 | ₹11,23,391 |\n| 15 years | ₹18,00,000 | ₹50,45,763 | ₹32,45,763 |\n| 20 years | ₹24,00,000 | ₹99,91,479 | ₹75,91,479 |\n| 25 years | ₹30,00,000 | ₹1,89,76,351 | ₹1,59,76,351 |\n| 30 years | ₹36,00,000 | ₹3,52,99,138 | ₹3,16,99,138 |\n\n*Try our SIP Calculator to model your actual monthly amount and target year.*"
       },
       {
         type: "h3",
@@ -781,15 +670,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h2",
         title: "Calendar Method",
-        content_md: "### Calendar vs Threshold: Comparison
-
-| Method | How It Works | Frequency | Tax Impact | Best For |
-|---|---|---|---|---|
-| Calendar | Fixed date (e.g., April 1 each year) | Annual / semi-annual | Predictable | Most investors |
-| Threshold | Trigger when drift > ±5% | As needed | Variable | Active monitors |
-| Hybrid | Calendar + threshold | Annual minimum | Balanced | Best practice |
-
-For most salaried investors, **annual rebalancing on April 1** (new financial year) is simplest and aligns with tax planning."
+        content_md: "### Calendar vs Threshold: Comparison\n\n| Method | How It Works | Frequency | Tax Impact | Best For |\n|---|---|---|---|---|\n| Calendar | Fixed date (e.g., April 1 each year) | Annual / semi-annual | Predictable | Most investors |\n| Threshold | Trigger when drift > ±5% | As needed | Variable | Active monitors |\n| Hybrid | Calendar + threshold | Annual minimum | Balanced | Best practice |\n\nFor most salaried investors, **annual rebalancing on April 1** (new financial year) is simplest and aligns with tax planning."
       },
       {
         type: "h2",
