@@ -3,65 +3,51 @@ import { randomUUID } from "crypto";
 import fs from "fs";
 import path from "path";
 
-// @ts-ignore - pdfkit types are available
+// ─────────────────────────────────────────────────────────────────────────────
+// INTERFACES
+// ─────────────────────────────────────────────────────────────────────────────
 
-interface EmployerDetails {
-  name: string;
-  tan?: string;
-  address?: string;
-  natureOfEmployment?: string;
-}
-
-interface SalaryBreakdown {
-  basicSalary?: number;
-  hra?: number;
-  specialAllowance?: number;
-  lta?: number;
-  otherAllowances?: number;
-  bonus?: number;
-  perquisites?: number;
+export interface RegimePDFData {
+  // Salary
   grossSalary: number;
+  basicDA?: number;
+  hraReceived?: number;
+  hraExemption?: number;
+  ltaReceived?: number;
+  ltaExemption?: number;
+  otherAllowances?: number;
+  otherAllowancesExemption?: number;
+  bonus?: number;
+  specialAllowances?: number;
+  // Deductions u/s 16
   standardDeduction: number;
+  professionalTax?: number;
   netSalary: number;
-}
-
-interface Deductions {
-  section80C?: number;
-  section80D?: number;
-  section80E?: number;
-  section80TTA?: number;
-  section80CCD1B?: number;  // NPS additional contribution
-  nps80CCD1B?: number;      // Legacy alias — kept for backward compat
-  section80G?: number;
+  // Other Income
+  rentalIncome?: number;
+  capitalGainsLTCG?: number;
+  capitalGainsSTC?: number;
+  dividendIncome?: number;
+  otherIncome?: number;
+  grossTotalIncome: number;
+  // Chapter VI-A Deductions (only applicable in old regime)
+  sec80C?: number;
+  sec80D?: number;
+  sec80E?: number;
+  sec80TTA?: number;
+  sec80CCD1B?: number;
+  sec80G?: number;
   homeLoanInterest?: number;
-  lta?: number;
-  otherDeductions?: number;
-  totalDeductions: number;
-}
-
-interface TaxBreakdown {
+  totalChapterVIA: number;
+  // Tax computation
   taxableIncome: number;
-  taxOnIncome: number;
+  incomeTax: number;
+  rebate87A: number;
+  taxAfterRebate: number;
   surcharge: number;
   cess: number;
   totalTax: number;
-  tdsDeducted?: number;
-  advanceTaxPaid?: number;
-  selfAssessmentTax?: number;
-  refundDue?: number;
-  taxPayable?: number;
-}
-
-interface OtherIncome {
-  interestIncome?: number;
-  dividendIncome?: number;
-  rentalIncome?: number;
-  capitalGains?: {
-    shortTerm?: number;
-    longTerm?: number;
-  };
-  otherSources?: number;
-  total: number;
+  monthlyTDS: number;
 }
 
 export interface TaxComputationData {
@@ -78,430 +64,557 @@ export interface TaxComputationData {
   };
   assessmentYear: string;
   financialYear: string;
-  regime: "old" | "new";
-  employer?: EmployerDetails;
-  salary?: SalaryBreakdown;
-  otherIncome?: OtherIncome;
-  deductions?: Deductions;
-  taxBreakdown: TaxBreakdown;
-  bankDetails?: {
-    bankName: string;
-    accountNumber: string;
-    ifscCode: string;
+  // New detailed both-regime data
+  oldRegimeData?: RegimePDFData;
+  newRegimeData?: RegimePDFData;
+  recommendedRegime?: "old" | "new";
+  savings?: number;
+  // Legacy single-regime fields (kept for backward compat)
+  regime?: "old" | "new";
+  employer?: { name: string; tan?: string; address?: string };
+  salary?: { grossSalary: number; standardDeduction: number; netSalary: number };
+  otherIncome?: {
+    interestIncome?: number;
+    dividendIncome?: number;
+    rentalIncome?: number;
+    capitalGains?: { shortTerm?: number; longTerm?: number };
+    otherSources?: number;
+    total: number;
   };
+  deductions?: {
+    section80C?: number;
+    section80D?: number;
+    section80E?: number;
+    section80TTA?: number;
+    section80CCD1B?: number;
+    nps80CCD1B?: number;
+    section80G?: number;
+    homeLoanInterest?: number;
+    lta?: number;
+    otherDeductions?: number;
+    totalDeductions: number;
+  };
+  taxBreakdown: {
+    taxableIncome: number;
+    taxOnIncome: number;
+    surcharge: number;
+    cess: number;
+    totalTax: number;
+    tdsDeducted?: number;
+    advanceTaxPaid?: number;
+    selfAssessmentTax?: number;
+    refundDue?: number;
+    taxPayable?: number;
+  };
+  bankDetails?: { bankName: string; accountNumber: string; ifscCode: string };
   computationDate: Date;
 }
 
-function formatCurrency(amount: number | undefined): string {
-  if (amount === undefined || amount === null) return "-";
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
+// ─────────────────────────────────────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────────────────────────────────────
+
+function fmt(n: number | undefined | null): string {
+  if (n === undefined || n === null || isNaN(n)) return "-";
+  return new Intl.NumberFormat("en-IN").format(Math.round(n));
 }
 
-function formatNumber(amount: number | undefined): string {
-  if (amount === undefined || amount === null) return "-";
-  return new Intl.NumberFormat("en-IN").format(amount);
+function fmtNeg(n: number | undefined | null): string {
+  if (!n || n === 0) return "-";
+  return `(${fmt(n)})`;
 }
+
+function fmtCur(n: number | undefined | null): string {
+  if (n === undefined || n === null || isNaN(n)) return "-";
+  return `₹${new Intl.NumberFormat("en-IN").format(Math.round(n))}`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MAIN PDF GENERATOR
+// ─────────────────────────────────────────────────────────────────────────────
 
 export function generateTaxComputationPDF(data: TaxComputationData): Promise<Buffer> {
+  // Route to the detailed generator if both-regime data is present
+  if (data.oldRegimeData && data.newRegimeData) {
+    return generateDetailedComparisonPDF(data);
+  }
+  return generateLegacyPDF(data);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DETAILED COMPARISON PDF (new format — ITR-style)
+// ─────────────────────────────────────────────────────────────────────────────
+
+function generateDetailedComparisonPDF(data: TaxComputationData): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     const chunks: Buffer[] = [];
-    const doc = new PDFDocument({ 
-      margin: 50, 
+    const doc = new PDFDocument({
+      margin: 36,
       size: "A4",
       info: {
-        Title: `Income Tax Computation - ${data.assessmentYear}`,
+        Title: `Income Tax Computation - AY ${data.assessmentYear}`,
         Author: "AiTaxBot",
-        Subject: "Income Tax Computation Statement",
-      }
+        Subject: "Income Tax Comparison Statement",
+      },
     });
 
-    doc.on("data", (chunk: Buffer) => chunks.push(chunk));
+    doc.on("data", (c: Buffer) => chunks.push(c));
     doc.on("end", () => resolve(Buffer.concat(chunks)));
     doc.on("error", reject);
 
-    const pageWidth = doc.page.width - 100;
-    let y = 40;
+    const OLD = data.oldRegimeData!;
+    const NEW = data.newRegimeData!;
+    const rec = data.recommendedRegime || "new";
+    const savings = data.savings || Math.abs(OLD.totalTax - NEW.totalTax);
 
-    // Header with AiTaxBot branding
-    doc.fontSize(22).font("Helvetica-Bold")
-       .fillColor("#1E40AF")
-       .text("AiTaxBot", { align: "center" });
-    y += 30;
-    
-    doc.fontSize(10).font("Helvetica")
-       .fillColor("#666666")
-       .text("www.aitaxbot.co.in | AI-Powered Tax Calculator & Financial Tools", { align: "center" });
-    y += 25;
-    
-    // Divider line - with proper spacing
-    y += 10;
-    doc.moveTo(50, y).lineTo(545, y).strokeColor("#1E40AF").lineWidth(2).stroke();
-    y += 30;
-    
-    doc.fillColor("#000000").lineWidth(1);
-    
-    doc.fontSize(14).font("Helvetica-Bold")
-       .text(`INCOME TAX COMPUTATION STATEMENT`, { align: "center" });
-    y += 30;
-    
-    doc.fontSize(12).font("Helvetica-Bold")
-       .text(`Assessment Year: ${data.assessmentYear}`, { align: "center" });
-    y += 40;
+    const L = 36;           // left margin
+    const PW = 523;         // usable page width (595 - 2×36)
+    const C1 = 220;         // particulars column width
+    const C2 = 140;         // old regime column width
+    const C3 = 140;         // new regime column width
+    const COL_OLD = L + C1 + 10;
+    const COL_NEW = L + C1 + C2 + 15;
+    const DARK_BLUE = "#1E3A8A";
+    const MID_BLUE = "#2563EB";
+    const LIGHT_BLUE = "#DBEAFE";
+    const GREEN = "#166534";
+    const GREEN_BG = "#DCFCE7";
+    const AMBER = "#92400E";
+    const AMBER_BG = "#FEF3C7";
+    const GRAY = "#6B7280";
+    const ROW_H = 16;
 
-    doc.fontSize(10).font("Helvetica");
-    
-    const leftCol = 50;
-    const rightCol = 350;
-    
-    doc.text(`Name`, leftCol, y);
-    doc.text(`: ${data.personalInfo.name}`, leftCol + 100, y);
-    doc.text(`Previous Year`, rightCol, y);
-    doc.text(`: ${data.financialYear}`, rightCol + 100, y);
-    y += 15;
+    let y = 36;
 
-    if (data.personalInfo.fatherName) {
-      doc.text(`Father's Name`, leftCol, y);
-      doc.text(`: ${data.personalInfo.fatherName}`, leftCol + 100, y);
-    }
-    if (data.personalInfo.pan) {
-      doc.text(`PAN`, rightCol, y);
-      doc.text(`: ${data.personalInfo.pan}`, rightCol + 100, y);
-    }
-    y += 15;
-
-    if (data.personalInfo.address) {
-      doc.text(`Address`, leftCol, y);
-      doc.text(`: ${data.personalInfo.address.substring(0, 40)}`, leftCol + 100, y);
-    }
-    if (data.personalInfo.aadhaar) {
-      doc.text(`Aadhaar No.`, rightCol, y);
-      doc.text(`: ${data.personalInfo.aadhaar}`, rightCol + 100, y);
-    }
-    y += 15;
-
-    if (data.personalInfo.dateOfBirth) {
-      doc.text(`Date of Birth`, rightCol, y);
-      doc.text(`: ${data.personalInfo.dateOfBirth}`, rightCol + 100, y);
-    }
-    y += 15;
-
-    doc.text(`Status`, rightCol, y);
-    doc.text(`: ${data.personalInfo.status}`, rightCol + 100, y);
-    y += 15;
-
-    doc.text(`Age Group`, leftCol, y);
-    doc.text(`: ${data.personalInfo.ageGroup === "below60" ? "Below 60" : data.personalInfo.ageGroup === "60to80" ? "60-80 (Senior)" : "Above 80 (Super Senior)"}`, leftCol + 100, y);
-    
-    doc.text(`Tax Regime`, rightCol, y);
-    doc.text(`: ${data.regime === "new" ? "New Regime (115BAC)" : "Old Regime"}`, rightCol + 100, y);
-    y += 30;
-
-    doc.moveTo(leftCol, y).lineTo(leftCol + pageWidth, y).stroke();
-    y += 10;
-
-    doc.fontSize(12).font("Helvetica-Bold")
-       .text("Statement of Income", leftCol, y, { align: "center", width: pageWidth });
-    y += 25;
-
-    doc.fontSize(10).font("Helvetica");
-
-    const colSchedule = leftCol + pageWidth - 50;
-    const colAmount = leftCol + pageWidth - 150;
-
-    doc.font("Helvetica-Bold").text("Particulars", leftCol, y);
-    doc.text("Sch.No", colSchedule, y);
-    doc.text("Rs.", colAmount, y);
-    y += 20;
-
-    doc.moveTo(leftCol, y).lineTo(leftCol + pageWidth, y).stroke();
-    y += 10;
-
-    if (data.salary) {
-      doc.font("Helvetica-Bold").text("▶ Income from Salaries", leftCol, y);
-      y += 18;
-
-      if (data.employer) {
-        doc.font("Helvetica").fontSize(9)
-           .text(`Employer: ${data.employer.name}`, leftCol + 10, y);
-        y += 15;
-      }
-
-      if (data.salary.grossSalary) {
-        doc.font("Helvetica").fontSize(10)
-           .text("Salaries, allowances and perquisites", leftCol + 15, y);
-        doc.text(formatNumber(data.salary.grossSalary), colAmount, y, { width: 80, align: "right" });
-        y += 15;
-      }
-
-      doc.text(`Standard deduction u/s 16(ia)`, leftCol + 15, y);
-      doc.text(formatNumber(data.salary.standardDeduction), colAmount, y, { width: 80, align: "right" });
-      y += 15;
-
-      doc.font("Helvetica-Bold")
-         .text('Income chargeable under the head "Salaries"', leftCol + 15, y);
-      doc.text(formatNumber(data.salary.netSalary), colAmount, y, { width: 80, align: "right" });
-      y += 25;
-    }
-
-    if (data.otherIncome && data.otherIncome.total > 0) {
-      doc.font("Helvetica-Bold").text("▶ Income from Other Sources", leftCol, y);
-      y += 18;
-
-      if (data.otherIncome.interestIncome) {
-        doc.font("Helvetica").text("Interest income", leftCol + 15, y);
-        doc.text(formatNumber(data.otherIncome.interestIncome), colAmount, y, { width: 80, align: "right" });
-        y += 15;
-      }
-
-      if (data.otherIncome.dividendIncome) {
-        doc.font("Helvetica").text("Dividends", leftCol + 15, y);
-        doc.text(formatNumber(data.otherIncome.dividendIncome), colAmount, y, { width: 80, align: "right" });
-        y += 15;
-      }
-
-      if (data.otherIncome.rentalIncome) {
-        doc.font("Helvetica").text("Rental income", leftCol + 15, y);
-        doc.text(formatNumber(data.otherIncome.rentalIncome), colAmount, y, { width: 80, align: "right" });
-        y += 15;
-      }
-
-      doc.font("Helvetica-Bold")
-         .text('Income chargeable under the head "Other Sources"', leftCol + 15, y);
-      doc.text(formatNumber(data.otherIncome.total), colAmount, y, { width: 80, align: "right" });
-      y += 25;
-    }
-
-    if (data.otherIncome?.capitalGains && 
-        ((data.otherIncome.capitalGains.shortTerm || 0) + (data.otherIncome.capitalGains.longTerm || 0)) > 0) {
-      doc.font("Helvetica-Bold").text("▶ Capital Gains", leftCol, y);
-      y += 18;
-
-      if (data.otherIncome.capitalGains.shortTerm) {
-        doc.font("Helvetica").text("Short-term Capital Gains", leftCol + 15, y);
-        doc.text(formatNumber(data.otherIncome.capitalGains.shortTerm), colAmount, y, { width: 80, align: "right" });
-        y += 15;
-      }
-
-      if (data.otherIncome.capitalGains.longTerm) {
-        doc.font("Helvetica").text("Long-term Capital Gains", leftCol + 15, y);
-        doc.text(formatNumber(data.otherIncome.capitalGains.longTerm), colAmount, y, { width: 80, align: "right" });
-        y += 15;
-      }
-
-      const totalCapGains = (data.otherIncome.capitalGains.shortTerm || 0) + (data.otherIncome.capitalGains.longTerm || 0);
-      doc.font("Helvetica-Bold")
-         .text('Income chargeable under the head "Capital Gains"', leftCol + 15, y);
-      doc.text(formatNumber(totalCapGains), colAmount, y, { width: 80, align: "right" });
-      y += 25;
-    }
-
-    if (data.deductions && data.deductions.totalDeductions > 0 && data.regime === "old") {
-      doc.font("Helvetica-Bold").text("▶ Deductions under Chapter VI-A", leftCol, y);
-      y += 18;
-
-      if (data.deductions.section80C) {
-        doc.font("Helvetica").text("Section 80C (PPF, ELSS, LIC, etc.)", leftCol + 15, y);
-        doc.text(formatNumber(data.deductions.section80C), colAmount, y, { width: 80, align: "right" });
-        y += 15;
-      }
-
-      if (data.deductions.section80D) {
-        doc.font("Helvetica").text("Section 80D (Health Insurance)", leftCol + 15, y);
-        doc.text(formatNumber(data.deductions.section80D), colAmount, y, { width: 80, align: "right" });
-        y += 15;
-      }
-
-      const npsAmount = data.deductions.section80CCD1B || data.deductions.nps80CCD1B;
-      if (npsAmount) {
-        doc.font("Helvetica").text("Section 80CCD(1B) (NPS – Additional)", leftCol + 15, y);
-        doc.text(formatNumber(npsAmount), colAmount, y, { width: 80, align: "right" });
-        y += 15;
-      }
-
-      if (data.deductions.section80TTA) {
-        doc.font("Helvetica").text("Section 80TTA (Savings Bank Interest)", leftCol + 15, y);
-        doc.text(formatNumber(data.deductions.section80TTA), colAmount, y, { width: 80, align: "right" });
-        y += 15;
-      }
-
-      if (data.deductions.section80E) {
-        doc.font("Helvetica").text("Section 80E (Education Loan Interest)", leftCol + 15, y);
-        doc.text(formatNumber(data.deductions.section80E), colAmount, y, { width: 80, align: "right" });
-        y += 15;
-      }
-
-      if (data.deductions.section80G) {
-        doc.font("Helvetica").text("Section 80G (Donations)", leftCol + 15, y);
-        doc.text(formatNumber(data.deductions.section80G), colAmount, y, { width: 80, align: "right" });
-        y += 15;
-      }
-
-      if (data.deductions.homeLoanInterest) {
-        doc.font("Helvetica").text("Section 24(b) (Home Loan Interest)", leftCol + 15, y);
-        doc.text(formatNumber(data.deductions.homeLoanInterest), colAmount, y, { width: 80, align: "right" });
-        y += 15;
-      }
-
-      if (data.deductions.lta) {
-        doc.font("Helvetica").text("LTA – Leave Travel Allowance", leftCol + 15, y);
-        doc.text(formatNumber(data.deductions.lta), colAmount, y, { width: 80, align: "right" });
-        y += 15;
-      }
-
-      if (data.deductions.otherDeductions) {
-        doc.font("Helvetica").text("Other Deductions", leftCol + 15, y);
-        doc.text(formatNumber(data.deductions.otherDeductions), colAmount, y, { width: 80, align: "right" });
-        y += 15;
-      }
-
-      doc.font("Helvetica-Bold")
-         .text("Total Deductions under Chapter VI-A", leftCol + 15, y);
-      doc.text(formatNumber(data.deductions.totalDeductions), colAmount, y, { width: 80, align: "right" });
-      y += 25;
-    }
-
-    doc.moveTo(leftCol, y).lineTo(leftCol + pageWidth, y).stroke();
-    y += 10;
-
-    doc.font("Helvetica-Bold").fontSize(11)
-       .text("▶ Total Income", leftCol, y);
-    doc.text(formatNumber(data.taxBreakdown.taxableIncome), colAmount, y, { width: 80, align: "right" });
-    y += 20;
-
-    doc.fontSize(10).text("Total income rounded off u/s 288A", leftCol + 15, y);
-    const roundedIncome = Math.round(data.taxBreakdown.taxableIncome / 10) * 10;
-    doc.text(formatNumber(roundedIncome), colAmount, y, { width: 80, align: "right" });
-    y += 25;
-
-    doc.font("Helvetica-Bold").fontSize(12)
-       .text("Tax Computation", leftCol, y, { align: "center", width: pageWidth });
-    y += 20;
-
-    doc.fontSize(10).font("Helvetica");
-
-    doc.text("▶ Tax on total income", leftCol, y);
-    doc.text(formatNumber(data.taxBreakdown.taxOnIncome), colAmount, y, { width: 80, align: "right" });
-    y += 15;
-
-    if (data.taxBreakdown.surcharge > 0) {
-      doc.text("Add: Surcharge", leftCol + 15, y);
-      doc.text(formatNumber(data.taxBreakdown.surcharge), colAmount, y, { width: 80, align: "right" });
-      y += 15;
-    }
-
-    doc.text("Add: Health & Education Cess (4%)", leftCol + 15, y);
-    doc.text(formatNumber(data.taxBreakdown.cess), colAmount, y, { width: 80, align: "right" });
-    y += 15;
-
-    doc.font("Helvetica-Bold")
-       .text("Total Tax Liability", leftCol + 15, y);
-    doc.text(formatNumber(data.taxBreakdown.totalTax), colAmount, y, { width: 80, align: "right" });
-    y += 20;
-
-    if (data.taxBreakdown.tdsDeducted) {
-      doc.font("Helvetica").text("Less: TDS / TCS Deducted", leftCol + 15, y);
-      doc.text(formatNumber(data.taxBreakdown.tdsDeducted), colAmount, y, { width: 80, align: "right" });
-      y += 15;
-    }
-
-    if (data.taxBreakdown.advanceTaxPaid) {
-      doc.text("Less: Advance Tax Paid", leftCol + 15, y);
-      doc.text(formatNumber(data.taxBreakdown.advanceTaxPaid), colAmount, y, { width: 80, align: "right" });
-      y += 15;
-    }
-
-    if (data.taxBreakdown.selfAssessmentTax) {
-      doc.text("Less: Self Assessment Tax", leftCol + 15, y);
-      doc.text(formatNumber(data.taxBreakdown.selfAssessmentTax), colAmount, y, { width: 80, align: "right" });
-      y += 15;
-    }
-
-    y += 5;
-    doc.moveTo(leftCol, y).lineTo(leftCol + pageWidth, y).stroke();
-    y += 10;
-
-    if (data.taxBreakdown.refundDue && data.taxBreakdown.refundDue > 0) {
-      doc.font("Helvetica-Bold").fontSize(11)
-         .text("▶ Refund Due", leftCol, y);
-      doc.fillColor("green")
-         .text(formatNumber(data.taxBreakdown.refundDue), colAmount, y, { width: 80, align: "right" });
-      doc.fillColor("black");
-    } else if (data.taxBreakdown.taxPayable && data.taxBreakdown.taxPayable > 0) {
-      doc.font("Helvetica-Bold").fontSize(11)
-         .text("▶ Tax Payable", leftCol, y);
-      doc.fillColor("red")
-         .text(formatNumber(data.taxBreakdown.taxPayable), colAmount, y, { width: 80, align: "right" });
-      doc.fillColor("black");
-    } else {
-      doc.font("Helvetica-Bold").fontSize(11)
-         .text("▶ Balance Tax", leftCol, y);
-      doc.text("NIL", colAmount, y, { width: 80, align: "right" });
-    }
-    y += 40;
-
-    if (data.bankDetails) {
-      doc.font("Helvetica-Bold").fontSize(10)
-         .text("Bank Details for Refund", leftCol, y);
-      y += 15;
-      doc.font("Helvetica").fontSize(9);
-      doc.text(`Bank Name: ${data.bankDetails.bankName}`, leftCol + 15, y);
-      y += 12;
-      doc.text(`Account No: ${data.bankDetails.accountNumber}`, leftCol + 15, y);
-      y += 12;
-      doc.text(`IFSC Code: ${data.bankDetails.ifscCode}`, leftCol + 15, y);
-      y += 25;
-    }
+    // ── HEADER ──────────────────────────────────────────────────────────────
+    doc.rect(L, y, PW, 52).fill(DARK_BLUE);
+    doc.fillColor("#FFFFFF").font("Helvetica-Bold").fontSize(20)
+       .text("AiTaxBot", L + 10, y + 8);
+    doc.font("Helvetica").fontSize(9).fillColor("#93C5FD")
+       .text("www.aitaxbot.co.in  |  AI-Powered Tax Calculator", L + 10, y + 32);
 
     const compDate = new Date(data.computationDate);
-    doc.fontSize(9).font("Helvetica")
-       .text(`Date: ${compDate.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}`, leftCol, y);
-    
-    y += 40;
-    doc.text(`(${data.personalInfo.name.toUpperCase()})`, rightCol, y, { align: "right" });
+    const dateStr = compDate.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+    doc.fillColor("#FFFFFF").font("Helvetica-Bold").fontSize(11)
+       .text("INCOME TAX COMPARISON STATEMENT", L + 140, y + 10, { width: PW - 150, align: "right" });
+    doc.font("Helvetica").fontSize(9).fillColor("#93C5FD")
+       .text(`AY ${data.assessmentYear}  |  FY ${data.financialYear}  |  Date: ${dateStr}`, L + 140, y + 28, { width: PW - 150, align: "right" });
+    y += 62;
 
-    // Footer with branding
-    y += 50;
-    doc.moveTo(leftCol, y).lineTo(leftCol + pageWidth, y).strokeColor("#1E40AF").lineWidth(1).stroke();
-    y += 15;
-    
-    doc.fontSize(9).font("Helvetica-Bold")
-       .fillColor("#1E40AF")
-       .text("Generated by AiTaxBot | www.aitaxbot.co.in", { align: "center" });
-    y += 12;
-    
-    doc.fontSize(8).font("Helvetica")
-       .fillColor("#666666")
-       .text("AI-Powered Tax Calculator & Financial Tools", { align: "center" });
+    // ── CLIENT INFO + TAX SUMMARY STRIP ─────────────────────────────────────
+    doc.rect(L, y, PW, 28).fill("#F0F9FF");
+    doc.fillColor(DARK_BLUE).font("Helvetica-Bold").fontSize(10)
+       .text(`Name: `, L + 8, y + 9, { continued: true })
+       .font("Helvetica").fillColor("#111827")
+       .text(data.personalInfo.name, { continued: true })
+       .font("Helvetica-Bold").fillColor(DARK_BLUE)
+       .text(`   Age Group: `, { continued: true })
+       .font("Helvetica").fillColor("#111827")
+       .text(data.personalInfo.ageGroup === "below60" ? "Below 60" : data.personalInfo.ageGroup === "60to80" ? "Senior (60-80)" : "Super Senior (80+)", { continued: true });
+    if (data.personalInfo.pan) {
+      doc.font("Helvetica-Bold").fillColor(DARK_BLUE)
+         .text(`   PAN: `, { continued: true })
+         .font("Helvetica").fillColor("#111827")
+         .text(data.personalInfo.pan);
+    } else {
+      doc.text("");
+    }
+    y += 36;
+
+    // ── REGIME RECOMMENDATION BOX ─────────────────────────────────────────
+    const recBg = rec === "new" ? GREEN_BG : AMBER_BG;
+    const recFg = rec === "new" ? GREEN : AMBER;
+    doc.rect(L, y, PW, 30).fill(recBg);
+    doc.fillColor(recFg).font("Helvetica-Bold").fontSize(11)
+       .text(`✅  RECOMMENDED: ${rec === "new" ? "NEW REGIME" : "OLD REGIME"}`, L + 10, y + 9, { continued: true });
+    doc.font("Helvetica").fontSize(10).fillColor(recFg)
+       .text(`   |   Potential Tax Savings: ${fmtCur(savings)}   |   Monthly TDS Savings: ${fmtCur(savings / 12)}`);
+    y += 38;
+
+    // ── QUICK COMPARISON TABLE ────────────────────────────────────────────
+    // Header
+    doc.rect(L, y, PW, 20).fill(DARK_BLUE);
+    doc.fillColor("#FFFFFF").font("Helvetica-Bold").fontSize(9)
+       .text("TAX STATISTICS", L + 6, y + 6)
+       .text("OLD REGIME", COL_OLD, y + 6, { width: C2, align: "center" })
+       .text("NEW REGIME", COL_NEW, y + 6, { width: C3, align: "center" });
+    y += 20;
+
+    const summaryRows: Array<[string, number, number, boolean?]> = [
+      ["Gross Income", OLD.grossTotalIncome, NEW.grossTotalIncome],
+      ["Total Deductions", OLD.totalChapterVIA + OLD.standardDeduction, NEW.standardDeduction],
+      ["Taxable Income", OLD.taxableIncome, NEW.taxableIncome],
+      ["Income Tax (Before Cess)", OLD.incomeTax, NEW.incomeTax],
+      ["Less: Rebate u/s 87A", OLD.rebate87A, NEW.rebate87A],
+      ["Add: Health & Education Cess (4%)", OLD.cess, NEW.cess],
+      ["NET TAX PAYABLE", OLD.totalTax, NEW.totalTax, true],
+      ["Monthly TDS (÷ 12)", OLD.monthlyTDS, NEW.monthlyTDS, true],
+    ];
+
+    summaryRows.forEach(([label, oldVal, newVal, bold], i) => {
+      const bg = i % 2 === 0 ? "#FFFFFF" : "#F8FAFC";
+      doc.rect(L, y, PW, ROW_H).fill(bg);
+      doc.rect(L, y, 1, ROW_H).fill("#E2E8F0");
+      doc.rect(L + PW, y, 1, ROW_H).fill("#E2E8F0");
+
+      const fnt = bold ? "Helvetica-Bold" : "Helvetica";
+      const oldColor = bold ? (rec === "old" ? GREEN : "#DC2626") : "#111827";
+      const newColor = bold ? (rec === "new" ? GREEN : "#DC2626") : "#111827";
+
+      doc.font(fnt).fontSize(9).fillColor("#374151")
+         .text(label as string, L + 6, y + 4, { width: C1 - 6 });
+      doc.fillColor(oldColor).font(fnt).fontSize(9)
+         .text(fmt(oldVal as number), COL_OLD, y + 4, { width: C2, align: "right" });
+      doc.fillColor(newColor).font(fnt).fontSize(9)
+         .text(fmt(newVal as number), COL_NEW, y + 4, { width: C3, align: "right" });
+
+      // Recommended marker
+      if (bold && label === "NET TAX PAYABLE") {
+        const markerX = rec === "new" ? COL_NEW + C3 + 4 : COL_OLD + C2 + 4;
+        doc.fillColor(GREEN).fontSize(8).text("◀ Best", markerX - 30, y + 4);
+      }
+      y += ROW_H;
+    });
+
+    // Bottom border
+    doc.rect(L, y, PW, 1).fill("#1E3A8A");
+    y += 16;
+
+    // ── PAGE BREAK CHECK ─────────────────────────────────────────────────────
+    if (y > 700) {
+      doc.addPage();
+      y = 36;
+    }
+
+    // ── DETAILED COMPUTATION TABLE ────────────────────────────────────────────
+    // Section header
+    doc.rect(L, y, PW, 20).fill(DARK_BLUE);
+    doc.fillColor("#FFFFFF").font("Helvetica-Bold").fontSize(9)
+       .text("DETAILED TAX COMPUTATION", L + 6, y + 6)
+       .text("OLD REGIME", COL_OLD, y + 6, { width: C2, align: "center" })
+       .text("NEW REGIME", COL_NEW, y + 6, { width: C3, align: "center" });
+    y += 20;
+
+    // Sub-header
+    doc.rect(L, y, PW, 14).fill("#E2E8F0");
+    doc.fillColor(GRAY).font("Helvetica").fontSize(7.5)
+       .text("Particulars", L + 6, y + 3)
+       .text("Amount (₹)", COL_OLD, y + 3, { width: C2, align: "right" })
+       .text("Amount (₹)", COL_NEW, y + 3, { width: C3, align: "right" });
+    y += 14;
+
+    let rowIndex = 0;
+
+    const detailRow = (
+      label: string,
+      oldVal: number | string | null,
+      newVal: number | string | null,
+      options: { bold?: boolean; sectionHeader?: boolean; indent?: number; highlight?: "green" | "blue" | "amber" } = {}
+    ) => {
+      // Page break check
+      if (y > 770) {
+        doc.addPage();
+        y = 36;
+        // Re-draw column headers on new page
+        doc.rect(L, y, PW, 14).fill(DARK_BLUE);
+        doc.fillColor("#FFFFFF").font("Helvetica-Bold").fontSize(8)
+           .text("Particulars (continued)", L + 6, y + 3)
+           .text("Old Regime", COL_OLD, y + 3, { width: C2, align: "center" })
+           .text("New Regime", COL_NEW, y + 3, { width: C3, align: "center" });
+        y += 14;
+        rowIndex = 0;
+      }
+
+      let bg = rowIndex % 2 === 0 ? "#FFFFFF" : "#F8FAFC";
+      if (options.sectionHeader) bg = LIGHT_BLUE;
+      if (options.highlight === "green") bg = GREEN_BG;
+      if (options.highlight === "blue") bg = "#EFF6FF";
+      if (options.highlight === "amber") bg = AMBER_BG;
+
+      doc.rect(L, y, PW, ROW_H).fill(bg);
+      doc.rect(L, y, 1, ROW_H).fill("#E2E8F0");
+      doc.rect(L + PW, y, 1, ROW_H).fill("#E2E8F0");
+      doc.rect(L + C1 + 5, y, 1, ROW_H).fill("#E2E8F0");
+      doc.rect(L + C1 + C2 + 10, y, 1, ROW_H).fill("#E2E8F0");
+
+      const indent = (options.indent || 0) * 10;
+      const fnt = options.bold || options.sectionHeader ? "Helvetica-Bold" : "Helvetica";
+      const labelColor = options.sectionHeader ? DARK_BLUE : "#374151";
+
+      doc.font(fnt).fontSize(8.5).fillColor(labelColor)
+         .text(label, L + 6 + indent, y + 4, { width: C1 - 6 - indent });
+
+      const renderVal = (val: number | string | null, xStart: number, width: number, isOld: boolean) => {
+        if (val === null || val === undefined) return;
+        const sVal = typeof val === "string" ? val : fmt(val);
+        const isNegative = typeof val === "number" && val < 0;
+        let color = "#374151";
+        if (options.bold) color = "#111827";
+        if (options.highlight === "green") color = GREEN;
+        if (options.sectionHeader) color = DARK_BLUE;
+        if (isNegative) color = "#DC2626";
+        // For recommended column, use green for final tax
+        if (options.highlight === "green") {
+          color = isOld && rec !== "old" ? "#DC2626" : GREEN;
+          if (!isOld && rec === "new") color = GREEN;
+          if (isOld && rec === "old") color = GREEN;
+        }
+        doc.font(fnt).fontSize(8.5).fillColor(color)
+           .text(sVal === "-" ? "-" : sVal, xStart, y + 4, { width, align: "right" });
+      };
+
+      renderVal(oldVal, COL_OLD, C2, true);
+      renderVal(newVal, COL_NEW, C3, false);
+
+      y += ROW_H;
+      if (!options.sectionHeader) rowIndex++;
+    };
+
+    const neg = (n: number) => n > 0 ? -n : n;
+
+    // ── SALARY SECTION ─────────────────────────────────────────────────────
+    detailRow("Gross Salary", OLD.grossSalary, NEW.grossSalary, { bold: true });
+
+    if (OLD.basicDA || NEW.basicDA) {
+      detailRow("Basic + Dearness Allowance", OLD.basicDA || null, NEW.basicDA || null, { indent: 1 });
+    }
+
+    // Exemptions
+    detailRow("EXEMPTIONS  [Chapter III]", null, null, { sectionHeader: true });
+
+    if (OLD.hraReceived || OLD.hraExemption) {
+      detailRow(
+        "House Rent Allowance (HRA) — Sec 10(13A)",
+        OLD.hraExemption ? neg(OLD.hraExemption) : null,
+        "-",
+        { indent: 1 }
+      );
+    }
+    if (OLD.ltaReceived || OLD.ltaExemption) {
+      detailRow(
+        "Leave Travel Allowance (LTA) — Sec 10(5)",
+        OLD.ltaExemption ? neg(OLD.ltaExemption) : null,
+        "-",
+        { indent: 1 }
+      );
+    }
+    if (OLD.otherAllowancesExemption) {
+      detailRow(
+        "Other Allowances — Sec 10(14)",
+        neg(OLD.otherAllowancesExemption),
+        neg(NEW.otherAllowancesExemption || 0),
+        { indent: 1 }
+      );
+    }
+
+    // Deductions u/s 16
+    detailRow("DEDUCTIONS UNDER SECTION 16", null, null, { sectionHeader: true });
+    detailRow("Standard Deduction u/s 16(ia)", neg(OLD.standardDeduction), neg(NEW.standardDeduction), { indent: 1 });
+    if (OLD.professionalTax) {
+      detailRow("Professional Tax u/s 16(iii)", neg(OLD.professionalTax), neg(NEW.professionalTax || 0), { indent: 1 });
+    }
+
+    detailRow("Net Income from Salary", OLD.netSalary, NEW.netSalary, { bold: true });
+
+    // Other income
+    if ((OLD.rentalIncome || 0) + (OLD.capitalGainsLTCG || 0) + (OLD.capitalGainsSTC || 0) + (OLD.otherIncome || 0) > 0) {
+      detailRow("OTHER INCOME", null, null, { sectionHeader: true });
+      if (OLD.rentalIncome) detailRow("Income from House Property — Sec 24", OLD.rentalIncome, NEW.rentalIncome || 0, { indent: 1 });
+      if (OLD.dividendIncome) detailRow("Dividend Income", OLD.dividendIncome, NEW.dividendIncome || 0, { indent: 1 });
+      if (OLD.capitalGainsLTCG) detailRow("Long-term Capital Gains (LTCG @ 12.5%)", OLD.capitalGainsLTCG, NEW.capitalGainsLTCG || 0, { indent: 1 });
+      if (OLD.capitalGainsSTC) detailRow("Short-term Capital Gains (STCG @ 20%)", OLD.capitalGainsSTC, NEW.capitalGainsSTC || 0, { indent: 1 });
+      if (OLD.otherIncome) detailRow("Income from Other Sources (Interest etc.)", OLD.otherIncome, NEW.otherIncome || 0, { indent: 1 });
+    }
+
+    detailRow("GROSS TOTAL INCOME", OLD.grossTotalIncome, NEW.grossTotalIncome, { bold: true, highlight: "blue" });
+
+    // Chapter VI-A
+    detailRow("DEDUCTIONS UNDER CHAPTER VI-A", null, null, { sectionHeader: true });
+    if (OLD.sec80C) detailRow("Sec 80C — PPF / ELSS / LIC / EPF (Max ₹1,50,000)", neg(OLD.sec80C), "NIL", { indent: 1 });
+    if (OLD.sec80D) detailRow("Sec 80D — Health Insurance Premium", neg(OLD.sec80D), "NIL", { indent: 1 });
+    if (OLD.sec80CCD1B) detailRow("Sec 80CCD(1B) — NPS Additional (Max ₹50,000)", neg(OLD.sec80CCD1B), "NIL", { indent: 1 });
+    if (OLD.sec80E) detailRow("Sec 80E — Education Loan Interest", neg(OLD.sec80E), "NIL", { indent: 1 });
+    if (OLD.sec80TTA) detailRow("Sec 80TTA — Savings Bank Interest (Max ₹10,000)", neg(OLD.sec80TTA), "NIL", { indent: 1 });
+    if (OLD.sec80G) detailRow("Sec 80G — Donations to NGO / Charitable Trusts", neg(OLD.sec80G), "NIL", { indent: 1 });
+    if (OLD.homeLoanInterest) detailRow("Sec 24(b) — Home Loan Interest (Max ₹2,00,000)", neg(OLD.homeLoanInterest), "NIL", { indent: 1 });
+    detailRow("Total Deductions under Chapter VI-A", OLD.totalChapterVIA > 0 ? neg(OLD.totalChapterVIA) : "-", "NIL", { bold: true, indent: 1 });
+
+    // Taxable income
+    detailRow("TOTAL TAXABLE INCOME", OLD.taxableIncome, NEW.taxableIncome, { bold: true, highlight: "blue" });
+
+    // Tax computation
+    detailRow("TAX COMPUTATION", null, null, { sectionHeader: true });
+    detailRow("Tax at Normal Rates (as per slab)", OLD.incomeTax, NEW.incomeTax, { indent: 1 });
+    detailRow("Tax at Special Rates (LTCG / STCG)", OLD.capitalGainsLTCG ? Math.round((OLD.capitalGainsLTCG) * 0.125) : "-", NEW.capitalGainsLTCG ? Math.round((NEW.capitalGainsLTCG) * 0.125) : "-", { indent: 1 });
+    detailRow("Tax Payable (before rebate)", OLD.incomeTax, NEW.incomeTax, { indent: 1 });
+    detailRow("Less: Rebate u/s 87A", OLD.rebate87A > 0 ? neg(OLD.rebate87A) : "-", NEW.rebate87A > 0 ? neg(NEW.rebate87A) : "-", { indent: 1 });
+    detailRow("Tax Payable (after rebate)", OLD.taxAfterRebate, NEW.taxAfterRebate, { indent: 1, bold: true });
+    detailRow("Add: Surcharge", OLD.surcharge > 0 ? OLD.surcharge : "-", NEW.surcharge > 0 ? NEW.surcharge : "-", { indent: 1 });
+    detailRow("Total Tax Including Surcharge", OLD.taxAfterRebate + OLD.surcharge, NEW.taxAfterRebate + NEW.surcharge, { indent: 1 });
+    detailRow("Add: Health & Education Cess @ 4%", OLD.cess, NEW.cess, { indent: 1 });
+
+    detailRow("NET TAX PAYABLE", OLD.totalTax, NEW.totalTax, { bold: true, highlight: "green" });
+    detailRow("Monthly TDS Deduction (÷ 12)", OLD.monthlyTDS, NEW.monthlyTDS, { bold: true });
+
+    y += 6;
+    doc.rect(L, y, PW, 1).fill(DARK_BLUE);
+    y += 14;
+
+    // ── ACTIONABLE SUGGESTIONS ──────────────────────────────────────────────
+    if (y > 650) { doc.addPage(); y = 36; }
+
+    doc.rect(L, y, PW, 18).fill(DARK_BLUE);
+    doc.fillColor("#FFFFFF").font("Helvetica-Bold").fontSize(9)
+       .text("ACTIONABLE SUGGESTIONS  (Old Regime Optimisation)", L + 6, y + 5);
+    y += 22;
+
+    const suggestions: Array<{ section: string; desc: string; limit: string }> = [];
+    if ((OLD.sec80C || 0) < 150000) suggestions.push({ section: "80C", desc: "Invest in PPF / ELSS / LIC / EPF to maximise the ₹1,50,000 deduction limit", limit: `Unclaimed: ₹${fmt(150000 - (OLD.sec80C || 0))}` });
+    if (!(OLD.sec80CCD1B)) suggestions.push({ section: "80CCD(1B)", desc: "Invest in NPS for an additional ₹50,000 deduction over and above 80C", limit: "Max: ₹50,000" });
+    if (!(OLD.sec80D)) suggestions.push({ section: "80D", desc: "Buy health insurance for self, family and parents to claim medical deduction", limit: "Max: ₹25,000–₹1,00,000" });
+    if (!(OLD.hraExemption) && OLD.grossSalary > 0) suggestions.push({ section: "HRA", desc: "If you are paying rent, declare it to claim HRA exemption under Sec 10(13A)", limit: "Based on salary & rent paid" });
+    if (!(OLD.sec80TTA)) suggestions.push({ section: "80TTA", desc: "Claim savings bank interest (up to ₹10,000) under Section 80TTA", limit: "Max: ₹10,000" });
+
+    suggestions.slice(0, 5).forEach((s, i) => {
+      const bg = i % 2 === 0 ? "#FFFFFF" : "#F8FAFC";
+      doc.rect(L, y, PW, 22).fill(bg);
+      doc.font("Helvetica-Bold").fontSize(8.5).fillColor(MID_BLUE).text(`Sec ${s.section}`, L + 6, y + 4, { width: 55 });
+      doc.font("Helvetica").fontSize(8.5).fillColor("#374151").text(s.desc, L + 65, y + 4, { width: PW - 130 });
+      doc.font("Helvetica-Bold").fontSize(8).fillColor(GREEN).text(s.limit, L + PW - 120, y + 8, { width: 115, align: "right" });
+      y += 22;
+    });
+
     y += 10;
-    
-    doc.fontSize(7)
-       .fillColor("#999999")
-       .text("Disclaimer: This computation is for informational purposes only. Please consult a qualified tax professional for filing.", { align: "center" });
+
+    // ── FOOTER ────────────────────────────────────────────────────────────────
+    doc.rect(L, y, PW, 1).fill(DARK_BLUE);
+    y += 8;
+    doc.font("Helvetica-Bold").fontSize(8).fillColor(DARK_BLUE)
+       .text("Generated by AiTaxBot  |  www.aitaxbot.co.in", L, y, { width: PW, align: "center" });
+    y += 12;
+    doc.font("Helvetica").fontSize(7).fillColor(GRAY)
+       .text("Disclaimer: This computation is for informational purposes only. Please consult a qualified tax professional before filing your ITR. All figures are rounded to the nearest rupee.", L, y, { width: PW, align: "center" });
 
     doc.end();
   });
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// LEGACY SINGLE-REGIME PDF (backward compat — used when only one regime is sent)
+// ─────────────────────────────────────────────────────────────────────────────
+
+function generateLegacyPDF(data: TaxComputationData): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    const chunks: Buffer[] = [];
+    const doc = new PDFDocument({ margin: 50, size: "A4" });
+    doc.on("data", (c: Buffer) => chunks.push(c));
+    doc.on("end", () => resolve(Buffer.concat(chunks)));
+    doc.on("error", reject);
+
+    const L = 50;
+    const PW = doc.page.width - 100;
+    let y = 40;
+
+    doc.fontSize(22).font("Helvetica-Bold").fillColor("#1E40AF")
+       .text("AiTaxBot", { align: "center" });
+    y += 30;
+    doc.fontSize(10).font("Helvetica").fillColor("#666666")
+       .text("www.aitaxbot.co.in | AI-Powered Tax Calculator", { align: "center" });
+    y += 25;
+    doc.moveTo(50, y).lineTo(545, y).strokeColor("#1E40AF").lineWidth(2).stroke();
+    y += 20;
+    doc.fillColor("#000000").lineWidth(1);
+    doc.fontSize(14).font("Helvetica-Bold").text("INCOME TAX COMPUTATION STATEMENT", { align: "center" });
+    y += 30;
+    doc.fontSize(12).font("Helvetica-Bold").text(`Assessment Year: ${data.assessmentYear}`, { align: "center" });
+    y += 30;
+
+    const colR = 350;
+    doc.fontSize(10).font("Helvetica");
+    doc.text("Name", L, y); doc.text(`: ${data.personalInfo.name}`, L + 100, y);
+    doc.text("Previous Year", colR, y); doc.text(`: ${data.financialYear}`, colR + 100, y); y += 15;
+    doc.text("Age Group", L, y);
+    doc.text(`: ${data.personalInfo.ageGroup === "below60" ? "Below 60" : data.personalInfo.ageGroup === "60to80" ? "60-80 (Senior)" : "Above 80 (Super Senior)"}`, L + 100, y);
+    doc.text("Tax Regime", colR, y);
+    doc.text(`: ${(data.regime || "new") === "new" ? "New Regime (115BAC)" : "Old Regime"}`, colR + 100, y); y += 30;
+
+    doc.moveTo(L, y).lineTo(L + PW, y).stroke(); y += 10;
+    doc.fontSize(10).font("Helvetica");
+
+    const colA = L + PW - 150;
+
+    if (data.salary) {
+      doc.font("Helvetica-Bold").text("▶ Income from Salaries", L, y); y += 18;
+      doc.font("Helvetica").text("Gross Salary", L + 15, y);
+      doc.text(fmt(data.salary.grossSalary), colA, y, { width: 80, align: "right" }); y += 15;
+      doc.text(`Less: Standard Deduction u/s 16(ia)`, L + 15, y);
+      doc.text(`(${fmt(data.salary.standardDeduction)})`, colA, y, { width: 80, align: "right" }); y += 15;
+      doc.font("Helvetica-Bold").text("Net Income from Salary", L + 15, y);
+      doc.text(fmt(data.salary.netSalary), colA, y, { width: 80, align: "right" }); y += 25;
+    }
+
+    if (data.deductions && data.deductions.totalDeductions > 0 && data.regime === "old") {
+      doc.font("Helvetica-Bold").text("▶ Deductions under Chapter VI-A", L, y); y += 18;
+      const d = data.deductions;
+      const sections: Array<[string, number | undefined]> = [
+        ["Section 80C (PPF, ELSS, LIC, etc.)", d.section80C],
+        ["Section 80D (Health Insurance)", d.section80D],
+        ["Section 80CCD(1B) — NPS", d.section80CCD1B || d.nps80CCD1B],
+        ["Section 80TTA (Savings Interest)", d.section80TTA],
+        ["Section 80E (Education Loan)", d.section80E],
+        ["Section 80G (Donations)", d.section80G],
+        ["Section 24(b) (Home Loan Interest)", d.homeLoanInterest],
+        ["LTA Exemption", d.lta],
+        ["Other Deductions", d.otherDeductions],
+      ];
+      sections.forEach(([label, val]) => {
+        if (val && val > 0) {
+          doc.font("Helvetica").text(label, L + 15, y);
+          doc.text(fmt(val), colA, y, { width: 80, align: "right" }); y += 15;
+        }
+      });
+      doc.font("Helvetica-Bold").text("Total Deductions under Chapter VI-A", L + 15, y);
+      doc.text(fmt(d.totalDeductions), colA, y, { width: 80, align: "right" }); y += 25;
+    }
+
+    doc.moveTo(L, y).lineTo(L + PW, y).stroke(); y += 10;
+    doc.font("Helvetica-Bold").fontSize(11).text("▶ Total Taxable Income", L, y);
+    doc.text(fmt(data.taxBreakdown.taxableIncome), colA, y, { width: 80, align: "right" }); y += 25;
+
+    doc.font("Helvetica").fontSize(10);
+    doc.text("Tax on Total Income", L, y);
+    doc.text(fmt(data.taxBreakdown.taxOnIncome), colA, y, { width: 80, align: "right" }); y += 15;
+    if (data.taxBreakdown.surcharge > 0) {
+      doc.text("Add: Surcharge", L + 15, y);
+      doc.text(fmt(data.taxBreakdown.surcharge), colA, y, { width: 80, align: "right" }); y += 15;
+    }
+    doc.text("Add: Health & Education Cess (4%)", L + 15, y);
+    doc.text(fmt(data.taxBreakdown.cess), colA, y, { width: 80, align: "right" }); y += 15;
+    doc.font("Helvetica-Bold").text("Net Tax Payable", L + 15, y);
+    doc.text(fmt(data.taxBreakdown.totalTax), colA, y, { width: 80, align: "right" }); y += 30;
+
+    const compDate = new Date(data.computationDate);
+    doc.fontSize(9).font("Helvetica").fillColor("#333333")
+       .text(`Date: ${compDate.toLocaleDateString("en-IN")}`, L, y);
+    y += 50;
+    doc.moveTo(L, y).lineTo(L + PW, y).strokeColor("#1E40AF").lineWidth(1).stroke(); y += 12;
+    doc.fontSize(9).font("Helvetica-Bold").fillColor("#1E40AF").text("Generated by AiTaxBot | www.aitaxbot.co.in", { align: "center" });
+    y += 10;
+    doc.fontSize(7).font("Helvetica").fillColor("#999999").text("Disclaimer: This computation is for informational purposes only. Please consult a qualified tax professional for ITR filing.", { align: "center" });
+
+    doc.end();
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SAVE PDF HELPER
+// ─────────────────────────────────────────────────────────────────────────────
+
 export async function savePDFToStorage(pdfBuffer: Buffer, userId: string): Promise<string> {
-  // Save PDF to local file system in a temporary directory
   const uploadDir = path.join(process.cwd(), "temp-pdfs");
-  
-  // Create directory if it doesn't exist
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-  }
-  
+  if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
   const fileName = `tax-computation-${randomUUID()}.pdf`;
   const filePath = path.join(uploadDir, fileName);
-  
-  // Write PDF to file
   fs.writeFileSync(filePath, pdfBuffer);
-  
-  // Return the file path (in production, you might want to use a cloud storage solution)
   return `/temp-pdfs/${fileName}`;
 }

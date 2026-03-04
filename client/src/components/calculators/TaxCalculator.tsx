@@ -508,76 +508,132 @@ export default function TaxCalculator({ onClose }: TaxCalculatorProps = {}) {
         '2025-26': '2026-27',
         '2026-27': '2027-28'
       };
-      
-      const assessmentYear = fyToAY[formData.financialYear] || '2026-27';
-      const selectedRegime = result.recommendedRegime;
-      const regimeResult = selectedRegime === 'old' ? result.oldRegime : result.newRegime;
 
+      const assessmentYear = fyToAY[formData.financialYear] || '2026-27';
+
+      // ── Re-derive inputs needed for PDF ───────────────────────────────────
+      const salaryIncome   = parseFloat(formData.salaryIncome)        || 0;
+      const hraReceived    = parseFloat(formData.hraReceived)         || 0;
+      const rentPaid       = parseFloat(formData.rentPaid)            || 0;
+      const rentalIncome   = parseFloat(formData.housePropertyIncome) || 0;
+      const capitalGains   = parseFloat(formData.capitalGainsIncome)  || 0;
+      const businessInc    = parseFloat(formData.businessIncome)      || 0;
+      const otherInc       = parseFloat(formData.otherIncome)         || 0;
+
+      // Deductions (capped exactly as in calculateSingleRegime)
+      const sec80C         = Math.min(parseFloat(formData.section80C)      || 0, 150000);
+      const sec80D         = parseFloat(formData.section80D)               || 0;
+      const sec80E         = parseFloat(formData.section80E)               || 0;
+      const sec80TTA       = Math.min(parseFloat(formData.section80TTA)    || 0, 10000);
+      const sec80CCD1B     = Math.min(parseFloat(formData.section80CCD1B)  || 0, 50000);
+      const sec80G         = parseFloat(formData.section80G)               || 0;
+      const homeLoanInt    = Math.min(parseFloat(formData.homeLoanInterest) || 0, 200000);
+      const lta            = parseFloat(formData.lta)                      || 0;
+
+      // HRA exemption (same formula as calculateSingleRegime)
+      let hraExemption = 0;
+      if (hraReceived > 0 && rentPaid > 0 && salaryIncome > 0) {
+        const rentExcess    = Math.max(0, rentPaid - salaryIncome * 0.1);
+        const hraPercentage = formData.isMetroCity ? 0.5 : 0.4;
+        hraExemption = Math.min(hraReceived, rentExcess, salaryIncome * hraPercentage);
+      }
+
+      const totalChapterVIA = sec80C + sec80D + sec80E + sec80TTA + sec80CCD1B + sec80G + homeLoanInt;
+
+      // ── Build OLD regime RegimePDFData ─────────────────────────────────────
+      const oldSD       = result.oldRegime.standardDeduction;   // ₹50,000
+      const oldNetSal   = salaryIncome - hraExemption - lta - oldSD;
+      const oldOtherInc = rentalIncome + capitalGains + businessInc + otherInc;
+      const oldGTI      = Math.max(0, oldNetSal) + oldOtherInc;
+      const oldTaxAfterRebate = Math.max(0, result.oldRegime.incomeTax - result.oldRegime.rebate87A);
+
+      const oldRegimeData = {
+        grossSalary:      salaryIncome,
+        hraReceived:      hraReceived  || undefined,
+        hraExemption:     hraExemption || undefined,
+        ltaReceived:      lta          || undefined,
+        ltaExemption:     lta          || undefined,
+        standardDeduction: oldSD,
+        netSalary:        Math.max(0, oldNetSal),
+        rentalIncome:     rentalIncome  || undefined,
+        capitalGainsLTCG: capitalGains  || undefined,
+        otherIncome:      (businessInc + otherInc) || undefined,
+        grossTotalIncome: oldGTI,
+        sec80C:           sec80C        || undefined,
+        sec80D:           sec80D        || undefined,
+        sec80E:           sec80E        || undefined,
+        sec80TTA:         sec80TTA      || undefined,
+        sec80CCD1B:       sec80CCD1B    || undefined,
+        sec80G:           sec80G        || undefined,
+        homeLoanInterest: homeLoanInt   || undefined,
+        totalChapterVIA,
+        taxableIncome:    result.oldRegime.taxableIncome,
+        incomeTax:        result.oldRegime.incomeTax,
+        rebate87A:        result.oldRegime.rebate87A,
+        taxAfterRebate:   oldTaxAfterRebate,
+        surcharge:        0,
+        cess:             result.oldRegime.cess,
+        totalTax:         result.oldRegime.totalTax,
+        monthlyTDS:       Math.round(result.oldRegime.totalTax / 12),
+      };
+
+      // ── Build NEW regime RegimePDFData ─────────────────────────────────────
+      const newSD       = result.newRegime.standardDeduction;   // ₹75,000
+      const newNetSal   = salaryIncome - newSD;
+      const newOtherInc = rentalIncome + capitalGains + businessInc + otherInc;
+      const newGTI      = Math.max(0, newNetSal) + newOtherInc;
+      const newTaxAfterRebate = Math.max(0, result.newRegime.incomeTax - result.newRegime.rebate87A);
+
+      const newRegimeData = {
+        grossSalary:      salaryIncome,
+        standardDeduction: newSD,
+        netSalary:        Math.max(0, newNetSal),
+        rentalIncome:     rentalIncome  || undefined,
+        capitalGainsLTCG: capitalGains  || undefined,
+        otherIncome:      (businessInc + otherInc) || undefined,
+        grossTotalIncome: newGTI,
+        totalChapterVIA:  0,
+        taxableIncome:    result.newRegime.taxableIncome,
+        incomeTax:        result.newRegime.incomeTax,
+        rebate87A:        result.newRegime.rebate87A,
+        taxAfterRebate:   newTaxAfterRebate,
+        surcharge:        0,
+        cess:             result.newRegime.cess,
+        totalTax:         result.newRegime.totalTax,
+        monthlyTDS:       Math.round(result.newRegime.totalTax / 12),
+      };
+
+      // ── Build full computationData payload ────────────────────────────────
       const computationData = {
         personalInfo: {
           name: user?.displayName || `${userProfile?.firstName || ''} ${userProfile?.lastName || ''}`.trim() || 'Taxpayer',
-          pan: '',  // PAN not stored in profile yet — placeholder for future doc upload
+          pan: '',
           status: 'Individual',
           ageGroup: formData.ageGroup,
           residencyStatus: 'Resident',
         },
         assessmentYear,
         financialYear: formData.financialYear,
-        regime: selectedRegime,
-        salary: {
-          grossSalary: parseFloat(formData.salaryIncome) || 0,
-          standardDeduction: regimeResult.standardDeduction,
-          netSalary: (parseFloat(formData.salaryIncome) || 0) - regimeResult.standardDeduction,
-        },
-        otherIncome: {
-          rentalIncome: parseFloat(formData.housePropertyIncome) || 0,
-          capitalGains: {
-            shortTerm: 0,
-            longTerm: parseFloat(formData.capitalGainsIncome) || 0,
-          },
-          otherSources: (parseFloat(formData.businessIncome) || 0) + (parseFloat(formData.otherIncome) || 0),
-          total: (parseFloat(formData.housePropertyIncome) || 0) + 
-                 (parseFloat(formData.capitalGainsIncome) || 0) + 
-                 (parseFloat(formData.businessIncome) || 0) + 
-                 (parseFloat(formData.otherIncome) || 0),
-        },
-        deductions: selectedRegime === 'old' ? {
-          section80C: parseFloat(formData.section80C) || 0,
-          section80D: parseFloat(formData.section80D) || 0,
-          section80E: parseFloat(formData.section80E) || 0,
-          section80TTA: parseFloat(formData.section80TTA) || 0,
-          section80CCD1B: parseFloat(formData.section80CCD1B) || 0,
-          section80G: parseFloat(formData.section80G) || 0,
-          homeLoanInterest: parseFloat(formData.homeLoanInterest) || 0,
-          lta: parseFloat(formData.lta) || 0,
-          otherDeductions: parseFloat(formData.otherDeductions) || 0,
-          totalDeductions: (parseFloat(formData.section80C) || 0) +
-                           (parseFloat(formData.section80D) || 0) +
-                           (parseFloat(formData.section80E) || 0) +
-                           (parseFloat(formData.section80TTA) || 0) +
-                           (parseFloat(formData.section80CCD1B) || 0) +
-                           (parseFloat(formData.section80G) || 0) +
-                           (parseFloat(formData.homeLoanInterest) || 0) +
-                           (parseFloat(formData.lta) || 0) +
-                           (parseFloat(formData.otherDeductions) || 0),
-        } : undefined,
+        // New detailed both-regime data (triggers ITR-style PDF)
+        oldRegimeData,
+        newRegimeData,
+        recommendedRegime: result.recommendedRegime,
+        savings: result.savings,
+        // Legacy fallback fields (used by generateLegacyPDF)
+        regime: result.recommendedRegime,
         taxBreakdown: {
-          taxableIncome: regimeResult.taxableIncome,
-          taxOnIncome: regimeResult.incomeTax,
-          surcharge: 0,
-          cess: regimeResult.cess,
-          totalTax: regimeResult.totalTax,
-          refundDue: 0,
-          taxPayable: regimeResult.totalTax,
+          taxableIncome: result.oldRegime.taxableIncome,
+          taxOnIncome:   result.oldRegime.incomeTax,
+          surcharge:     0,
+          cess:          result.oldRegime.cess,
+          totalTax:      result.oldRegime.totalTax,
         },
       };
 
       const response = await fetch('/api/tax-computation/generate-pdf', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(computationData)
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(computationData),
       });
 
       if (!response.ok) {
@@ -593,17 +649,17 @@ export default function TaxCalculator({ onClose }: TaxCalculatorProps = {}) {
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-      
+
       toast({
-        title: "Success",
-        description: "Tax computation PDF downloaded successfully!",
+        title: 'PDF Downloaded',
+        description: 'Detailed ITR-style tax comparison downloaded successfully!',
       });
     } catch (error) {
       console.error('Error generating PDF:', error);
       toast({
-        title: "Error",
-        description: "Failed to generate PDF. Please try again.",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to generate PDF. Please try again.',
+        variant: 'destructive',
       });
     } finally {
       setIsGeneratingPDF(false);
