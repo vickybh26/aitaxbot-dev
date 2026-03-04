@@ -27,10 +27,10 @@ interface HRAResult {
   taxableHRA: number;
   exemptionPercentage: number;
   calculationBreakdown: {
-    rule1: number; // Actual HRA received
-    rule2: number; // Actual rent paid minus 10% of basic salary
-    rule3: number; // 50% or 40% of basic salary
-    minimumOf: number; // Minimum of above three
+    rule1: number;
+    rule2: number;
+    rule3: number;
+    minimumOf: number;
   };
 }
 
@@ -48,38 +48,83 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
   const [hraReceived, setHraReceived] = useState<number>(240000);
   const [actualRentPaid, setActualRentPaid] = useState<number>(300000);
   const [cityType, setCityType] = useState<string>("metro");
+  const [inputMode, setInputMode] = useState<'annual' | 'monthly'>('annual');
   const [result, setResult] = useState<HRAResult | null>(null);
   const [recommendations, setRecommendations] = useState<AIRecommendation[]>([]);
   const [activeTab, setActiveTab] = useState<string>("calculator");
   const [isCalculating, setIsCalculating] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
-  const calculateHRA = async () => {
-    setIsCalculating(true);
-    
-    // Add artificial delay to show loading state for better UX
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    // HRA exemption calculation as per Section 10(13A) of Income Tax Act
-    const rule1 = hraReceived; // Actual HRA received
-    const rule2 = Math.max(0, actualRentPaid - (basicSalary * 0.10)); // Actual rent paid minus 10% of basic salary
-    const rule3 = cityType === "metro" ? basicSalary * 0.50 : basicSalary * 0.40; // 50% for metro, 40% for non-metro
-    
-    const hraExemption = Math.min(rule1, rule2, rule3);
-    const taxableHRA = Math.max(0, hraReceived - hraExemption);
-    const exemptionPercentage = hraReceived > 0 ? (hraExemption / hraReceived) * 100 : 0;
+  const isModal = !!onClose;
 
-    const calculationBreakdown = {
-      rule1,
-      rule2,
-      rule3,
-      minimumOf: hraExemption
+  const handleInputModeChange = (newMode: 'annual' | 'monthly') => {
+    if (newMode === inputMode) return;
+
+    if (newMode === 'monthly') {
+      // Convert from annual to monthly
+      setBasicSalary(Math.round(basicSalary / 12));
+      setHraReceived(Math.round(hraReceived / 12));
+      setActualRentPaid(Math.round(actualRentPaid / 12));
+    } else {
+      // Convert from monthly to annual
+      setBasicSalary(Math.round(basicSalary * 12));
+      setHraReceived(Math.round(hraReceived * 12));
+      setActualRentPaid(Math.round(actualRentPaid * 12));
+    }
+
+    setInputMode(newMode);
+  };
+
+  const getDisplayValues = () => {
+    if (inputMode === 'monthly') {
+      return {
+        displayBasic: Math.round(basicSalary / 12),
+        displayHra: Math.round(hraReceived / 12),
+        displayRent: Math.round(actualRentPaid / 12),
+      };
+    }
+    return {
+      displayBasic: basicSalary,
+      displayHra: hraReceived,
+      displayRent: actualRentPaid,
     };
+  };
+
+  const getAnnualValues = () => {
+    if (inputMode === 'monthly') {
+      return {
+        annualBasic: basicSalary * 12,
+        annualHra: hraReceived * 12,
+        annualRent: actualRentPaid * 12,
+      };
+    }
+    return {
+      annualBasic: basicSalary,
+      annualHra: hraReceived,
+      annualRent: actualRentPaid,
+    };
+  };
+
+  const calculateHRA = () => {
+    setIsCalculating(true);
+
+    const { annualBasic, annualHra, annualRent } = getAnnualValues();
+
+    // HRA exemption calculation as per Section 10(13A) of Income Tax Act
+    const rule1 = annualHra;
+    const rule2 = Math.max(0, annualRent - (annualBasic * 0.10));
+    const rule3 = cityType === "metro" ? annualBasic * 0.50 : annualBasic * 0.40;
+
+    const hraExemption = Math.min(rule1, rule2, rule3);
+    const taxableHRA = Math.max(0, annualHra - hraExemption);
+    const exemptionPercentage = annualHra > 0 ? (hraExemption / annualHra) * 100 : 0;
+
+    const calculationBreakdown = { rule1, rule2, rule3, minimumOf: hraExemption };
 
     const hraResult: HRAResult = {
-      basicSalary,
-      hraReceived,
-      actualRentPaid,
+      basicSalary: annualBasic,
+      hraReceived: annualHra,
+      actualRentPaid: annualRent,
       cityType,
       hraExemption,
       taxableHRA,
@@ -95,10 +140,8 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
 
   const generateRecommendations = (hraResult: HRAResult) => {
     const recommendations: AIRecommendation[] = [];
-
-    // HRA optimization recommendations
     if (hraResult.exemptionPercentage < 90) {
-      const potentialSaving = (hraResult.taxableHRA * 0.30); // Assuming 30% tax bracket
+      const potentialSaving = (hraResult.taxableHRA * 0.30);
       recommendations.push({
         type: 'optimization',
         title: 'Optimize Your HRA Exemption',
@@ -106,8 +149,6 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
         potentialSaving
       });
     }
-
-    // Rent vs HRA analysis
     if (hraResult.actualRentPaid < hraResult.basicSalary * 0.10) {
       recommendations.push({
         type: 'warning',
@@ -115,8 +156,6 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
         description: 'Your rent is less than 10% of basic salary. You might not be utilizing HRA exemption optimally.'
       });
     }
-
-    // City type optimization
     if (hraResult.cityType === "non-metro" && hraResult.hraReceived > hraResult.basicSalary * 0.40) {
       recommendations.push({
         type: 'tip',
@@ -124,8 +163,6 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
         description: 'Metro cities allow 50% HRA exemption vs 40% in non-metro. If relocating, factor in higher HRA benefits.'
       });
     }
-
-    // Salary structure recommendation
     if (hraResult.hraReceived < hraResult.basicSalary * 0.40) {
       recommendations.push({
         type: 'investment',
@@ -133,8 +170,6 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
         description: 'Consider negotiating a higher HRA component in your salary structure to maximize tax exemptions.'
       });
     }
-
-    // High taxable HRA warning
     if (hraResult.taxableHRA > 100000) {
       recommendations.push({
         type: 'warning',
@@ -142,7 +177,6 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
         description: `₹${hraResult.taxableHRA.toLocaleString()} of your HRA is taxable. Review your rent and salary structure for optimization.`
       });
     }
-
     setRecommendations(recommendations);
   };
 
@@ -151,6 +185,7 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
     setHraReceived(240000);
     setActualRentPaid(300000);
     setCityType("metro");
+    setInputMode('annual');
     setResult(null);
     setRecommendations([]);
     setActiveTab("calculator");
@@ -165,17 +200,13 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
     try {
       const token = await getIdToken();
       if (!token) throw new Error("No token");
-
       const response = await fetch('/api/tax-calculations', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({
           calculationType: 'hra',
           assessmentYear: new Date().getFullYear() + '-' + (new Date().getFullYear() + 1),
-          inputData: { basicSalary, hraReceived, actualRentPaid, cityType },
+          inputData: { basicSalary: result.basicSalary, hraReceived: result.hraReceived, actualRentPaid: result.actualRentPaid, cityType },
           oldRegimeResult: {
             hraExemption: result.hraExemption,
             taxableHRA: result.taxableHRA,
@@ -184,9 +215,7 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
           },
         }),
       });
-
       if (!response.ok) throw new Error('Save failed');
-
       toast({ title: "HRA calculation saved!", description: "Your calculation has been saved to your account." });
     } catch {
       toast({ title: "Failed to save calculation", variant: "destructive" });
@@ -195,372 +224,394 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
     }
   };
 
+  const { displayBasic, displayHra, displayRent } = getDisplayValues();
+
+  const outerClassName = isModal
+    ? "fixed inset-0 bg-white/95 backdrop-blur-md z-50 flex items-center justify-center p-2 md:p-4"
+    : "w-full";
+
+  const cardClassName = isModal
+    ? "w-full max-w-4xl max-h-[95vh] overflow-hidden"
+    : "w-full shadow-lg rounded-2xl";
+
+  const contentClassName = isModal
+    ? "overflow-y-auto max-h-[calc(95vh-120px)]"
+    : "";
+
   return (
-    <div className="fixed inset-0 bg-white/95 backdrop-blur-md z-50 flex items-center justify-center p-2 md:p-4">
-      <Card className="w-full max-w-4xl max-h-[95vh] overflow-hidden">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-          <div className="space-y-1">
-            <CardTitle className="text-xl md:text-2xl font-bold text-persian-blue-600">
-              HRA Calculator
-            </CardTitle>
-            <CardDescription className="text-sm md:text-base">
-              Calculate House Rent Allowance exemption as per Section 10(13A) of Income Tax Act
-            </CardDescription>
+    <div className={outerClassName}>
+      <Card className={cardClassName}>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-2xl">HRA Calculator</CardTitle>
+              <CardDescription>Calculate your House Rent Allowance exemption under Section 10(13A)</CardDescription>
+            </div>
+            {isModal && (
+              <Button variant="ghost" size="icon" onClick={onClose}>
+                <X className="h-5 w-5" />
+              </Button>
+            )}
           </div>
-          {onClose && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onClose}
-              className="h-8 w-8 hover:bg-persian-blue-50"
-              data-testid="button-close-hra-calculator"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          )}
         </CardHeader>
 
-        <CardContent className="overflow-y-auto max-h-[calc(95vh-120px)]">
+        <CardContent className={contentClassName}>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-4 mb-6">
-              <TabsTrigger value="calculator" className="text-xs md:text-sm">
-                <Calculator className="w-4 h-4 mr-1" />
-                Calculator
+              <TabsTrigger value="calculator" className="flex items-center gap-2">
+                <Calculator className="h-4 w-4" />
+                <span className="hidden sm:inline">Calculator</span>
               </TabsTrigger>
-              <TabsTrigger value="results" className="text-xs md:text-sm">
-                <FileText className="w-4 h-4 mr-1" />
-                Results
+              <TabsTrigger value="results" disabled={!result} className="flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                <span className="hidden sm:inline">Results</span>
               </TabsTrigger>
-              <TabsTrigger value="breakdown" className="text-xs md:text-sm">
-                <AlertTriangle className="w-4 h-4 mr-1" />
-                Breakdown
+              <TabsTrigger value="breakdown" disabled={!result} className="flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                <span className="hidden sm:inline">Breakdown</span>
               </TabsTrigger>
-              <TabsTrigger value="insights" className="text-xs md:text-sm">
-                <Lightbulb className="w-4 h-4 mr-1" />
-                AI Insights
+              <TabsTrigger value="tips" disabled={!result} className="flex items-center gap-2">
+                <Lightbulb className="h-4 w-4" />
+                <span className="hidden sm:inline">Tax Tips</span>
               </TabsTrigger>
             </TabsList>
 
+            {/* Calculator Tab */}
             <TabsContent value="calculator" className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="basicSalary" className="text-sm font-medium">
-                      Basic Salary (Annual)
-                    </Label>
-                    <Input
-                      id="basicSalary"
-                      type="number"
-                      value={basicSalary}
-                      onChange={(e) => setBasicSalary(Number(e.target.value))}
-                      placeholder="Enter basic salary"
-                      className="h-12"
-                      data-testid="input-basic-salary"
-                    />
+              <Card className="border-l-4 border-l-blue-500">
+                <CardHeader>
+                  <CardTitle className="text-lg">Input Mode</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex gap-2">
+                    <Button
+                      variant={inputMode === 'monthly' ? 'default' : 'outline'}
+                      onClick={() => handleInputModeChange('monthly')}
+                      className="flex-1"
+                    >
+                      Monthly
+                    </Button>
+                    <Button
+                      variant={inputMode === 'annual' ? 'default' : 'outline'}
+                      onClick={() => handleInputModeChange('annual')}
+                      className="flex-1"
+                    >
+                      Annual
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Salary Information</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="basicSalary">
+                        Basic Salary {inputMode === 'monthly' ? '(Monthly)' : '(Annual)'}
+                      </Label>
+                      <Input
+                        id="basicSalary"
+                        type="number"
+                        min={0}
+                        value={displayBasic}
+                        onChange={(e) => {
+                          const value = Math.max(0, parseFloat(e.target.value) || 0);
+                          if (inputMode === 'monthly') {
+                            setBasicSalary(value);
+                          } else {
+                            setBasicSalary(value);
+                          }
+                        }}
+                        placeholder="Enter basic salary"
+                        className="text-lg"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="hraReceived">
+                        HRA Received {inputMode === 'monthly' ? '(Monthly)' : '(Annual)'}
+                      </Label>
+                      <Input
+                        id="hraReceived"
+                        type="number"
+                        min={0}
+                        value={displayHra}
+                        onChange={(e) => {
+                          const value = Math.max(0, parseFloat(e.target.value) || 0);
+                          setHraReceived(value);
+                        }}
+                        placeholder="Enter HRA received"
+                        className="text-lg"
+                      />
+                    </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="hraReceived" className="text-sm font-medium">
-                      HRA Received (Annual)
+                    <Label htmlFor="rentPaid">
+                      Actual Rent Paid {inputMode === 'monthly' ? '(Monthly)' : '(Annual)'}
                     </Label>
                     <Input
-                      id="hraReceived"
+                      id="rentPaid"
                       type="number"
-                      value={hraReceived}
-                      onChange={(e) => setHraReceived(Number(e.target.value))}
-                      placeholder="Enter HRA received"
-                      className="h-12"
-                      data-testid="input-hra-received"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="actualRentPaid" className="text-sm font-medium">
-                      Actual Rent Paid (Annual)
-                    </Label>
-                    <Input
-                      id="actualRentPaid"
-                      type="number"
-                      value={actualRentPaid}
-                      onChange={(e) => setActualRentPaid(Number(e.target.value))}
+                      min={0}
+                      value={displayRent}
+                      onChange={(e) => {
+                        const value = Math.max(0, parseFloat(e.target.value) || 0);
+                        setActualRentPaid(value);
+                      }}
                       placeholder="Enter actual rent paid"
-                      className="h-12"
-                      data-testid="input-rent-paid"
+                      className="text-lg"
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="cityType" className="text-sm font-medium">
-                      City Type
-                    </Label>
+                    <Label htmlFor="cityType">City Type</Label>
                     <Select value={cityType} onValueChange={setCityType}>
-                      <SelectTrigger className="h-12" data-testid="select-city-type">
-                        <SelectValue placeholder="Select city type" />
+                      <SelectTrigger id="cityType">
+                        <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="metro">Metro City (50% exemption)</SelectItem>
-                        <SelectItem value="non-metro">Non-Metro City (40% exemption)</SelectItem>
+                        <SelectItem value="metro">Metro City (50%)</SelectItem>
+                        <SelectItem value="non-metro">Non-Metro City (40%)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
 
-              <div className="flex flex-col sm:flex-row gap-3 pt-4">
+              <div className="flex gap-3">
                 <Button
                   onClick={calculateHRA}
                   disabled={isCalculating}
-                  className="flex-1 h-12 bg-persian-blue-600 hover:bg-persian-blue-700 text-white font-medium border border-persian-blue-600 hover:border-persian-blue-700"
-                  data-testid="button-calculate-hra"
+                  className="flex-1 md:flex-none"
                 >
-                  {isCalculating ? (
-                    <LoadingState message="Calculating HRA exemption..." />
-                  ) : (
-                    <>
-                      <Calculator className="w-4 h-4 mr-2" />
-                      Calculate HRA Exemption
-                    </>
-                  )}
+                  {isCalculating ? 'Calculating...' : 'Calculate HRA'}
                 </Button>
                 <Button
                   variant="outline"
                   onClick={resetCalculator}
-                  className="h-12"
-                  data-testid="button-reset-hra"
+                  className="flex-1 md:flex-none"
                 >
                   Reset
                 </Button>
               </div>
             </TabsContent>
 
+            {/* Results Tab */}
             <TabsContent value="results" className="space-y-6">
-              {result ? (
-                <div className="space-y-6">
-                  {/* Quick Overview */}
-                  <Card className="border-persian-blue-200 bg-persian-blue-50">
+              {isCalculating ? (
+                <LoadingState message="Calculating HRA exemption..." />
+              ) : result ? (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-sm font-medium text-gray-600">HRA Exemption</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-3xl font-bold text-green-600">
+                          ₹{result.hraExemption.toLocaleString()}
+                        </div>
+                        <p className="text-sm text-gray-500 mt-2">
+                          {result.exemptionPercentage.toFixed(1)}% of your HRA is exempt
+                        </p>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-sm font-medium text-gray-600">Taxable HRA</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-3xl font-bold text-red-600">
+                          ₹{result.taxableHRA.toLocaleString()}
+                        </div>
+                        <p className="text-sm text-gray-500 mt-2">
+                          {(100 - result.exemptionPercentage).toFixed(1)}% of your HRA is taxable
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  <Card>
                     <CardHeader>
-                      <CardTitle className="text-lg text-persian-blue-700">HRA Exemption Summary</CardTitle>
+                      <CardTitle>Tax Impact</CardTitle>
+                      <CardDescription>Tax savings across different tax brackets</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="text-center p-4 bg-white rounded-lg border">
-                          <div className="text-2xl font-bold text-green-600">
-                            ₹{result.hraExemption.toLocaleString()}
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <div>
+                            <p className="font-medium text-sm">5% Bracket</p>
+                            <p className="text-xs text-gray-500">Savings</p>
                           </div>
-                          <div className="text-sm text-gray-600">HRA Exemption</div>
+                          <p className="font-semibold">₹{(result.hraExemption * 0.05).toLocaleString()}</p>
                         </div>
-                        <div className="text-center p-4 bg-white rounded-lg border">
-                          <div className="text-2xl font-bold text-red-600">
-                            ₹{result.taxableHRA.toLocaleString()}
+                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <div>
+                            <p className="font-medium text-sm">20% Bracket</p>
+                            <p className="text-xs text-gray-500">Savings</p>
                           </div>
-                          <div className="text-sm text-gray-600">Taxable HRA</div>
+                          <p className="font-semibold">₹{(result.hraExemption * 0.20).toLocaleString()}</p>
                         </div>
-                        <div className="text-center p-4 bg-white rounded-lg border">
-                          <div className="text-2xl font-bold text-persian-blue-600">
-                            {`${result.exemptionPercentage.toFixed(1)}%`}
+                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <div>
+                            <p className="font-medium text-sm">30% Bracket</p>
+                            <p className="text-xs text-gray-500">Savings</p>
                           </div>
-                          <div className="text-sm text-gray-600">Exemption Rate</div>
+                          <p className="font-semibold">₹{(result.hraExemption * 0.30).toLocaleString()}</p>
                         </div>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span>Exemption Progress</span>
-                          <span>{`${result.exemptionPercentage.toFixed(1)}%`}</span>
-                        </div>
-                        <Progress value={result.exemptionPercentage} className="h-2" />
-                      </div>
-                      
-                      <div className={`mt-4 ${onApplyHRA ? 'grid grid-cols-1 sm:grid-cols-2 gap-3' : ''}`}>
-                        {onApplyHRA && (
-                          <Button
-                            onClick={() => onApplyHRA(result.hraExemption)}
-                            className="w-full bg-green-600 hover:bg-green-700 text-white font-medium"
-                            data-testid="button-apply-hra-to-tax-calculator"
-                          >
-                            Apply HRA Exemption to Tax Calculator
-                          </Button>
-                        )}
-                        <Button
-                          onClick={saveCalculation}
-                          disabled={isSaving || !user}
-                          variant="outline"
-                          className="w-full border-persian-blue-400 text-persian-blue-600 hover:bg-persian-blue-50"
-                          data-testid="button-save-hra-calculation"
-                        >
-                          {isSaving ? (
-                            <LoadingState message="Saving..." />
-                          ) : (
-                            <>
-                              <Save className="w-4 h-4 mr-2" />
-                              Save Calculation
-                            </>
-                          )}
-                        </Button>
                       </div>
                     </CardContent>
                   </Card>
 
-                  {/* Detailed Results */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-lg">Input Details</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-3">
-                        <div className="flex justify-between">
-                          <span>Basic Salary:</span>
-                          <span className="font-medium">₹{result.basicSalary.toLocaleString()}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>HRA Received:</span>
-                          <span className="font-medium">₹{result.hraReceived.toLocaleString()}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Rent Paid:</span>
-                          <span className="font-medium">₹{result.actualRentPaid.toLocaleString()}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>City Type:</span>
-                          <Badge variant={result.cityType === 'metro' ? 'default' : 'secondary'}>
-                            {result.cityType === 'metro' ? 'Metro' : 'Non-Metro'}
-                          </Badge>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-lg">Tax Impact</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-3">
-                        <div className="flex justify-between">
-                          <span>HRA Exemption:</span>
-                          <span className="font-medium text-green-600">₹{result.hraExemption.toLocaleString()}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Taxable HRA:</span>
-                          <span className="font-medium text-red-600">₹{result.taxableHRA.toLocaleString()}</span>
-                        </div>
-                        <Separator />
-                        <div className="flex justify-between">
-                          <span>Tax Saved (30% bracket):</span>
-                          <span className="font-medium text-green-600">
-                            ₹{(result.hraExemption * 0.30).toLocaleString()}
-                          </span>
-                        </div>
-                      </CardContent>
-                    </Card>
+                  <div className="flex gap-3">
+                    {user && (
+                      <Button
+                        onClick={saveCalculation}
+                        disabled={isSaving}
+                        variant="outline"
+                        className="flex-1 md:flex-none"
+                      >
+                        <Save className="h-4 w-4 mr-2" />
+                        {isSaving ? 'Saving...' : 'Save Calculation'}
+                      </Button>
+                    )}
+                    {onApplyHRA && (
+                      <Button
+                        onClick={() => onApplyHRA(result.hraExemption)}
+                        className="flex-1 md:flex-none"
+                      >
+                        Apply to Tax Calculator
+                      </Button>
+                    )}
                   </div>
-                </div>
-              ) : (
-                <div className="text-center py-8 text-gray-500">
-                  Calculate HRA exemption to see results
-                </div>
-              )}
+                </>
+              ) : null}
             </TabsContent>
 
+            {/* Breakdown Tab */}
             <TabsContent value="breakdown" className="space-y-6">
-              {result ? (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">HRA Calculation Breakdown</CardTitle>
-                    <CardDescription>
-                      As per Section 10(13A) - Minimum of the following three amounts
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                        <div>
-                          <div className="font-medium">Rule 1: Actual HRA Received</div>
-                          <div className="text-sm text-gray-600">HRA component in salary</div>
+              {result && (
+                <>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>HRA Exemption Calculation Rules</CardTitle>
+                      <CardDescription>Section 10(13A) of Income Tax Act</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-3">
+                        <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                          <p className="text-sm font-medium text-gray-700 mb-2">Rule 1: HRA Received</p>
+                          <p className="text-2xl font-bold text-blue-600">₹{result.calculationBreakdown.rule1.toLocaleString()}</p>
                         </div>
-                        <div className="text-lg font-bold">₹{result.calculationBreakdown.rule1.toLocaleString()}</div>
-                      </div>
 
-                      <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                        <div>
-                          <div className="font-medium">Rule 2: Rent Paid - 10% of Basic</div>
-                          <div className="text-sm text-gray-600">
+                        <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
+                          <p className="text-sm font-medium text-gray-700 mb-2">Rule 2: Rent - 10% of Basic Salary</p>
+                          <p className="text-sm text-gray-600 mb-2">
                             ₹{result.actualRentPaid.toLocaleString()} - ₹{(result.basicSalary * 0.10).toLocaleString()}
-                          </div>
+                          </p>
+                          <p className="text-2xl font-bold text-purple-600">₹{result.calculationBreakdown.rule2.toLocaleString()}</p>
                         </div>
-                        <div className="text-lg font-bold">₹{result.calculationBreakdown.rule2.toLocaleString()}</div>
-                      </div>
 
-                      <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                        <div>
-                          <div className="font-medium">
+                        <div className="p-4 bg-orange-50 rounded-lg border border-orange-200">
+                          <p className="text-sm font-medium text-gray-700 mb-2">
                             Rule 3: {result.cityType === 'metro' ? '50%' : '40%'} of Basic Salary
-                          </div>
-                          <div className="text-sm text-gray-600">
-                            Based on {result.cityType === 'metro' ? 'metro' : 'non-metro'} city classification
-                          </div>
-                        </div>
-                        <div className="text-lg font-bold">₹{result.calculationBreakdown.rule3.toLocaleString()}</div>
-                      </div>
-
-                      <Separator />
-
-                      <div className="flex justify-between items-center p-4 bg-persian-blue-50 rounded-lg">
-                        <div>
-                          <div className="font-bold text-persian-blue-700">HRA Exemption (Minimum)</div>
-                          <div className="text-sm text-persian-blue-600">Least of above three amounts</div>
-                        </div>
-                        <div className="text-xl font-bold text-persian-blue-700">
-                          ₹{result.calculationBreakdown.minimumOf.toLocaleString()}
+                          </p>
+                          <p className="text-sm text-gray-600 mb-2">
+                            {result.cityType === 'metro' ? '50%' : '40%'} × ₹{result.basicSalary.toLocaleString()}
+                          </p>
+                          <p className="text-2xl font-bold text-orange-600">₹{result.calculationBreakdown.rule3.toLocaleString()}</p>
                         </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ) : (
-                <div className="text-center py-8 text-gray-500">
-                  Calculate HRA exemption to see breakdown
-                </div>
+
+                      <Separator className="my-4" />
+
+                      <div className="p-4 bg-green-50 rounded-lg border-2 border-green-200">
+                        <p className="text-sm font-medium text-gray-700 mb-2">HRA Exemption = Minimum of the above 3 rules</p>
+                        <p className="text-3xl font-bold text-green-600">₹{result.calculationBreakdown.minimumOf.toLocaleString()}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Calculation Summary</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="flex items-center justify-between p-3 border-b">
+                        <span className="text-gray-600">Annual Basic Salary</span>
+                        <span className="font-semibold">₹{result.basicSalary.toLocaleString()}</span>
+                      </div>
+                      <div className="flex items-center justify-between p-3 border-b">
+                        <span className="text-gray-600">Annual HRA Received</span>
+                        <span className="font-semibold">₹{result.hraReceived.toLocaleString()}</span>
+                      </div>
+                      <div className="flex items-center justify-between p-3 border-b">
+                        <span className="text-gray-600">Annual Rent Paid</span>
+                        <span className="font-semibold">₹{result.actualRentPaid.toLocaleString()}</span>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                        <span className="text-gray-600">HRA Exemption</span>
+                        <span className="font-bold text-green-600">₹{result.hraExemption.toLocaleString()}</span>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                        <span className="text-gray-600">Taxable HRA</span>
+                        <span className="font-bold text-red-600">₹{result.taxableHRA.toLocaleString()}</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </>
               )}
             </TabsContent>
 
-            <TabsContent value="insights" className="space-y-6">
-              {recommendations.length > 0 ? (
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-persian-blue-700">AI-Powered Recommendations</h3>
-                  {recommendations.map((rec, index) => (
-                    <Card key={index} className={`border-l-4 ${
-                      rec.type === 'optimization' ? 'border-l-green-500 bg-green-50' :
-                      rec.type === 'warning' ? 'border-l-red-500 bg-red-50' :
-                      rec.type === 'investment' ? 'border-l-blue-500 bg-blue-50' :
-                      'border-l-yellow-500 bg-yellow-50'
-                    }`}>
-                      <CardContent className="p-4">
-                        <div className="flex items-start space-x-3">
-                          <Badge variant={rec.type === 'optimization' ? 'default' : 
-                                        rec.type === 'warning' ? 'destructive' :
-                                        rec.type === 'investment' ? 'secondary' : 'outline'}>
-                            {rec.type.charAt(0).toUpperCase() + rec.type.slice(1)}
-                          </Badge>
-                          <div className="flex-1">
-                            <h4 className="font-medium text-gray-900">{rec.title}</h4>
-                            <p className="text-sm text-gray-600 mt-1">{rec.description}</p>
-                            {rec.potentialSaving && (
-                              <p className="text-sm font-medium text-green-600 mt-2">
-                                Potential Tax Saving: ₹{rec.potentialSaving.toLocaleString()}
-                              </p>
-                            )}
+            {/* Tax Tips Tab */}
+            <TabsContent value="tips" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Personalised Tax Tips</CardTitle>
+                  <CardDescription>Recommendations to optimize your tax savings</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {recommendations.length > 0 ? (
+                    <div className="space-y-4">
+                      {recommendations.map((rec, idx) => (
+                        <div
+                          key={idx}
+                          className={`p-4 rounded-lg border-l-4 ${
+                            rec.type === 'optimization'
+                              ? 'border-l-blue-500 bg-blue-50'
+                              : rec.type === 'warning'
+                              ? 'border-l-red-500 bg-red-50'
+                              : rec.type === 'investment'
+                              ? 'border-l-purple-500 bg-purple-50'
+                              : 'border-l-green-500 bg-green-50'
+                          }`}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className="flex-1">
+                              <h3 className="font-semibold text-gray-900">{rec.title}</h3>
+                              <p className="text-sm text-gray-700 mt-1">{rec.description}</p>
+                              {rec.potentialSaving && (
+                                <div className="mt-2 inline-block">
+                                  <Badge variant="secondary">
+                                    Potential Saving: ₹{rec.potentialSaving.toLocaleString()}
+                                  </Badge>
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8 text-gray-500">
-                  Calculate HRA exemption to get AI-powered insights
-                </div>
-              )}
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500">No recommendations at this time.</p>
+                  )}
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
         </CardContent>

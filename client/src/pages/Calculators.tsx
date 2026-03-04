@@ -330,7 +330,7 @@ export default function Calculators() {
         <footer className="bg-slate-900 text-white py-8 px-6">
           <div className="max-w-6xl mx-auto text-center">
             <p className="text-sm text-slate-400">
-              &copy; 2025 AiTaxBot. All rights reserved. | Financial Calculators updated for FY 2025-26 (AY 2026-27)
+              &copy; 2026 AiTaxBot. All rights reserved. | Financial Calculators updated for FY 2025-26 (AY 2026-27)
             </p>
           </div>
         </footer>

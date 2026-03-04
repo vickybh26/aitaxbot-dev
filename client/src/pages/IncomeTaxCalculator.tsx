@@ -469,7 +469,7 @@ export default function IncomeTaxCalculatorPage() {
         <footer className="bg-slate-900 text-white py-8 px-6">
           <div className="max-w-6xl mx-auto text-center">
             <p className="text-sm text-slate-400">
-              © 2025 AiTaxBot. All rights reserved. | Income Tax Calculator FY 2025-26
+              © 2026 AiTaxBot. All rights reserved. | Income Tax Calculator FY 2025-26
             </p>
           </div>
         </footer>

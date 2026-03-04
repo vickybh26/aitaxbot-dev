@@ -379,7 +379,7 @@ export default function NPSCalculatorPage() {
         <footer className="bg-slate-900 text-white py-8 px-6">
           <div className="max-w-6xl mx-auto text-center">
             <p className="text-sm text-slate-400">
-              © 2025 AiTaxBot. All rights reserved. | NPS Calculator — National Pension System India
+              © 2026 AiTaxBot. All rights reserved. | NPS Calculator — National Pension System India
             </p>
           </div>
         </footer>

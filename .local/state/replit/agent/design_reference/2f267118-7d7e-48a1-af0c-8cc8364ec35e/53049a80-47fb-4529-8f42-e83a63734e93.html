@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Management Dashboard | AiTaxBot</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'persian-blue': {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        };
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-50 font-sans antialiased">
+    <!-- @COMPONENT: MainLayout -->
+    <div class="min-h-screen flex">
+        <!-- @COMPONENT: Sidebar -->
+        <aside class="w-64 bg-white shadow-lg border-r border-slate-200 flex-shrink-0">
+            <div class="p-6 border-b border-slate-200">
+                <div class="flex items-center gap-3">
+                    <!-- AiTaxBot logo placeholder -->
+                    <div class="w-10 h-10 bg-persian-blue-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-robot text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold text-slate-800">AiTaxBot</h1>
+                        <p class="text-xs text-slate-500">API Management</p>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="p-4 space-y-2">
+                <!-- @MAP: navigationItems.map(item => ( -->
+                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-persian-blue-700 bg-persian-blue-50 font-medium" data-active="true">
+                    <i class="fas fa-tachometer-alt w-5"></i>
+                    <span>Dashboard</span>
+                </a>
+                
+                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors">
+                    <i class="fas fa-plug w-5"></i>
+                    <span>API Integrations</span>
+                </a>
+                
+                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors">
+                    <i class="fas fa-users w-5"></i>
+                    <span>User Management</span>
+                </a>
+                
+                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors">
+                    <i class="fas fa-key w-5"></i>
+                    <span>API Keys</span>
+                </a>
+                
+                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors">
+                    <i class="fas fa-chart-line w-5"></i>
+                    <span>Analytics</span>
+                </a>
+                
+                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors">
+                    <i class="fas fa-file-alt w-5"></i>
+                    <span>Documentation</span>
+                </a>
+                
+                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors">
+                    <i class="fas fa-cog w-5"></i>
+                    <span>Settings</span>
+                </a>
+                <!-- @END_MAP -->
+            </nav>
+        </aside>
+        <!-- @END_COMPONENT: Sidebar -->
+
+        <!-- @COMPONENT: MainContent -->
+        <main class="flex-1 overflow-hidden">
+            <!-- @COMPONENT: Header -->
+            <header class="bg-white border-b border-slate-200 px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-800">API Management Dashboard</h2>
+                        <p class="text-slate-600 text-sm mt-1">Monitor and manage your API integrations</p>
+                    </div>
+                    
+                    <div class="flex items-center gap-4">
+                        <!-- @COMPONENT: NotificationBell -->
+                        <button class="relative p-2 text-slate-400 hover:text-slate-600 transition-colors">
+                            <i class="fas fa-bell text-lg"></i>
+                            <span class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center" data-bind="notifications.count">3</span>
+                        </button>
+                        
+                        <!-- @COMPONENT: UserProfile -->
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-persian-blue-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-persian-blue-600"></i>
+                            </div>
+                            <div class="text-sm">
+                                <p class="font-medium text-slate-800" data-bind="user.name">Admin User</p>
+                                <p class="text-slate-500" data-bind="user.role">Administrator</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            <!-- @END_COMPONENT: Header -->
+
+            <!-- @COMPONENT: DashboardContent -->
+            <div class="p-6 overflow-y-auto h-full">
+                <!-- @COMPONENT: StatsGrid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <!-- @MAP: statsCards.map(card => ( -->
+                    <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-slate-600 text-sm font-medium">Total API Calls</p>
+                                <p class="text-2xl font-bold text-slate-800 mt-1" data-bind="stats.totalCalls">24,758</p>
+                                <p class="text-emerald-600 text-sm mt-1">
+                                    <i class="fas fa-arrow-up text-xs mr-1"></i>
+                                    <span data-bind="stats.callsGrowth">+12.5%</span> from last month
+                                </p>
+                            </div>
+                            <div class="w-12 h-12 bg-persian-blue-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-chart-line text-persian-blue-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-slate-600 text-sm font-medium">Active Users</p>
+                                <p class="text-2xl font-bold text-slate-800 mt-1" data-bind="stats.activeUsers">1,294</p>
+                                <p class="text-emerald-600 text-sm mt-1">
+                                    <i class="fas fa-arrow-up text-xs mr-1"></i>
+                                    <span data-bind="stats.usersGrowth">+5.2%</span> from last week
+                                </p>
+                            </div>
+                            <div class="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-users text-emerald-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-slate-600 text-sm font-medium">API Response Time</p>
+                                <p class="text-2xl font-bold text-slate-800 mt-1" data-bind="stats.responseTime">247ms</p>
+                                <p class="text-red-600 text-sm mt-1">
+                                    <i class="fas fa-arrow-up text-xs mr-1"></i>
+                                    <span data-bind="stats.responseTimeChange">+15ms</span> from yesterday
+                                </p>
+                            </div>
+                            <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-clock text-amber-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-slate-600 text-sm font-medium">Error Rate</p>
+                                <p class="text-2xl font-bold text-slate-800 mt-1" data-bind="stats.errorRate">0.8%</p>
+                                <p class="text-emerald-600 text-sm mt-1">
+                                    <i class="fas fa-arrow-down text-xs mr-1"></i>
+                                    <span data-bind="stats.errorRateChange">-0.3%</span> improvement
+                                </p>
+                            </div>
+                            <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- @END_MAP -->
+                </div>
+                <!-- @END_COMPONENT: StatsGrid -->
+
+                <!-- @COMPONENT: APIIntegrationsSection -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                    <div class="lg:col-span-2">
+                        <div class="bg-white rounded-lg shadow-sm border border-slate-200">
+                            <div class="px-6 py-4 border-b border-slate-200">
+                                <h3 class="text-lg font-semibold text-slate-800">API Integrations</h3>
+                                <p class="text-slate-600 text-sm mt-1">Manage your external API connections</p>
+                            </div>
+                            
+                            <div class="p-6 space-y-4">
+                                <!-- @MAP: apiIntegrations.map(api => ( -->
+                                <!-- Finnhub API Integration -->
+                                <div class="flex items-center justify-between p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                            <i class="fas fa-chart-candlestick text-blue-600 text-xl"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-medium text-slate-800">Finnhub API</h4>
+                                            <p class="text-slate-600 text-sm">Stock market data and financial information</p>
+                                            <div class="flex items-center gap-2 mt-1">
+                                                <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-emerald-100 text-emerald-700 rounded-full">
+                                                    <i class="fas fa-circle text-emerald-500 text-xs mr-1"></i>
+                                                    Active
+                                                </span>
+                                                <span class="text-xs text-slate-500" data-bind="finnhub.lastCall">Last call: 2 minutes ago</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <button class="px-3 py-1 text-sm font-medium text-slate-600 hover:text-slate-800 transition-colors">
+                                            <i class="fas fa-cog mr-1"></i>
+                                            Configure
+                                        </button>
+                                        <button class="px-3 py-1 text-sm font-medium text-persian-blue-600 hover:text-persian-blue-700 transition-colors">
+                                            <i class="fas fa-chart-bar mr-1"></i>
+                                            View Stats
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Upstox API Integration -->
+                                <div class="flex items-center justify-between p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                                            <i class="fas fa-rupee-sign text-orange-600 text-xl"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-medium text-slate-800">Upstox API</h4>
+                                            <p class="text-slate-600 text-sm">Indian stock market and trading data</p>
+                                            <div class="flex items-center gap-2 mt-1">
+                                                <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-emerald-100 text-emerald-700 rounded-full">
+                                                    <i class="fas fa-circle text-emerald-500 text-xs mr-1"></i>
+                                                    Active
+                                                </span>
+                                                <span class="text-xs text-slate-500" data-bind="upstox.lastCall">Last call: 5 minutes ago</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <button class="px-3 py-1 text-sm font-medium text-slate-600 hover:text-slate-800 transition-colors">
+                                            <i class="fas fa-cog mr-1"></i>
+                                            Configure
+                                        </button>
+                                        <button class="px-3 py-1 text-sm font-medium text-persian-blue-600 hover:text-persian-blue-700 transition-colors">
+                                            <i class="fas fa-chart-bar mr-1"></i>
+                                            View Stats
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Gemini AI API Integration -->
+                                <div class="flex items-center justify-between p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                                            <i class="fas fa-brain text-purple-600 text-xl"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-medium text-slate-800">Gemini AI API</h4>
+                                            <p class="text-slate-600 text-sm">AI-powered financial insights and analysis</p>
+                                            <div class="flex items-center gap-2 mt-1">
+                                                <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-emerald-100 text-emerald-700 rounded-full">
+                                                    <i class="fas fa-circle text-emerald-500 text-xs mr-1"></i>
+                                                    Active
+                                                </span>
+                                                <span class="text-xs text-slate-500" data-bind="gemini.lastCall">Last call: 1 minute ago</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <button class="px-3 py-1 text-sm font-medium text-slate-600 hover:text-slate-800 transition-colors">
+                                            <i class="fas fa-cog mr-1"></i>
+                                            Configure
+                                        </button>
+                                        <button class="px-3 py-1 text-sm font-medium text-persian-blue-600 hover:text-persian-blue-700 transition-colors">
+                                            <i class="fas fa-chart-bar mr-1"></i>
+                                            View Stats
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Mutual Fund API Integration -->
+                                <div class="flex items-center justify-between p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                            <i class="fas fa-seedling text-green-600 text-xl"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-medium text-slate-800">Mutual Fund API</h4>
+                                            <p class="text-slate-600 text-sm">Comprehensive mutual fund data and NAV information</p>
+                                            <div class="flex items-center gap-2 mt-1">
+                                                <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-amber-100 text-amber-700 rounded-full">
+                                                    <i class="fas fa-circle text-amber-500 text-xs mr-1"></i>
+                                                    Limited
+                                                </span>
+                                                <span class="text-xs text-slate-500" data-bind="mutualfund.lastCall">Last call: 15 minutes ago</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <button class="px-3 py-1 text-sm font-medium text-slate-600 hover:text-slate-800 transition-colors">
+                                            <i class="fas fa-cog mr-1"></i>
+                                            Configure
+                                        </button>
+                                        <button class="px-3 py-1 text-sm font-medium text-persian-blue-600 hover:text-persian-blue-700 transition-colors">
+                                            <i class="fas fa-chart-bar mr-1"></i>
+                                            View Stats
+                                        </button>
+                                    </div>
+                                </div>
+                                <!-- @END_MAP -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- @COMPONENT: QuickActions -->
+                    <div class="space-y-6">
+                        <div class="bg-white rounded-lg shadow-sm border border-slate-200">
+                            <div class="px-6 py-4 border-b border-slate-200">
+                                <h3 class="text-lg font-semibold text-slate-800">Quick Actions</h3>
+                            </div>
+                            <div class="p-6 space-y-3">
+                                <button class="w-full flex items-center gap-3 px-4 py-3 text-left border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors" data-event="click:openNewAPIModal">
+                                    <div class="w-10 h-10 bg-persian-blue-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-plus text-persian-blue-600"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-slate-800">Add New API</p>
+                                        <p class="text-slate-600 text-sm">Connect a new API integration</p>
+                                    </div>
+                                </button>
+                                
+                                <button class="w-full flex items-center gap-3 px-4 py-3 text-left border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors" data-event="click:openUserModal">
+                                    <div class="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-user-plus text-emerald-600"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-slate-800">Add User</p>
+                                        <p class="text-slate-600 text-sm">Create new user account</p>
+                                    </div>
+                                </button>
+                                
+                                <button class="w-full flex items-center gap-3 px-4 py-3 text-left border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors" data-event="click:generateAPIKey">
+                                    <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-key text-amber-600"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-slate-800">Generate API Key</p>
+                                        <p class="text-slate-600 text-sm">Create new authentication key</p>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- @COMPONENT: SystemHealth -->
+                        <div class="bg-white rounded-lg shadow-sm border border-slate-200">
+                            <div class="px-6 py-4 border-b border-slate-200">
+                                <h3 class="text-lg font-semibold text-slate-800">System Health</h3>
+                            </div>
+                            <div class="p-6 space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-slate-600 text-sm">Database</span>
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                                        <span class="text-emerald-600 text-sm font-medium">Healthy</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center justify-between">
+                                    <span class="text-slate-600 text-sm">API Gateway</span>
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                                        <span class="text-emerald-600 text-sm font-medium">Operational</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center justify-between">
+                                    <span class="text-slate-600 text-sm">Authentication</span>
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-2 h-2 bg-amber-500 rounded-full"></div>
+                                        <span class="text-amber-600 text-sm font-medium">Slow</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center justify-between">
+                                    <span class="text-slate-600 text-sm">External APIs</span>
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                                        <span class="text-emerald-600 text-sm font-medium">All Online</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: APIIntegrationsSection -->
+
+                <!-- @COMPONENT: RecentActivity -->
+                <div class="bg-white rounded-lg shadow-sm border border-slate-200">
+                    <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-semibold text-slate-800">Recent API Activity</h3>
+                            <p class="text-slate-600 text-sm mt-1">Latest API calls and system events</p>
+                        </div>
+                        <button class="px-4 py-2 text-sm font-medium text-persian-blue-600 hover:text-persian-blue-700 transition-colors">
+                            View All Logs
+                        </button>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-slate-50 border-b border-slate-200">
+                                <tr>
+                                    <th class="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Timestamp</th>
+                                    <th class="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">API</th>
+                                    <th class="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Endpoint</th>
+                                    <th class="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">User</th>
+                                    <th class="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
+                                    <th class="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Response Time</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200">
+                                <!-- @MAP: recentActivity.map(activity => ( -->
+                                <tr class="hover:bg-slate-50" data-mock="true">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">2024-01-15 14:23:45</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center gap-2">
+                                            <i class="fas fa-chart-candlestick text-blue-600"></i>
+                                            <span class="text-sm font-medium text-slate-800">Finnhub</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">/api/v1/quote</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">user@example.com</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-emerald-100 text-emerald-700 rounded-full">
+                                            200
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">142ms</td>
+                                </tr>
+                                
+                                <tr class="hover:bg-slate-50" data-mock="true">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">2024-01-15 14:22:30</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center gap-2">
+                                            <i class="fas fa-brain text-purple-600"></i>
+                                            <span class="text-sm font-medium text-slate-800">Gemini AI</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">/api/v1/analyze</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">admin@aitaxbot.in</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-emerald-100 text-emerald-700 rounded-full">
+                                            200
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">1.2s</td>
+                                </tr>
+                                
+                                <tr class="hover:bg-slate-50" data-mock="true">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">2024-01-15 14:21:15</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center gap-2">
+                                            <i class="fas fa-rupee-sign text-orange-600"></i>
+                                            <span class="text-sm font-medium text-slate-800">Upstox</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">/api/v1/market-data</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">trader@example.com</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-red-100 text-red-700 rounded-full">
+                                            429
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">55ms</td>
+                                </tr>
+                                
+                                <tr class="hover:bg-slate-50" data-mock="true">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">2024-01-15 14:20:02</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center gap-2">
+                                            <i class="fas fa-seedling text-green-600"></i>
+                                            <span class="text-sm font-medium text-slate-800">Mutual Fund</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">/api/v1/nav</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">investor@example.com</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-emerald-100 text-emerald-700 rounded-full">
+                                            200
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">234ms</td>
+                                </tr>
+                                <!-- @END_MAP -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: RecentActivity -->
+            </div>
+            <!-- @END_COMPONENT: DashboardContent -->
+        </main>
+        <!-- @END_COMPONENT: MainContent -->
+    </div>
+    <!-- @END_COMPONENT: MainLayout -->
+
+    <!-- @COMPONENT: Modal - Add New API -->
+    <div id="newApiModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50" data-implementation="Modal component for adding new API integrations">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+            <div class="px-6 py-4 border-b border-slate-200">
+                <h3 class="text-lg font-semibold text-slate-800">Add New API Integration</h3>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">API Provider</label>
+                    <select class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-persian-blue-500">
+                        <option>Select API Provider</option>
+                        <option>Custom REST API</option>
+                        <option>GraphQL API</option>
+                        <option>WebSocket API</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">API Name</label>
+                    <input type="text" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-persian-blue-500" placeholder="Enter API name">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Base URL</label>
+                    <input type="url" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-persian-blue-500" placeholder="https://api.example.com">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">API Key</label>
+                    <input type="password" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-persian-blue-500" placeholder="Enter API key">
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-slate-200 flex justify-end gap-3">
+                <button class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-800 transition-colors" data-event="click:closeModal">
+                    Cancel
+                </button>
+                <button class="px-4 py-2 text-sm font-medium text-white bg-persian-blue-600 hover:bg-persian-blue-700 rounded-lg transition-colors" data-event="click:submitAPI">
+                    Add API
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: Modal -->
+
+    <script>
+        // TODO: Implement business logic, API calls, and state management
+        (function() {
+            // Basic modal functionality
+            const newApiModal = document.getElementById('newApiModal');
+            
+            // Open modal
+            document.querySelectorAll('[data-event^="click:openNewAPIModal"]').forEach(button => {
+                button.addEventListener('click', () => {
+                    newApiModal.classList.remove('hidden');
+                    newApiModal.classList.add('flex');
+                });
+            });
+            
+            // Close modal
+            document.querySelectorAll('[data-event^="click:closeModal"]').forEach(button => {
+                button.addEventListener('click', () => {
+                    newApiModal.classList.add('hidden');
+                    newApiModal.classList.remove('flex');
+                });
+            });
+            
+            // Close modal on background click
+            newApiModal.addEventListener('click', (e) => {
+                if (e.target === newApiModal) {
+                    newApiModal.classList.add('hidden');
+                    newApiModal.classList.remove('flex');
+                }
+            });
+            
+            // Mock notification system
+            let notificationCount = 3;
+            document.querySelector('[data-bind="notifications.count"]').textContent = notificationCount;
+            
+            // TODO: Implement real-time updates for statistics
+            // TODO: Add JWT authentication validation
+            // TODO: Connect to PostgreSQL database
+            // TODO: Implement rate limiting
+            // TODO: Add comprehensive error handling
+            // TODO: Set up API key management system
+            // TODO: Add user management functionality
+            // TODO: Implement real-time API monitoring
+        })();
+    </script>
+</body>
+</html>

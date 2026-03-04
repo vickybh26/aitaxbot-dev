@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import HRACalculatorModal from '@/components/calculators/HRACalculator';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -71,6 +72,8 @@ export default function TaxCalculator({ onClose }: TaxCalculatorProps = {}) {
   const [activeTab, setActiveTab] = useState('calculator');
   const [isCalculating, setIsCalculating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [showHRAModal, setShowHRAModal] = useState(false);
+  const [hraFromCalculator, setHraFromCalculator] = useState(false);
   const [result, setResult] = useState<BothRegimesResult | null>(null);
   const [aiAdvice, setAiAdvice] = useState<AiAdvice | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
@@ -1042,13 +1045,29 @@ export default function TaxCalculator({ onClose }: TaxCalculatorProps = {}) {
                   </div>
 
                   <div>
-                    <Label htmlFor="hra-received">HRA Received</Label>
+                    <div className="flex items-center justify-between mb-1">
+                      <Label htmlFor="hra-received">
+                        HRA Received
+                        {hraFromCalculator && (
+                          <span className="ml-2 text-xs font-medium text-green-600 bg-green-50 border border-green-200 rounded px-1.5 py-0.5">
+                            ✓ From HRA Calculator
+                          </span>
+                        )}
+                      </Label>
+                      <button
+                        type="button"
+                        onClick={() => setShowHRAModal(true)}
+                        className="text-xs text-persian-blue-600 hover:text-persian-blue-800 font-medium underline underline-offset-2"
+                      >
+                        Calculate HRA →
+                      </button>
+                    </div>
                     <Input
                       id="hra-received"
                       type="number"
                       placeholder="e.g., 200000"
                       value={formData.hraReceived}
-                      onChange={(e) => updateFormData('hraReceived', e.target.value)}
+                      onChange={(e) => { updateFormData('hraReceived', e.target.value); setHraFromCalculator(false); }}
                       data-testid="input-hra-received"
                     />
                   </div>
@@ -1486,11 +1505,25 @@ export default function TaxCalculator({ onClose }: TaxCalculatorProps = {}) {
 
   // If onClose is provided, wrap in Modal (for use in homepage modals)
   // Otherwise, render standalone (for dedicated calculator pages)
-  return onClose ? (
-    <Modal isOpen={true} onClose={onClose} title="🤖 AI Income Tax Calculator FY 2025-26 / AY 2026-27" size="6xl">
-      {calculatorContent}
-    </Modal>
-  ) : (
-    calculatorContent
+  return (
+    <>
+      {showHRAModal && (
+        <HRACalculatorModal
+          onClose={() => setShowHRAModal(false)}
+          onApplyHRA={(hraAmount: number) => {
+            updateFormData('hraReceived', String(hraAmount));
+            setHraFromCalculator(true);
+            setShowHRAModal(false);
+          }}
+        />
+      )}
+      {onClose ? (
+        <Modal isOpen={true} onClose={onClose} title="🤖 AI Income Tax Calculator FY 2025-26 / AY 2026-27" size="6xl">
+          {calculatorContent}
+        </Modal>
+      ) : (
+        calculatorContent
+      )}
+    </>
   );
 }

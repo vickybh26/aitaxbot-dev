@@ -52,7 +52,7 @@ export default function Footer() {
           <div className="flex flex-col md:flex-row justify-between items-center mb-6">
             <div className="mb-4 md:mb-0">
               <p className="text-sm text-readable font-semibold">
-                © 2025 AiTaxBot. All rights reserved. Built with real financial APIs.
+                © 2026 AiTaxBot. All rights reserved. Built with real financial APIs.
               </p>
               <p className="text-xs text-readable-light mt-1">
                 Website: <a href="https://aitaxbot.co.in" className="hover:text-primary transition-colors">aitaxbot.co.in</a> | 
