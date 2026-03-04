@@ -467,43 +467,96 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`✉️ New contact inquiry received from ${email} - ID: ${docRef.id}`);
       
-      // Send email notification using Brevo
+      // ── Send emails via Brevo ──────────────────────────────────────────────
       try {
         if (!process.env.BREVO_API_KEY) {
-          console.warn('⚠️ BREVO_API_KEY not set - skipping email notification. Contact saved to Firestore.');
+          console.warn('⚠️ BREVO_API_KEY not set — contact saved to Firestore only. Add it in Railway to enable emails.');
         } else {
           const apiInstance = new TransactionalEmailsApi();
           apiInstance.setApiKey(TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY);
 
-          // IMPORTANT: sender email must be a verified sender in your Brevo account
-          // Go to Brevo → Senders & Domains → Add & verify info@aitaxbot.in
           const senderEmail = process.env.BREVO_SENDER_EMAIL || 'info@aitaxbot.in';
-          const senderName = process.env.BREVO_SENDER_NAME || 'AiTaxBot';
+          const senderName  = process.env.BREVO_SENDER_NAME  || 'AiTaxBot';
+          const adminEmail  = process.env.BREVO_ADMIN_EMAIL  || senderEmail; // where YOU receive alerts
+          const submittedAt = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
 
+          // ── 1. Admin notification ────────────────────────────────────────
           await apiInstance.sendTransacEmail({
-            to: [{ email: senderEmail, name: 'AiTaxBot Support' }],
+            sender:  { email: senderEmail, name: senderName },
+            to:      [{ email: adminEmail, name: 'AiTaxBot Team' }],
             replyTo: { email, name },
-            sender: { email: senderEmail, name: senderName },
-            subject: `[AiTaxBot Contact] ${subject || 'New inquiry from ' + name}`,
+            subject: `[AiTaxBot Contact] ${subject || 'New inquiry'} — ${name}`,
             htmlContent: `
-              <h2>New Contact Form Submission</h2>
-              <p><strong>From:</strong> ${name} (${email})</p>
-              ${subject ? `<p><strong>Subject:</strong> ${subject}</p>` : ''}
-              <p><strong>Message:</strong></p>
-              <p style="background:#f5f5f5;padding:12px;border-radius:6px">${message.replace(/\n/g, '<br>')}</p>
-              <hr>
-              <p><small>Inquiry ID: ${docRef.id}</small></p>
-              <p><small>Submitted: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST</small></p>
+              <!DOCTYPE html>
+              <html><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;color:#1e293b">
+                <div style="background:#1E3A8A;padding:16px 20px;border-radius:8px 8px 0 0">
+                  <h2 style="color:#fff;margin:0;font-size:18px">📬 New Contact Form Submission</h2>
+                </div>
+                <div style="background:#f8fafc;border:1px solid #e2e8f0;border-top:none;padding:20px;border-radius:0 0 8px 8px">
+                  <table style="width:100%;border-collapse:collapse">
+                    <tr><td style="padding:6px 0;font-weight:bold;width:100px;color:#64748b;font-size:13px">Name</td><td style="padding:6px 0;font-size:14px">${name}</td></tr>
+                    <tr><td style="padding:6px 0;font-weight:bold;color:#64748b;font-size:13px">Email</td><td style="padding:6px 0;font-size:14px"><a href="mailto:${email}" style="color:#2563eb">${email}</a></td></tr>
+                    ${subject ? `<tr><td style="padding:6px 0;font-weight:bold;color:#64748b;font-size:13px">Subject</td><td style="padding:6px 0;font-size:14px">${subject}</td></tr>` : ''}
+                    <tr><td style="padding:6px 0;font-weight:bold;color:#64748b;font-size:13px">Time</td><td style="padding:6px 0;font-size:14px">${submittedAt} IST</td></tr>
+                    <tr><td style="padding:6px 0;font-weight:bold;color:#64748b;font-size:13px">Ref ID</td><td style="padding:6px 0;font-size:13px;color:#94a3b8">${docRef.id}</td></tr>
+                  </table>
+                  <div style="margin-top:16px">
+                    <p style="font-weight:bold;color:#64748b;font-size:13px;margin:0 0 6px">Message</p>
+                    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:12px;font-size:14px;line-height:1.6;white-space:pre-wrap">${message}</div>
+                  </div>
+                  <div style="margin-top:16px;text-align:center">
+                    <a href="mailto:${email}?subject=Re: ${encodeURIComponent(subject || 'Your AiTaxBot inquiry')}" style="background:#2563eb;color:#fff;padding:10px 24px;border-radius:6px;text-decoration:none;font-size:14px;font-weight:bold">Reply to ${name}</a>
+                  </div>
+                </div>
+                <p style="text-align:center;font-size:11px;color:#94a3b8;margin-top:12px">AiTaxBot · aitaxbot.in</p>
+              </body></html>
             `,
-            textContent: `New Contact Form Submission\n\nFrom: ${name} (${email})\n${subject ? 'Subject: ' + subject + '\n' : ''}\nMessage:\n${message}\n\nInquiry ID: ${docRef.id}`
+            textContent: `New Contact Inquiry\n\nFrom: ${name} (${email})\n${subject ? 'Subject: ' + subject + '\n' : ''}Time: ${submittedAt} IST\nRef: ${docRef.id}\n\nMessage:\n${message}`
           });
-          console.log(`📧 Email notification sent for inquiry ${docRef.id}`);
+
+          // ── 2. Auto-reply to the user ────────────────────────────────────
+          await apiInstance.sendTransacEmail({
+            sender:  { email: senderEmail, name: senderName },
+            to:      [{ email, name }],
+            subject: `We received your message — AiTaxBot`,
+            htmlContent: `
+              <!DOCTYPE html>
+              <html><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;color:#1e293b">
+                <div style="background:#1E3A8A;padding:20px;border-radius:8px 8px 0 0;text-align:center">
+                  <h1 style="color:#fff;margin:0;font-size:22px">AiTaxBot</h1>
+                  <p style="color:#93C5FD;margin:4px 0 0;font-size:13px">www.aitaxbot.in · Smart Tax Calculator for India</p>
+                </div>
+                <div style="background:#f8fafc;border:1px solid #e2e8f0;border-top:none;padding:24px;border-radius:0 0 8px 8px">
+                  <p style="font-size:16px;margin:0 0 12px">Hi <strong>${name}</strong>,</p>
+                  <p style="font-size:14px;line-height:1.6;color:#475569">
+                    Thank you for reaching out! We have received your message and our team will get back to you within <strong>24 hours</strong> on business days.
+                  </p>
+                  ${subject ? `<p style="font-size:13px;color:#64748b">Your inquiry: <em>${subject}</em></p>` : ''}
+                  <div style="background:#EFF6FF;border-left:4px solid #2563eb;padding:12px 16px;margin:16px 0;border-radius:0 6px 6px 0">
+                    <p style="margin:0;font-size:13px;color:#1d4ed8">
+                      While you wait, you can explore our free tax calculators at <a href="https://aitaxbot.in" style="color:#1d4ed8">aitaxbot.in</a> — no sign-up required!
+                    </p>
+                  </div>
+                  <p style="font-size:13px;color:#64748b;margin:16px 0 4px">If you have an urgent query, you can also reach us directly:</p>
+                  <p style="font-size:13px;margin:0">📧 <a href="mailto:info@aitaxbot.in" style="color:#2563eb">info@aitaxbot.in</a> &nbsp;|&nbsp; 📞 <a href="tel:+917899869036" style="color:#2563eb">+91 78998 69036</a></p>
+                  <hr style="border:none;border-top:1px solid #e2e8f0;margin:20px 0">
+                  <p style="font-size:12px;color:#94a3b8;margin:0">Reference ID: ${docRef.id}</p>
+                </div>
+                <p style="text-align:center;font-size:11px;color:#94a3b8;margin-top:12px">
+                  This is an automated confirmation. Please do not reply to this email.
+                  <br>AiTaxBot · Bengaluru, Karnataka, India
+                </p>
+              </body></html>
+            `,
+            textContent: `Hi ${name},\n\nThank you for contacting AiTaxBot! We have received your message and will get back to you within 24 hours on business days.\n\nFor urgent queries:\nEmail: info@aitaxbot.in\nPhone: +91 78998 69036\n\nReference ID: ${docRef.id}\n\n-- AiTaxBot Team`
+          });
+
+          console.log(`📧 Admin notification + auto-reply sent for inquiry ${docRef.id}`);
         }
       } catch (emailError: any) {
-        // Log full error details but don't fail the request - inquiry is already saved to Firestore
-        const errDetail = emailError?.response?.text || emailError?.message || String(emailError);
+        const errDetail = (emailError as any)?.response?.text || (emailError as any)?.message || String(emailError);
         console.error('❌ Brevo email failed:', errDetail);
-        console.error('ℹ️  Fix: Verify sender domain in Brevo dashboard → Senders & IP → Domains. Set BREVO_SENDER_EMAIL env var to a verified sender.');
+        console.error('ℹ️  Fix: Verify sender domain in Brevo → Senders & Domains. Set BREVO_SENDER_EMAIL to a verified sender.');
       }
       
       res.json({ 
