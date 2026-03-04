@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Calculator, 
+import {
+  Calculator,
   TrendingUp,
   ArrowRight,
   FileText,
@@ -17,13 +17,25 @@ import {
   CheckCircle2,
   Newspaper,
   ExternalLink,
-  Home as HomeIcon
+  Home as HomeIcon,
+  ChevronDown,
+  ChevronUp,
+  Send,
+  Mail,
+  Phone,
+  MapPin,
+  Linkedin,
+  Instagram,
+  AlertCircle,
+  Info
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import logoImage from "@assets/aitaxbot-logo.png";
 import { ResponsiveAd, LeaderboardAd } from "@/components/AdBanner";
 import { trackPageView } from "@/lib/analytics";
 import { generateHomePageSchema } from "@/lib/structuredData";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 // Import calculator components
 import TaxCalculator from "@/components/calculators/TaxCalculator";
@@ -57,6 +69,44 @@ interface LandingProps {
 }
 
 export default function Landing({ activeModal, setActiveModal }: LandingProps) {
+  const { toast } = useToast();
+
+  // Contact form state
+  const [contactOpen, setContactOpen] = useState(false);
+  const [contactFormData, setContactFormData] = useState({
+    name: '', email: '', subject: '', message: ''
+  });
+
+  const contactMutation = useMutation({
+    mutationFn: async (data: typeof contactFormData) => {
+      return await apiRequest('POST', '/api/contact', data);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Message Sent!",
+        description: "Thank you! We'll get back to you within 24 hours.",
+      });
+      setContactFormData({ name: '', email: '', subject: '', message: '' });
+      setContactOpen(false);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error?.message || "Failed to send message. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleContactChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setContactFormData({ ...contactFormData, [e.target.name]: e.target.value });
+  };
+
+  const handleContactSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    contactMutation.mutate(contactFormData);
+  };
+
   useEffect(() => {
     trackPageView('/', 'Home - AiTaxBot');
   }, []);
@@ -446,6 +496,278 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                   </div>
                 </div>
               </section>
+
+              {/* ── LEGAL DECLARATION SECTION ──────────────────────────────── */}
+              <section className="py-6">
+                <div className="rounded-2xl border border-amber-200 bg-amber-50/60 p-5">
+                  <div className="flex items-start gap-3 mb-4">
+                    <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                    <h2 className="text-base font-bold text-amber-800">Important Declarations & Disclaimers</h2>
+                  </div>
+
+                  <div className="space-y-4 text-sm text-slate-700">
+                    {/* Row 1 */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="flex gap-2">
+                        <Info className="h-4 w-4 text-persian-blue-500 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="font-semibold text-slate-800 mb-0.5">For Informational Purposes Only</p>
+                          <p className="text-slate-600 leading-relaxed">
+                            All calculations provided by AiTaxBot are indicative and for general reference only.
+                            Results should not be treated as legal, financial, or professional tax advice.
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Info className="h-4 w-4 text-persian-blue-500 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="font-semibold text-slate-800 mb-0.5">Consult a Chartered Accountant</p>
+                          <p className="text-slate-600 leading-relaxed">
+                            For official ITR filing, audit, tax planning with legal validity, or complex cases
+                            (capital gains, business income, foreign assets), please consult a qualified CA or tax professional.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Row 2 */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="flex gap-2">
+                        <Info className="h-4 w-4 text-persian-blue-500 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="font-semibold text-slate-800 mb-0.5">Not Affiliated with Income Tax Dept.</p>
+                          <p className="text-slate-600 leading-relaxed">
+                            AiTaxBot is an independent private platform. We are not affiliated with, endorsed by,
+                            or connected to the Income Tax Department of India, CBDT, or any government body.
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Info className="h-4 w-4 text-persian-blue-500 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="font-semibold text-slate-800 mb-0.5">Not a Tax Return Preparer (TRP)</p>
+                          <p className="text-slate-600 leading-relaxed">
+                            AiTaxBot is a self-service calculation tool only. We are not registered as a Tax
+                            Return Preparer under the TRP Scheme and do not file returns on behalf of users.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Row 3 */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="flex gap-2">
+                        <Info className="h-4 w-4 text-persian-blue-500 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="font-semibold text-slate-800 mb-0.5">Data Privacy (DPDP Act 2023)</p>
+                          <p className="text-slate-600 leading-relaxed">
+                            Any personal or financial data you enter for saved calculations is stored securely
+                            and used solely to provide our services. We never sell or share your data with third
+                            parties. You can request deletion at any time. See our{' '}
+                            <a href="/privacy-policy" className="text-persian-blue-600 hover:underline font-medium">Privacy Policy</a>.
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Info className="h-4 w-4 text-persian-blue-500 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="font-semibold text-slate-800 mb-0.5">Accuracy & Updates</p>
+                          <p className="text-slate-600 leading-relaxed">
+                            Calculations are based on FY 2025-26 / AY 2026-27 rules under the Income Tax Act 2025.
+                            Tax laws may change; always verify with the latest CBDT notifications or official
+                            sources before making financial decisions.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Compliance badges */}
+                    <div className="flex flex-wrap gap-2 pt-2 border-t border-amber-200">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white border border-amber-200 text-xs font-medium text-amber-700">
+                        <CheckCircle2 className="h-3 w-3" /> Income Tax Act 2025 Compliant
+                      </span>
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white border border-amber-200 text-xs font-medium text-amber-700">
+                        <CheckCircle2 className="h-3 w-3" /> DPDP Act 2023 Aware
+                      </span>
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white border border-amber-200 text-xs font-medium text-amber-700">
+                        <CheckCircle2 className="h-3 w-3" /> CA-Reviewed Calculations
+                      </span>
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white border border-amber-200 text-xs font-medium text-amber-700">
+                        <CheckCircle2 className="h-3 w-3" /> No Govt. Affiliation
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* ── COLLAPSIBLE CONTACT US SECTION ───────────────────────────── */}
+              <section className="py-4 pb-8">
+                {/* Toggle Button */}
+                <button
+                  type="button"
+                  onClick={() => setContactOpen(prev => !prev)}
+                  className="w-full flex items-center justify-between px-5 py-4 rounded-2xl bg-persian-blue-600 hover:bg-persian-blue-700 text-white font-semibold transition-all duration-300 shadow-colored group"
+                >
+                  <div className="flex items-center gap-2">
+                    <Mail className="h-5 w-5" />
+                    <span>Contact Us / Get Help</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm font-normal text-white/80">
+                    <span className="hidden sm:inline">info@aitaxbot.co.in  ·  +91 78998 69036</span>
+                    {contactOpen
+                      ? <ChevronUp className="h-5 w-5 group-hover:scale-110 transition-transform" />
+                      : <ChevronDown className="h-5 w-5 group-hover:scale-110 transition-transform" />}
+                  </div>
+                </button>
+
+                {/* Collapsible body */}
+                {contactOpen && (
+                  <div className="mt-3 rounded-2xl border border-slate-200 bg-slate-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="grid md:grid-cols-5 gap-0">
+
+                      {/* Left: info strip */}
+                      <div className="md:col-span-2 bg-gradient-to-br from-persian-blue-600 to-persian-blue-800 p-6 text-white">
+                        <h3 className="text-base font-bold mb-4">Get in Touch</h3>
+                        <div className="space-y-4 text-sm">
+                          <div className="flex items-start gap-3">
+                            <Mail className="h-4 w-4 flex-shrink-0 mt-0.5 text-persian-blue-200" />
+                            <div>
+                              <p className="text-persian-blue-200 text-xs mb-0.5">Email</p>
+                              <a href="mailto:info@aitaxbot.co.in" className="font-medium hover:text-persian-blue-100 transition-colors">
+                                info@aitaxbot.co.in
+                              </a>
+                            </div>
+                          </div>
+                          <div className="flex items-start gap-3">
+                            <Phone className="h-4 w-4 flex-shrink-0 mt-0.5 text-persian-blue-200" />
+                            <div>
+                              <p className="text-persian-blue-200 text-xs mb-0.5">Phone</p>
+                              <a href="tel:+917899869036" className="font-medium hover:text-persian-blue-100 transition-colors">
+                                +91 78998 69036
+                              </a>
+                            </div>
+                          </div>
+                          <div className="flex items-start gap-3">
+                            <MapPin className="h-4 w-4 flex-shrink-0 mt-0.5 text-persian-blue-200" />
+                            <div>
+                              <p className="text-persian-blue-200 text-xs mb-0.5">Location</p>
+                              <span className="font-medium">Bengaluru, Karnataka, India</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="mt-6 pt-5 border-t border-persian-blue-500">
+                          <p className="text-persian-blue-200 text-xs mb-3">Follow Us</p>
+                          <div className="flex gap-3">
+                            <a
+                              href="https://www.linkedin.com/company/aitaxbot/"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="bg-white/10 hover:bg-white/20 rounded-full p-2 transition-colors"
+                            >
+                              <Linkedin className="h-4 w-4" />
+                            </a>
+                            <a
+                              href="https://www.instagram.com/aitaxbot/"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="bg-white/10 hover:bg-white/20 rounded-full p-2 transition-colors"
+                            >
+                              <Instagram className="h-4 w-4" />
+                            </a>
+                          </div>
+                        </div>
+
+                        <p className="text-persian-blue-200 text-xs mt-6">
+                          We reply within 24 hours on business days.
+                        </p>
+                      </div>
+
+                      {/* Right: form */}
+                      <div className="md:col-span-3 p-6">
+                        <h3 className="text-base font-bold text-slate-900 mb-4">Send us a Message</h3>
+                        <form onSubmit={handleContactSubmit} className="space-y-3">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                              <label className="block text-xs font-medium text-slate-700 mb-1">Full Name *</label>
+                              <input
+                                type="text"
+                                name="name"
+                                required
+                                value={contactFormData.name}
+                                onChange={handleContactChange}
+                                disabled={contactMutation.isPending}
+                                placeholder="Your full name"
+                                className="w-full px-3 py-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-persian-blue-500 focus:border-persian-blue-500 transition-colors disabled:opacity-50 bg-white"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium text-slate-700 mb-1">Email Address *</label>
+                              <input
+                                type="email"
+                                name="email"
+                                required
+                                value={contactFormData.email}
+                                onChange={handleContactChange}
+                                disabled={contactMutation.isPending}
+                                placeholder="your@email.com"
+                                className="w-full px-3 py-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-persian-blue-500 focus:border-persian-blue-500 transition-colors disabled:opacity-50 bg-white"
+                              />
+                            </div>
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-medium text-slate-700 mb-1">Subject</label>
+                            <select
+                              name="subject"
+                              value={contactFormData.subject}
+                              onChange={handleContactChange}
+                              disabled={contactMutation.isPending}
+                              className="w-full px-3 py-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-persian-blue-500 focus:border-persian-blue-500 transition-colors disabled:opacity-50 bg-white"
+                            >
+                              <option value="">Select a topic...</option>
+                              <option value="Tax calculation query">Tax calculation query</option>
+                              <option value="Bug or incorrect result">Bug / incorrect result</option>
+                              <option value="Feature request">Feature request</option>
+                              <option value="GST / Invoicing help">GST / Invoicing help</option>
+                              <option value="Account / Login issue">Account / Login issue</option>
+                              <option value="General feedback">General feedback</option>
+                              <option value="Other">Other</option>
+                            </select>
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-medium text-slate-700 mb-1">Message *</label>
+                            <textarea
+                              name="message"
+                              rows={4}
+                              required
+                              value={contactFormData.message}
+                              onChange={handleContactChange}
+                              disabled={contactMutation.isPending}
+                              placeholder="Describe your question or feedback..."
+                              className="w-full px-3 py-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-persian-blue-500 focus:border-persian-blue-500 transition-colors resize-none disabled:opacity-50 bg-white"
+                            />
+                          </div>
+
+                          <div className="flex items-center justify-between pt-1">
+                            <p className="text-xs text-slate-400">* Required fields</p>
+                            <button
+                              type="submit"
+                              disabled={contactMutation.isPending}
+                              className="inline-flex items-center gap-2 bg-persian-blue-600 hover:bg-persian-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              <Send className="h-4 w-4" />
+                              {contactMutation.isPending ? 'Sending...' : 'Send Message'}
+                            </button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </section>
+
             </div>
 
             {/* RIGHT COLUMN - Sticky Sidebar */}
