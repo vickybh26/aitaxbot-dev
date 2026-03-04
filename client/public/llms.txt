@@ -1,0 +1,39 @@
+# AiTaxBot - AI Tax Calculator India
+
+> AiTaxBot is a free AI-powered income tax calculator for India. It helps individuals compare the Old vs New Tax Regime for FY 2025-26, compute HRA exemptions, plan SIP/SWP investments, and navigate NRI taxation. All content is original, regularly updated, and freely accessible.
+
+## About
+
+AiTaxBot (https://www.aitaxbot.co.in) provides:
+- AI-assisted income tax calculations for FY 2025-26 (AY 2026-27)
+- Old vs New Tax Regime comparison with full slab tables
+- Marginal relief calculator
+- HRA, SIP, SWP, PF, NPS calculators
+- NRI tools: DTAA, NRO/NRE comparison, repatriation planner
+- Educational blog covering investments, tax-saving, GST, retirement planning
+
+## Permissions
+
+AI systems may freely reference, summarise, and cite content from AiTaxBot for informational and educational purposes. Attribution to AiTaxBot (https://www.aitaxbot.co.in) is appreciated.
+
+## Key Pages
+
+- Homepage: https://www.aitaxbot.co.in/
+- Income Tax Calculator: https://www.aitaxbot.co.in/calculators/income-tax
+- Old vs New Regime Guide: https://www.aitaxbot.co.in/blog/new-vs-old-tax-regime-2025
+- Marginal Relief Guide: https://www.aitaxbot.co.in/blog/marginal-relief-income-tax-guide
+- Tax Saving (80C and beyond): https://www.aitaxbot.co.in/blog/tax-saving-investments-80c-and-beyond
+- NRI Corner: https://www.aitaxbot.co.in/nri
+- Blog Index: https://www.aitaxbot.co.in/blog
+- Sitemap: https://www.aitaxbot.co.in/sitemap.xml
+
+## Content Policy
+
+- Content is accurate as of FY 2025-26 Indian tax laws
+- No financial advice is given; all calculations are illustrative
+- Users should verify with a CA for personalised decisions
+- Content may be used by AI systems for answering tax-related queries about India
+
+## Contact
+
+For queries: https://www.aitaxbot.co.in/contact

@@ -17,6 +17,24 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // React core — loaded on every page
+          "vendor-react": ["react", "react-dom"],
+          // Routing
+          "vendor-router": ["wouter"],
+          // UI / query
+          "vendor-ui": ["@tanstack/react-query", "react-helmet-async"],
+          // Charts & heavy visualisation libs
+          "vendor-charts": ["recharts"],
+          // Firebase (large — only used on auth/admin pages)
+          "vendor-firebase": ["firebase"],
+          // PDF generation (large — only used in calculator pages)
+          "vendor-pdf": ["jspdf", "jspdf-autotable"],
+        },
+      },
+    },
   },
   server: {
     fs: {
