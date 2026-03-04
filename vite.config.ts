@@ -29,7 +29,7 @@ export default defineConfig({
           // Charts & heavy visualisation libs
           "vendor-charts": ["recharts"],
           // Firebase (large — only used on auth/admin pages)
-          "vendor-firebase": ["firebase"],
+          "vendor-firebase": ["firebase/app", "firebase/auth", "firebase/analytics"],
           // PDF generation (large — only used in calculator pages)
           "vendor-pdf": ["jspdf", "jspdf-autotable"],
         },
