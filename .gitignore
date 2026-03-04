@@ -47,3 +47,9 @@ config/secrets.json
 __pycache__/
 *.pyc
 *.pyo
+
+
+# Replit internal files
+.config/
+.local/
+.replit
