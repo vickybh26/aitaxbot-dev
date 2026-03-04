@@ -28,7 +28,7 @@ import {
   Info
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import logoImage from "@assets/aitaxbot-logo.png";
+import logoImage from "@assets/aitaxbot-logo-lovable.png";
 import { ResponsiveAd, LeaderboardAd } from "@/components/AdBanner";
 import { trackPageView } from "@/lib/analytics";
 import { generateHomePageSchema } from "@/lib/structuredData";
@@ -872,14 +872,17 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
           <div className="max-w-6xl mx-auto">
             <div className="flex flex-col md:flex-row justify-between items-center">
               <div className="flex items-center space-x-3 mb-4 md:mb-0">
-                <img 
-                  src={logoImage} 
-                  alt="AiTaxBot Logo" 
-                  className="h-10 w-auto"
+                <img
+                  src={logoImage}
+                  alt="AiTaxBot Logo"
+                  className="h-14 w-auto brightness-110"
                   loading="lazy"
                   data-testid="logo-footer"
                 />
-                <span className="text-slate-400">Smart Tax Calculator for India</span>
+                <div>
+                  <div className="font-bold text-white text-base leading-tight">AiTaxBot</div>
+                  <div className="text-slate-400 text-xs">Smart Tax Calculator for India</div>
+                </div>
               </div>
               <div className="flex space-x-6 text-sm text-slate-400">
                 <a href="/privacy-policy" className="hover:text-white transition-colors">Privacy</a>
