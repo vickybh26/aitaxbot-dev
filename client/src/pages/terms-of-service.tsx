@@ -26,7 +26,7 @@ export default function TermsOfService() {
           <h1 className="text-3xl font-bold text-gray-900 mb-8">Terms of Service</h1>
           <div className="prose prose-lg max-w-none">
             <p className="text-gray-600 mb-6">
-              <strong>Last updated:</strong> January 31, 2025
+              <strong>Last updated:</strong> March 4, 2026
             </p>
 
             <section className="mb-8">
@@ -40,14 +40,13 @@ export default function TermsOfService() {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">Description of Service</h2>
               <p className="text-gray-700 mb-4">
-                AiTaxBot provides AI-powered financial calculators, tax computation tools, and market data services 
+                AiTaxBot provides AI-powered tax calculators and financial planning tools
                 for informational and educational purposes.
               </p>
               <ul className="list-disc pl-6 mb-4 text-gray-700">
-                <li>Income tax calculators for Indian tax slabs</li>
-                <li>SIP, SWP, and HRA calculators</li>
-                <li>Real-time stock market data and mutual fund information</li>
-                <li>Financial news and market insights</li>
+                <li>Income tax calculators for Indian tax slabs (Old &amp; New Regime)</li>
+                <li>SIP, SWP, HRA, and other financial calculators</li>
+                <li>AI-powered tax saving tips and regime comparison</li>
                 <li>Document upload and automatic data extraction</li>
               </ul>
             </section>
@@ -106,7 +105,7 @@ export default function TermsOfService() {
                 Our service integrates with various third-party APIs and services:
               </p>
               <ul className="list-disc pl-6 mb-4 text-gray-700">
-                <li><strong>Financial Data:</strong> Finnhub, Upstox, MF API for market data</li>
+                <li><strong>AI Services:</strong> Google Firebase AI Logic (Gemini) for tax advice</li>
                 <li><strong>Analytics:</strong> Google Analytics, Microsoft Clarity</li>
                 <li><strong>Advertising:</strong> Google AdSense</li>
                 <li><strong>Storage:</strong> Firebase for temporary document storage</li>
@@ -161,7 +160,7 @@ export default function TermsOfService() {
                 For questions about these Terms of Service, contact us at:
               </p>
               <ul className="text-gray-700">
-                <li><strong>Email:</strong> info@aitaxbot.co.in</li>
+                <li><strong>Email:</strong> info@aitaxbot.in</li>
                 <li><strong>Website:</strong> aitaxbot.co.in</li>
                 <li><strong>Business Hours:</strong> Monday-Friday, 9 AM - 6 PM IST</li>
               </ul>

@@ -56,7 +56,7 @@ export default function Contact() {
     <>
       <Helmet>
         <title>Contact Us - AiTaxBot Support & Inquiries</title>
-        <meta name="description" content="Get in touch with AiTaxBot for tax calculator support, questions, or feedback. Email: info@aitaxbot.co.in | Phone: +91 78998 69036 | Bengaluru, India" />
+        <meta name="description" content="Get in touch with AiTaxBot for tax calculator support, questions, or feedback. Email: info@aitaxbot.in | Phone: +91 78998 69036 | Bengaluru, India" />
         <meta name="keywords" content="contact aitaxbot, tax calculator support, customer support India, tax help" />
         <link rel="canonical" href="https://aitaxbot.co.in/contact" />
         
@@ -88,11 +88,11 @@ export default function Contact() {
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">Email</h3>
                     <a 
-                      href="mailto:info@aitaxbot.co.in" 
+                      href="mailto:info@aitaxbot.in" 
                       className="text-persian-blue-600 hover:text-persian-blue-700 transition-colors"
                       data-testid="link-email"
                     >
-                      info@aitaxbot.co.in
+                      info@aitaxbot.in
                     </a>
                   </div>
                 </div>

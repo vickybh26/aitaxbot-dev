@@ -43,7 +43,7 @@ export default function Footer() {
             <ul className="space-y-2">
               <li><a href="/privacy-policy" className="text-sm text-readable hover:text-primary font-medium transition-colors">Privacy Policy</a></li>
               <li><a href="/terms-of-service" className="text-sm text-readable hover:text-primary font-medium transition-colors">Terms of Service</a></li>
-              <li><a href="mailto:info@aitaxbot.co.in" className="text-sm text-readable hover:text-primary font-medium transition-colors">Contact Support</a></li>
+              <li><a href="mailto:info@aitaxbot.in" className="text-sm text-readable hover:text-primary font-medium transition-colors">Contact Support</a></li>
             </ul>
           </div>
         </div>
@@ -56,7 +56,7 @@ export default function Footer() {
               </p>
               <p className="text-xs text-readable-light mt-1">
                 Website: <a href="https://aitaxbot.co.in" className="hover:text-primary transition-colors">aitaxbot.co.in</a> | 
-                Email: <a href="mailto:info@aitaxbot.co.in" className="hover:text-primary transition-colors ml-1">info@aitaxbot.co.in</a>
+                Email: <a href="mailto:info@aitaxbot.in" className="hover:text-primary transition-colors ml-1">info@aitaxbot.in</a>
               </p>
             </div>
             <div className="flex items-center space-x-4">

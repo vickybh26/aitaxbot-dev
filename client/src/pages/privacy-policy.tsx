@@ -23,7 +23,7 @@ export default function PrivacyPolicy() {
         <div className="max-w-4xl mx-auto px-4 py-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4" data-testid="heading-privacy">Privacy Policy</h1>
           <p className="text-gray-600 mb-8">
-            <strong>Last Updated:</strong> October 26, 2025
+            <strong>Last Updated:</strong> March 4, 2026
           </p>
 
           <div className="prose prose-lg max-w-none">
@@ -215,7 +215,7 @@ export default function PrivacyPolicy() {
                 <li><strong>Right to Withdraw Consent:</strong> Withdraw consent for cookie usage at any time</li>
               </ul>
               <p className="text-gray-700 mt-4">
-                To exercise these rights, please contact us at <a href="mailto:info@aitaxbot.co.in" className="text-persian-blue-600 hover:underline">info@aitaxbot.co.in</a>.
+                To exercise these rights, please contact us at <a href="mailto:info@aitaxbot.in" className="text-persian-blue-600 hover:underline">info@aitaxbot.in</a>.
               </p>
             </section>
 
@@ -236,7 +236,7 @@ export default function PrivacyPolicy() {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">10. Third-Party Links</h2>
               <p className="text-gray-700">
-                Our website may contain links to third-party sites (e.g., market data providers, news sources, Google Ads Settings). We are not responsible for the privacy practices of those websites. We encourage you to read their privacy policies.
+                Our website may contain links to third-party sites (e.g., tax authority portals, news sources, Google Ads Settings). We are not responsible for the privacy practices of those websites. We encourage you to read their privacy policies.
               </p>
             </section>
 
@@ -278,8 +278,8 @@ export default function PrivacyPolicy() {
               <div className="bg-gray-50 rounded-lg p-6">
                 <p className="text-gray-800 font-medium mb-2">📧 Email:</p>
                 <p className="mb-4">
-                  <a href="mailto:info@aitaxbot.co.in" className="text-persian-blue-600 hover:text-persian-blue-700 transition-colors text-lg" data-testid="link-contact-email">
-                    info@aitaxbot.co.in
+                  <a href="mailto:info@aitaxbot.in" className="text-persian-blue-600 hover:text-persian-blue-700 transition-colors text-lg" data-testid="link-contact-email">
+                    info@aitaxbot.in
                   </a>
                 </p>
                 

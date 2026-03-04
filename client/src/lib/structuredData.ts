@@ -61,7 +61,7 @@ export function generateOrganizationSchema() {
     ],
     "contactPoint": {
       "@type": "ContactPoint",
-      "email": "info@aitaxbot.co.in",
+      "email": "info@aitaxbot.in",
       "contactType": "Customer Service"
     }
   };
