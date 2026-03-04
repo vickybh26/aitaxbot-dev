@@ -1,5 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
+import { getAI, getGenerativeModel, GoogleAIBackend } from "firebase/ai";
 import { 
   getAuth, 
   GoogleAuthProvider, 
@@ -26,6 +27,30 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig);
 export const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
 export const auth = getAuth(app);
+
+// Firebase AI Logic — Gemini Developer API
+// Requires "AI Logic" to be enabled in your Firebase console project
+// (Build → AI Logic → Get started → select Gemini Developer API)
+let _firebaseAI: ReturnType<typeof getAI> | null = null;
+let _geminiModel: ReturnType<typeof getGenerativeModel> | null = null;
+
+export function getGeminiModel() {
+  if (!_geminiModel) {
+    try {
+      _firebaseAI = getAI(app, { backend: new GoogleAIBackend() });
+      _geminiModel = getGenerativeModel(_firebaseAI, {
+        model: "gemini-2.5-flash",
+        generationConfig: {
+          temperature: 0.3,
+          responseMimeType: "application/json",
+        },
+      });
+    } catch (e) {
+      console.warn("[Firebase AI] Not configured — falling back to server-side Gemini:", e);
+    }
+  }
+  return _geminiModel;
+}
 export const googleProvider = new GoogleAuthProvider();
 
 // Set custom parameters for better UX

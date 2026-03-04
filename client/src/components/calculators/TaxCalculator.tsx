@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import HRACalculatorModal from '@/components/calculators/HRACalculator';
+import { getClientTaxAdvice } from '@/lib/geminiAIService';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -367,41 +368,36 @@ export default function TaxCalculator({ onClose }: TaxCalculatorProps = {}) {
     setActiveTab('results');
     setIsCalculating(false);
 
-    // Fetch AI advice asynchronously (non-blocking)
+    // Get AI advice via Firebase AI Logic (client-side Gemini) with server fallback
     setAiAdvice(null);
     setAiLoading(true);
-    fetch('/api/ai/tax-advice', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        occupation: userProfile?.occupation || '',
-        ageGroup: formData.ageGroup,
-        salaryIncome: parseFloat(formData.salaryIncome) || 0,
-        housePropertyIncome: parseFloat(formData.housePropertyIncome) || 0,
-        businessIncome: parseFloat(formData.businessIncome) || 0,
-        capitalGainsIncome: parseFloat(formData.capitalGainsIncome) || 0,
-        otherIncome: parseFloat(formData.otherIncome) || 0,
-        totalIncome: oldRegimeResult.grossIncome,
-        section80C: parseFloat(formData.section80C) || 0,
-        section80D: parseFloat(formData.section80D) || 0,
-        section80E: parseFloat(formData.section80E) || 0,
-        section80TTA: parseFloat(formData.section80TTA) || 0,
-        section80CCD1B: parseFloat(formData.section80CCD1B) || 0,
-        section80G: parseFloat(formData.section80G) || 0,
-        homeLoanInterest: parseFloat(formData.homeLoanInterest) || 0,
-        lta: parseFloat(formData.lta) || 0,
-        hraReceived: parseFloat(formData.hraReceived) || 0,
-        rentPaid: parseFloat(formData.rentPaid) || 0,
-        isMetroCity: formData.isMetroCity,
-        otherDeductions: parseFloat(formData.otherDeductions) || 0,
-        oldRegimeTax: oldRegimeResult.totalTax,
-        newRegimeTax: newRegimeResult.totalTax,
-        recommendedRegime,
-        taxSavings: savings,
-        financialYear: formData.financialYear,
-      })
+    getClientTaxAdvice({
+      occupation: userProfile?.occupation || '',
+      ageGroup: formData.ageGroup,
+      salaryIncome: parseFloat(formData.salaryIncome) || 0,
+      housePropertyIncome: parseFloat(formData.housePropertyIncome) || 0,
+      businessIncome: parseFloat(formData.businessIncome) || 0,
+      capitalGainsIncome: parseFloat(formData.capitalGainsIncome) || 0,
+      otherIncome: parseFloat(formData.otherIncome) || 0,
+      totalIncome: oldRegimeResult.grossIncome,
+      section80C: parseFloat(formData.section80C) || 0,
+      section80D: parseFloat(formData.section80D) || 0,
+      section80E: parseFloat(formData.section80E) || 0,
+      section80TTA: parseFloat(formData.section80TTA) || 0,
+      section80CCD1B: parseFloat(formData.section80CCD1B) || 0,
+      section80G: parseFloat(formData.section80G) || 0,
+      homeLoanInterest: parseFloat(formData.homeLoanInterest) || 0,
+      lta: parseFloat(formData.lta) || 0,
+      hraReceived: parseFloat(formData.hraReceived) || 0,
+      rentPaid: parseFloat(formData.rentPaid) || 0,
+      isMetroCity: formData.isMetroCity,
+      otherDeductions: parseFloat(formData.otherDeductions) || 0,
+      oldRegimeTax: oldRegimeResult.totalTax,
+      newRegimeTax: newRegimeResult.totalTax,
+      recommendedRegime,
+      taxSavings: savings,
+      financialYear: formData.financialYear,
     })
-      .then(r => r.json())
       .then(data => setAiAdvice(data))
       .catch(() => setAiAdvice(null))
       .finally(() => setAiLoading(false));
