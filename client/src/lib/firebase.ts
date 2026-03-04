@@ -1,15 +1,16 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getAI, getGenerativeModel, GoogleAIBackend } from "firebase/ai";
-import { 
-  getAuth, 
-  GoogleAuthProvider, 
+import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
+import {
+  getAuth,
+  GoogleAuthProvider,
   signInWithPopup,
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword, 
-  signOut, 
-  onAuthStateChanged, 
-  type User 
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  type User
 } from "firebase/auth";
 
 const firebaseConfig = {
@@ -27,6 +28,22 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig);
 export const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
 export const auth = getAuth(app);
+
+// Firebase App Check — protects Gemini quota from abuse
+// Uses reCAPTCHA v3; site key is public (safe in client code)
+if (typeof window !== 'undefined') {
+  try {
+    initializeAppCheck(app, {
+      provider: new ReCaptchaV3Provider(
+        import.meta.env.VITE_RECAPTCHA_SITE_KEY || '6Lee0X8sAAAAACedq2LTR5ojEoSddwas2wnN2u2c'
+      ),
+      isTokenAutoRefreshEnabled: true, // auto-refreshes token in background
+    });
+  } catch (e) {
+    // App Check may fail in localhost dev if domain isn't whitelisted — non-fatal
+    console.warn('[App Check] Initialization skipped:', e);
+  }
+}
 
 // Firebase AI Logic — Gemini Developer API
 // Requires "AI Logic" to be enabled in your Firebase console project
