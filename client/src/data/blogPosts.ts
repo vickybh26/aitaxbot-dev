@@ -78,12 +78,22 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h2",
         title: "Tax & Liquidity Lens (High-Level)",
-        content_md: "Different instruments have different **tax treatments** (e.g., capital gains vs interest) and **lock-ins** (e.g., ELSS: 3 years). Since tax rules evolve, use **AI Tax Bot's calculators** to estimate net returns and make apples-to-apples comparisons."
+        content_md: "### Investment Types at a Glance
+
+| Type | Examples | Risk | Return Potential | Liquidity | Lock-in |
+|---|---|---|---|---|---|
+| Equity | Nifty 50 index, ELSS, large-cap funds | High | 10–15% (LT) | High | ELSS: 3 yr; others: none |
+| Debt | FD, PPF, bonds, debt funds | Low–Medium | 5–8% | Medium–High | PPF: 15 yr; FD: varies |
+| Gold | SGBs, Gold ETFs, digital gold | Medium | 7–10% (LT) | Medium–High | SGB: 8 yr; ETF: none |
+| Real Estate | Direct property, REITs | Medium | 7–12% | Very Low | Years; REITs: none |
+| International | US equity ETFs, global funds | Medium–High | 8–14% | Medium | None |
+
+*Tax rules evolve — use AiTaxBot calculators for up-to-date after-tax return comparisons.*"
       },
       {
         type: "h3",
         title: "Putting It Together: Sample Allocation by Risk Profile",
-        content_md: "**Conservative:** 20% Equity, 65% Debt/PPF/FDs, 10% Gold, 5% REITs  \n\n**Balanced:** 50% Equity (incl. index funds), 35% Debt, 10% Gold, 5% REITs  \n\n**Aggressive:** 75% Equity, 15% Debt, 5% Gold, 5% International/REITs  \n\n_These are illustrative; fine-tune using your time horizon and comfort with volatility._"
+        content_md: "| Risk Profile | Equity | Debt | Gold | REITs / Intl |\n|---|---|---|---|---|\n| Conservative | 20% | 65% | 10% | 5% |\n| Balanced | 50% | 35% | 10% | 5% |\n| Aggressive | 75% | 15% | 5% | 5% |\n\n*Fine-tune using your time horizon and comfort with volatility.*"
       },
       {
         type: "faq",
@@ -173,7 +183,21 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h3",
         title: "How to Choose",
-        content_md: "Match each option to a role: **Growth (equity)**, **Stability (debt)**, **Hedge (gold)**, **Income (REITs/FD ladder)**. Then check **taxes**, **costs**, and **liquidity** in that order."
+        content_md: "### 2025 Investment Options at a Glance
+
+| Option | Role | Risk | Expected Return | Lock-in | Ideal For |
+|---|---|---|---|---|---|
+| Nifty 50 Index Fund | Growth core | High | 10–13% (LT) | None | All investors |
+| Flexi/Multicap Fund | Growth active | High | 11–15% (LT) | None | Experienced investors |
+| FD / Short-term Debt | Stability | Very Low | 6–8% | Varies | Short-term goals |
+| PPF | Retirement debt | Very Low | ~7.1% | 15 years | Conservative / retirement |
+| Sovereign Gold Bond | Hedge + interest | Medium | 8–10% | 8 years | Diversification |
+| Gold ETF | Hedge liquid | Medium | 7–9% | None | Active traders |
+| NPS Tier I | Retirement | Medium | 9–12% | Till age 60 | Salaried with tax benefit |
+| REIT / InvIT | Income | Medium | 7–9% yield | None | Income seekers |
+| International Fund | Geographic hedge | Medium–High | 8–13% | None | Diversified portfolios |
+
+*Match each option to a role — then verify taxes, costs, and liquidity before allocating.*"
       },
       {
         type: "cta",
@@ -238,7 +262,18 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h3",
         title: "Turning Profile into Allocation",
-        content_md: "Map conservative/balanced/aggressive profiles to equity–debt–gold mixes. Use glide paths (reduce equity as goals near). Rebalance annually or by thresholds (±5%)."
+        content_md: "### Model Allocations by Risk Profile
+
+| Profile | Equity | Debt | Gold / Alts | Time Horizon | Typical Investor |
+|---|---|---|---|---|---|
+| Conservative | 20–30% | 60–70% | 5–10% | < 5 years | Retirees, near-term goals |
+| Moderate | 45–55% | 35–45% | 5–10% | 5–10 years | Mid-career, balanced goals |
+| Balanced Growth | 60–65% | 25–30% | 5–10% | 7–12 years | 30s–40s with long horizon |
+| Aggressive | 75–80% | 10–20% | 5% | 10+ years | Young investors, high tolerance |
+
+- Use a **glide path**: reduce equity allocation by 1–2% per year as you approach your goal
+- Rebalance annually or when allocation drifts ±5% from target
+- Measure capacity and tolerance separately — use the lower of the two"
       },
       {
         type: "cta",
@@ -287,12 +322,23 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h2",
         title: "Income Heads (High-Level)",
-        content_md: "1) **Salary**  \n2) **House Property** (rental income or deemed)  \n3) **Profits & Gains from Business/Profession**  \n4) **Capital Gains** (on sale of assets like equities, real estate, gold)  \n5) **Other Sources** (interest, dividends, etc.)."
+        content_md: "| Head | What It Covers | Key Deductions Available |\n|---|---|---|\n| Salary | CTC, allowances, perquisites | Standard deduction, HRA, LTA |\n| House Property | Rental income; notional rent on 2nd property | 30% standard deduction on rent, home loan interest |\n| Business / Profession | Self-employment, freelance, business profits | Actual business expenses |\n| Capital Gains | Profit on sale of equity, debt, property, gold | Exemptions u/s 54, 54EC; LTCG threshold |\n| Other Sources | Bank interest, dividends, gifts | ₹10K savings interest (80TTA) |\n\n*India follows a 'heads of income' system — losses in one head can sometimes be set off against another, with specific restrictions.*"
       },
       {
         type: "h2",
         title: "Capital Gains Basics",
-        content_md: "Two key ideas: **holding period** and **asset class**. They determine **short-term vs long-term** and applicable rates/benefits per current rules. Equity and debt-oriented instruments may have different thresholds and indexation provisions subject to law."
+        content_md: "### Capital Gains Quick Reference — FY 2025-26
+
+| Asset Class | Short-Term (STCG) | Holding for LTCG | LTCG Rate |
+|---|---|---|---|
+| Listed equity shares | 20% (≤ 12 months) | > 12 months | 12.5% above ₹1.25L |
+| Equity mutual funds | 20% (≤ 12 months) | > 12 months | 12.5% above ₹1.25L |
+| Debt mutual funds | Slab rate (≤ 24 months) | > 24 months | 12.5% (no indexation) |
+| Real estate | Slab rate (≤ 24 months) | > 24 months | 12.5% (no indexation) |
+| Gold / physical | Slab rate (≤ 24 months) | > 24 months | 12.5% (no indexation) |
+| Sovereign Gold Bonds | N/A (held to maturity) | — | Exempt on maturity |
+
+*Note: 4% cess applies. Budget 2024 removed indexation for most assets. Verify latest provisions before filing.*"
       },
       {
         type: "h2",
@@ -302,7 +348,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h3",
         title: "Compliance Workflow",
-        content_md: "1) Collect proofs & statements  \n2) Reconcile income and TDS  \n3) Choose appropriate regime/methods as applicable  \n4) Compute tax  \n5) E-file and e-verify within due dates."
+        content_md: "1. Collect proofs and statements (Form 16, 26AS, AIS, investment proofs)\n2. Reconcile income with TDS credits in Form 26AS and Annual Information Statement\n3. Choose tax regime (new vs old) and applicable methods\n4. Compute tax liability — check advance tax paid vs TDS deducted\n5. E-file ITR and e-verify within due date (July 31 for individuals)"
       },
       {
         type: "cta",
@@ -356,7 +402,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h2",
         title: "Key Risks",
-        content_md: "1) **Price swings** and drawdowns >50%  \n2) **Counterparty risk** on exchanges  \n3) **Custody/security** for self-custody  \n4) **Regulatory** and **tax** uncertainty  \n5) **Scams/rug pulls** in small-cap tokens."
+        content_md: "| Risk Category | Description | Mitigation |\n|---|---|---|\n| Price Volatility | Drawdowns of 50–80% are common | Use DCA; invest only what you can afford to lose |\n| Exchange Risk | Exchange hacks or insolvency (FTX, etc.) | Use regulated Indian exchanges; withdraw to wallet |\n| Custody Risk | Private key loss = permanent loss | Hardware wallet for large holdings |\n| Regulatory Risk | Tax treatment and legal status can change | Track CBDT guidelines; file ITR Schedule VDA |\n| Scam / Rug Pull | Fake projects, pump-and-dump | Stick to BTC, ETH; avoid unknown tokens |\n\n- Cap allocation to **1–5% of net worth** maximum\n- Document every buy, sell, and transfer with date, price, and quantity\n- Current Indian tax: **30% flat** on crypto gains + 1% TDS on transactions above threshold"
       },
       {
         type: "h2",
@@ -429,7 +475,22 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h3",
         title: "Allocation Playbook",
-        content_md: "Most retail portfolios can cap alternatives at **10–20%** total (e.g., 5–10% gold, 5% REITs, optional sleeve for international/commodities)."
+        content_md: "### Alternatives Comparison
+
+| Alternative | Form | Role | Risk | Return | Liquidity |
+|---|---|---|---|---|---|
+| Gold | SGB, ETF, digital | Inflation hedge, crisis buffer | Medium | 7–10% (LT) | High (ETF) |
+| Silver | ETF, e-silver | Industrial + inflation hedge | High | 8–12% (volatile) | High (ETF) |
+| REIT | Exchange-listed | Real estate income | Medium | 7–9% yield | High |
+| InvIT | Exchange-listed | Infrastructure income | Medium | 8–10% yield | Medium |
+| International Equity | MF/ETF | Geographic diversification | Medium–High | 8–13% | Medium |
+| Commodities | MF/ETF | Inflation cyclical play | High | Variable | Medium |
+
+**Suggested caps for retail portfolios:**
+- Gold/Silver: 5–10%
+- REITs/InvITs: 5%
+- International equity: 5–10%
+- Commodities: 0–3% (optional)"
       },
       {
         type: "cta",
@@ -477,7 +538,20 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h2",
         title: "80C (Illustrative Instruments)",
-        content_md: "ELSS, PPF, EPF, principal on home loan (subject to conditions), etc. Assess lock-ins and equity/debt mix that fits your plan."
+        content_md: "### Section 80C Instruments — FY 2025-26 (Limit: ₹1,50,000)
+
+| Instrument | Type | Lock-in | Returns | Risk | Best For |
+|---|---|---|---|---|---|
+| ELSS | Equity mutual fund | 3 years | 12–15% (market) | High | Wealth + tax |
+| PPF | Govt debt scheme | 15 years | ~7.1% (fixed) | Nil | Safety + retirement |
+| EPF | Mandatory PF | Till retirement | ~8.15% (fixed) | Nil | Salaried employees |
+| NSC | Post office bond | 5 years | ~7.7% (fixed) | Nil | Conservative savers |
+| SCSS | Senior citizens | 5 years | ~8.2% (fixed) | Nil | Senior citizens only |
+| 5-yr FD | Bank FD | 5 years | 6–7.5% (fixed) | Very Low | Capital safety |
+| Home Loan Principal | Repayment | None | N/A | N/A | Home loan borrowers |
+| Life Insurance | LIC/ULIP premium | Varies | 5–12% | Low–High | Protection + savings |
+
+*ELSS gives the shortest lock-in (3 years) among equity instruments and is the only 80C option with market-linked growth potential.*"
       },
       {
         type: "h2",
@@ -487,7 +561,17 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h2",
         title: "NPS Benefits & Retirement Focus",
-        content_md: "Low-cost, goal-aligned. Consider lifecycle funds and annuity rules. Treat as a **retirement** vehicle, not a short-term tax play."
+        content_md: "### NPS Tax Benefits Summary
+
+| Deduction | Section | Limit | Available In |
+|---|---|---|---|
+| Employee contribution | 80CCD(1) | Part of ₹1.5L 80C limit | Both regimes |
+| Extra voluntary contribution | 80CCD(1B) | ₹50,000 additional | Old regime only |
+| Employer NPS contribution | 80CCD(2) | 14% of basic (new regime) / 10% (old) | Both regimes |
+
+**Total maximum NPS benefit (old regime):** ₹1,50,000 (within 80C) + ₹50,000 (80CCD1B) + employer NPS = potentially ₹3L+ in deductions
+
+*NPS requires 40% of corpus to purchase annuity at withdrawal. Treat as a **retirement** vehicle, not a short-term tax play.*"
       },
       {
         type: "h3",
@@ -554,7 +638,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h3",
         title: "Decision Checklist",
-        content_md: "1) Can you read balance sheets and analyze moats?  \n2) Do you have 5+ hours/week for research?  \n3) Can you ignore short-term noise?  \nIf 3/3 yes → consider direct stocks. Else, funds are safer."
+        content_md: "### Mutual Funds vs Direct Stocks — Side-by-Side\n\n| Factor | Mutual Funds | Direct Stocks |\n|---|---|---|\n| Effort required | Low (passive) | High (active research) |\n| Diversification | Instant (20–50 stocks) | DIY (minimum 15–20 stocks) |\n| Minimum investment | ₹100–₹500 SIP | 1 share of any company |\n| Cost | 0.1–2% expense ratio | Brokerage + STT only |\n| Tax efficiency | Lower (fund churning) | Higher (buy-and-hold) |\n| Returns potential | Market-matching or above | Can exceed market |\n| Skill required | Low | High |\n| Emotional control | Easier (fund manager handles) | Harder (you decide) |\n\n**Decision questions:**\n1. Can you read balance sheets and analyze competitive moats?\n2. Do you have 5+ hours/week for research and monitoring?\n3. Can you ignore short-term noise and hold through bear markets?\n\nIf all 3: yes → direct stocks. Otherwise: mutual funds are the smarter choice."
       },
       {
         type: "cta",
@@ -602,7 +686,21 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h2",
         title: "What Is Compounding?",
-        content_md: "Earning returns on your returns. A 12% annual return doesn't just grow ₹1L to ₹1.12L in Year 1—it grows to ₹3.1L in 10 years and ₹9.6L in 20 years. The curve is **exponential**, not linear."
+        content_md: "Earning returns on your returns — the longer you stay invested, the more powerful this effect becomes.
+
+### ₹1 Lakh Invested Once at 12% Annual Return
+
+| Year | Value |
+|---|---|
+| 1 | ₹1,12,000 |
+| 5 | ₹1,76,234 |
+| 10 | ₹3,10,585 |
+| 15 | ₹5,47,357 |
+| 20 | ₹9,64,629 |
+| 25 | ₹17,00,006 |
+| 30 | ₹29,95,992 |
+
+*The curve is exponential, not linear — the last 10 years do more work than the first 20.*"
       },
       {
         type: "h2",
@@ -612,7 +710,20 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h2",
         title: "Rupee Cost Averaging (SIPs)",
-        content_md: "Invest fixed amounts regularly. You buy more units when prices are low, fewer when high—smoothing entry and removing the need to time markets."
+        content_md: "Invest a fixed amount regularly regardless of market levels. You automatically buy more units when prices are low and fewer when high — smoothing your average cost.
+
+### ₹10,000/month SIP — Projected Corpus at 12%
+
+| Investment Period | Total Invested | Estimated Corpus | Gain |
+|---|---|---|---|
+| 5 years | ₹6,00,000 | ₹8,16,697 | ₹2,16,697 |
+| 10 years | ₹12,00,000 | ₹23,23,391 | ₹11,23,391 |
+| 15 years | ₹18,00,000 | ₹50,45,763 | ₹32,45,763 |
+| 20 years | ₹24,00,000 | ₹99,91,479 | ₹75,91,479 |
+| 25 years | ₹30,00,000 | ₹1,89,76,351 | ₹1,59,76,351 |
+| 30 years | ₹36,00,000 | ₹3,52,99,138 | ₹3,16,99,138 |
+
+*Try our SIP Calculator to model your actual monthly amount and target year.*"
       },
       {
         type: "h3",
@@ -665,12 +776,20 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h2",
         title: "Why Rebalance?",
-        content_md: "1) **Risk control:** Prevents overexposure to volatile assets  \n2) **Discipline:** Forces you to sell high, buy low  \n3) **Goal alignment:** Keeps allocation matched to timeline and profile."
+        content_md: "1. **Risk control:** Prevents overexposure to volatile assets after a bull run\n2. **Discipline:** Mechanically forces you to sell high (equity) and buy low (debt)\n3. **Goal alignment:** Keeps your allocation matched to your timeline and risk profile\n\n### Drift Without Rebalancing (Example)\n\n| Year | Equity | Debt | Gold | Risk Level |\n|---|---|---|---|---|\n| 2020 (target) | 60% | 30% | 10% | Balanced |\n| 2021 (after bull run) | 73% | 20% | 7% | Aggressive |\n| 2022 (after correction) | 64% | 28% | 8% | Still high |\n| 2024 (after 2023 rally) | 79% | 15% | 6% | Very aggressive |\n\n*Without rebalancing, a 60% equity portfolio can silently drift to 75–80% — exposing you to far more risk than you signed up for.*"
       },
       {
         type: "h2",
         title: "Calendar Method",
-        content_md: "Rebalance on a fixed schedule (e.g., yearly, semi-annually). Simple and disciplined. Works well for most investors."
+        content_md: "### Calendar vs Threshold: Comparison
+
+| Method | How It Works | Frequency | Tax Impact | Best For |
+|---|---|---|---|---|
+| Calendar | Fixed date (e.g., April 1 each year) | Annual / semi-annual | Predictable | Most investors |
+| Threshold | Trigger when drift > ±5% | As needed | Variable | Active monitors |
+| Hybrid | Calendar + threshold | Annual minimum | Balanced | Best practice |
+
+For most salaried investors, **annual rebalancing on April 1** (new financial year) is simplest and aligns with tax planning."
       },
       {
         type: "h2",
@@ -744,7 +863,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h2",
         title: "How to Use a SIP Calculator",
-        content_md: "Enter three variables: **Monthly Investment**, **Expected Return (%)**, and **Time Horizon (years)**. The calculator shows:\n\n1. **Total Invested:** Your contributions\n2. **Estimated Gains:** Compounded growth\n3. **Maturity Value:** Final corpus\n\nUse conservative return assumptions (10–12% for equity) to avoid disappointment."
+        content_md: "Enter three variables: **Monthly Investment**, **Expected Return (%)**, and **Time Horizon (years)**. The calculator shows Total Invested, Estimated Gains, and the final Maturity Value.\n\n### SIP Growth Examples at 12% Annual Return\n\n| Monthly SIP | 10 Years | 20 Years | 30 Years |\n|---|---|---|---|\n| ₹3,000 | ₹6,97,017 | ₹29,97,444 | ₹1,05,89,741 |\n| ₹5,000 | ₹11,61,695 | ₹49,95,740 | ₹1,76,49,569 |\n| ₹10,000 | ₹23,23,391 | ₹99,91,479 | ₹3,52,99,138 |\n| ₹20,000 | ₹46,46,782 | ₹1,99,82,959 | ₹7,05,98,276 |\n| ₹50,000 | ₹1,16,16,954 | ₹4,99,57,397 | ₹17,64,95,690 |\n\n*Use 10–12% for equity funds (conservative). Actual returns depend on fund selection and market cycles.*"
       },
       {
         type: "h3",
@@ -810,12 +929,12 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h3",
         title: "Example: Metro City",
-        content_md: "**Salary Details:**\n- Basic: ₹50,000/month\n- HRA received: ₹20,000/month\n- Rent paid: ₹18,000/month\n\n**Calculation:**\n1. Actual HRA = ₹20,000\n2. 50% of basic = ₹25,000\n3. Rent - 10% basic = ₹18,000 - ₹5,000 = ₹13,000\n\n**Exemption:** ₹13,000 (minimum)\n**Taxable HRA:** ₹20,000 - ₹13,000 = ₹7,000"
+        content_md: "| Component | Monthly |\n|---|---|\n| Basic salary | ₹50,000 |\n| HRA received | ₹20,000 |\n| Rent paid | ₹18,000 |\n\n**HRA Exemption Calculation (pick lowest of 3):**\n\n| Rule | Calculation | Amount |\n|---|---|---|\n| 1. Actual HRA received | — | ₹20,000 |\n| 2. 50% of basic (metro) | 50% × ₹50,000 | ₹25,000 |\n| 3. Rent minus 10% of basic | ₹18,000 − ₹5,000 | ₹13,000 |\n\n**Exemption = ₹13,000 (lowest value)**\n**Taxable HRA = ₹20,000 − ₹13,000 = ₹7,000**"
       },
       {
         type: "h3",
         title: "Example: Non-Metro City",
-        content_md: "Same salary, but in Pune:\n\n1. Actual HRA = ₹20,000\n2. **40%** of basic = ₹20,000\n3. Rent - 10% basic = ₹13,000\n\n**Exemption:** ₹13,000\n**Taxable HRA:** ₹7,000"
+        content_md: "Same salary profile as above, but city is Pune (non-metro):\n\n| Rule | Calculation | Amount |\n|---|---|---|\n| 1. Actual HRA received | — | ₹20,000 |\n| 2. 40% of basic (non-metro) | 40% × ₹50,000 | ₹20,000 |\n| 3. Rent minus 10% of basic | ₹18,000 − ₹5,000 | ₹13,000 |\n\n**Exemption = ₹13,000 (lowest) | Taxable HRA = ₹7,000**\n\n### Metro vs Non-Metro — Key Difference\n\n| City Type | Cities | % of Basic for Rule 2 |\n|---|---|---|\n| Metro | Delhi, Mumbai, Kolkata, Chennai | 50% |\n| Non-Metro | Bangalore, Pune, Hyderabad, others | 40% |"
       },
       {
         type: "h3",
@@ -889,7 +1008,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h3",
         title: "Which Should You Choose?",
-        content_md: "**Choose ELSS if:** You want wealth creation with tax savings and can handle volatility\n\n**Choose PPF if:** Safety is priority and you're okay with modest returns\n\n**Choose NPS if:** Retirement planning is the goal and you want extra ₹50K tax benefit\n\n**Smart strategy:** Diversify across all three based on age and goals"
+        content_md: "| Scenario | Best Choice | Reason |\n|---|---|---|\n| Age 25–35, high risk tolerance | ELSS | Highest return potential with 3-yr liquidity |\n| Risk-averse / conservative | PPF | Government guarantee, EEE tax treatment |\n| Focused on retirement | NPS | Extra ₹50K deduction + low-cost lifecycle funds |\n| Maximum tax saving needed | All three | ELSS + PPF fills ₹1.5L; NPS adds ₹50K more |\n| Short investment horizon (< 5 yr) | PPF / FD | ELSS 3-yr lock-in may not suit |\n\n**Ideal combination (salaried, age 30–40):** 60% ELSS + 20% PPF + 20% NPS contribution = full 80C + extra 80CCD(1B) deduction"
       },
       {
         type: "cta",
@@ -948,17 +1067,17 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h2",
         title: "Types of GST Returns",
-        content_md: "**GSTR-1:** Outward supplies (sales) - Monthly/Quarterly\n**GSTR-3B:** Summary return with tax payment - Monthly\n**GSTR-9:** Annual return - Yearly (by Dec 31)\n\nSmall taxpayers (turnover < ₹5 cr) can opt for **QRMP scheme** (Quarterly Return, Monthly Payment)."
+        content_md: "| Return | What It Covers | Frequency | Who Files |\n|---|---|---|---|\n| GSTR-1 | Outward supplies (sales details) | Monthly or Quarterly | All regular taxpayers |\n| GSTR-3B | Summary return + tax payment | Monthly | All regular taxpayers |\n| GSTR-9 | Annual consolidated return | Yearly (by Dec 31) | Turnover > ₹2 crore |\n| GSTR-4 | Composition scheme annual return | Yearly | Composition dealers |\n| GSTR-2B | Auto-populated ITC statement | Monthly (auto) | Reference only |\n\n*Small taxpayers (turnover < ₹5 crore) can opt for the **QRMP scheme** — file GSTR-1 quarterly, pay tax monthly via PMT-06.*"
       },
       {
         type: "h3",
         title: "Filing Due Dates",
-        content_md: "**GSTR-1:**\n- Monthly filers: 11th of next month\n- Quarterly filers: 13th of month after quarter\n\n**GSTR-3B:**\n- 20th of next month for monthly filers\n- 22nd/24th for QRMP taxpayers\n\n**GSTR-9:** December 31st of next financial year"
+        content_md: "| Return | Filing Frequency | Due Date |\n|---|---|---|\n| GSTR-1 (monthly) | Monthly | 11th of next month |\n| GSTR-1 (quarterly / QRMP) | Quarterly | 13th of month after quarter end |\n| GSTR-3B (monthly) | Monthly | 20th of next month |\n| GSTR-3B (QRMP - state A) | Quarterly | 22nd of month after quarter |\n| GSTR-3B (QRMP - state B) | Quarterly | 24th of month after quarter |\n| GSTR-9 (annual) | Yearly | December 31 of next FY |"
       },
       {
         type: "h3",
         title: "Late Filing Penalties",
-        content_md: "**GSTR-1:** ₹50/day (₹20/day for nil returns), max ₹10,000\n**GSTR-3B:** ₹50/day (₹20/day for nil returns)\n**Interest:** 18% per annum on outstanding tax\n\nNote: Continuous defaults can lead to registration cancellation."
+        content_md: "| Violation | Penalty / Interest |\n|---|---|\n| GSTR-1 late filing | ₹50/day (₹20/day for nil returns); max ₹10,000 |\n| GSTR-3B late filing | ₹50/day (₹20/day for nil returns) |\n| Tax paid late | 18% per annum interest on outstanding amount |\n| Continuous non-filing | Risk of GST registration suspension or cancellation |\n| Claiming excess ITC | 100% penalty + interest |\n\n*Set reminders well before due dates — penalties accumulate daily and interest compounds.*"
       },
       {
         type: "h3",
@@ -1028,7 +1147,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h2",
         title: "Where to Park Your Emergency Fund",
-        content_md: "**Priority:** Safety and instant access over returns\n\n**Best options:**\n1. **Savings account** (instant access, ~3-4% returns)\n2. **Liquid funds** (1-day redemption, ~5-6% returns)\n3. **Sweep-in FD** (better rates with liquidity)\n4. **Money market funds** (ultra-short duration)\n\n**Avoid:** Equity, long-term FDs, PPF, locked-in investments"
+        content_md: "Priority: **safety and instant access** over returns.\n\n| Option | Liquidity | Returns | Safety | Best For |\n|---|---|---|---|---|\n| Savings account | Instant | 3–4% | Very High | Immediate 1–2 month portion |\n| Liquid fund | 1 working day | 5–6% | High | Bulk of emergency fund |\n| Sweep-in FD | Instant (auto-break) | 6–7% | Very High | Better returns with FD safety |\n| Money market fund | 1 working day | 5.5–6.5% | High | Active monitors |\n\n**Avoid:** Equity funds, long-term FDs, PPF, ELSS, or any locked-in instrument for emergency money."
       },
       {
         type: "h3",
@@ -1093,12 +1212,12 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h2",
         title: "Cost Comparison",
-        content_md: "**Index Funds:**\n- Expense ratio: 0.05% - 0.50%\n- No entry/exit loads (usually)\n- Lower transaction costs\n\n**Active Funds:**\n- Expense ratio: 0.5% - 2.5%\n- May have exit loads\n- Higher due to research and management\n\n**Impact:** Over 20 years, 1.5% higher expense can reduce corpus by 25-30%"
+        content_md: "| Factor | Index Fund | Active Fund |\n|---|---|---|\n| Expense ratio | 0.05% – 0.50% | 0.5% – 2.5% |\n| Entry load | Nil | Nil |\n| Exit load | Nil (usually) | 0.5–1% if redeemed early |\n| Transaction cost | Very low | Higher (more portfolio churn) |\n| Fund manager cost | None | Built into expense ratio |\n\n**Long-term cost impact:** On a ₹10 lakh portfolio over 20 years at 12% return, a 1.5% higher expense ratio reduces final corpus from ₹96.5L to ₹74.8L — a **₹21.7 lakh penalty** just from fees."
       },
       {
         type: "h2",
         title: "Performance Reality",
-        content_md: "**Key stat:** ~70-80% of active funds fail to beat their benchmark over 10-year periods (SPIVA India data).\n\n**Why?**\n- High costs eat into returns\n- Timing errors\n- Cash drag\n- Style drift\n\n**However:** Top-quartile active funds can outperform by 2-4% annually, but identifying them beforehand is difficult."
+        content_md: "**Key stat:** ~70–80% of large-cap active funds fail to beat their benchmark over 10-year periods (SPIVA India).\n\n### Benchmark Outperformance Over 10 Years (Approx.)\n\n| Category | % of Active Funds Beating Index |\n|---|---|\n| Large-cap | ~20–25% |\n| Flexi-cap | ~30–35% |\n| Mid-cap | ~40–50% |\n| Small-cap | ~45–55% |\n\n*Active funds do better in less-efficient (mid/small-cap) segments. Large-cap is where index funds shine most.*\n\n- **Why active underperforms:** High costs, timing errors, cash drag, style drift\n- **Exception:** Top-quartile active funds can outperform by 2–4% annually — but identifying them before the fact is difficult"
       },
       {
         type: "h3",
@@ -1178,17 +1297,17 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h2",
         title: "Tax Rates (FY 2024-25)",
-        content_md: "**Equity (Listed Shares & Equity Funds):**\n- **STCG:** 15% (flat rate)\n- **LTCG:** 10% on gains above ₹1 lakh per year (no indexation)\n\n**Debt Mutual Funds:**\n- **STCG:** Added to income, taxed at slab rate\n- **LTCG:** 20% with indexation benefit\n\n**Note:** Tax rules evolve; verify latest rates before filing."
+        content_md: "### Capital Gains Tax Rates — FY 2025-26 (AY 2026-27)\n\n| Asset Class | Holding for STCG | STCG Rate | Holding for LTCG | LTCG Rate | LTCG Exemption |\n|---|---|---|---|---|---|\n| Listed equity shares | ≤ 12 months | 20% | > 12 months | 12.5% | ₹1.25L/year |\n| Equity mutual funds | ≤ 12 months | 20% | > 12 months | 12.5% | ₹1.25L/year |\n| Debt mutual funds | ≤ 24 months | Slab rate | > 24 months | 12.5% | Nil |\n| Real estate | ≤ 24 months | Slab rate | > 24 months | 12.5% | Sec 54 reinvestment |\n| Gold / jewellery | ≤ 24 months | Slab rate | > 24 months | 12.5% | Nil |\n| Unlisted shares | ≤ 24 months | Slab rate | > 24 months | 12.5% | Nil |\n\n*Budget 2024 unified LTCG at 12.5% and raised STCG on equity to 20%. Indexation benefit removed for most assets. Verify latest provisions before filing.*"
       },
       {
         type: "h3",
         title: "Example: Equity LTCG Calculation",
-        content_md: "**Scenario:**\n- Bought shares: ₹5,00,000 (Jan 2023)\n- Sold shares: ₹7,50,000 (Feb 2024)\n- Holding: 13 months (Long-term)\n\n**Calculation:**\n- Total gain: ₹2,50,000\n- Exempt: ₹1,00,000\n- Taxable LTCG: ₹1,50,000\n- **Tax:** ₹1,50,000 × 10% = **₹15,000**"
+        content_md: "| Detail | Amount |\n|---|---|\n| Purchase price (Jan 2023) | ₹5,00,000 |\n| Sale price (Feb 2024) | ₹7,50,000 |\n| Holding period | 13 months → **Long-term** |\n| Total gain | ₹2,50,000 |\n| LTCG exemption (₹1.25L) | ₹1,25,000 |\n| **Taxable LTCG** | **₹1,25,000** |\n| **Tax @ 12.5%** | **₹15,625** |\n| 4% Cess | ₹625 |\n| **Total tax payable** | **₹16,250** |"
       },
       {
         type: "h3",
         title: "Example: Equity STCG Calculation",
-        content_md: "**Scenario:**\n- Bought shares: ₹3,00,000 (June 2024)\n- Sold shares: ₹4,00,000 (Nov 2024)\n- Holding: 5 months (Short-term)\n\n**Calculation:**\n- Total gain: ₹1,00,000\n- **Tax:** ₹1,00,000 × 15% = **₹15,000**\n- No exemption for STCG"
+        content_md: "| Detail | Amount |\n|---|---|\n| Purchase price (Jun 2024) | ₹3,00,000 |\n| Sale price (Nov 2024) | ₹4,00,000 |\n| Holding period | 5 months → **Short-term** |\n| Total gain | ₹1,00,000 |\n| STCG exemption | Nil |\n| **Tax @ 20% (STCG)** | **₹20,000** |\n| 4% Cess | ₹800 |\n| **Total tax payable** | **₹20,800** |"
       },
       {
         type: "h3",
@@ -1268,12 +1387,12 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h3",
         title: "Power of Starting Early",
-        content_md: "**Scenario:** Target ₹3 crore at age 60\n\n**Starting at 25:**\n- SIP needed: ₹8,500/month @ 12%\n- Total invested: ₹35.7L\n- Growth: ₹2.64 crore\n\n**Starting at 35:**\n- SIP needed: ₹25,000/month @ 12%\n- Total invested: ₹75L\n- Growth: ₹2.25 crore\n\n**Starting at 45:**\n- SIP needed: ₹85,000/month @ 12%\n- Total invested: ₹1.53 crore\n- Growth: ₹1.47 crore\n\n**Conclusion:** Starting 10 years later triples the monthly burden!"
+        content_md: "**Target: ₹3 crore at age 60 @ 12% annual return**\n\n| Start Age | Years to Invest | Monthly SIP Needed | Total Invested | Corpus at 60 |\n|---|---|---|---|---|\n| Age 25 | 35 years | ₹8,500 | ₹35.7 lakh | ₹3.0 crore |\n| Age 30 | 30 years | ₹14,500 | ₹52.2 lakh | ₹3.0 crore |\n| Age 35 | 25 years | ₹25,000 | ₹75.0 lakh | ₹3.0 crore |\n| Age 40 | 20 years | ₹44,000 | ₹1.06 crore | ₹3.0 crore |\n| Age 45 | 15 years | ₹85,000 | ₹1.53 crore | ₹3.0 crore |\n\n**Starting at 45 requires 10× the monthly commitment of starting at 25.** The extra ₹76,500/month is the price of a 20-year delay."
       },
       {
         type: "h3",
         title: "Retirement Vehicles Comparison",
-        content_md: "**EPF (Employees Provident Fund):**\n- Mandatory for salaried\n- ~8.15% returns\n- Tax-free withdrawals\n- Limited to ₹2.5L contribution for tax-free growth\n\n**PPF (Public Provident Fund):**\n- 15-year lock-in\n- ~7.1% returns\n- EEE status\n- Max ₹1.5L/year\n\n**NPS (National Pension System):**\n- Flexible equity-debt mix\n- Low charges (~0.1%)\n- Extra ₹50K deduction\n- 40% annuity mandatory\n- Withdrawals partially taxable\n\n**Mutual Funds:**\n- Full flexibility\n- Higher return potential\n- Market risk\n- Tax-efficient after 12 months"
+        content_md: "| Feature | EPF | PPF | NPS | Equity Mutual Fund |\n|---|---|---|---|---|\n| Returns | ~8.15% (fixed) | ~7.1% (fixed) | 9–12% (market) | 11–14% (market) |\n| Risk | Nil | Nil | Low–Medium | High |\n| Lock-in | Till retirement | 15 years | Till age 60 | None |\n| Tax on investment | 80C | 80C | 80C + 80CCD(1B) | 80C (ELSS only) |\n| Tax on withdrawal | Exempt | Exempt | 60% exempt, 40% annuity | LTCG 12.5% above ₹1.25L |\n| Annuity required | No | No | Yes (40%) | No |\n| Control | Low | Medium | Medium | Full |\n| Best for | Salaried (mandatory) | Conservative | Pension-focused | Wealth building |"
       },
       {
         type: "h3",
