@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useRoute, Link } from "wouter";
 import { Helmet } from "react-helmet-async";
 import { trackPageView } from "@/lib/analytics";
@@ -53,26 +53,169 @@ export default function BlogPost() {
     }
   };
 
+  // Inline formatter: handles **bold**, *italic*, `code`
+  const renderInline = (text: string) => {
+    const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g);
+    return (
+      <>
+        {parts.map((part, i) => {
+          if (part.startsWith('**') && part.endsWith('**'))
+            return <strong key={i}>{part.slice(2, -2)}</strong>;
+          if (part.startsWith('*') && part.endsWith('*') && part.length > 2)
+            return <em key={i}>{part.slice(1, -1)}</em>;
+          if (part.startsWith('`') && part.endsWith('`'))
+            return <code key={i} className="bg-gray-100 rounded px-1 font-mono text-sm">{part.slice(1, -1)}</code>;
+          return <span key={i}>{part}</span>;
+        })}
+      </>
+    );
+  };
+
+  // Table renderer: converts markdown table lines into a styled <table>
+  const renderTable = (tableLines: string[], keyBase: number) => {
+    const parseRow = (line: string) =>
+      line.split('|').slice(1, -1).map(c => c.trim());
+    const headers = parseRow(tableLines[0]);
+    // tableLines[1] is the |---|---| separator — skip it
+    const rows = tableLines.slice(2).map(parseRow);
+    return (
+      <div key={`tbl-${keyBase}`} className="overflow-x-auto my-6 rounded-lg border border-gray-200 shadow-sm">
+        <table className="w-full border-collapse text-sm">
+          <thead>
+            <tr className="bg-blue-700 text-white">
+              {headers.map((h, i) => (
+                <th key={i} className="px-4 py-3 text-left font-semibold border-r border-blue-600 last:border-r-0 whitespace-nowrap">
+                  {renderInline(h)}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row, ri) => (
+              <tr key={ri} className={`border-b border-gray-100 last:border-b-0 transition-colors hover:bg-blue-50 ${ri % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
+                {row.map((cell, ci) => (
+                  <td key={ci} className="px-4 py-3 text-gray-700 border-r border-gray-100 last:border-r-0">
+                    {renderInline(cell)}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
+  // Block-level markdown renderer: tables, lists, headings, paragraphs
   const renderMarkdown = (content: string) => {
-    return content.split('\n').map((line, idx) => {
-      line = line.trim();
-      if (!line) return <br key={idx} />;
-      
-      if (line.startsWith('**') && line.endsWith('**')) {
-        const text = line.replace(/\*\*/g, '');
-        return <p key={idx} className="font-bold mb-2">{text}</p>;
+    const lines = content.split('\n');
+    const nodes: React.ReactNode[] = [];
+    let i = 0;
+
+    while (i < lines.length) {
+      const trimmed = lines[i].trim();
+
+      // Empty line — skip (sections provide their own spacing)
+      if (!trimmed) { i++; continue; }
+
+      // Sub-sub heading: ### Foo
+      if (trimmed.startsWith('### ')) {
+        nodes.push(
+          <h4 key={i} className="text-xl font-bold text-gray-900 mt-8 mb-3">
+            {renderInline(trimmed.slice(4))}
+          </h4>
+        );
+        i++; continue;
       }
-      
-      const parts = line.split(/(\*\*.*?\*\*)/g);
-      const rendered = parts.map((part, i) => {
-        if (part.startsWith('**') && part.endsWith('**')) {
-          return <strong key={i}>{part.replace(/\*\*/g, '')}</strong>;
+
+      // Sub heading: ## Foo
+      if (trimmed.startsWith('## ')) {
+        nodes.push(
+          <h3 key={i} className="text-2xl font-bold text-gray-900 mt-8 mb-3">
+            {renderInline(trimmed.slice(3))}
+          </h3>
+        );
+        i++; continue;
+      }
+
+      // Horizontal rule
+      if (trimmed === '---') {
+        nodes.push(<hr key={i} className="border-gray-200 my-6" />);
+        i++; continue;
+      }
+
+      // Markdown table block — collect all consecutive | lines
+      if (trimmed.startsWith('|')) {
+        const tableLines: string[] = [];
+        while (i < lines.length && lines[i].trim().startsWith('|')) {
+          tableLines.push(lines[i]);
+          i++;
         }
-        return part;
-      });
-      
-      return <p key={idx} className="mb-2 leading-relaxed">{rendered}</p>;
-    });
+        nodes.push(renderTable(tableLines, i));
+        continue;
+      }
+
+      // Unordered list: lines starting with "- " or "* "
+      if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+        const items: string[] = [];
+        while (i < lines.length) {
+          const t = lines[i].trim();
+          if (t.startsWith('- ') || t.startsWith('* ')) { items.push(t.slice(2)); i++; }
+          else break;
+        }
+        nodes.push(
+          <ul key={`ul-${i}`} className="list-disc pl-6 space-y-1 mb-4 text-gray-700">
+            {items.map((item, idx) => <li key={idx}>{renderInline(item)}</li>)}
+          </ul>
+        );
+        continue;
+      }
+
+      // Ordered list: lines starting with "1. " "2. " etc.
+      if (/^\d+\.\s/.test(trimmed)) {
+        const items: string[] = [];
+        while (i < lines.length && /^\d+\.\s/.test(lines[i].trim())) {
+          items.push(lines[i].trim().replace(/^\d+\.\s/, ''));
+          i++;
+        }
+        nodes.push(
+          <ol key={`ol-${i}`} className="list-decimal pl-6 space-y-1 mb-4 text-gray-700">
+            {items.map((item, idx) => <li key={idx}>{renderInline(item)}</li>)}
+          </ol>
+        );
+        continue;
+      }
+
+      // Checkmark / emoji list: lines starting with ✅ or ✔
+      if (trimmed.startsWith('✅') || trimmed.startsWith('✔')) {
+        const items: string[] = [];
+        while (i < lines.length) {
+          const t = lines[i].trim();
+          if (t.startsWith('✅') || t.startsWith('✔')) { items.push(t); i++; }
+          else break;
+        }
+        nodes.push(
+          <ul key={`chk-${i}`} className="space-y-2 mb-4">
+            {items.map((item, idx) => (
+              <li key={idx} className="flex items-start gap-2 text-gray-700">
+                {renderInline(item)}
+              </li>
+            ))}
+          </ul>
+        );
+        continue;
+      }
+
+      // Regular paragraph
+      nodes.push(
+        <p key={i} className="mb-3 leading-relaxed text-gray-700">
+          {renderInline(trimmed)}
+        </p>
+      );
+      i++;
+    }
+
+    return <>{nodes}</>;
   };
 
   return (
