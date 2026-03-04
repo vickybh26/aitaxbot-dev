@@ -18,8 +18,6 @@ import {
   Newspaper,
   ExternalLink,
   Home as HomeIcon,
-  ChevronDown,
-  ChevronUp,
   Send,
   Mail,
   Phone,
@@ -72,7 +70,6 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
   const { toast } = useToast();
 
   // Contact form state
-  const [contactOpen, setContactOpen] = useState(false);
   const [contactFormData, setContactFormData] = useState({
     name: '', email: '', subject: '', message: ''
   });
@@ -87,7 +84,6 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
         description: "Thank you! We'll get back to you within 24 hours.",
       });
       setContactFormData({ name: '', email: '', subject: '', message: '' });
-      setContactOpen(false);
     },
     onError: (error: any) => {
       toast({
@@ -600,29 +596,15 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                 </div>
               </section>
 
-              {/* ── COLLAPSIBLE CONTACT US SECTION ───────────────────────────── */}
+              {/* ── CONTACT US SECTION ───────────────────────────────────────── */}
               <section className="py-4 pb-8">
-                {/* Toggle Button */}
-                <button
-                  type="button"
-                  onClick={() => setContactOpen(prev => !prev)}
-                  className="w-full flex items-center justify-between px-5 py-4 rounded-2xl bg-persian-blue-600 hover:bg-persian-blue-700 text-white font-semibold transition-all duration-300 shadow-colored group"
-                >
-                  <div className="flex items-center gap-2">
-                    <Mail className="h-5 w-5" />
-                    <span>Contact Us / Get Help</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm font-normal text-white/80">
-                    <span className="hidden sm:inline">info@aitaxbot.co.in  ·  +91 78998 69036</span>
-                    {contactOpen
-                      ? <ChevronUp className="h-5 w-5 group-hover:scale-110 transition-transform" />
-                      : <ChevronDown className="h-5 w-5 group-hover:scale-110 transition-transform" />}
-                  </div>
-                </button>
+                {/* Section header */}
+                <div className="flex items-center gap-2 mb-4">
+                  <Mail className="h-5 w-5 text-persian-blue-600" />
+                  <h2 className="text-xl font-bold text-slate-900">Contact Us / <span className="gradient-text">Get Help</span></h2>
+                </div>
 
-                {/* Collapsible body */}
-                {contactOpen && (
-                  <div className="mt-3 rounded-2xl border border-slate-200 bg-slate-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 overflow-hidden">
                     <div className="grid md:grid-cols-5 gap-0">
 
                       {/* Left: info strip */}
@@ -633,8 +615,8 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                             <Mail className="h-4 w-4 flex-shrink-0 mt-0.5 text-persian-blue-200" />
                             <div>
                               <p className="text-persian-blue-200 text-xs mb-0.5">Email</p>
-                              <a href="mailto:info@aitaxbot.co.in" className="font-medium hover:text-persian-blue-100 transition-colors">
-                                info@aitaxbot.co.in
+                              <a href="mailto:info@aitaxbot.in" className="font-medium hover:text-persian-blue-100 transition-colors">
+                                info@aitaxbot.in
                               </a>
                             </div>
                           </div>
@@ -765,7 +747,6 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                       </div>
                     </div>
                   </div>
-                )}
               </section>
 
             </div>
