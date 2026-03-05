@@ -285,7 +285,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                     </div>
                     <div className="flex items-center gap-1.5 text-sm text-slate-600">
                       <span className="text-blue-500 font-bold text-base">✓</span>
-                      <span>FY 2025-26 &amp; Income Tax Act 2025 ready</span>
+                      <span>FY 2025-26 (IT Act 1961) &amp; Tax Year 2026-27 (IT Act 2025) Ready</span>
                     </div>
                     {calcCountDisplay && (
                       <div className="flex items-center gap-1.5 text-sm text-slate-600">
@@ -480,7 +480,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                       <Shield className="h-6 w-6 text-green-600" />
                     </div>
                     <h3 className="text-base font-bold text-slate-900 mb-2">Tax Compliant</h3>
-                    <p className="text-slate-600 text-sm">Updated for FY 2025-26 (AY 2026-27) with latest Income Tax Act, 2025 provisions.</p>
+                    <p className="text-slate-600 text-sm">Covers FY 2025-26 (AY 2026-27) under IT Act 1961 &amp; Tax Year 2026-27 under IT Act 2025.</p>
                   </div>
 
                   <div className="text-center p-4 rounded-xl bg-slate-50">
@@ -569,7 +569,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                         <div>
                           <p className="font-semibold text-slate-800 mb-0.5">Accuracy & Updates</p>
                           <p className="text-slate-600 leading-relaxed">
-                            Calculations are based on FY 2025-26 / AY 2026-27 rules under the Income Tax Act 2025.
+                            Calculations are based on FY 2025-26 (AY 2026-27) rules under Income Tax Act, 1961 and Tax Year 2026-27 rules under Income Tax Act, 2025.
                             Tax laws may change; always verify with the latest CBDT notifications or official
                             sources before making financial decisions.
                           </p>
@@ -580,7 +580,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                     {/* Compliance badges */}
                     <div className="flex flex-wrap gap-2 pt-2 border-t border-amber-200">
                       <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white border border-amber-200 text-xs font-medium text-amber-700">
-                        <CheckCircle2 className="h-3 w-3" /> Income Tax Act 2025 Compliant
+                        <CheckCircle2 className="h-3 w-3" /> IT Act 1961 &amp; IT Act 2025 Compliant
                       </span>
                       <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white border border-amber-200 text-xs font-medium text-amber-700">
                         <CheckCircle2 className="h-3 w-3" /> DPDP Act 2023 Aware

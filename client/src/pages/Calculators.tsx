@@ -20,7 +20,7 @@ const hubFAQs = [
   },
   {
     question: "Are the calculators updated for the latest tax rules?",
-    answer: "Yes, all tax calculators are updated for FY 2025-26 (AY 2026-27) including the new Income Tax Act, 2025 provisions. We update our tools immediately when tax laws or interest rates change."
+    answer: "Yes, all tax calculators cover FY 2025-26 (AY 2026-27) under Income Tax Act, 1961 and Tax Year 2026-27 under the new Income Tax Act, 2025. We update our tools immediately when tax laws or interest rates change."
   },
   {
     question: "Who reviews the calculator accuracy?",
@@ -210,9 +210,9 @@ export default function Calculators() {
               Free Tax & Financial Calculators India - FY 2025-26
             </h1>
             <p className="text-xl text-white/90 mb-4 max-w-3xl mx-auto">
-              Plan your taxes and investments with our comprehensive suite of free financial calculators, 
-              designed specifically for Indian taxpayers and investors. Updated for FY 2025-26 (AY 2026-27) 
-              with the latest Income Tax Act, 2025 provisions.
+              Plan your taxes and investments with our comprehensive suite of free financial calculators,
+              designed specifically for Indian taxpayers and investors. Updated for FY 2025-26 (AY 2026-27)
+              under Income Tax Act, 1961 and Tax Year 2026-27 under the new Income Tax Act, 2025.
             </p>
             <p className="text-base text-white/80 max-w-2xl mx-auto">
               All calculators are reviewed by a Chartered Accountant for accuracy and comply with CBDT rules, 
