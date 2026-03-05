@@ -1482,6 +1482,110 @@ export const blogPosts: BlogPost[] = [
       }
     ]
   },
+  {
+    slug: "income-tax-act-1961-vs-income-tax-act-2025",
+    status: "published",
+    metaTitle: "Income Tax Act 1961 vs Income Tax Act 2025 — What Is Changing | AiTaxBot",
+    metaDescription: "Complete comparison of Income Tax Act 1961 vs Income Tax Act 2025. What changes from Tax Year 2026-27, benefits, drawbacks, caution points, and impact on salaried, business, capital gains & house property. CA-verified guide.",
+    keywords: [
+      "income tax act 2025", "income tax act 1961 vs 2025", "tax year 2026-27",
+      "income tax act changes", "new income tax act India", "assessment year abolished",
+      "tax year concept", "IT act 2025 salaried", "IT act 2025 capital gains",
+      "VDA reclassification 2025", "income tax simplification", "IT act 2025 benefits"
+    ],
+    ogTitle: "Income Tax Act 1961 vs Income Tax Act 2025 — Full Comparison, Benefits & Caution Points",
+    ogDescription: "India's biggest tax law overhaul in 60 years. What changes from April 1, 2026 (Tax Year 2026-27)? Salaried, business, capital gains, house property impact — CA-verified.",
+    tags: ["Tax Planning", "Income Tax Act 2025", "Tax Year 2026-27", "India"],
+    readingTimeMinutes: 14,
+    heroImage: "/images/aitaxbot-logo.png",
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Income Tax Act 1961 vs Income Tax Act 2025 — What Is Changing, Benefits, Drawbacks & Impact",
+      "author": { "@type": "Organization", "name": "AiTaxBot Expert Team" },
+      "publisher": { "@type": "Organization", "name": "AiTaxBot" }
+    },
+    bodySections: [
+      {
+        type: "intro",
+        content_md: "India's income tax system is undergoing its biggest overhaul since independence. The **Income Tax Act, 1961** — in force for over 60 years — is being replaced by the **Income Tax Act, 2025**, effective **April 1, 2026 (Tax Year 2026-27)**.\n\nThe new Act does not change tax rates, slabs, or deductions. Its primary mandate is **simplification**: cleaner language, restructured sections, unified time-period concept, and the elimination of redundant provisions. However, a few substantive changes — particularly in VDA/crypto taxation and refund rules — do have real impact.\n\n> **Key Fact:** The Income Tax Act, 1961 governed FY 2025-26 (AY 2026-27) and all preceding years. The Income Tax Act, 2025 applies from Tax Year 2026-27 (April 1, 2026 onwards). All existing deductions and exemptions continue."
+      },
+      {
+        type: "section",
+        title: "Structural Comparison at a Glance",
+        content_md: "| Parameter | Income Tax Act, 1961 | Income Tax Act, 2025 |\n|---|---|---|\n| Applicable from | April 1, 1962 | April 1, 2026 (Tax Year 2026-27) |\n| Sections | ~819 sections | 536 sections (−35%) |\n| Chapters | 47 chapters | 23 chapters |\n| Word Count | ~5.12 lakh words | ~2.60 lakh words (−49%) |\n| Time Period | Previous Year + Assessment Year | Tax Year (single concept) |\n| Language | Complex legal jargon, long provisos | Plain, structured, tabular |\n| VDA / Crypto | Section 115BBH (Other Sources) | Reclassified as Capital Gains |\n| Schedules | Various | 16 consolidated schedules |"
+      },
+      {
+        type: "section",
+        title: "The Biggest Change: 'Tax Year' Replaces Previous Year + Assessment Year",
+        content_md: "Under the 1961 Act, income was earned in the **Previous Year (PY)** and taxed in the **Assessment Year (AY)** — the following year. This two-year concept confused millions of taxpayers.\n\nThe 2025 Act eliminates both terms and introduces a single **'Tax Year'**:\n\n| Old Term | New Term | Example |\n|---|---|---|\n| Previous Year (PY) | Tax Year | April 1, 2026 – March 31, 2027 = Tax Year 2026-27 |\n| Assessment Year (AY) | Abolished | No more 'AY 2027-28' — just Tax Year 2026-27 |\n| Financial Year (FY) | Tax Year (aligned) | FY 2026-27 = Tax Year 2026-27 |\n\n> **Caution:** Your Form 16, investment certificates, and tax software will continue using 'FY' and 'AY' terminology during transition. When filing returns for Tax Year 2026-27, verify you are referencing income earned April 1, 2026 to March 31, 2027."
+      },
+      {
+        type: "section",
+        title: "VDA / Crypto Reclassification",
+        content_md: "Under the 1961 Act, income from Virtual Digital Assets (crypto, NFTs) was taxed under 'Income from Other Sources' at 30% flat under Section 115BBH. The 2025 Act **reclassifies VDA income as Capital Gains** — but keeps the same tax rate and restrictions:\n\n| Aspect | Under 1961 Act | Under 2025 Act |\n|---|---|---|\n| Classification | Other Sources (Sec 115BBH) | Capital Gains |\n| Tax Rate | 30% flat + 4% cess | 30% flat + 4% cess (unchanged) |\n| TDS | 1% on transfer | 1% on transfer (unchanged) |\n| Set-off of losses | Not allowed | Not allowed (unchanged) |\n\n**Crypto investors: no tax relief from reclassification.** The 30% flat rate and all restrictions remain."
+      },
+      {
+        type: "section",
+        title: "Benefits of Income Tax Act, 2025",
+        content_md: "**1. Simpler Language:** Word count cut by ~49% — genuinely easier to read without always needing a CA.\n\n**2. Reduced Litigation Risk:** Clearer definitions reduce ambiguity that fuelled thousands of court cases.\n\n**3. Modern Framework:** 'Tax Year' aligns India with global norms. Digital evidence and e-proceedings formally recognised.\n\n**4. All Deductions Retained:** 80C (₹1.5L), 80D, HRA, LTA, home loan interest, NPS — all continue unchanged. Only section numbers change.\n\n**5. New Tax Regime Built In:** Section 115BAC is now integrated as the default regime, no longer a 'special section'."
+      },
+      {
+        type: "section",
+        title: "Drawbacks & Concerns",
+        content_md: "**1. Re-Litigation Risk:** 60+ years of judicial interpretation may be reopened as courts interpret new language.\n\n**2. Cosmetic, Not Substantive:** Tax rates, slabs, and surcharges unchanged. Critics call it a 'cut-copy-paste' exercise.\n\n**3. Transition Confusion:** ITR forms, Form 16, TDS codes, and tax software all need updates — causing disruption in early years.\n\n**4. Refund Rules Tightened:** Refunds now restricted to timely-filed returns only. Under the 1961 Act, refunds were claimable even on belated returns.\n\n**5. Expanded Digital Search Powers:** Tax authorities can now access email, cloud storage, and messaging apps — raising privacy concerns without mandatory judicial oversight."
+      },
+      {
+        type: "section",
+        title: "Impact on Salaried Employees",
+        content_md: "**What stays the same:** Standard Deduction (₹75,000 New / ₹50,000 Old), HRA exemption, LTA, 80C limit (₹1.5L), 87A rebate (zero tax up to ₹12L net taxable), employer NPS (14% of basic), professional tax.\n\n**What changes:** Section numbers in Form 16 and salary certificates update to 2025 Act references after April 2026. TDS on salary (erstwhile Section 192) renumbered. 'Assessment Year' box in declarations becomes 'Tax Year'.\n\n**Net impact: Minimal.** All deductions and exemptions identical. Regime choice (Old vs New) unaffected."
+      },
+      {
+        type: "section",
+        title: "Impact on Business Owners & Self-Employed",
+        content_md: "**What stays the same:** All business deduction principles, presumptive taxation (44AD, 44ADA, 44AE), MAT, GST (separate law).\n\n**What changes:** Business income under Sections 26–66 (was 28–44D). Depreciation schedules now in tabular format. GAAR retained. TDS codes renumbered.\n\n**Critical caution:** The 2025 Act explicitly permits digital search — tax authorities can access business emails, cloud storage, accounting software data, and WhatsApp communications. Ensure all digital records are compliant."
+      },
+      {
+        type: "section",
+        title: "Impact on Capital Gains & Investors",
+        content_md: "**Rates unchanged:** STCG on equity/MFs: 20%. LTCG on equity/MFs: 12.5% above ₹1.25L. LTCG on real estate/gold/debt MFs: 12.5% (no indexation). Holding periods unchanged (12 months equity, 24 months others).\n\n**Reinvestment exemptions retained:** Section 54 (property) → Clause 82; Section 54B (agri land) → Section 83; Section 54EC (bonds) → renumbered.\n\n**Capital gains charge:** Section 45 (1961) → Clause 67 (2025 Act)."
+      },
+      {
+        type: "section",
+        title: "Impact on House Property",
+        content_md: "**Minimal change.** Annual Value computation, 30% standard deduction on NAV, ₹2L home loan interest deduction (self-occupied, Old Regime), deemed rent rules, set-off against salary — all unchanged.\n\nSections 22–27 restructured with simpler language. Definitions of Annual Value, Municipal Tax, and Unrealised Rent presented more clearly. Substance identical."
+      },
+      {
+        type: "section",
+        title: "Caution Points: What Every Taxpayer Must Know",
+        content_md: "1. **Filing FY 2025-26 ITR:** The 1961 Act still governs. Do NOT use 2025 Act section numbers in July 2026 filing for FY 2025-26.\n2. **Section number confusion:** When your CA quotes a section, clarify whether it is the 1961 Act or 2025 Act.\n3. **No tax rate change:** The 2025 Act does NOT reduce rates or add new deductions beyond Budget 2025 announcements.\n4. **File on time:** The July 31 deadline is now more critical — late filing may cost you your refund.\n5. **Update software:** Payroll, accounting, and tax software must be updated before April 1, 2026.\n6. **Crypto investors:** 30% flat remains. VDA reclassification to capital gains gives no rate benefit."
+      },
+      {
+        type: "faq",
+        items: [
+          { "q": "From which date does the Income Tax Act, 2025 apply?", "a": "The Income Tax Act, 2025 applies from April 1, 2026 — i.e., Tax Year 2026-27 (April 1, 2026 to March 31, 2027) onwards. For FY 2025-26 (AY 2026-27) and earlier, the Income Tax Act, 1961 governs." },
+          { "q": "Does the new Income Tax Act 2025 change my tax slabs or deductions?", "a": "No. The Income Tax Act, 2025 does not change tax slabs, rates, surcharges, or deduction limits. All deductions (80C, 80D, HRA, NPS, home loan interest) continue unchanged. Only section numbers are renumbered." },
+          { "q": "What is 'Tax Year' and how is it different from Assessment Year?", "a": "The 2025 Act introduces a single 'Tax Year' concept that replaces both 'Previous Year' (the year income is earned) and 'Assessment Year' (the following year when tax is paid). Tax Year 2026-27 = April 1, 2026 to March 31, 2027 — both earning and assessment are covered in one term." },
+          { "q": "Does the VDA/crypto tax rate change under the new Act?", "a": "No. Crypto and NFT income is reclassified from 'Income from Other Sources' to 'Capital Gains', but the 30% flat tax rate, 1% TDS, and the restriction on set-off of losses all remain unchanged. Reclassification provides no tax benefit to crypto investors." },
+          { "q": "When should I use the 2025 Act section numbers in my ITR?", "a": "Only from Tax Year 2026-27 onwards (returns filed in 2027 for income earned April 2026–March 2027). For your July 2026 ITR filing (for FY 2025-26), use Income Tax Act, 1961 references as usual." }
+        ]
+      },
+      {
+        type: "internal_links",
+        internal_links: [
+          { "label": "Income Tax Calculator — Old vs New Regime", "href": "/calculators/income-tax" },
+          { "label": "New vs Old Tax Regime 2025 — Complete Guide", "href": "/blog/new-vs-old-tax-regime-2025" },
+          { "label": "NPS Calculator — Section 80CCD Tax Saving", "href": "/calculators/nps" },
+          { "label": "HRA Exemption — Metro vs Non-Metro Guide", "href": "/blog/hra-exemption-metro-vs-non-metro" },
+          { "label": "Capital Gains Tax on Stocks & Mutual Funds", "href": "/blog/capital-gains-tax-stocks-mutual-funds" }
+        ]
+      },
+      {
+        type: "outro",
+        content_md: "The Income Tax Act, 2025 is a welcome and long-overdue modernisation of India's tax law. Its greatest contribution is **readability** — making the law more accessible to the common taxpayer. The 'Tax Year' concept brings India closer to global standards.\n\nHowever, do not mistake structural reform for tax relief. Your tax liability for Tax Year 2026-27 will be essentially the same as FY 2025-26 — same slabs, same deduction limits, only section numbers changed. The real test will be whether the new Act reduces litigation, speeds up assessments, and genuinely simplifies compliance for India's millions of first-generation taxpayers."
+      }
+    ]
+  },
 ];
 
 export function getBlogPost(slug: string): BlogPost | undefined {

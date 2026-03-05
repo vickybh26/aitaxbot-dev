@@ -845,6 +845,37 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                   </div>
                 </div>
 
+                {/* Featured Blog Card */}
+                <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-soft">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-bold uppercase tracking-wide text-persian-blue-600 flex items-center gap-1.5">
+                      <FileText className="h-3.5 w-3.5" />
+                      Featured Article
+                    </span>
+                    <span className="text-xs bg-orange-100 text-orange-700 font-semibold px-2 py-0.5 rounded-full">New</span>
+                  </div>
+                  <a
+                    href="/blog/income-tax-act-1961-vs-income-tax-act-2025"
+                    className="group block"
+                  >
+                    <h4 className="text-sm font-bold text-slate-900 group-hover:text-persian-blue-600 transition-colors leading-snug mb-2">
+                      Income Tax Act 1961 vs Income Tax Act 2025 — What Is Changing?
+                    </h4>
+                    <p className="text-xs text-slate-500 leading-relaxed mb-3">
+                      India's biggest tax law overhaul in 60 years. 'Tax Year' replaces Assessment Year, VDA reclassified as Capital Gains, and 819 sections simplified to 536 — effective Tax Year 2026-27.
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <div className="flex flex-wrap gap-1">
+                        <span className="text-xs bg-persian-blue-50 text-persian-blue-700 px-2 py-0.5 rounded-full font-medium">IT Act 2025</span>
+                        <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-medium">14 min read</span>
+                      </div>
+                      <span className="text-persian-blue-600 text-xs font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                        Read <ArrowRight className="h-3 w-3" />
+                      </span>
+                    </div>
+                  </a>
+                </div>
+
                 {/* CTA Card */}
                 <div className="bg-gradient-to-br from-persian-blue-600 to-persian-blue-700 rounded-2xl p-5 text-white">
                   <h3 className="text-lg font-bold mb-2">Ready to Calculate?</h3>
