@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   Calculator,
@@ -10,7 +10,6 @@ import {
   ArrowRight,
   FileText,
   PiggyBank,
-  BarChart3,
   Shield,
   Zap,
   Clock,
@@ -25,15 +24,18 @@ import {
   Linkedin,
   Instagram,
   AlertCircle,
-  Info
+  Info,
+  BookOpen,
+  BarChart2,
+  Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import logoImage from "@assets/aitaxbot-logo-lovable.png";
-import { ResponsiveAd, LeaderboardAd } from "@/components/AdBanner";
 import { trackPageView } from "@/lib/analytics";
 import { generateHomePageSchema } from "@/lib/structuredData";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { blogPosts } from "@/data/blogPosts";
 
 // Import calculator components
 import TaxCalculator from "@/components/calculators/TaxCalculator";
@@ -50,47 +52,40 @@ interface NewsItem {
   thumbnail?: string;
 }
 
-interface MetalPricesData {
-  gold24k: number;
-  gold22k: number;
-  silver: number;
-  currency: string;
-  lastUpdated: string;
-  nextUpdateAt: string;
-  source: string;
-  cached?: boolean;
-}
-
 interface LandingProps {
   activeModal?: string | null;
   setActiveModal?: (modal: string | null) => void;
 }
+
+// ── Latest 3 blog posts for sidebar ──────────────────────────────────────────
+const latestBlogPosts = [...blogPosts]
+  .reverse()
+  .slice(0, 3)
+  .map(p => ({
+    slug: p.slug,
+    title: p.metaTitle.replace(/\s*[|—–-]\s*AiTaxBot.*$/i, "").trim(),
+    readTime: `${p.readingTimeMinutes} min`,
+    tag: p.tags[0] || "General",
+    publishedAt: p.publishedAt,
+  }));
 
 export default function Landing({ activeModal, setActiveModal }: LandingProps) {
   const { toast } = useToast();
 
   // Contact form state
   const [contactFormData, setContactFormData] = useState({
-    name: '', email: '', subject: '', message: ''
+    name: "", email: "", subject: "", message: "",
   });
 
   const contactMutation = useMutation({
-    mutationFn: async (data: typeof contactFormData) => {
-      return await apiRequest('POST', '/api/contact', data);
-    },
+    mutationFn: async (data: typeof contactFormData) =>
+      await apiRequest("POST", "/api/contact", data),
     onSuccess: () => {
-      toast({
-        title: "Message Sent!",
-        description: "Thank you! We'll get back to you within 24 hours.",
-      });
-      setContactFormData({ name: '', email: '', subject: '', message: '' });
+      toast({ title: "Message Sent!", description: "Thank you! We'll get back to you within 24 hours." });
+      setContactFormData({ name: "", email: "", subject: "", message: "" });
     },
     onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error?.message || "Failed to send message. Please try again.",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: error?.message || "Failed to send message. Please try again.", variant: "destructive" });
     },
   });
 
@@ -104,138 +99,67 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
   };
 
   useEffect(() => {
-    trackPageView('/', 'Home - AiTaxBot');
+    trackPageView("/", "Home - AiTaxBot");
   }, []);
 
-  // Market News Query
-  const { 
-    data: marketNewsData, 
-    isLoading: newsLoading 
-  } = useQuery<{ news: NewsItem[] }>({
-    queryKey: ['/api/market-news'],
-    refetchInterval: (query) => {
-      return document.visibilityState === 'visible' ? 7200000 : false;
-    },
+  // Market News
+  const { data: marketNewsData, isLoading: newsLoading } = useQuery<{ news: NewsItem[] }>({
+    queryKey: ["/api/market-news"],
+    refetchInterval: () => document.visibilityState === "visible" ? 7200000 : false,
     refetchOnWindowFocus: false,
   });
 
-  // Metal Prices Query (Gold & Silver)
-  const {
-    data: metalPrices,
-    isLoading: metalPricesLoading
-  } = useQuery<MetalPricesData>({
-    queryKey: ['/api/metal-prices'],
-    refetchInterval: false, // Fixed update times on server, no client refresh
-    refetchOnWindowFocus: false,
-    staleTime: 8 * 60 * 60 * 1000, // 8 hours - match server cache
-  });
-
-  // Live calculation counter from Firestore
+  // Live calculation counter
   const { data: calcStatsData } = useQuery<{ count: number }>({
-    queryKey: ['/api/stats/calculations-count'],
+    queryKey: ["/api/stats/calculations-count"],
     refetchInterval: false,
     refetchOnWindowFocus: false,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
   });
   const calcCount = calcStatsData?.count ?? 0;
-  const calcCountDisplay = calcCount > 0
-    ? `${calcCount.toLocaleString('en-IN')}+ calculations done`
-    : null;
+  const calcCountDisplay = calcCount > 0 ? `${calcCount.toLocaleString("en-IN")}+` : null;
 
-  const showModal = (modalType: string) => {
-    if (setActiveModal) {
-      setActiveModal(modalType);
-    }
-  };
-  
-  const closeModal = () => {
-    if (setActiveModal) {
-      setActiveModal(null);
-    }
-  };
-
-  const formatNumber = (value: number) => {
-    return new Intl.NumberFormat('en-IN').format(value);
-  };
+  const showModal = (modalType: string) => setActiveModal?.(modalType);
+  const closeModal = () => setActiveModal?.(null);
 
   // Calculator quick links for sidebar
   const calculators = [
-    {
-      title: "Income Tax",
-      description: "Old vs New Regime",
-      icon: Calculator,
-      href: "/calculators/income-tax",
-      color: "from-persian-blue-500 to-persian-blue-600",
-      badge: "Popular"
-    },
-    {
-      title: "HRA Calculator",
-      description: "Section 10(13A)",
-      icon: HomeIcon,
-      href: "/calculators/hra",
-      color: "from-blue-500 to-cyan-600"
-    },
-    {
-      title: "SIP Calculator",
-      description: "Wealth Builder",
-      icon: TrendingUp,
-      href: "/calculators/sip",
-      color: "from-green-500 to-emerald-600"
-    },
-    {
-      title: "SWP Calculator",
-      description: "Retirement Plan",
-      icon: PiggyBank,
-      href: "/calculators/swp",
-      color: "from-purple-500 to-pink-600"
-    },
-    {
-      title: "PF Calculator",
-      description: "EPF / VPF / PPF",
-      icon: Shield,
-      href: "/calculators/pf",
-      color: "from-indigo-500 to-indigo-600",
-      badge: "New"
-    }
+    { title: "Income Tax", description: "Old vs New Regime", icon: Calculator, href: "/calculators/income-tax", color: "from-persian-blue-500 to-persian-blue-600", badge: "Popular" },
+    { title: "HRA Calculator", description: "Section 10(13A)", icon: HomeIcon, href: "/calculators/hra", color: "from-blue-500 to-cyan-600" },
+    { title: "SIP Calculator", description: "Wealth Builder", icon: TrendingUp, href: "/calculators/sip", color: "from-green-500 to-emerald-600" },
+    { title: "SWP Calculator", description: "Retirement Plan", icon: PiggyBank, href: "/calculators/swp", color: "from-purple-500 to-pink-600" },
+    { title: "PF Calculator", description: "EPF / VPF / PPF", icon: Shield, href: "/calculators/pf", color: "from-indigo-500 to-indigo-600", badge: "New" },
   ];
 
   return (
     <>
       <Helmet>
         <title>AiTaxBot - Income Tax Calculator India FY 2025-26 | AY 2026-27</title>
-        <meta name="description" content="AI tax calculator India AY 2026-27. Compare old vs new regime, ₹12L tax-free under Section 202. Free SIP, SWP, HRA, PF calculators. Live gold rates." />
-        <meta name="keywords" content="income tax calculator, tax calculator India, AI tax calculator, new tax regime, old tax regime, SIP calculator, SWP calculator, HRA calculator, PF calculator, EPF calculator, provident fund, AY 2026-27, AY 2027-28, Income Tax Act 2025, gold rates, market news, commodity prices" />
+        <meta name="description" content="AI-powered tax calculator for India. Compare old vs new regime, ₹12L tax-free under Section 87A. Free SIP, SWP, HRA, PF calculators. CA-reviewed. FY 2025-26 & Tax Year 2026-27 ready." />
+        <meta name="keywords" content="income tax calculator, tax calculator India, AI tax calculator, new tax regime, old tax regime, SIP calculator, SWP calculator, HRA calculator, PF calculator, AY 2026-27, Income Tax Act 2025" />
         <link rel="canonical" href="https://aitaxbot.co.in/" />
-        
         <meta property="og:title" content="AiTaxBot - Income Tax Calculator India FY 2025-26 | AY 2026-27" />
-        <meta property="og:description" content="AI-powered income tax calculator with ₹12L tax-free limit. Live market news, gold/silver rates, and financial calculators. Income Tax Act, 2025 ready." />
+        <meta property="og:description" content="AI-powered income tax calculator with ₹12L tax-free limit. CA-reviewed calculators for salaried, freelancers & investors. Income Tax Act 2025 ready." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://aitaxbot.co.in/" />
         <meta property="og:image" content="https://aitaxbot.co.in/images/aitaxbot-logo.png" />
-        
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="AiTaxBot - Income Tax Calculator India FY 2025-26 | AY 2026-27" />
-        <meta name="twitter:description" content="AI-powered income tax calculator for India. ₹12L tax-free under new regime. Compare tax regimes, live market news, and gold rates." />
-        
-        {/* Structured Data - Organization and WebSite schema */}
-        <script type="application/ld+json">
-          {JSON.stringify(generateHomePageSchema())}
-        </script>
+        <meta name="twitter:description" content="AI-powered income tax calculator for India. ₹12L tax-free under new regime. Compare tax regimes instantly." />
+        <script type="application/ld+json">{JSON.stringify(generateHomePageSchema())}</script>
       </Helmet>
-      
+
       <div className="min-h-screen bg-white">
-        {/* Main Two-Column Layout */}
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 pt-6 pb-12">
-            
-            {/* LEFT COLUMN - Main Content */}
+
+            {/* ── LEFT COLUMN ──────────────────────────────────────────────── */}
             <div className="flex-1 min-w-0">
-              {/* Hero Section */}
+
+              {/* Hero */}
               <section className="relative py-12 lg:py-16 overflow-hidden">
-                {/* Gradient Mesh Background */}
                 <div className="absolute inset-0 gradient-mesh opacity-40 rounded-3xl"></div>
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/30 to-white rounded-3xl"></div>
-                
                 <div className="relative z-10 px-4 lg:px-8">
                   <Badge className="mb-4 bg-white/80 backdrop-blur-sm text-persian-blue-700 border-persian-blue-200 shadow-soft px-3 py-1 text-xs font-semibold">
                     ✨ FY 2025-26 (AY 2026-27) & Tax Year 2026-27 Ready
@@ -244,14 +168,12 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                     Smart Tax Calculator for
                     <span className="gradient-text block mt-1">Indian Taxpayers</span>
                   </h1>
-                  
                   <p className="text-base lg:text-lg text-slate-600 mb-6 leading-relaxed max-w-2xl">
-                    Say goodbye to tax stress with Ai Tax Bot – your smart and reliable tax companion. Calculate your tax liability in minutes with AI-powered tools for salaried individuals, freelancers, and crypto traders.
+                    Calculate your tax liability in minutes — compare Old vs New Regime, estimate deductions, and get personalised AI suggestions. Built for salaried employees, freelancers, and investors.
                   </p>
-                  
                   <div className="flex flex-col sm:flex-row gap-3">
-                    <Button 
-                      size="lg" 
+                    <Button
+                      size="lg"
                       onClick={() => window.location.href = "/calculators/income-tax"}
                       className="gradient-blue text-white px-6 py-5 rounded-xl shadow-colored hover:shadow-colored-hover transition-all duration-300 font-semibold hover:scale-105 transform"
                       data-testid="button-calculate-tax"
@@ -269,11 +191,11 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                     </Button>
                   </div>
 
-                  {/* Trust signals — honest early-stage */}
+                  {/* Trust signals */}
                   <div className="flex flex-wrap items-center gap-4 mt-8 pt-6 border-t border-slate-200/60">
                     <div className="flex items-center gap-1.5 text-sm text-slate-600">
                       <span className="text-green-500 font-bold text-base">✓</span>
-                      <span>100% Free — no signup needed for calculators</span>
+                      <span>100% Free — no signup needed</span>
                     </div>
                     <div className="flex items-center gap-1.5 text-sm text-slate-600">
                       <span className="text-green-500 font-bold text-base">✓</span>
@@ -281,136 +203,73 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                     </div>
                     <div className="flex items-center gap-1.5 text-sm text-slate-600">
                       <span className="text-purple-500 font-bold text-base">✦</span>
-                      <span>Powered by <strong className="text-purple-700">Gemini AI</strong></span>
+                      <span>AI Powered</span>
                     </div>
                     <div className="flex items-center gap-1.5 text-sm text-slate-600">
                       <span className="text-blue-500 font-bold text-base">✓</span>
-                      <span>FY 2025-26 (IT Act 1961) &amp; Tax Year 2026-27 (IT Act 2025) Ready</span>
+                      <span>IT Act 1961 &amp; IT Act 2025 Ready</span>
                     </div>
                     {calcCountDisplay && (
                       <div className="flex items-center gap-1.5 text-sm text-slate-600">
                         <span className="text-orange-500 font-bold text-base">📊</span>
-                        <span><strong className="text-orange-600">{calcCountDisplay}</strong></span>
+                        <span><strong className="text-orange-600">{calcCountDisplay} calculations done</strong></span>
                       </div>
                     )}
                   </div>
                 </div>
               </section>
 
-              {/* Key Stats - Compact */}
+              {/* How It Works */}
+              <section className="py-8">
+                <h2 className="text-xl font-bold text-slate-900 mb-6">
+                  How It Works — <span className="gradient-text">3 Simple Steps</span>
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {[
+                    { step: "01", icon: <Users className="h-6 w-6 text-persian-blue-600" />, title: "Pick Your Profile", desc: "Salaried, freelancer, or investor — select what fits you and enter your income." },
+                    { step: "02", icon: <Calculator className="h-6 w-6 text-emerald-600" />, title: "Enter Deductions", desc: "Add 80C investments, HRA, home loan, NPS — only what applies to you." },
+                    { step: "03", icon: <BarChart2 className="h-6 w-6 text-orange-500" />, title: "See Your Result", desc: "Instantly compare Old vs New Regime. Know exactly which saves you more tax." },
+                  ].map(({ step, icon, title, desc }) => (
+                    <div key={step} className="relative p-5 rounded-2xl bg-slate-50 border border-slate-100">
+                      <div className="text-4xl font-black text-slate-100 absolute top-4 right-4 leading-none select-none">{step}</div>
+                      <div className="w-11 h-11 bg-white rounded-xl flex items-center justify-center shadow-soft mb-3 border border-slate-100">
+                        {icon}
+                      </div>
+                      <h3 className="text-base font-bold text-slate-900 mb-1">{title}</h3>
+                      <p className="text-sm text-slate-500 leading-relaxed">{desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              {/* Key Stats — with context */}
               <section className="py-6">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   <div className="glass-card text-center p-4 rounded-xl hover:scale-105 transition-transform duration-300">
                     <div className="text-2xl md:text-3xl font-bold gradient-text mb-1">₹12L</div>
-                    <div className="text-slate-700 font-medium text-xs">Tax-Free Limit</div>
-                  </div>
-                  <div className="glass-card text-center p-4 rounded-xl hover:scale-105 transition-transform duration-300">
-                    <div className="text-2xl md:text-3xl font-bold gradient-text mb-1">30%</div>
-                    <div className="text-slate-700 font-medium text-xs">Crypto Tax Rate</div>
+                    <div className="text-slate-700 font-medium text-xs">Zero tax at this income under New Regime</div>
                   </div>
                   <div className="glass-card text-center p-4 rounded-xl hover:scale-105 transition-transform duration-300">
                     <div className="text-2xl md:text-3xl font-bold gradient-text mb-1">₹1.5L</div>
-                    <div className="text-slate-700 font-medium text-xs">80C Deduction</div>
+                    <div className="text-slate-700 font-medium text-xs">Save up to ₹46,800 via 80C deduction</div>
                   </div>
                   <div className="glass-card text-center p-4 rounded-xl hover:scale-105 transition-transform duration-300">
                     <div className="text-2xl md:text-3xl font-bold gradient-text mb-1">₹75K</div>
-                    <div className="text-slate-700 font-medium text-xs">Std. Deduction</div>
+                    <div className="text-slate-700 font-medium text-xs">Standard deduction for salaried employees</div>
+                  </div>
+                  <div className="glass-card text-center p-4 rounded-xl hover:scale-105 transition-transform duration-300">
+                    <div className="text-2xl md:text-3xl font-bold gradient-text mb-1">30%</div>
+                    <div className="text-slate-700 font-medium text-xs">Flat tax on crypto / VDA income</div>
                   </div>
                 </div>
               </section>
 
-              {/* Live Gold & Silver Prices - Compact */}
-              <section className="py-6">
-                <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-yellow-600" />
-                  Live <span className="gradient-text">Gold & Silver Prices</span>
-                </h2>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {metalPricesLoading ? (
-                    Array.from({ length: 3 }).map((_, i) => (
-                      <Card key={i} className="border border-gray-100">
-                        <CardContent className="p-4">
-                          <div className="h-16 bg-gray-200 rounded animate-pulse"></div>
-                        </CardContent>
-                      </Card>
-                    ))
-                  ) : (
-                    <>
-                      {/* Gold 24K */}
-                      <Card className="border border-yellow-200 hover:border-yellow-400 transition-all duration-300 bg-gradient-to-br from-yellow-50 to-amber-50">
-                        <CardContent className="p-4">
-                          <div data-testid="card-gold-24k">
-                            <div className="flex items-center gap-2 mb-2">
-                              <span className="text-2xl">🪙</span>
-                              <span className="text-sm font-semibold text-yellow-800">Gold 24K</span>
-                            </div>
-                            <div className="text-xl font-bold text-slate-900">
-                              ₹{formatNumber(metalPrices?.gold24k || 7850)}<span className="text-sm font-normal text-slate-600">/gram</span>
-                            </div>
-                            <div className="text-xs text-yellow-700 mt-1">
-                              Pure Gold (99.9%)
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                      
-                      {/* Gold 22K */}
-                      <Card className="border border-amber-200 hover:border-amber-400 transition-all duration-300 bg-gradient-to-br from-amber-50 to-orange-50">
-                        <CardContent className="p-4">
-                          <div data-testid="card-gold-22k">
-                            <div className="flex items-center gap-2 mb-2">
-                              <span className="text-2xl">💍</span>
-                              <span className="text-sm font-semibold text-amber-800">Gold 22K</span>
-                            </div>
-                            <div className="text-xl font-bold text-slate-900">
-                              ₹{formatNumber(metalPrices?.gold22k || 7200)}<span className="text-sm font-normal text-slate-600">/gram</span>
-                            </div>
-                            <div className="text-xs text-amber-700 mt-1">
-                              Jewellery Gold (91.6%)
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                      
-                      {/* Silver */}
-                      <Card className="border border-gray-200 hover:border-gray-400 transition-all duration-300 bg-gradient-to-br from-gray-50 to-slate-100">
-                        <CardContent className="p-4">
-                          <div data-testid="card-silver">
-                            <div className="flex items-center gap-2 mb-2">
-                              <span className="text-2xl">🥈</span>
-                              <span className="text-sm font-semibold text-gray-700">Silver</span>
-                            </div>
-                            <div className="text-xl font-bold text-slate-900">
-                              ₹{formatNumber(metalPrices?.silver || 95)}<span className="text-sm font-normal text-slate-600">/gram</span>
-                            </div>
-                            <div className="text-xs text-gray-600 mt-1">
-                              Pure Silver (99.9%)
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </>
-                  )}
-                </div>
-                
-                {metalPrices && (
-                  <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-xs text-slate-500 mt-3">
-                    <span>Source: {metalPrices.source}</span>
-                    <span className="hidden sm:inline">|</span>
-                    <span>Updated: {new Date(metalPrices.lastUpdated).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'short', timeStyle: 'short' })}</span>
-                  </div>
-                )}
-              </section>
-
-              {/* Features Section */}
+              {/* Features */}
               <section id="features" className="py-8">
                 <h2 className="text-xl font-bold text-slate-900 mb-6">
                   Everything You Need for <span className="gradient-text">Tax Planning</span>
                 </h2>
-
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Tax Calculator Card */}
                   <Card className="p-5 border-2 border-persian-blue-100 hover:border-persian-blue-300 transition-all duration-300 shadow-soft hover:shadow-medium">
                     <div className="flex items-start space-x-3">
                       <div className="w-10 h-10 gradient-blue rounded-lg flex items-center justify-center shadow-colored flex-shrink-0">
@@ -419,11 +278,11 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                       <div className="flex-1 min-w-0">
                         <h3 className="text-lg font-bold text-slate-900 mb-2">Income Tax Calculator</h3>
                         <ul className="space-y-1 text-slate-600 text-sm mb-4">
-                          <li className="flex items-center"><CheckCircle2 className="h-4 w-4 text-green-500 mr-1.5 flex-shrink-0" />Compare Old vs New Regime</li>
-                          <li className="flex items-center"><CheckCircle2 className="h-4 w-4 text-green-500 mr-1.5 flex-shrink-0" />80C, 80D Deductions</li>
-                          <li className="flex items-center"><CheckCircle2 className="h-4 w-4 text-green-500 mr-1.5 flex-shrink-0" />Crypto Tax (30% rate)</li>
+                          <li className="flex items-center"><CheckCircle2 className="h-4 w-4 text-green-500 mr-1.5 flex-shrink-0" />Compares Old vs New Regime side-by-side</li>
+                          <li className="flex items-center"><CheckCircle2 className="h-4 w-4 text-green-500 mr-1.5 flex-shrink-0" />87A rebate eligibility calculated automatically</li>
+                          <li className="flex items-center"><CheckCircle2 className="h-4 w-4 text-green-500 mr-1.5 flex-shrink-0" />Handles crypto income (Section 115BBH)</li>
                         </ul>
-                        <Button 
+                        <Button
                           onClick={() => window.location.href = "/calculators/income-tax"}
                           className="gradient-blue hover:shadow-colored transition-all duration-300 text-white w-full py-4 text-sm font-semibold"
                         >
@@ -433,7 +292,6 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                     </div>
                   </Card>
 
-                  {/* Invoicing & Accounting Card */}
                   <Card className="p-5 border-2 border-green-100 hover:border-green-300 transition-all duration-300 shadow-soft hover:shadow-medium">
                     <div className="flex items-start space-x-3">
                       <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-soft flex-shrink-0">
@@ -442,11 +300,11 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                       <div className="flex-1 min-w-0">
                         <h3 className="text-lg font-bold text-slate-900 mb-2">GST Invoicing</h3>
                         <ul className="space-y-1 text-slate-600 text-sm mb-4">
-                          <li className="flex items-center"><CheckCircle2 className="h-4 w-4 text-green-500 mr-1.5 flex-shrink-0" />GST-Compliant Invoices</li>
-                          <li className="flex items-center"><CheckCircle2 className="h-4 w-4 text-green-500 mr-1.5 flex-shrink-0" />Sales Register</li>
-                          <li className="flex items-center"><CheckCircle2 className="h-4 w-4 text-green-500 mr-1.5 flex-shrink-0" />Multi-Firm Support</li>
+                          <li className="flex items-center"><CheckCircle2 className="h-4 w-4 text-green-500 mr-1.5 flex-shrink-0" />GST-compliant invoices in seconds</li>
+                          <li className="flex items-center"><CheckCircle2 className="h-4 w-4 text-green-500 mr-1.5 flex-shrink-0" />Sales register & multi-firm support</li>
+                          <li className="flex items-center"><CheckCircle2 className="h-4 w-4 text-green-500 mr-1.5 flex-shrink-0" />Built for freelancers & small businesses</li>
                         </ul>
-                        <Button 
+                        <Button
                           variant="outline"
                           className="border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white w-full py-4 text-sm font-semibold transition-all duration-300"
                           onClick={() => window.location.href = "/accounting"}
@@ -460,302 +318,117 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                 </div>
               </section>
 
-              {/* Why Choose AiTaxBot */}
+              {/* Why AiTaxBot — specific differentiators */}
               <section className="py-8">
-                <h2 className="text-xl font-bold text-slate-900 mb-6">
-                  Why Choose AiTaxBot?
-                </h2>
-
+                <h2 className="text-xl font-bold text-slate-900 mb-6">Why Choose AiTaxBot?</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="text-center p-4 rounded-xl bg-slate-50">
-                    <div className="w-12 h-12 bg-persian-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <Zap className="h-6 w-6 text-persian-blue-600" />
+                  <div className="p-5 rounded-2xl bg-slate-50 border border-slate-100">
+                    <div className="w-11 h-11 bg-persian-blue-100 rounded-xl flex items-center justify-center mb-3">
+                      <Zap className="h-5 w-5 text-persian-blue-600" />
                     </div>
-                    <h3 className="text-base font-bold text-slate-900 mb-2">Smart Calculations</h3>
-                    <p className="text-slate-600 text-sm">Intelligent tax computation with regime comparison and optimization suggestions.</p>
+                    <h3 className="text-base font-bold text-slate-900 mb-1">Regime comparison in 30 seconds</h3>
+                    <p className="text-slate-500 text-sm leading-relaxed">Enter your salary and deductions once — see Old vs New Regime results instantly, with the saving amount highlighted.</p>
                   </div>
-
-                  <div className="text-center p-4 rounded-xl bg-slate-50">
-                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <Shield className="h-6 w-6 text-green-600" />
+                  <div className="p-5 rounded-2xl bg-slate-50 border border-slate-100">
+                    <div className="w-11 h-11 bg-green-100 rounded-xl flex items-center justify-center mb-3">
+                      <Shield className="h-5 w-5 text-green-600" />
                     </div>
-                    <h3 className="text-base font-bold text-slate-900 mb-2">Tax Compliant</h3>
-                    <p className="text-slate-600 text-sm">Covers FY 2025-26 (AY 2026-27) under IT Act 1961 &amp; Tax Year 2026-27 under IT Act 2025.</p>
+                    <h3 className="text-base font-bold text-slate-900 mb-1">CA-reviewed, not generic</h3>
+                    <p className="text-slate-500 text-sm leading-relaxed">Every calculator covers IT Act 1961 (FY 2025-26) and IT Act 2025 (Tax Year 2026-27). Logic reviewed by Chartered Accountants.</p>
                   </div>
-
-                  <div className="text-center p-4 rounded-xl bg-slate-50">
-                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <Clock className="h-6 w-6 text-blue-600" />
+                  <div className="p-5 rounded-2xl bg-slate-50 border border-slate-100">
+                    <div className="w-11 h-11 bg-orange-100 rounded-xl flex items-center justify-center mb-3">
+                      <BookOpen className="h-5 w-5 text-orange-500" />
                     </div>
-                    <h3 className="text-base font-bold text-slate-900 mb-2">Instant Results</h3>
-                    <p className="text-slate-600 text-sm">Get immediate tax calculations with savings suggestions.</p>
+                    <h3 className="text-base font-bold text-slate-900 mb-1">Guides for every situation</h3>
+                    <p className="text-slate-500 text-sm leading-relaxed">Salaried? Freelancer? Crypto investor? Our blog covers HRA, 80C, capital gains, marginal relief, and the new IT Act 2025 — in plain language.</p>
                   </div>
                 </div>
               </section>
 
-              {/* ── LEGAL DECLARATION SECTION ──────────────────────────────── */}
-              <section className="py-6">
+              {/* Disclaimer — condensed */}
+              <section className="py-4">
                 <div className="rounded-2xl border border-amber-200 bg-amber-50/60 p-5">
-                  <div className="flex items-start gap-3 mb-4">
+                  <div className="flex items-start gap-3 mb-3">
                     <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                    <h2 className="text-base font-bold text-amber-800">Important Declarations & Disclaimers</h2>
+                    <h2 className="text-base font-bold text-amber-800">Important Disclaimers</h2>
                   </div>
-
-                  <div className="space-y-4 text-sm text-slate-700">
-                    {/* Row 1 */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="flex gap-2">
-                        <Info className="h-4 w-4 text-persian-blue-500 flex-shrink-0 mt-0.5" />
-                        <div>
-                          <p className="font-semibold text-slate-800 mb-0.5">For Informational Purposes Only</p>
-                          <p className="text-slate-600 leading-relaxed">
-                            All calculations provided by AiTaxBot are indicative and for general reference only.
-                            Results should not be treated as legal, financial, or professional tax advice.
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <Info className="h-4 w-4 text-persian-blue-500 flex-shrink-0 mt-0.5" />
-                        <div>
-                          <p className="font-semibold text-slate-800 mb-0.5">Consult a Chartered Accountant</p>
-                          <p className="text-slate-600 leading-relaxed">
-                            For official ITR filing, audit, tax planning with legal validity, or complex cases
-                            (capital gains, business income, foreign assets), please consult a qualified CA or tax professional.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Row 2 */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="flex gap-2">
-                        <Info className="h-4 w-4 text-persian-blue-500 flex-shrink-0 mt-0.5" />
-                        <div>
-                          <p className="font-semibold text-slate-800 mb-0.5">Not Affiliated with Income Tax Dept.</p>
-                          <p className="text-slate-600 leading-relaxed">
-                            AiTaxBot is an independent private platform. We are not affiliated with, endorsed by,
-                            or connected to the Income Tax Department of India, CBDT, or any government body.
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <Info className="h-4 w-4 text-persian-blue-500 flex-shrink-0 mt-0.5" />
-                        <div>
-                          <p className="font-semibold text-slate-800 mb-0.5">Not a Tax Return Preparer (TRP)</p>
-                          <p className="text-slate-600 leading-relaxed">
-                            AiTaxBot is a self-service calculation tool only. We are not registered as a Tax
-                            Return Preparer under the TRP Scheme and do not file returns on behalf of users.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Row 3 */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="flex gap-2">
-                        <Info className="h-4 w-4 text-persian-blue-500 flex-shrink-0 mt-0.5" />
-                        <div>
-                          <p className="font-semibold text-slate-800 mb-0.5">Data Privacy (DPDP Act 2023)</p>
-                          <p className="text-slate-600 leading-relaxed">
-                            Any personal or financial data you enter for saved calculations is stored securely
-                            and used solely to provide our services. We never sell or share your data with third
-                            parties. You can request deletion at any time. See our{' '}
-                            <a href="/privacy-policy" className="text-persian-blue-600 hover:underline font-medium">Privacy Policy</a>.
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <Info className="h-4 w-4 text-persian-blue-500 flex-shrink-0 mt-0.5" />
-                        <div>
-                          <p className="font-semibold text-slate-800 mb-0.5">Accuracy & Updates</p>
-                          <p className="text-slate-600 leading-relaxed">
-                            Calculations are based on FY 2025-26 (AY 2026-27) rules under Income Tax Act, 1961 and Tax Year 2026-27 rules under Income Tax Act, 2025.
-                            Tax laws may change; always verify with the latest CBDT notifications or official
-                            sources before making financial decisions.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Compliance badges */}
-                    <div className="flex flex-wrap gap-2 pt-2 border-t border-amber-200">
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white border border-amber-200 text-xs font-medium text-amber-700">
-                        <CheckCircle2 className="h-3 w-3" /> IT Act 1961 &amp; IT Act 2025 Compliant
+                  <p className="text-sm text-slate-600 leading-relaxed mb-3">
+                    All calculations on AiTaxBot are <strong>indicative and for general reference only</strong> — not legal, financial, or professional tax advice. AiTaxBot is an independent private platform, not affiliated with the Income Tax Department, CBDT, or any government body. We are not a registered Tax Return Preparer and do not file returns on your behalf. For official ITR filing or complex cases (capital gains, business income, foreign assets), please consult a qualified CA.
+                  </p>
+                  <div className="flex flex-wrap gap-2 pt-3 border-t border-amber-200">
+                    {["IT Act 1961 & 2025 Compliant", "DPDP Act 2023 Aware", "CA-Reviewed", "No Govt. Affiliation"].map(label => (
+                      <span key={label} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white border border-amber-200 text-xs font-medium text-amber-700">
+                        <CheckCircle2 className="h-3 w-3" /> {label}
                       </span>
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white border border-amber-200 text-xs font-medium text-amber-700">
-                        <CheckCircle2 className="h-3 w-3" /> DPDP Act 2023 Aware
-                      </span>
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white border border-amber-200 text-xs font-medium text-amber-700">
-                        <CheckCircle2 className="h-3 w-3" /> CA-Reviewed Calculations
-                      </span>
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white border border-amber-200 text-xs font-medium text-amber-700">
-                        <CheckCircle2 className="h-3 w-3" /> No Govt. Affiliation
-                      </span>
-                    </div>
+                    ))}
+                    <a href="/privacy-policy" className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white border border-amber-200 text-xs font-medium text-persian-blue-600 hover:underline">
+                      Privacy Policy →
+                    </a>
                   </div>
                 </div>
               </section>
 
-              {/* ── CONTACT US SECTION ───────────────────────────────────────── */}
-              <section className="py-4 pb-8">
-                {/* Section header */}
+              {/* Contact — simple strip (no embedded form) */}
+              <section className="py-6 pb-8">
                 <div className="flex items-center gap-2 mb-4">
                   <Mail className="h-5 w-5 text-persian-blue-600" />
-                  <h2 className="text-xl font-bold text-slate-900">Contact Us / <span className="gradient-text">Get Help</span></h2>
+                  <h2 className="text-xl font-bold text-slate-900">Get in Touch</h2>
                 </div>
-
-                  <div className="rounded-2xl border border-slate-200 bg-slate-50 overflow-hidden">
-                    <div className="grid md:grid-cols-5 gap-0">
-
-                      {/* Left: info strip */}
-                      <div className="md:col-span-2 bg-gradient-to-br from-persian-blue-600 to-persian-blue-800 p-6 text-white">
-                        <h3 className="text-base font-bold mb-4">Get in Touch</h3>
-                        <div className="space-y-4 text-sm">
-                          <div className="flex items-start gap-3">
-                            <Mail className="h-4 w-4 flex-shrink-0 mt-0.5 text-persian-blue-200" />
-                            <div>
-                              <p className="text-persian-blue-200 text-xs mb-0.5">Email</p>
-                              <a href="mailto:info@aitaxbot.in" className="font-medium hover:text-persian-blue-100 transition-colors">
-                                info@aitaxbot.in
-                              </a>
-                            </div>
-                          </div>
-                          <div className="flex items-start gap-3">
-                            <Phone className="h-4 w-4 flex-shrink-0 mt-0.5 text-persian-blue-200" />
-                            <div>
-                              <p className="text-persian-blue-200 text-xs mb-0.5">Phone</p>
-                              <a href="tel:+917899869036" className="font-medium hover:text-persian-blue-100 transition-colors">
-                                +91 78998 69036
-                              </a>
-                            </div>
-                          </div>
-                          <div className="flex items-start gap-3">
-                            <MapPin className="h-4 w-4 flex-shrink-0 mt-0.5 text-persian-blue-200" />
-                            <div>
-                              <p className="text-persian-blue-200 text-xs mb-0.5">Location</p>
-                              <span className="font-medium">Bengaluru, Karnataka, India</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="mt-6 pt-5 border-t border-persian-blue-500">
-                          <p className="text-persian-blue-200 text-xs mb-3">Follow Us</p>
-                          <div className="flex gap-3">
-                            <a
-                              href="https://www.linkedin.com/company/aitaxbot/"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="bg-white/10 hover:bg-white/20 rounded-full p-2 transition-colors"
-                            >
-                              <Linkedin className="h-4 w-4" />
-                            </a>
-                            <a
-                              href="https://www.instagram.com/aitaxbot/"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="bg-white/10 hover:bg-white/20 rounded-full p-2 transition-colors"
-                            >
-                              <Instagram className="h-4 w-4" />
-                            </a>
-                          </div>
-                        </div>
-
-                        <p className="text-persian-blue-200 text-xs mt-6">
-                          We reply within 24 hours on business days.
-                        </p>
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+                  <div className="grid md:grid-cols-3 gap-4 mb-5">
+                    <a href="mailto:info@aitaxbot.in" className="flex items-center gap-3 p-4 bg-white rounded-xl border border-slate-100 hover:border-persian-blue-200 hover:shadow-soft transition-all group">
+                      <div className="w-9 h-9 bg-persian-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Mail className="h-4 w-4 text-persian-blue-600" />
                       </div>
-
-                      {/* Right: form */}
-                      <div className="md:col-span-3 p-6">
-                        <h3 className="text-base font-bold text-slate-900 mb-4">Send us a Message</h3>
-                        <form onSubmit={handleContactSubmit} className="space-y-3">
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                              <label className="block text-xs font-medium text-slate-700 mb-1">Full Name *</label>
-                              <input
-                                type="text"
-                                name="name"
-                                required
-                                value={contactFormData.name}
-                                onChange={handleContactChange}
-                                disabled={contactMutation.isPending}
-                                placeholder="Your full name"
-                                className="w-full px-3 py-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-persian-blue-500 focus:border-persian-blue-500 transition-colors disabled:opacity-50 bg-white"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-xs font-medium text-slate-700 mb-1">Email Address *</label>
-                              <input
-                                type="email"
-                                name="email"
-                                required
-                                value={contactFormData.email}
-                                onChange={handleContactChange}
-                                disabled={contactMutation.isPending}
-                                placeholder="your@email.com"
-                                className="w-full px-3 py-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-persian-blue-500 focus:border-persian-blue-500 transition-colors disabled:opacity-50 bg-white"
-                              />
-                            </div>
-                          </div>
-
-                          <div>
-                            <label className="block text-xs font-medium text-slate-700 mb-1">Subject</label>
-                            <select
-                              name="subject"
-                              value={contactFormData.subject}
-                              onChange={handleContactChange}
-                              disabled={contactMutation.isPending}
-                              className="w-full px-3 py-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-persian-blue-500 focus:border-persian-blue-500 transition-colors disabled:opacity-50 bg-white"
-                            >
-                              <option value="">Select a topic...</option>
-                              <option value="Tax calculation query">Tax calculation query</option>
-                              <option value="Bug or incorrect result">Bug / incorrect result</option>
-                              <option value="Feature request">Feature request</option>
-                              <option value="GST / Invoicing help">GST / Invoicing help</option>
-                              <option value="Account / Login issue">Account / Login issue</option>
-                              <option value="General feedback">General feedback</option>
-                              <option value="Other">Other</option>
-                            </select>
-                          </div>
-
-                          <div>
-                            <label className="block text-xs font-medium text-slate-700 mb-1">Message *</label>
-                            <textarea
-                              name="message"
-                              rows={4}
-                              required
-                              value={contactFormData.message}
-                              onChange={handleContactChange}
-                              disabled={contactMutation.isPending}
-                              placeholder="Describe your question or feedback..."
-                              className="w-full px-3 py-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-persian-blue-500 focus:border-persian-blue-500 transition-colors resize-none disabled:opacity-50 bg-white"
-                            />
-                          </div>
-
-                          <div className="flex items-center justify-between pt-1">
-                            <p className="text-xs text-slate-400">* Required fields</p>
-                            <button
-                              type="submit"
-                              disabled={contactMutation.isPending}
-                              className="inline-flex items-center gap-2 bg-persian-blue-600 hover:bg-persian-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              <Send className="h-4 w-4" />
-                              {contactMutation.isPending ? 'Sending...' : 'Send Message'}
-                            </button>
-                          </div>
-                        </form>
+                      <div>
+                        <p className="text-xs text-slate-400 mb-0.5">Email</p>
+                        <p className="text-sm font-semibold text-slate-800 group-hover:text-persian-blue-600 transition-colors">info@aitaxbot.in</p>
+                      </div>
+                    </a>
+                    <a href="tel:+917899869036" className="flex items-center gap-3 p-4 bg-white rounded-xl border border-slate-100 hover:border-persian-blue-200 hover:shadow-soft transition-all group">
+                      <div className="w-9 h-9 bg-green-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Phone className="h-4 w-4 text-green-600" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-400 mb-0.5">Phone</p>
+                        <p className="text-sm font-semibold text-slate-800 group-hover:text-persian-blue-600 transition-colors">+91 78998 69036</p>
+                      </div>
+                    </a>
+                    <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-slate-100">
+                      <div className="w-9 h-9 bg-orange-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <MapPin className="h-4 w-4 text-orange-500" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-400 mb-0.5">Location</p>
+                        <p className="text-sm font-semibold text-slate-800">Bengaluru, India</p>
                       </div>
                     </div>
                   </div>
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <p className="text-sm text-slate-500">Follow us:</p>
+                      <a href="https://www.linkedin.com/company/aitaxbot/" target="_blank" rel="noopener noreferrer" className="bg-persian-blue-100 hover:bg-persian-blue-200 text-persian-blue-700 rounded-full p-2 transition-colors">
+                        <Linkedin className="h-4 w-4" />
+                      </a>
+                      <a href="https://www.instagram.com/aitaxbot/" target="_blank" rel="noopener noreferrer" className="bg-pink-100 hover:bg-pink-200 text-pink-600 rounded-full p-2 transition-colors">
+                        <Instagram className="h-4 w-4" />
+                      </a>
+                    </div>
+                    <a href="/contact" className="inline-flex items-center gap-2 bg-persian-blue-600 hover:bg-persian-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors">
+                      <Send className="h-4 w-4" /> Send a Message
+                    </a>
+                  </div>
+                </div>
               </section>
 
             </div>
 
-            {/* RIGHT COLUMN - Sticky Sidebar */}
+            {/* ── RIGHT COLUMN — Sticky Sidebar ────────────────────────────── */}
             <aside className="lg:w-80 xl:w-96 flex-shrink-0">
               <div className="lg:sticky lg:top-20 space-y-6">
-                
-                {/* Calculators Section */}
+
+                {/* Quick Calculators */}
                 <div className="bg-gradient-to-br from-slate-50 to-white rounded-2xl p-5 border border-slate-100 shadow-soft">
                   <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
                     <Calculator className="h-5 w-5 text-persian-blue-600" />
@@ -789,23 +462,49 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                   </div>
                 </div>
 
-                {/* News Section - Scrollable */}
+                {/* Latest from Blog */}
                 <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-soft">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                      <Newspaper className="h-5 w-5 text-blue-600" />
-                      Market News
+                    <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                      <BookOpen className="h-4 w-4 text-persian-blue-600" />
+                      Latest Articles
                     </h3>
-                    <a
-                      href="/blog"
-                      className="text-xs text-persian-blue-600 hover:underline flex items-center gap-1"
-                    >
-                      View All
-                      <ExternalLink className="h-3 w-3" />
+                    <a href="/blog" className="text-xs text-persian-blue-600 hover:underline flex items-center gap-1">
+                      View All <ExternalLink className="h-3 w-3" />
                     </a>
                   </div>
-                  
-                  <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1 scrollbar-thin">
+                  <div className="space-y-3">
+                    {latestBlogPosts.map((post) => (
+                      <a
+                        key={post.slug}
+                        href={`/blog/${post.slug}`}
+                        className="block p-3 rounded-xl bg-slate-50 hover:bg-persian-blue-50 border border-transparent hover:border-persian-blue-100 transition-all group"
+                      >
+                        <h4 className="text-sm font-semibold text-slate-800 group-hover:text-persian-blue-700 transition-colors line-clamp-2 mb-1.5 leading-snug">
+                          {post.title}
+                        </h4>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs bg-persian-blue-50 text-persian-blue-600 px-2 py-0.5 rounded-full font-medium border border-persian-blue-100">
+                            {post.tag}
+                          </span>
+                          <span className="text-xs text-slate-400 flex items-center gap-1">
+                            <Clock className="h-3 w-3" />{post.readTime}
+                          </span>
+                        </div>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Tax & Finance News */}
+                <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-soft">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                      <Newspaper className="h-4 w-4 text-blue-600" />
+                      Tax & Finance News
+                    </h3>
+                  </div>
+                  <div className="space-y-3 max-h-[360px] overflow-y-auto pr-1 scrollbar-thin">
                     {newsLoading ? (
                       Array.from({ length: 4 }).map((_, i) => (
                         <div key={i} className="animate-pulse p-3 rounded-lg bg-slate-50">
@@ -845,44 +544,11 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                   </div>
                 </div>
 
-                {/* Featured Blog Card */}
-                <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-soft">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-bold uppercase tracking-wide text-persian-blue-600 flex items-center gap-1.5">
-                      <FileText className="h-3.5 w-3.5" />
-                      Featured Article
-                    </span>
-                    <span className="text-xs bg-orange-100 text-orange-700 font-semibold px-2 py-0.5 rounded-full">New</span>
-                  </div>
-                  <a
-                    href="/blog/income-tax-act-1961-vs-income-tax-act-2025"
-                    className="group block"
-                  >
-                    <h4 className="text-sm font-bold text-slate-900 group-hover:text-persian-blue-600 transition-colors leading-snug mb-2">
-                      Income Tax Act 1961 vs Income Tax Act 2025 — What Is Changing?
-                    </h4>
-                    <p className="text-xs text-slate-500 leading-relaxed mb-3">
-                      India's biggest tax law overhaul in 60 years. 'Tax Year' replaces Assessment Year, VDA reclassified as Capital Gains, and 819 sections simplified to 536 — effective Tax Year 2026-27.
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <div className="flex flex-wrap gap-1">
-                        <span className="text-xs bg-persian-blue-50 text-persian-blue-700 px-2 py-0.5 rounded-full font-medium">IT Act 2025</span>
-                        <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-medium">14 min read</span>
-                      </div>
-                      <span className="text-persian-blue-600 text-xs font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
-                        Read <ArrowRight className="h-3 w-3" />
-                      </span>
-                    </div>
-                  </a>
-                </div>
-
                 {/* CTA Card */}
                 <div className="bg-gradient-to-br from-persian-blue-600 to-persian-blue-700 rounded-2xl p-5 text-white">
                   <h3 className="text-lg font-bold mb-2">Ready to Calculate?</h3>
-                  <p className="text-sm text-white/80 mb-4">
-                    Get accurate tax calculations in seconds
-                  </p>
-                  <Button 
+                  <p className="text-sm text-white/80 mb-4">Get accurate tax calculations in seconds</p>
+                  <Button
                     onClick={() => window.location.href = "/calculators"}
                     className="w-full bg-white text-persian-blue-600 hover:bg-slate-50 font-semibold"
                     data-testid="button-start-calculating"
@@ -903,13 +569,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
           <div className="max-w-6xl mx-auto">
             <div className="flex flex-col md:flex-row justify-between items-center">
               <div className="flex items-center space-x-3 mb-4 md:mb-0">
-                <img
-                  src={logoImage}
-                  alt="AiTaxBot Logo"
-                  className="h-14 w-auto brightness-110"
-                  loading="lazy"
-                  data-testid="logo-footer"
-                />
+                <img src={logoImage} alt="AiTaxBot Logo" className="h-14 w-auto brightness-110" loading="lazy" data-testid="logo-footer" />
                 <div>
                   <div className="font-bold text-white text-base leading-tight">AiTaxBot</div>
                   <div className="text-slate-400 text-xs">Smart Tax Calculator for India</div>
@@ -918,6 +578,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
               <div className="flex space-x-6 text-sm text-slate-400">
                 <a href="/privacy-policy" className="hover:text-white transition-colors">Privacy</a>
                 <a href="/terms-of-service" className="hover:text-white transition-colors">Terms</a>
+                <a href="/contact" className="hover:text-white transition-colors">Contact</a>
                 <span>FY 2025-26 / AY 2026-27 Compliant</span>
               </div>
             </div>
@@ -925,18 +586,10 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
         </footer>
 
         {/* Calculator Modals */}
-        {activeModal === "tax-calculator" && (
-          <TaxCalculator onClose={closeModal} />
-        )}
-        {activeModal === "hra-calculator" && (
-          <HRACalculator onClose={closeModal} onApplyHRA={() => {}} />
-        )}
-        {activeModal === "sip-calculator" && (
-          <SIPCalculator onClose={closeModal} />
-        )}
-        {activeModal === "swp-calculator" && (
-          <SWPCalculator onClose={closeModal} />
-        )}
+        {activeModal === "tax-calculator" && <TaxCalculator onClose={closeModal} />}
+        {activeModal === "hra-calculator" && <HRACalculator onClose={closeModal} onApplyHRA={() => {}} />}
+        {activeModal === "sip-calculator" && <SIPCalculator onClose={closeModal} />}
+        {activeModal === "swp-calculator" && <SWPCalculator onClose={closeModal} />}
       </div>
     </>
   );

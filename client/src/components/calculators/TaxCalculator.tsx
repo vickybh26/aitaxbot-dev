@@ -1368,7 +1368,7 @@ export default function TaxCalculator({ onClose }: TaxCalculatorProps = {}) {
                       </div>
                       <div>
                         <h3 className="font-bold text-purple-900 text-sm">AI Tax Advisor</h3>
-                        <p className="text-purple-600 text-xs">Powered by Gemini AI • Personalised for you</p>
+                        <p className="text-purple-600 text-xs">AI Powered • Personalised for you</p>
                       </div>
                     </div>
                     {aiAdvice.maxPossibleSaving > 0 && (
