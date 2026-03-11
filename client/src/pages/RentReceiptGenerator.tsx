@@ -87,7 +87,6 @@ export default function RentReceiptGenerator() {
     if (!form.landlordName.trim()) e.landlordName = "Landlord name is required";
     if (!form.propertyAddress.trim()) e.propertyAddress = "Property address is required";
     if (!form.rentAmount || isNaN(rentAmt) || rentAmt <= 0) e.rentAmount = "Enter a valid rent amount";
-    if (needsPan && !form.landlordPan.trim()) e.landlordPan = "PAN is required when annual rent > ₹1,00,000";
     if (form.landlordPan && !/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(form.landlordPan.toUpperCase()))
       e.landlordPan = "PAN format: AAAAA9999A";
     if (months.length === 0) e.months = "Add at least one month";
@@ -304,9 +303,9 @@ export default function RentReceiptGenerator() {
                       onChange={e => { setForm(f => ({ ...f, landlordPan: e.target.value.toUpperCase() })); if (errors.landlordPan) setErrors(er => { const { landlordPan: _, ...r } = er; return r; }); }}
                     />
                     {errors.landlordPan && <p className="text-xs text-red-500 mt-1">{errors.landlordPan}</p>}
-                    {needsPan && !errors.landlordPan && (
+                    {needsPan && !errors.landlordPan && !form.landlordPan.trim() && (
                       <p className="text-xs text-amber-600 mt-1 flex items-center gap-1">
-                        <Info className="h-3 w-3" /> Landlord PAN required — annual rent exceeds ₹1,00,000 (HRA documentation, Rule 26C)
+                        <Info className="h-3 w-3" /> Annual rent &gt; ₹1,00,000 — PAN strongly recommended (Rule 26C). If unavailable, obtain a written declaration from your landlord.
                       </p>
                     )}
                   </div>
@@ -448,9 +447,9 @@ export default function RentReceiptGenerator() {
 
                 {rentAmt > 0 && (
                   <div className="mt-4 pt-3 border-t border-slate-100 space-y-1.5">
-                    {needsPan && (
+                    {needsPan && !form.landlordPan.trim() && (
                       <div className="flex items-center gap-1.5 text-xs text-amber-700 bg-amber-50 rounded-lg px-2 py-1.5">
-                        <Info className="h-3 w-3 flex-shrink-0" /> Landlord PAN required (annual rent &gt; ₹1L — HRA Rule 26C)
+                        <Info className="h-3 w-3 flex-shrink-0" /> PAN not entered — get landlord declaration if PAN unavailable (Rule 26C)
                       </div>
                     )}
                     {needsStamp && (
