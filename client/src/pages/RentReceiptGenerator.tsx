@@ -306,7 +306,7 @@ export default function RentReceiptGenerator() {
                     {errors.landlordPan && <p className="text-xs text-red-500 mt-1">{errors.landlordPan}</p>}
                     {needsPan && !errors.landlordPan && (
                       <p className="text-xs text-amber-600 mt-1 flex items-center gap-1">
-                        <Info className="h-3 w-3" /> Annual rent exceeds ₹1L — PAN mandatory (Section 194-IB)
+                        <Info className="h-3 w-3" /> Landlord PAN required — annual rent exceeds ₹1,00,000 (HRA documentation, Rule 26C)
                       </p>
                     )}
                   </div>
@@ -450,7 +450,7 @@ export default function RentReceiptGenerator() {
                   <div className="mt-4 pt-3 border-t border-slate-100 space-y-1.5">
                     {needsPan && (
                       <div className="flex items-center gap-1.5 text-xs text-amber-700 bg-amber-50 rounded-lg px-2 py-1.5">
-                        <Info className="h-3 w-3 flex-shrink-0" /> PAN required (rent &gt; ₹1L/yr)
+                        <Info className="h-3 w-3 flex-shrink-0" /> Landlord PAN required (annual rent &gt; ₹1L — HRA Rule 26C)
                       </div>
                     )}
                     {needsStamp && (
@@ -480,7 +480,7 @@ export default function RentReceiptGenerator() {
                 <ul className="space-y-2.5 text-xs text-slate-600">
                   {[
                     { icon: "📋", tip: "Keep receipts for all 12 months to submit for HRA exemption with your employer (Form 12BB)." },
-                    { icon: "🔢", tip: "If annual rent exceeds ₹1,00,000, landlord PAN is mandatory — TDS @5% may apply under Sec 194-IB." },
+                    { icon: "🔢", tip: "Landlord PAN is mandatory for HRA documentation if annual rent exceeds ₹1,00,000 (Income Tax Rule 26C). If landlord has no PAN, obtain a written declaration from them." },
                     { icon: "🏷️", tip: "A ₹1 revenue stamp is legally required on physical receipts when rent exceeds ₹5,000/month." },
                     { icon: "📅", tip: "Use 'Full Year' button to generate 12 receipts at once — ideal for year-end HRA claims." },
                   ].map(({ icon, tip }) => (
