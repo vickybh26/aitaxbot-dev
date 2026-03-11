@@ -36,6 +36,7 @@ import { generateHomePageSchema } from "@/lib/structuredData";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { blogPosts } from "@/data/blogPosts";
+import { useTranslation } from "@/lib/i18n";
 
 // Import calculator components
 import TaxCalculator from "@/components/calculators/TaxCalculator";
@@ -71,6 +72,7 @@ const latestBlogPosts = [...blogPosts]
 
 export default function Landing({ activeModal, setActiveModal }: LandingProps) {
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   // Contact form state
   const [contactFormData, setContactFormData] = useState({
@@ -165,11 +167,11 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                     ✨ FY 2025-26 (AY 2026-27) & Tax Year 2026-27 Ready
                   </Badge>
                   <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-4 leading-tight">
-                    Smart Tax Calculator for
-                    <span className="gradient-text block mt-1">Indian Taxpayers</span>
+                    {t("hero.headline").split("\n")[0]}
+                    <span className="gradient-text block mt-1">{t("hero.headline").split("\n")[1] ?? "Indian Taxpayers"}</span>
                   </h1>
                   <p className="text-base lg:text-lg text-slate-600 mb-6 leading-relaxed max-w-2xl">
-                    Calculate your tax liability in minutes — compare Old vs New Regime, estimate deductions, and get personalised AI suggestions. Built for salaried employees, freelancers, and investors.
+                    {t("hero.subheadline")}
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3">
                     <Button
@@ -179,7 +181,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                       data-testid="button-calculate-tax"
                     >
                       <Calculator className="mr-2 h-5 w-5" />
-                      Calculate Tax Now
+                      {t("hero.cta")}
                     </Button>
                     <Button
                       variant="outline"
@@ -195,7 +197,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                   <div className="flex flex-wrap items-center gap-4 mt-8 pt-6 border-t border-slate-200/60">
                     <div className="flex items-center gap-1.5 text-sm text-slate-600">
                       <span className="text-green-500 font-bold text-base">✓</span>
-                      <span>100% Free — no signup needed</span>
+                      <span>{t("hero.ctaFree")}</span>
                     </div>
                     <div className="flex items-center gap-1.5 text-sm text-slate-600">
                       <span className="text-green-500 font-bold text-base">✓</span>

@@ -1,68 +1,72 @@
+import { useTranslation } from "@/lib/i18n";
+
 export default function Footer() {
+  const { t } = useTranslation();
+
   return (
     <footer className="bg-white border-t border-neutral-200 py-12 mt-16">
       <div className="max-container container-padding">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
             <div className="flex items-center space-x-3 mb-4">
-              <img 
-                src="/images/aitaxbot-logo.png" 
-                alt="AiTaxBot Logo" 
+              <img
+                src="/images/aitaxbot-logo.png"
+                alt="AiTaxBot Logo"
                 className="h-12 w-auto"
                 loading="lazy"
               />
             </div>
             <p className="text-base text-readable-light font-medium">
-              Your partner in financial growth. Making money simple with smart AI tools and real-time market data.
+              {t("footer.tagline")}
             </p>
           </div>
-          
+
           <div>
-            <h4 className="font-semibold text-neutral-800 mb-4">Calculators</h4>
+            <h4 className="font-semibold text-neutral-800 mb-4">{t("footer.calculators")}</h4>
             <ul className="space-y-2">
-              <li><a href="/calculators/income-tax" className="text-sm text-readable hover:text-primary font-medium transition-colors">Income Tax Calculator</a></li>
-              <li><a href="/calculators/hra" className="text-sm text-readable hover:text-primary font-medium transition-colors">HRA Calculator</a></li>
-              <li><a href="/calculators/sip" className="text-sm text-readable hover:text-primary font-medium transition-colors">SIP Calculator</a></li>
-              <li><a href="/calculators/swp" className="text-sm text-readable hover:text-primary font-medium transition-colors">SWP Calculator</a></li>
-              <li><a href="/calculators/pf" className="text-sm text-readable hover:text-primary font-medium transition-colors">PF Calculator</a></li>
+              <li><a href="/calculators/income-tax" className="text-sm text-readable hover:text-primary font-medium transition-colors">{t("footer.incomeTax")}</a></li>
+              <li><a href="/calculators/hra"         className="text-sm text-readable hover:text-primary font-medium transition-colors">{t("footer.hra")}</a></li>
+              <li><a href="/calculators/sip"         className="text-sm text-readable hover:text-primary font-medium transition-colors">{t("footer.sip")}</a></li>
+              <li><a href="/calculators/swp"         className="text-sm text-readable hover:text-primary font-medium transition-colors">{t("footer.swp")}</a></li>
+              <li><a href="/calculators/pf"          className="text-sm text-readable hover:text-primary font-medium transition-colors">{t("footer.pf")}</a></li>
             </ul>
           </div>
-          
+
           <div>
-            <h4 className="font-semibold text-neutral-800 mb-4">Market Tools</h4>
+            <h4 className="font-semibold text-neutral-800 mb-4">{t("footer.marketTools")}</h4>
             <ul className="space-y-2">
-              <li><a href="#mutual-funds" className="text-sm text-readable hover:text-primary font-medium transition-colors">Mutual Funds</a></li>
-              <li><a href="#stock-quotes" className="text-sm text-readable hover:text-primary font-medium transition-colors">Stock Quotes</a></li>
-              <li><a href="#market-news" className="text-sm text-readable hover:text-primary font-medium transition-colors">Market News</a></li>
-              <li><a href="#ipo-analyzer" className="text-sm text-readable hover:text-primary font-medium transition-colors">IPO Analyzer</a></li>
+              <li><a href="#mutual-funds"  className="text-sm text-readable hover:text-primary font-medium transition-colors">{t("footer.mutualFunds")}</a></li>
+              <li><a href="#stock-quotes"  className="text-sm text-readable hover:text-primary font-medium transition-colors">{t("footer.stockQuotes")}</a></li>
+              <li><a href="#market-news"   className="text-sm text-readable hover:text-primary font-medium transition-colors">{t("footer.marketNews")}</a></li>
+              <li><a href="#ipo-analyzer"  className="text-sm text-readable hover:text-primary font-medium transition-colors">{t("footer.ipoAnalyzer")}</a></li>
             </ul>
           </div>
-          
+
           <div>
-            <h4 className="font-semibold text-neutral-800 mb-4">Legal & Support</h4>
+            <h4 className="font-semibold text-neutral-800 mb-4">{t("footer.legalSupport")}</h4>
             <ul className="space-y-2">
-              <li><a href="/privacy-policy" className="text-sm text-readable hover:text-primary font-medium transition-colors">Privacy Policy</a></li>
-              <li><a href="/terms-of-service" className="text-sm text-readable hover:text-primary font-medium transition-colors">Terms of Service</a></li>
-              <li><a href="mailto:info@aitaxbot.in" className="text-sm text-readable hover:text-primary font-medium transition-colors">Contact Support</a></li>
+              <li><a href="/privacy-policy"         className="text-sm text-readable hover:text-primary font-medium transition-colors">{t("footer.privacyPolicy")}</a></li>
+              <li><a href="/terms-of-service"       className="text-sm text-readable hover:text-primary font-medium transition-colors">{t("footer.termsOfService")}</a></li>
+              <li><a href="mailto:info@aitaxbot.in" className="text-sm text-readable hover:text-primary font-medium transition-colors">{t("footer.contactSupport")}</a></li>
             </ul>
           </div>
         </div>
-        
+
         <div className="border-t border-neutral-200 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center mb-6">
             <div className="mb-4 md:mb-0">
               <p className="text-sm text-readable font-semibold">
-                © 2026 AiTaxBot. All rights reserved. Built with real financial APIs.
+                {t("footer.copyright")}
               </p>
               <p className="text-xs text-readable-light mt-1">
-                Website: <a href="https://aitaxbot.co.in" className="hover:text-primary transition-colors">aitaxbot.co.in</a> | 
+                Website: <a href="https://aitaxbot.co.in" className="hover:text-primary transition-colors">aitaxbot.co.in</a> |
                 Email: <a href="mailto:info@aitaxbot.in" className="hover:text-primary transition-colors ml-1">info@aitaxbot.in</a>
               </p>
             </div>
             <div className="flex items-center space-x-4">
-              <a 
-                href="https://linkedin.com/company/aitaxbot" 
-                target="_blank" 
+              <a
+                href="https://linkedin.com/company/aitaxbot"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="text-readable-light hover:text-primary transition-colors"
                 aria-label="LinkedIn"
@@ -71,9 +75,9 @@ export default function Footer() {
                   <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
                 </svg>
               </a>
-              <a 
-                href="https://www.instagram.com/aitaxbot/" 
-                target="_blank" 
+              <a
+                href="https://www.instagram.com/aitaxbot/"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="text-readable-light hover:text-primary transition-colors"
                 aria-label="Instagram"
