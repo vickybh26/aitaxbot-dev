@@ -11,7 +11,7 @@ import adminRoutes from "./adminRoutes";
 import { getFirestore, verifyFirebaseToken, admin } from "./firebase";
 import { TransactionalEmailsApi, TransactionalEmailsApiApiKeys } from '@getbrevo/brevo';
 import { seedTaxRates, getTaxSlabsForCalculation } from "./seedTaxRates";
-import { generateTaxComputationPDF, savePDFToStorage, type TaxComputationData } from "./pdfGenerator";
+import { generateTaxComputationPDF, savePDFToStorage, generateRentReceiptPDF, type TaxComputationData, type RentReceiptData } from "./pdfGenerator";
 import { geminiTaxService, type TaxAdviceInput } from "./geminiTaxService";
 
 // Configure multer for Firebase Storage uploads (store in memory)
@@ -571,6 +571,128 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // ──────────────────────────────────────────────────────────────────────────
+  // RENT RECEIPT GENERATOR
+  // ──────────────────────────────────────────────────────────────────────────
+
+  // POST /api/rent-receipt/generate — returns a PDF buffer (one or more pages)
+  app.post("/api/rent-receipt/generate", async (req, res) => {
+    try {
+      const { receipts } = req.body as { receipts: RentReceiptData[] };
+      if (!receipts || !Array.isArray(receipts) || receipts.length === 0) {
+        return res.status(400).json({ error: "receipts array is required" });
+      }
+      const pdfBuffer = await generateRentReceiptPDF(receipts);
+      const filename = receipts.length === 1
+        ? `Rent_Receipt_${receipts[0].receiptNumber}.pdf`
+        : `Rent_Receipts_${receipts[0].rentPeriodFrom.replace(/\s/g, "_")}_to_${receipts[receipts.length - 1].rentPeriodTo.replace(/\s/g, "_")}.pdf`;
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+      res.send(pdfBuffer);
+    } catch (error) {
+      console.error("Rent receipt PDF error:", error);
+      res.status(500).json({ error: "Failed to generate rent receipt PDF" });
+    }
+  });
+
+  // POST /api/rent-receipt/email — generates PDF and emails it to the provided address
+  // Also checks if the email belongs to a registered user:
+  //   • Registered  → PDF + link to their dashboard
+  //   • Unregistered → PDF + sign-up invitation
+  app.post("/api/rent-receipt/email", async (req, res) => {
+    try {
+      const { receipts, email, recipientName } = req.body as {
+        receipts: RentReceiptData[];
+        email: string;
+        recipientName?: string;
+      };
+
+      if (!receipts || !Array.isArray(receipts) || receipts.length === 0) {
+        return res.status(400).json({ error: "receipts array is required" });
+      }
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return res.status(400).json({ error: "A valid email address is required" });
+      }
+
+      // 1. Generate PDF
+      const pdfBuffer = await generateRentReceiptPDF(receipts);
+      const filename = receipts.length === 1
+        ? `Rent_Receipt_${receipts[0].receiptNumber}.pdf`
+        : `Rent_Receipts_${receipts.length}_months.pdf`;
+
+      // 2. Check if user exists in Firestore
+      const existingUser = await storage.getUserByUsername(email);
+      const userExists = !!existingUser;
+
+      // 3. Send email via Brevo
+      if (!process.env.BREVO_API_KEY) {
+        console.warn("⚠️ BREVO_API_KEY not set — email not sent");
+        return res.json({ success: true, userExists, emailSent: false, message: "PDF generated but email not sent (BREVO_API_KEY missing)" });
+      }
+
+      const apiInstance = new TransactionalEmailsApi();
+      apiInstance.setApiKey(TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY);
+
+      const senderEmail = process.env.BREVO_SENDER_EMAIL || "info@aitaxbot.in";
+      const senderName  = process.env.BREVO_SENDER_NAME  || "AiTaxBot";
+
+      const name = recipientName || receipts[0].tenantName || "there";
+      const periodLabel = receipts.length === 1
+        ? `${receipts[0].rentPeriodFrom} – ${receipts[0].rentPeriodTo}`
+        : `${receipts[0].rentPeriodFrom} to ${receipts[receipts.length - 1].rentPeriodTo}`;
+
+      const ctaHtml = userExists
+        ? `<a href="https://aitaxbot.co.in/dashboard" style="background:#1E3A8A;color:#fff;padding:10px 24px;border-radius:6px;text-decoration:none;font-size:14px;font-weight:bold;display:inline-block">View My Dashboard</a>`
+        : `<a href="https://aitaxbot.co.in/login" style="background:#1E3A8A;color:#fff;padding:10px 24px;border-radius:6px;text-decoration:none;font-size:14px;font-weight:bold;display:inline-block">Create Free Account →</a>`;
+      const ctaText = userExists
+        ? "You can view all your saved documents at: https://aitaxbot.co.in/dashboard"
+        : "Create a free AiTaxBot account to save receipts, calculate HRA, and plan your taxes: https://aitaxbot.co.in/login";
+      const ctaNote = userExists
+        ? "Your rent receipt is attached. You can also view all your saved documents in your AiTaxBot dashboard."
+        : "Your rent receipt is attached below. Create a free AiTaxBot account to save your receipts, claim HRA exemption, and access all our free tax calculators — no credit card required.";
+
+      await apiInstance.sendTransacEmail({
+        sender: { email: senderEmail, name: senderName },
+        to: [{ email, name }],
+        subject: `Your Rent Receipt for ${periodLabel} — AiTaxBot`,
+        htmlContent: `
+          <!DOCTYPE html>
+          <html><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;color:#1e293b">
+            <div style="background:#1E3A8A;padding:20px;border-radius:8px 8px 0 0;text-align:center">
+              <h1 style="color:#fff;margin:0;font-size:22px">AiTaxBot</h1>
+              <p style="color:#93C5FD;margin:4px 0 0;font-size:13px">www.aitaxbot.co.in · Smart Tax Tools for India</p>
+            </div>
+            <div style="background:#f8fafc;border:1px solid #e2e8f0;border-top:none;padding:24px;border-radius:0 0 8px 8px">
+              <p style="font-size:16px;margin:0 0 12px">Hi <strong>${name}</strong>,</p>
+              <p style="font-size:14px;line-height:1.6;color:#475569">${ctaNote}</p>
+              <div style="background:#EFF6FF;border-left:4px solid #2563eb;padding:12px 16px;margin:16px 0;border-radius:0 6px 6px 0">
+                <p style="margin:0 0 4px;font-size:13px;color:#1d4ed8;font-weight:bold">📄 Receipt Details</p>
+                <p style="margin:0;font-size:13px;color:#1d4ed8">Period: ${periodLabel}</p>
+                <p style="margin:4px 0 0;font-size:13px;color:#1d4ed8">Property: ${receipts[0].propertyAddress}</p>
+              </div>
+              <div style="margin:20px 0;text-align:center">${ctaHtml}</div>
+              <hr style="border:none;border-top:1px solid #e2e8f0;margin:20px 0">
+              <p style="font-size:12px;color:#94a3b8;margin:0">
+                💡 Use our <a href="https://aitaxbot.co.in/calculators/hra" style="color:#2563eb">HRA Calculator</a> to find out how much HRA exemption you can claim under Section 10(13A).
+              </p>
+            </div>
+            <p style="text-align:center;font-size:11px;color:#94a3b8;margin-top:12px">
+              AiTaxBot · Bengaluru, Karnataka, India · <a href="https://aitaxbot.co.in" style="color:#94a3b8">aitaxbot.co.in</a>
+            </p>
+          </body></html>
+        `,
+        textContent: `Hi ${name},\n\nYour rent receipt for ${periodLabel} is attached.\n\n${ctaText}\n\nFor HRA exemption: https://aitaxbot.co.in/calculators/hra\n\n-- AiTaxBot Team`,
+        attachment: [{ content: pdfBuffer.toString("base64"), name: filename }],
+      });
+
+      console.log(`📧 Rent receipt emailed to ${email} (userExists: ${userExists})`);
+      res.json({ success: true, userExists, emailSent: true });
+    } catch (error: any) {
+      console.error("Rent receipt email error:", error?.response?.text || error?.message || error);
+      res.status(500).json({ error: "Failed to send rent receipt email" });
+    }
+  });
+
   // Tax Document Upload API with Firebase Storage
   app.post("/api/tax-documents/upload", upload.single('document'), async (req, res) => {
     try {

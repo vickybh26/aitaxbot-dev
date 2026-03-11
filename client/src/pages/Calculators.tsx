@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'wouter';
-import { Calculator, Home, TrendingUp, PiggyBank, Wallet, Shield, Award } from 'lucide-react';
+import { Calculator, Home, TrendingUp, PiggyBank, Wallet, Shield, Award, FileText } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useEffect } from 'react';
@@ -112,6 +112,22 @@ const investmentCalculators = [
       'Employer contribution (80CCD2)',
       'Lump sum + monthly pension split',
       'NPS vs PPF vs EPF comparison'
+    ]
+  }
+];
+
+const documentTools = [
+  {
+    title: 'Rent Receipt Generator',
+    description: 'Generate professional rent receipts for HRA tax claims. Get a PDF with all mandatory details — landlord PAN, revenue stamp notice, and payment mode. Send directly to your email.',
+    icon: FileText,
+    link: '/tools/rent-receipt',
+    color: 'orange',
+    features: [
+      'PDF receipts for full year in one click',
+      'Landlord PAN & revenue stamp guidance',
+      'Email delivery with dashboard link',
+      '100% free — no registration needed'
     ]
   }
 ];
@@ -253,11 +269,24 @@ export default function Calculators() {
             <div className="mt-14">
               <h2 className="text-2xl font-bold text-slate-900 mb-2">Investment & Retirement Calculators</h2>
               <p className="text-slate-600 mb-6">
-                Plan your wealth creation through systematic investing, retirement withdrawals, and 
+                Plan your wealth creation through systematic investing, retirement withdrawals, and
                 provident fund growth. Estimate your long-term corpus with compounding projections.
               </p>
               <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
                 {investmentCalculators.map((calc, index) => (
+                  <CalculatorCard key={index} calc={calc} />
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-14">
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">Tools & Document Generators</h2>
+              <p className="text-slate-600 mb-6">
+                Generate tax-compliant documents and receipts instantly. Free tools built for Indian
+                taxpayers — no account needed.
+              </p>
+              <div className="grid gap-8 md:grid-cols-2">
+                {documentTools.map((calc, index) => (
                   <CalculatorCard key={index} calc={calc} />
                 ))}
               </div>

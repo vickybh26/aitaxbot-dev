@@ -652,3 +652,179 @@ export async function savePDFToStorage(pdfBuffer: Buffer, userId: string): Promi
   fs.writeFileSync(filePath, pdfBuffer);
   return `/temp-pdfs/${fileName}`;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RENT RECEIPT PDF
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface RentReceiptData {
+  receiptNumber: string;          // e.g. "RR-2025-001"
+  receiptDate: string;            // formatted date string
+  tenantName: string;
+  tenantAddress?: string;
+  landlordName: string;
+  landlordAddress?: string;
+  landlordPan?: string;           // required if annual rent > ₹1L
+  propertyAddress: string;
+  rentAmount: number;             // monthly rent in ₹
+  rentPeriodFrom: string;         // e.g. "1 April 2025"
+  rentPeriodTo: string;           // e.g. "30 April 2025"
+  paymentMode: string;            // Cash / Bank Transfer / UPI / Cheque / NEFT
+  chequeDetails?: string;         // cheque no + bank (if mode = Cheque)
+}
+
+// ── Number to Indian words ────────────────────────────────────────────────────
+function numberToWords(n: number): string {
+  if (n === 0) return "Zero";
+  const ones = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine",
+    "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
+  const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+
+  function convert(num: number): string {
+    if (num < 20) return ones[num];
+    if (num < 100) return tens[Math.floor(num / 10)] + (num % 10 ? " " + ones[num % 10] : "");
+    if (num < 1000) return ones[Math.floor(num / 100)] + " Hundred" + (num % 100 ? " " + convert(num % 100) : "");
+    if (num < 100000) return convert(Math.floor(num / 1000)) + " Thousand" + (num % 1000 ? " " + convert(num % 1000) : "");
+    if (num < 10000000) return convert(Math.floor(num / 100000)) + " Lakh" + (num % 100000 ? " " + convert(num % 100000) : "");
+    return convert(Math.floor(num / 10000000)) + " Crore" + (num % 10000000 ? " " + convert(num % 10000000) : "");
+  }
+
+  const int = Math.floor(n);
+  const paise = Math.round((n - int) * 100);
+  let result = convert(int) + " Rupees";
+  if (paise > 0) result += " and " + convert(paise) + " Paise";
+  return result + " Only";
+}
+
+// ── Generate a single receipt page ───────────────────────────────────────────
+function drawReceiptPage(doc: PDFKit.PDFDocument, data: RentReceiptData, pageIndex: number): void {
+  const PW = doc.page.width;
+  const M = 50; // margin
+  const W = PW - M * 2;
+  let y = M;
+
+  // ── Header band ──────────────────────────────────────────────────────────
+  doc.rect(M, y, W, 52).fill("#1E3A8A");
+  doc.fontSize(18).font("Helvetica-Bold").fillColor("#FFFFFF")
+     .text("AiTaxBot", M + 12, y + 8);
+  doc.fontSize(8).font("Helvetica").fillColor("#93C5FD")
+     .text("www.aitaxbot.co.in  |  Smart Tax Tools for India", M + 12, y + 32);
+  doc.fontSize(11).font("Helvetica-Bold").fillColor("#FFFFFF")
+     .text("RENT RECEIPT", PW - M - 120, y + 18, { width: 110, align: "right" });
+  y += 62;
+
+  // ── Receipt meta row ─────────────────────────────────────────────────────
+  doc.roundedRect(M, y, W, 30, 4).fill("#F1F5F9");
+  doc.fontSize(9).font("Helvetica-Bold").fillColor("#1E3A8A")
+     .text(`Receipt No: ${data.receiptNumber}`, M + 10, y + 10);
+  doc.fontSize(9).font("Helvetica-Bold").fillColor("#1E3A8A")
+     .text(`Date: ${data.receiptDate}`, PW - M - 170, y + 10, { width: 160, align: "right" });
+  y += 42;
+
+  // ── Main receipt body text ────────────────────────────────────────────────
+  const amtWords = numberToWords(data.rentAmount);
+  const amtFmt = `₹${data.rentAmount.toLocaleString("en-IN")}`;
+
+  doc.roundedRect(M, y, W, 72, 4).fill("#EFF6FF").stroke("#BFDBFE");
+  y += 12;
+  doc.fontSize(10).font("Helvetica").fillColor("#1e293b")
+     .text("Received with thanks from", M + 12, y);
+  doc.font("Helvetica-Bold").fillColor("#1E3A8A")
+     .text(` ${data.tenantName}`, M + 12 + 148, y, { continued: false });
+  y += 16;
+  doc.font("Helvetica").fillColor("#1e293b")
+     .text("the sum of ", M + 12, y, { continued: true })
+     .font("Helvetica-Bold").fillColor("#1E3A8A")
+     .text(`${amtFmt} (${amtWords})`, { continued: true })
+     .font("Helvetica").fillColor("#1e293b")
+     .text(" towards rent for the period ", { continued: true })
+     .font("Helvetica-Bold").fillColor("#1E3A8A")
+     .text(`${data.rentPeriodFrom} to ${data.rentPeriodTo}.`, { continued: false });
+  y += 30;
+
+  // ── Details grid ─────────────────────────────────────────────────────────
+  y += 10;
+  const col1 = M;
+  const col2 = M + W / 2 + 10;
+  const colW = W / 2 - 10;
+
+  const drawField = (label: string, value: string, x: number, cy: number, w: number): number => {
+    doc.fontSize(7.5).font("Helvetica-Bold").fillColor("#64748B")
+       .text(label.toUpperCase(), x, cy);
+    cy += 11;
+    doc.fontSize(9.5).font("Helvetica").fillColor("#1e293b")
+       .text(value || "—", x, cy, { width: w, lineBreak: false });
+    return cy + 18;
+  };
+
+  let leftY = y;
+  let rightY = y;
+
+  leftY = drawField("Property Address", data.propertyAddress, col1, leftY, colW);
+  leftY = drawField("Tenant Name", data.tenantName, col1, leftY + 4, colW);
+  if (data.tenantAddress) leftY = drawField("Tenant Address", data.tenantAddress, col1, leftY + 4, colW);
+
+  rightY = drawField("Landlord Name", data.landlordName, col2, rightY, colW);
+  if (data.landlordAddress) rightY = drawField("Landlord Address", data.landlordAddress, col2, rightY + 4, colW);
+  if (data.landlordPan) rightY = drawField("Landlord PAN", data.landlordPan.toUpperCase(), col2, rightY + 4, colW);
+  rightY = drawField("Payment Mode", data.paymentMode, col2, rightY + 4, colW);
+  if (data.chequeDetails) rightY = drawField("Cheque Details", data.chequeDetails, col2, rightY + 4, colW);
+
+  y = Math.max(leftY, rightY) + 20;
+
+  // ── Divider ──────────────────────────────────────────────────────────────
+  doc.moveTo(M, y).lineTo(M + W, y).strokeColor("#E2E8F0").lineWidth(0.5).stroke();
+  y += 18;
+
+  // ── Signature block ───────────────────────────────────────────────────────
+  const sigX = PW - M - 180;
+  doc.fontSize(9).font("Helvetica").fillColor("#64748B")
+     .text("Landlord Signature", sigX, y, { width: 170, align: "center" });
+  y += 14;
+  doc.moveTo(sigX, y).lineTo(sigX + 170, y).strokeColor("#94A3B8").lineWidth(0.5).stroke();
+  y += 8;
+  doc.fontSize(9).font("Helvetica-Bold").fillColor("#1e293b")
+     .text(data.landlordName, sigX, y, { width: 170, align: "center" });
+  y += 30;
+
+  // ── Stamp duty note ───────────────────────────────────────────────────────
+  if (data.rentAmount > 5000) {
+    doc.roundedRect(M, y, W, 26, 3).fill("#FFFBEB").stroke("#FDE68A");
+    doc.fontSize(7.5).font("Helvetica").fillColor("#92400E")
+       .text("⚠  Revenue Stamp: A ₹1 revenue stamp is required on the physical copy of this receipt as rent exceeds ₹5,000/month (per Indian Stamp Act).", M + 10, y + 8, { width: W - 20 });
+    y += 34;
+  }
+
+  if (data.landlordPan) {
+    doc.roundedRect(M, y, W, 22, 3).fill("#F0FDF4").stroke("#BBF7D0");
+    doc.fontSize(7.5).font("Helvetica").fillColor("#166534")
+       .text("✓  Landlord PAN included as required for annual rent exceeding ₹1,00,000 (Section 194-IB, TDS @ 5% if applicable).", M + 10, y + 7, { width: W - 20 });
+    y += 30;
+  }
+
+  // ── Footer ────────────────────────────────────────────────────────────────
+  doc.moveTo(M, y + 6).lineTo(M + W, y + 6).strokeColor("#1E3A8A").lineWidth(0.5).stroke();
+  y += 14;
+  doc.fontSize(7).font("Helvetica").fillColor("#94A3B8")
+     .text("Generated by AiTaxBot | www.aitaxbot.co.in  —  For HRA exemption use our HRA Calculator at aitaxbot.co.in/calculators/hra", M, y, { width: W, align: "center" });
+  y += 11;
+  doc.fontSize(6.5).fillColor("#CBD5E1")
+     .text("Disclaimer: This receipt is a computer-generated document. AiTaxBot is an independent platform not affiliated with any government body.", M, y, { width: W, align: "center" });
+}
+
+export async function generateRentReceiptPDF(receipts: RentReceiptData[]): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    const doc = new PDFDocument({ size: "A4", margin: 0, bufferPages: true });
+    const chunks: Buffer[] = [];
+    doc.on("data", (chunk: Buffer) => chunks.push(chunk));
+    doc.on("end", () => resolve(Buffer.concat(chunks)));
+    doc.on("error", reject);
+
+    receipts.forEach((receipt, i) => {
+      if (i > 0) doc.addPage();
+      drawReceiptPage(doc, receipt, i);
+    });
+
+    doc.end();
+  });
+}
