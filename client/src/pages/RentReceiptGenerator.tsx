@@ -426,7 +426,7 @@ export default function RentReceiptGenerator() {
             <div className="space-y-5">
 
               {/* Live summary */}
-              <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 sticky top-20">
+              <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
                 <h3 className="text-sm font-bold text-slate-900 mb-3">Receipt Preview</h3>
                 <dl className="space-y-2 text-xs">
                   {[
