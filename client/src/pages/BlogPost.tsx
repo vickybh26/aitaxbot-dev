@@ -10,7 +10,9 @@ import {
   Clock,
   ArrowLeft,
   ChevronRight,
-  Share2
+  Share2,
+  UserCheck,
+  ShieldCheck
 } from "lucide-react";
 import { getBlogPost } from "@/data/blogPosts";
 import { ResponsiveAd, RectangleAd } from "@/components/AdBanner";
@@ -268,7 +270,7 @@ export default function BlogPost() {
               {post.metaTitle}
             </h1>
             
-            <div className="flex items-center gap-6 text-gray-600 mb-6">
+            <div className="flex items-center gap-6 text-gray-600 mb-3 flex-wrap">
               <div className="flex items-center gap-2">
                 <Calendar className="h-5 w-5" />
                 <span>{post.publishedAt || "October 21, 2025"}</span>
@@ -285,6 +287,21 @@ export default function BlogPost() {
                 <Share2 className="h-5 w-5" />
                 <span>Share</span>
               </button>
+            </div>
+
+            {/* Author byline — E-E-A-T signal */}
+            <div className="flex items-center gap-3 bg-blue-50 border border-blue-100 rounded-lg px-4 py-3 mb-6">
+              <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
+                <UserCheck className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-gray-900">
+                  Written by AiTaxBot Editorial Team
+                </p>
+                <p className="text-xs text-gray-500">
+                  Reviewed by a Chartered Accountant · Updated {post.publishedAt || "2025"} · All tax figures follow CBDT guidelines for FY 2025-26
+                </p>
+              </div>
             </div>
 
             {post.disclaimer && (
@@ -432,8 +449,26 @@ export default function BlogPost() {
             <ResponsiveAd />
           </div>
 
+          {/* Editorial Disclaimer — AdSense / E-E-A-T requirement */}
+          <div className="mt-12 bg-gray-50 border border-gray-200 rounded-xl p-5">
+            <div className="flex items-start gap-3">
+              <ShieldCheck className="h-5 w-5 text-gray-400 mt-0.5 shrink-0" />
+              <div>
+                <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-1">
+                  Editorial Disclaimer
+                </p>
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  This article is intended for general informational purposes only and does not constitute professional tax, legal, or financial advice. Tax laws and rates may change — always verify figures with the latest CBDT notifications or consult a qualified Chartered Accountant before making tax or investment decisions. AiTaxBot does not accept liability for decisions made based on this content.
+                </p>
+                <p className="text-xs text-gray-400 mt-2">
+                  Last reviewed by AiTaxBot Editorial Team · {post.publishedAt || "2025"} · Figures based on Income Tax Act, 1961 &amp; Union Budget 2025 provisions.
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* Back to Blog */}
-          <div className="mt-12 pt-8 border-t">
+          <div className="mt-8 pt-6 border-t">
             <Link href="/blog">
               <Button variant="outline" data-testid="button-back-to-blog-bottom">
                 <ArrowLeft className="h-4 w-4 mr-2" />

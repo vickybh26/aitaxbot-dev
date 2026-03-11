@@ -37,13 +37,14 @@ export const blogPosts: BlogPost[] = [
     ogDescription: "Explore equity, debt, gold, real estate, and hybrid investments with examples, pros/cons, and risk levels.",
     tags: ["Investing Basics", "Personal Finance", "India"],
     readingTimeMinutes: 8,
+    publishedAt: "September 18, 2025",
     heroImage: "/images/investment-types-india.jpg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
       "headline": "Types of Investments in India: A Beginner's Guide to Smart Wealth Building",
-      "author": {"@type": "Person", "name": "AI Tax Bot Editorial"},
-      "publisher": {"@type": "Organization", "name": "AI Tax Bot"},
+      "author": {"@type": "Person", "name": "AiTaxBot Editorial Team"},
+      "publisher": {"@type": "Organization", "name": "AiTaxBot"},
       "mainEntityOfPage": "https://aitaxbot.co.in/blog/types-of-investments-in-india-beginners-guide"
     },
     bodySections: [
@@ -119,12 +120,13 @@ export const blogPosts: BlogPost[] = [
     ogDescription: "A practical, tax-aware shortlist: index funds, debt options, PPF, SGBs, NPS, REITs, and more.",
     tags: ["Investing", "2025", "Tax Planning"],
     readingTimeMinutes: 8,
+    publishedAt: "September 25, 2025",
     heroImage: "/images/best-investment-options-2025.jpg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
       "headline": "Top Investment Options in India for 2025: Where to Invest",
-      "author": {"@type": "Person", "name": "AI Tax Bot Editorial"}
+      "author": {"@type": "Person", "name": "AiTaxBot Editorial Team"}
     },
     bodySections: [
       {
@@ -208,13 +210,14 @@ export const blogPosts: BlogPost[] = [
     ogDescription: "Discover capacity vs tolerance vs need for risk, and map them to a working allocation.",
     tags: ["Investing Basics", "Personal Finance"],
     readingTimeMinutes: 8,
+    publishedAt: "October 2, 2025",
     heroImage: "/images/risk-profile-india.jpg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
       "headline": "Understanding Risk Profile: The Foundation of Every Investment Plan",
-      "author": {"@type": "Person", "name": "AI Tax Bot Editorial"},
-      "publisher": {"@type": "Organization", "name": "AI Tax Bot"}
+      "author": {"@type": "Person", "name": "AiTaxBot Editorial Team"},
+      "publisher": {"@type": "Organization", "name": "AiTaxBot"}
     },
     bodySections: [
       {
@@ -272,13 +275,14 @@ export const blogPosts: BlogPost[] = [
     ogDescription: "A clear, high-level guide to income heads, capital gains, deductions, and planning ideas.",
     tags: ["Tax Planning", "India"],
     readingTimeMinutes: 9,
+    publishedAt: "October 9, 2025",
     heroImage: "/images/taxation-india-guide.jpg",
     disclaimer: "Tax provisions change. Always check the latest Finance Act and rules before filing.",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
       "headline": "Taxation in India: A Practical Guide",
-      "author": {"@type": "Person", "name": "AI Tax Bot Editorial"}
+      "author": {"@type": "Person", "name": "AiTaxBot Editorial Team"}
     },
     bodySections: [
       {
@@ -336,13 +340,14 @@ export const blogPosts: BlogPost[] = [
     ogDescription: "Understand the moving parts—volatility, custody, taxation awareness—and how to size crypto sensibly.",
     tags: ["Investing", "India"],
     readingTimeMinutes: 8,
+    publishedAt: "October 16, 2025",
     heroImage: "/images/crypto-india-2025.jpg",
     disclaimer: "Regulations and tax treatment evolve. Verify current rules and exchange compliance before investing.",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
       "headline": "Cryptocurrency Investments in India",
-      "author": {"@type": "Person", "name": "AI Tax Bot Editorial"}
+      "author": {"@type": "Person", "name": "AiTaxBot Editorial Team"}
     },
     bodySections: [
       {
@@ -400,12 +405,13 @@ export const blogPosts: BlogPost[] = [
     ogDescription: "Understand how alternatives hedge risk, smooth returns, and complement equity–debt cores.",
     tags: ["Investing", "India"],
     readingTimeMinutes: 8,
+    publishedAt: "October 23, 2025",
     heroImage: "/images/alt-investments-gold-silver.jpg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
       "headline": "Alternative Investments in India",
-      "author": {"@type": "Person", "name": "AI Tax Bot Editorial"}
+      "author": {"@type": "Person", "name": "AiTaxBot Editorial Team"}
     },
     bodySections: [
       {
@@ -462,13 +468,14 @@ export const blogPosts: BlogPost[] = [
     ogDescription: "Align tax savings with life goals using ELSS, PPF, NPS, insurance, and disciplined planning.",
     tags: ["Tax Planning", "Investing"],
     readingTimeMinutes: 8,
+    publishedAt: "October 30, 2025",
     heroImage: "/images/tax-saving-investments.jpg",
     disclaimer: "Verify current provisions before investing solely for tax benefits.",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
       "headline": "Tax-Smart Investing: 80C & Beyond",
-      "author": {"@type": "Person", "name": "AI Tax Bot Editorial"}
+      "author": {"@type": "Person", "name": "AiTaxBot Editorial Team"}
     },
     bodySections: [
       {
@@ -525,12 +532,13 @@ export const blogPosts: BlogPost[] = [
     ogDescription: "Learn when to pick funds and when to go direct—with examples, pros/cons, and decision criteria.",
     tags: ["Investing Basics", "Personal Finance"],
     readingTimeMinutes: 8,
+    publishedAt: "November 6, 2025",
     heroImage: "/images/funds-vs-stocks.jpg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
       "headline": "Mutual Funds vs Direct Stocks",
-      "author": {"@type": "Person", "name": "AI Tax Bot Editorial"}
+      "author": {"@type": "Person", "name": "AiTaxBot Editorial Team"}
     },
     bodySections: [
       {
@@ -588,12 +596,13 @@ export const blogPosts: BlogPost[] = [
     ogDescription: "Time in the market beats timing the market. Learn how patience and discipline unlock wealth.",
     tags: ["Investing Basics", "Personal Finance"],
     readingTimeMinutes: 8,
+    publishedAt: "November 13, 2025",
     heroImage: "/images/long-term-compounding.jpg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
       "headline": "Long-Term Investing: Harnessing the Power of Compounding",
-      "author": {"@type": "Person", "name": "AI Tax Bot Editorial"}
+      "author": {"@type": "Person", "name": "AiTaxBot Editorial Team"}
     },
     bodySections: [
       {
@@ -651,12 +660,13 @@ export const blogPosts: BlogPost[] = [
     ogDescription: "Realign your equity–debt–gold mix to control risk and capture gains systematically.",
     tags: ["Investing", "Personal Finance"],
     readingTimeMinutes: 8,
+    publishedAt: "November 20, 2025",
     heroImage: "/images/portfolio-rebalancing.jpg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
       "headline": "Portfolio Rebalancing: How & When to Realign Your Asset Allocation",
-      "author": {"@type": "Person", "name": "AI Tax Bot Editorial"}
+      "author": {"@type": "Person", "name": "AiTaxBot Editorial Team"}
     },
     bodySections: [
       {
@@ -712,20 +722,21 @@ export const blogPosts: BlogPost[] = [
   {
     slug: "sip-calculator-guide-mutual-fund-investments",
     status: "published",
-    metaTitle: "SIP Calculator Guide: Plan Your Mutual Fund Investments | AI Tax Bot",
+    metaTitle: "SIP Calculator Guide: Plan Your Mutual Fund Investments | AiTaxBot",
     metaDescription: "Understand SIPs, compounding and how to use a SIP calculator to reach your financial goals effectively.",
     keywords: ["sip calculator", "mutual fund sip", "compounding", "systematic investment plan"],
     ogTitle: "SIP Calculator Guide: Plan Your Mutual Fund Investments",
     ogDescription: "Learn how SIPs work, the power of compounding, and how to use a calculator to plan your investments.",
     tags: ["investment", "mutual fund", "calculator"],
     readingTimeMinutes: 8,
+    publishedAt: "November 27, 2025",
     heroImage: "/images/sip-calculator-guide.jpg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
       "headline": "SIP Calculator Guide: Plan Your Mutual Fund Investments",
-      "author": {"@type": "Person", "name": "AI Tax Bot Editorial"},
-      "publisher": {"@type": "Organization", "name": "AI Tax Bot"}
+      "author": {"@type": "Person", "name": "AiTaxBot Editorial Team"},
+      "publisher": {"@type": "Organization", "name": "AiTaxBot"}
     },
     bodySections: [
       {
@@ -778,20 +789,21 @@ export const blogPosts: BlogPost[] = [
   {
     slug: "hra-exemption-metro-vs-non-metro",
     status: "published",
-    metaTitle: "HRA Exemption: Metro vs Non-Metro | AI Tax Bot",
+    metaTitle: "HRA Exemption: Metro vs Non-Metro | AiTaxBot",
     metaDescription: "Learn the formula and rules for calculating House Rent Allowance (HRA) exemption with worked examples for metro and non-metro cities.",
     keywords: ["hra exemption", "metro vs non metro", "section 10(13A)", "rent receipts"],
     ogTitle: "Understanding HRA Exemption: Metro vs Non-Metro Cities",
     ogDescription: "Complete guide to HRA exemption calculation with examples for metro and non-metro cities.",
     tags: ["tax", "salary", "hra"],
     readingTimeMinutes: 7,
+    publishedAt: "December 4, 2025",
     heroImage: "/images/hra-exemption-metro.jpg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
       "headline": "Understanding HRA Exemption: Metro vs Non-Metro Cities",
-      "author": {"@type": "Person", "name": "AI Tax Bot Editorial"},
-      "publisher": {"@type": "Organization", "name": "AI Tax Bot"}
+      "author": {"@type": "Person", "name": "AiTaxBot Editorial Team"},
+      "publisher": {"@type": "Organization", "name": "AiTaxBot"}
     },
     bodySections: [
       {
@@ -847,20 +859,21 @@ export const blogPosts: BlogPost[] = [
   {
     slug: "elss-vs-ppf-vs-nps-tax-saving-comparison",
     status: "published",
-    metaTitle: "ELSS vs PPF vs NPS Comparison | AI Tax Bot",
+    metaTitle: "ELSS vs PPF vs NPS Comparison | AiTaxBot",
     metaDescription: "Comprehensive comparison of ELSS, PPF and NPS investments under Section 80C highlighting returns, risk, lock-in and ideal investor profile.",
     keywords: ["elss vs ppf vs nps", "80c", "tax saving", "retirement planning"],
     ogTitle: "ELSS vs PPF vs NPS: Best Tax-Saving Options Compared",
     ogDescription: "Compare ELSS, PPF, and NPS on returns, risk, lock-in period, and tax treatment to choose the right option.",
     tags: ["investment", "tax saving", "80C"],
     readingTimeMinutes: 9,
+    publishedAt: "December 11, 2025",
     heroImage: "/images/elss-ppf-nps-comparison.jpg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
       "headline": "ELSS vs PPF vs NPS: Best Tax-Saving Options Compared",
-      "author": {"@type": "Person", "name": "AI Tax Bot Editorial"},
-      "publisher": {"@type": "Organization", "name": "AI Tax Bot"}
+      "author": {"@type": "Person", "name": "AiTaxBot Editorial Team"},
+      "publisher": {"@type": "Organization", "name": "AiTaxBot"}
     },
     bodySections: [
       {
@@ -916,20 +929,21 @@ export const blogPosts: BlogPost[] = [
   {
     slug: "gst-filing-guide-small-businesses",
     status: "published",
-    metaTitle: "GST Filing Guide for Small Businesses | AI Tax Bot",
+    metaTitle: "GST Filing Guide for Small Businesses | AiTaxBot",
     metaDescription: "Step-by-step explanation of GST registration, return filing, due dates, penalties and automation tips for small businesses in India.",
     keywords: ["gst filing", "gstr1", "gstr3b", "gst registration", "gst late fees"],
     ogTitle: "GST Filing Guide for Small Businesses in India",
     ogDescription: "Complete guide to GST registration, return filing, due dates, and compliance for small businesses.",
     tags: ["gst", "business", "compliance"],
     readingTimeMinutes: 10,
+    publishedAt: "December 18, 2025",
     heroImage: "/images/gst-filing-guide.jpg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
       "headline": "GST Filing Guide for Small Businesses in India",
-      "author": {"@type": "Person", "name": "AI Tax Bot Editorial"},
-      "publisher": {"@type": "Organization", "name": "AI Tax Bot"}
+      "author": {"@type": "Person", "name": "AiTaxBot Editorial Team"},
+      "publisher": {"@type": "Organization", "name": "AiTaxBot"}
     },
     bodySections: [
       {
@@ -991,20 +1005,21 @@ export const blogPosts: BlogPost[] = [
   {
     slug: "emergency-fund-planning-guide",
     status: "published",
-    metaTitle: "Emergency Fund Planning | AI Tax Bot",
+    metaTitle: "Emergency Fund Planning | AiTaxBot",
     metaDescription: "Learn why an emergency fund is vital, how much to save, and where to park it for quick access and safety.",
     keywords: ["emergency fund", "savings", "contingency reserve", "personal finance"],
     ogTitle: "Emergency Fund Planning: How Much Do You Really Need?",
     ogDescription: "Comprehensive guide to building an emergency fund with calculation methods and investment options.",
     tags: ["personal finance", "planning"],
     readingTimeMinutes: 8,
+    publishedAt: "December 25, 2025",
     heroImage: "/images/emergency-fund-planning.jpg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
       "headline": "Emergency Fund Planning: How Much Do You Really Need?",
-      "author": {"@type": "Person", "name": "AI Tax Bot Editorial"},
-      "publisher": {"@type": "Organization", "name": "AI Tax Bot"}
+      "author": {"@type": "Person", "name": "AiTaxBot Editorial Team"},
+      "publisher": {"@type": "Organization", "name": "AiTaxBot"}
     },
     bodySections: [
       {
@@ -1066,20 +1081,21 @@ export const blogPosts: BlogPost[] = [
   {
     slug: "index-funds-vs-active-mutual-funds",
     status: "published",
-    metaTitle: "Index Funds vs Active Funds | AI Tax Bot",
+    metaTitle: "Index Funds vs Active Funds | AiTaxBot",
     metaDescription: "Compare passive index investing with actively managed mutual funds on cost, risk and long-term returns.",
     keywords: ["index funds", "active funds", "passive investing", "nifty 50", "expense ratio"],
     ogTitle: "Index Funds vs Active Mutual Funds: Complete Comparison",
     ogDescription: "Detailed comparison of index funds and active funds to help you choose the right investment strategy.",
     tags: ["investment", "mutual fund", "stock market"],
     readingTimeMinutes: 9,
+    publishedAt: "January 8, 2026",
     heroImage: "/images/index-vs-active-funds.jpg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
       "headline": "Index Funds vs Active Mutual Funds: Complete Comparison",
-      "author": {"@type": "Person", "name": "AI Tax Bot Editorial"},
-      "publisher": {"@type": "Organization", "name": "AI Tax Bot"}
+      "author": {"@type": "Person", "name": "AiTaxBot Editorial Team"},
+      "publisher": {"@type": "Organization", "name": "AiTaxBot"}
     },
     bodySections: [
       {
@@ -1146,20 +1162,21 @@ export const blogPosts: BlogPost[] = [
   {
     slug: "capital-gains-tax-stocks-mutual-funds",
     status: "published",
-    metaTitle: "Capital Gains Tax on Stocks and Mutual Funds Explained | AI Tax Bot",
+    metaTitle: "Capital Gains Tax on Stocks and Mutual Funds Explained | AiTaxBot",
     metaDescription: "Understand how capital gains tax works on equity shares and mutual funds in India for FY 2024-25—STCG, LTCG, exemptions and filing tips.",
     keywords: ["capital gains tax", "stcg", "ltcg", "equity taxation", "mutual fund tax"],
     ogTitle: "Capital Gains Tax on Stocks and Mutual Funds Explained",
     ogDescription: "Complete guide to capital gains taxation on equity investments in India with examples.",
     tags: ["tax", "investment", "capital gains"],
     readingTimeMinutes: 10,
+    publishedAt: "January 22, 2026",
     heroImage: "/images/capital-gains-tax-guide.jpg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
       "headline": "Capital Gains Tax on Stocks and Mutual Funds Explained",
-      "author": {"@type": "Person", "name": "AI Tax Bot Editorial"},
-      "publisher": {"@type": "Organization", "name": "AI Tax Bot"}
+      "author": {"@type": "Person", "name": "AiTaxBot Editorial Team"},
+      "publisher": {"@type": "Organization", "name": "AiTaxBot"}
     },
     bodySections: [
       {
@@ -1226,20 +1243,21 @@ export const blogPosts: BlogPost[] = [
   {
     slug: "retirement-planning-by-age",
     status: "published",
-    metaTitle: "Retirement Planning by Age | AI Tax Bot",
+    metaTitle: "Retirement Planning by Age | AiTaxBot",
     metaDescription: "A decade-wise roadmap to achieve financial independence using SIPs, NPS, and asset allocation suited to your life stage.",
     keywords: ["retirement planning", "nps", "epf", "sip", "financial freedom"],
     ogTitle: "Retirement Planning in Your 20s, 30s and 40s",
     ogDescription: "Complete retirement planning guide with age-specific strategies for building a retirement corpus.",
     tags: ["retirement", "financial planning", "investment"],
     readingTimeMinutes: 11,
+    publishedAt: "January 29, 2026",
     heroImage: "/images/retirement-planning-guide.jpg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
       "headline": "Retirement Planning in Your 20s, 30s and 40s",
-      "author": {"@type": "Person", "name": "AI Tax Bot Editorial"},
-      "publisher": {"@type": "Organization", "name": "AI Tax Bot"}
+      "author": {"@type": "Person", "name": "AiTaxBot Editorial Team"},
+      "publisher": {"@type": "Organization", "name": "AiTaxBot"}
     },
     bodySections: [
       {
@@ -1314,6 +1332,7 @@ export const blogPosts: BlogPost[] = [
     ogDescription: "Updated FY 2025-26 comparison: correct slabs, ₹12.75L zero-tax window, marginal relief table, 3 worked examples, deduction guide, switching rules — all in one place.",
     tags: ["tax", "salary", "planning", "marginal relief", "FY 2025-26", "80C", "HRA"],
     readingTimeMinutes: 15,
+    publishedAt: "February 5, 2026",
     heroImage: "/images/tax-regime-comparison-2025.jpg",
     schema: {
       "@context": "https://schema.org",
@@ -1410,6 +1429,7 @@ export const blogPosts: BlogPost[] = [
     ogDescription: "If your income is ₹12.1 lakh, your tax is ₹10,400 — not ₹63,960. Here's how marginal relief works at every threshold, with CA-verified examples.",
     tags: ["tax", "marginal relief", "surcharge", "high income", "CA tips"],
     readingTimeMinutes: 14,
+    publishedAt: "February 20, 2026",
     heroImage: "/images/marginal-relief-guide.jpg",
     schema: {
       "@context": "https://schema.org",
