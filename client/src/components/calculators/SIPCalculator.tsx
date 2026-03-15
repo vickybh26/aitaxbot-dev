@@ -58,6 +58,7 @@ export default function SIPCalculator({ onClose }: SIPCalculatorProps = {}) {
       maturityValue,
       wealthGain
     });
+    fetch('/api/stats/track-calculation', { method: 'POST' }).catch(() => {});
 
     // Update chart
     updateChart(totalInvestment, maturityValue);

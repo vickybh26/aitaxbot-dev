@@ -368,6 +368,9 @@ export default function TaxCalculator({ onClose }: TaxCalculatorProps = {}) {
     setActiveTab('results');
     setIsCalculating(false);
 
+    // Track calculation count (fire-and-forget)
+    fetch('/api/stats/track-calculation', { method: 'POST' }).catch(() => {});
+
     // Get AI advice via Firebase AI Logic (client-side Gemini) with server fallback
     setAiAdvice(null);
     setAiLoading(true);

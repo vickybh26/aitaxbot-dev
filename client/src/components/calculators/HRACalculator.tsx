@@ -136,6 +136,7 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
     generateRecommendations(hraResult);
     setActiveTab("results");
     setIsCalculating(false);
+    fetch('/api/stats/track-calculation', { method: 'POST' }).catch(() => {});
   };
 
   const generateRecommendations = (hraResult: HRAResult) => {

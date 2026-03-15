@@ -137,6 +137,7 @@ export default function RentReceiptGenerator() {
       a.click();
       URL.revokeObjectURL(url);
       toast({ title: "Receipt downloaded!", description: `${months.length} receipt${months.length > 1 ? "s" : ""} saved as PDF.` });
+      fetch('/api/stats/track-calculation', { method: 'POST' }).catch(() => {});
     } catch {
       toast({ title: "Download failed", description: "Please try again.", variant: "destructive" });
     } finally {

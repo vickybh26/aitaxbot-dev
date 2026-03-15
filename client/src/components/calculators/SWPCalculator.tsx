@@ -81,6 +81,7 @@ export default function SWPCalculator({ onClose }: SWPCalculatorProps = {}) {
       inflationAdjusted: enableInflation,
       yearlySnapshots: yearlySnapshots.slice(0, 10), // Show first 10 years
     });
+    fetch('/api/stats/track-calculation', { method: 'POST' }).catch(() => {});
   };
 
   useEffect(() => {

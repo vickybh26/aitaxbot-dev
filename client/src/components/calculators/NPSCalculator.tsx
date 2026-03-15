@@ -79,6 +79,7 @@ export default function NPSCalculator() {
       taxSaving80CCD2: tax80CCD2,
       totalTaxSaving: tax80CCD1 + tax80CCD1B + tax80CCD2
     });
+    fetch('/api/stats/track-calculation', { method: 'POST' }).catch(() => {});
   };
 
   useEffect(() => {

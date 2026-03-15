@@ -155,6 +155,7 @@ export default function PFCalculator() {
       totalInterestEarned: totalInterest,
       totalVPF
     });
+    fetch('/api/stats/track-calculation', { method: 'POST' }).catch(() => {});
 
     setActiveTab("results");
     updateChart(yearlyGrowth);

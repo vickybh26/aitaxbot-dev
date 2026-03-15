@@ -130,7 +130,8 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
     { title: "HRA Calculator", description: "Section 10(13A)", icon: HomeIcon, href: "/calculators/hra", color: "from-blue-500 to-cyan-600" },
     { title: "SIP Calculator", description: "Wealth Builder", icon: TrendingUp, href: "/calculators/sip", color: "from-green-500 to-emerald-600" },
     { title: "SWP Calculator", description: "Retirement Plan", icon: PiggyBank, href: "/calculators/swp", color: "from-purple-500 to-pink-600" },
-    { title: "PF Calculator", description: "EPF / VPF / PPF", icon: Shield, href: "/calculators/pf", color: "from-indigo-500 to-indigo-600", badge: "New" },
+    { title: "PF Calculator", description: "EPF / VPF / PPF", icon: Shield, href: "/calculators/pf", color: "from-indigo-500 to-indigo-600" },
+    { title: "Rent Receipt", description: "HRA Proof PDF", icon: FileText, href: "/tools/rent-receipt", color: "from-orange-500 to-amber-600", badge: "New" },
   ];
 
   return (
