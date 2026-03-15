@@ -73,6 +73,10 @@
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, 'Helvetica Neue', Arial, sans-serif;
     color: hsl(var(--neutral-800));
   }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    letter-spacing: -0.02em;
+  }
 }
 
 /* Modern Design System Classes */
@@ -272,11 +276,11 @@
 
 /* Hero Section Gradient */
 .hero-gradient {
-  background: linear-gradient(135deg, hsl(var(--primary-blue)) 0%, hsl(var(--accent-purple)) 100%);
+  background: linear-gradient(135deg, hsl(var(--primary-blue-dark)) 0%, hsl(var(--primary-blue)) 100%);
 }
 
 .hero-gradient-light {
-  background: linear-gradient(135deg, hsl(var(--primary-blue-light)) 0%, hsl(var(--accent-purple-light)) 100%);
+  background: linear-gradient(135deg, hsl(var(--primary-blue-light)) 0%, hsl(214, 65%, 93%) 100%);
 }
 
 /* Section spacing - Mobile optimized */
@@ -509,15 +513,15 @@ html {
 }
 
 .gradient-mesh {
-  background: 
+  background:
     radial-gradient(at 0% 0%, hsla(214, 65%, 56%, 0.2) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, hsla(262, 83%, 58%, 0.15) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, hsla(217, 91%, 60%, 0.2) 0px, transparent 50%),
-    radial-gradient(at 0% 100%, hsla(142, 76%, 36%, 0.15) 0px, transparent 50%);
+    radial-gradient(at 100% 0%, hsla(217, 91%, 60%, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, hsla(214, 65%, 50%, 0.2) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, hsla(142, 76%, 36%, 0.12) 0px, transparent 50%);
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, hsl(214, 65%, 56%) 0%, hsl(262, 83%, 58%) 100%);
+  background: linear-gradient(135deg, hsl(217, 91%, 45%) 0%, hsl(214, 65%, 60%) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

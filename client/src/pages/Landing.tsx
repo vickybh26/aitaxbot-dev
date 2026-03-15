@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Helmet } from "react-helmet-async";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -28,6 +28,7 @@ import {
   BookOpen,
   BarChart2,
   Users,
+  ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import logoImage from "@assets/aitaxbot-logo-lovable.png";
@@ -70,9 +71,46 @@ const latestBlogPosts = [...blogPosts]
     publishedAt: p.publishedAt,
   }));
 
+// ── Count-up hook (fires once when element enters viewport) ──────────────────
+function useCountUp(target: number, duration = 900) {
+  const [count, setCount] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+  const started = useRef(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !started.current) {
+          started.current = true;
+          const start = performance.now();
+          const tick = (now: number) => {
+            const progress = Math.min((now - start) / duration, 1);
+            setCount(Math.round(progress * target));
+            if (progress < 1) requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
+        }
+      },
+      { threshold: 0.3 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [target, duration]);
+
+  return { count, ref };
+}
+
 export default function Landing({ activeModal, setActiveModal }: LandingProps) {
   const { toast } = useToast();
   const { t } = useTranslation();
+
+  // Count-up refs for hero stats
+  const stat1 = useCountUp(12);
+  const stat2 = useCountUp(150);
+  const stat3 = useCountUp(75);
+  const stat4 = useCountUp(30);
 
   // Contact form state
   const [contactFormData, setContactFormData] = useState({
@@ -178,7 +216,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                     <Button
                       size="lg"
                       onClick={() => window.location.href = "/calculators/income-tax"}
-                      className="gradient-blue text-white px-6 py-5 rounded-xl shadow-colored hover:shadow-colored-hover transition-all duration-300 font-semibold hover:scale-105 transform"
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-5 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 font-semibold hover:scale-105 transform"
                       data-testid="button-calculate-tax"
                     >
                       <Calculator className="mr-2 h-5 w-5" />
@@ -248,20 +286,20 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
               {/* Key Stats — with context */}
               <section className="py-6">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  <div className="glass-card text-center p-4 rounded-xl hover:scale-105 transition-transform duration-300">
-                    <div className="text-2xl md:text-3xl font-bold gradient-text mb-1">₹12L</div>
+                  <div ref={stat1.ref} className="glass-card text-center p-4 rounded-xl hover:scale-105 transition-transform duration-300">
+                    <div className="text-2xl md:text-3xl font-bold text-persian-blue-700 mb-1">₹{stat1.count}L</div>
                     <div className="text-slate-700 font-medium text-xs">Zero tax at this income under New Regime</div>
                   </div>
-                  <div className="glass-card text-center p-4 rounded-xl hover:scale-105 transition-transform duration-300">
-                    <div className="text-2xl md:text-3xl font-bold gradient-text mb-1">₹1.5L</div>
+                  <div ref={stat2.ref} className="glass-card text-center p-4 rounded-xl hover:scale-105 transition-transform duration-300">
+                    <div className="text-2xl md:text-3xl font-bold text-persian-blue-700 mb-1">₹{stat2.count >= 100 ? "1.5L" : stat2.count + "K"}</div>
                     <div className="text-slate-700 font-medium text-xs">Save up to ₹46,800 via 80C deduction</div>
                   </div>
-                  <div className="glass-card text-center p-4 rounded-xl hover:scale-105 transition-transform duration-300">
-                    <div className="text-2xl md:text-3xl font-bold gradient-text mb-1">₹75K</div>
+                  <div ref={stat3.ref} className="glass-card text-center p-4 rounded-xl hover:scale-105 transition-transform duration-300">
+                    <div className="text-2xl md:text-3xl font-bold text-persian-blue-700 mb-1">₹{stat3.count}K</div>
                     <div className="text-slate-700 font-medium text-xs">Standard deduction for salaried employees</div>
                   </div>
-                  <div className="glass-card text-center p-4 rounded-xl hover:scale-105 transition-transform duration-300">
-                    <div className="text-2xl md:text-3xl font-bold gradient-text mb-1">30%</div>
+                  <div ref={stat4.ref} className="glass-card text-center p-4 rounded-xl hover:scale-105 transition-transform duration-300">
+                    <div className="text-2xl md:text-3xl font-bold text-persian-blue-700 mb-1">{stat4.count}%</div>
                     <div className="text-slate-700 font-medium text-xs">Flat tax on crypto / VDA income</div>
                   </div>
                 </div>
@@ -287,7 +325,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                         </ul>
                         <Button
                           onClick={() => window.location.href = "/calculators/income-tax"}
-                          className="gradient-blue hover:shadow-colored transition-all duration-300 text-white w-full py-4 text-sm font-semibold"
+                          className="bg-emerald-600 hover:bg-emerald-700 transition-all duration-300 text-white w-full py-4 text-sm font-semibold"
                         >
                           Calculate Now
                         </Button>
@@ -373,6 +411,52 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
               </section>
 
               {/* Contact — simple strip (no embedded form) */}
+              {/* FAQ Section */}
+              <section className="py-8" id="faq">
+                <div className="flex items-center gap-2 mb-6">
+                  <Info className="h-5 w-5 text-persian-blue-600" />
+                  <h2 className="text-xl font-bold text-slate-900">Frequently Asked Questions</h2>
+                </div>
+                <div className="space-y-3">
+                  {[
+                    {
+                      q: "Which regime — Old or New — is better for me?",
+                      a: "It depends on your deductions. If your total 80C + HRA + home loan deductions exceed ₹3.75 lakh, the Old Regime usually saves more. Below that threshold, the New Regime is typically better. Use our calculator above to get your exact answer in seconds."
+                    },
+                    {
+                      q: "Is income up to ₹12 lakh really tax-free in FY 2025-26?",
+                      a: "Yes — under the New Regime for FY 2025-26, the rebate under Section 87A has been enhanced so that taxpayers with net taxable income up to ₹12 lakh pay zero tax. The ₹75,000 standard deduction means a salaried person earning up to ₹12.75 lakh pays no tax."
+                    },
+                    {
+                      q: "What is the 87A rebate and am I eligible?",
+                      a: "Section 87A gives a full rebate on tax if your net taxable income is within the specified limit (₹12 lakh under New Regime for FY 2025-26). Our calculator automatically applies this rebate and shows you whether you qualify."
+                    },
+                    {
+                      q: "Can I switch between Old and New Regime every year?",
+                      a: "Salaried individuals with no business income can choose their regime every year at the time of filing. If you have business or professional income, you can switch only once. Our calculator shows you both options so you can decide each year."
+                    },
+                    {
+                      q: "Is the data I enter in the calculator saved anywhere?",
+                      a: "No. AiTaxBot calculators run entirely in your browser. Your income and deduction details are never sent to our servers or stored in any database."
+                    },
+                    {
+                      q: "How is AY (Assessment Year) different from FY (Financial Year)?",
+                      a: "Financial Year (FY) is when you earn the income — e.g., FY 2025-26 runs from April 2025 to March 2026. Assessment Year (AY) is when you file and pay tax on that income — so AY 2026-27 corresponds to FY 2025-26."
+                    },
+                  ].map(({ q, a }, i) => (
+                    <details key={i} className="group rounded-xl border border-slate-200 bg-white open:border-persian-blue-200 transition-all">
+                      <summary className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold text-slate-800 list-none [&::-webkit-details-marker]:hidden">
+                        {q}
+                        <ChevronDown className="h-4 w-4 flex-shrink-0 text-slate-400 transition-transform group-open:rotate-180" />
+                      </summary>
+                      <div className="px-5 pb-4 text-sm text-slate-600 leading-relaxed border-t border-slate-100 pt-3">
+                        {a}
+                      </div>
+                    </details>
+                  ))}
+                </div>
+              </section>
+
               <section className="py-6 pb-8">
                 <div className="flex items-center gap-2 mb-4">
                   <Mail className="h-5 w-5 text-persian-blue-600" />
