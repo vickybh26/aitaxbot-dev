@@ -61,7 +61,6 @@ const TAG_TO_CATEGORY: Record<string, Category> = {
   "Personal Finance": "Personal Finance",
   "personal finance": "Personal Finance",
   "hra": "Personal Finance",
-  "planning": "Personal Finance",
   // GST & Business
   "gst": "GST & Business",
   "business": "GST & Business",

@@ -119,7 +119,7 @@ export const blogPosts: BlogPost[] = [
         type: "outro",
         content_md: "There's no single 'best' type—only the best **mix** for your goals. Diversify across equity, debt, and select alternatives; review annually; and let compounding do the heavy lifting."
       }
-    ]
+    ],
   relatedPosts: [
     { slug: "risk-profile-explained", title: "Understanding Your Risk Profile Before Investing" },
     { slug: "sip-calculator-guide-mutual-fund-investments", title: "SIP Calculator Guide: Build Wealth with Mutual Funds" },
@@ -220,7 +220,7 @@ export const blogPosts: BlogPost[] = [
         type: "outro",
         content_md: "The best investment portfolio for 2025 is not a single instrument but a thoughtful combination—one that balances growth potential with stability, tax efficiency with liquidity, and short-term needs with long-term goals.\n\nA simple framework: cover your **emergency fund** first (3–6 months of expenses in a liquid fund or savings account), then build your **retirement core** (index fund SIPs + PPF/NPS), and finally add **tactical positions** (gold, international equity, REITs) based on your risk profile and preferences.\n\nAutomate what you can. Set up auto-debit SIPs, auto-credit to PPF, and annual calendar reminders for rebalancing. Review your portfolio once a year—not every week. The investors who build the most wealth are rarely the smartest or the most active. They are the most consistent."
       }
-    ]
+    ],
   relatedPosts: [
     { slug: "types-of-investments-in-india-beginners-guide", title: "Types of Investments in India: Beginner's Guide" },
     { slug: "portfolio-rebalancing-guide", title: "Portfolio Rebalancing: When and How to Rebalance" },
@@ -300,7 +300,7 @@ export const blogPosts: BlogPost[] = [
         type: "outro",
         content_md: "Measure, then allocate. A portfolio built on a true risk profile is easier to maintain and more likely to meet your goals."
       }
-    ]
+    ],
   relatedPosts: [
     { slug: "types-of-investments-in-india-beginners-guide", title: "Types of Investments in India: Beginner's Guide" },
     { slug: "portfolio-rebalancing-guide", title: "Portfolio Rebalancing: When and How to Rebalance" },
@@ -381,7 +381,7 @@ export const blogPosts: BlogPost[] = [
         type: "outro",
         content_md: "Focus on principles, then verify specifics with the latest rules and our calculators. Clean records + timely filings = stress-free compliance."
       }
-    ]
+    ],
   relatedPosts: [
     { slug: "new-vs-old-tax-regime-2025", title: "New vs Old Tax Regime 2025: Which Is Better?" },
     { slug: "section-80c-deductions-list-fy-2026-27", title: "Section 80C Deductions: Complete List FY 2026-27" },
@@ -462,7 +462,7 @@ export const blogPosts: BlogPost[] = [
         type: "outro",
         content_md: "Approach crypto with caution, documentation, and position limits. If in doubt, skip. There's no FOMO in sensible personal finance."
       }
-    ]
+    ],
   relatedPosts: [
     { slug: "taxation-in-india-complete-guide", title: "Taxation in India: Complete Guide" },
     { slug: "alternative-investments-gold-silver-beyond", title: "Alternative Investments: Gold, Silver & Beyond" },
@@ -536,7 +536,7 @@ export const blogPosts: BlogPost[] = [
         type: "outro",
         content_md: "Alternatives are spices, not the main course. Add thoughtfully to enhance resilience—not to chase fads."
       }
-    ]
+    ],
   relatedPosts: [
     { slug: "types-of-investments-in-india-beginners-guide", title: "Types of Investments in India: Beginner's Guide" },
     { slug: "portfolio-rebalancing-guide", title: "Portfolio Rebalancing: When and How to Rebalance" },
@@ -611,7 +611,7 @@ export const blogPosts: BlogPost[] = [
         type: "outro",
         content_md: "Tax-smart investing is a byproduct of **goal-smart** planning. Build the plan, then pick the right instruments."
       }
-    ]
+    ],
   relatedPosts: [
     { slug: "elss-vs-ppf-vs-nps-tax-saving-comparison", title: "ELSS vs PPF vs NPS: Tax Saving Comparison" },
     { slug: "section-80c-deductions-list-fy-2026-27", title: "Section 80C Deductions: Complete List FY 2026-27" },
@@ -696,7 +696,7 @@ export const blogPosts: BlogPost[] = [
         type: "outro",
         content_md: "There's no universal answer. Match your choice to your strengths and stay consistent."
       }
-    ]
+    ],
   relatedPosts: [
     { slug: "index-funds-vs-active-mutual-funds", title: "Index Funds vs Active Mutual Funds: Which to Choose?" },
     { slug: "sip-calculator-guide-mutual-fund-investments", title: "SIP Calculator Guide: Build Wealth with Mutual Funds" },
@@ -776,7 +776,7 @@ export const blogPosts: BlogPost[] = [
         type: "outro",
         content_md: "Compounding rewards patience. Start early, stay consistent, and let time work for you."
       }
-    ]
+    ],
   relatedPosts: [
     { slug: "sip-calculator-guide-mutual-fund-investments", title: "SIP Calculator Guide: Build Wealth with Mutual Funds" },
     { slug: "portfolio-rebalancing-guide", title: "Portfolio Rebalancing: When and How to Rebalance" },
@@ -856,7 +856,7 @@ export const blogPosts: BlogPost[] = [
         type: "outro",
         content_md: "Rebalancing is maintenance, not magic. Set a rule, follow it, and keep your portfolio aligned to your goals."
       }
-    ]
+    ],
   relatedPosts: [
     { slug: "risk-profile-explained", title: "Understanding Your Risk Profile Before Investing" },
     { slug: "long-term-investing-power-of-compounding", title: "Long-Term Investing: Power of Compounding" },
@@ -938,7 +938,7 @@ export const blogPosts: BlogPost[] = [
         type: "outro",
         content_md: "A SIP calculator simplifies planning, but discipline turns plans into reality. Start small, stay consistent, and let compounding do its work."
       }
-    ]
+    ],
   relatedPosts: [
     { slug: "mutual-funds-vs-stocks-which-is-better", title: "Mutual Funds vs Stocks: Which Is Better?" },
     { slug: "index-funds-vs-active-mutual-funds", title: "Index Funds vs Active Mutual Funds: Which to Choose?" },
@@ -1028,7 +1028,7 @@ export const blogPosts: BlogPost[] = [
         type: "outro",
         content_md: "Understanding HRA exemption can significantly reduce your tax liability. Keep proper documentation and use our calculator for accurate planning."
       }
-    ]
+    ],
   relatedPosts: [
     { slug: "taxation-in-india-complete-guide", title: "Taxation in India: Complete Guide" },
     { slug: "new-vs-old-tax-regime-2025", title: "New vs Old Tax Regime 2025: Which Is Better?" },
@@ -1118,7 +1118,7 @@ export const blogPosts: BlogPost[] = [
         type: "outro",
         content_md: "There's no one-size-fits-all answer. Assess your risk tolerance, time horizon, and goals, then build a balanced tax-saving portfolio."
       }
-    ]
+    ],
   relatedPosts: [
     { slug: "tax-saving-investments-80c-and-beyond", title: "Tax Saving Investments: 80C and Beyond" },
     { slug: "section-80c-deductions-list-fy-2026-27", title: "Section 80C Deductions: Complete List FY 2026-27" },
@@ -1214,7 +1214,7 @@ export const blogPosts: BlogPost[] = [
         type: "outro",
         content_md: "GST compliance is manageable with proper systems and timely filing. Stay organized, automate where possible, and never miss a deadline."
       }
-    ]
+    ],
   relatedPosts: [
     { slug: "taxation-in-india-complete-guide", title: "Taxation in India: Complete Guide" },
     { slug: "income-tax-act-1961-vs-income-tax-act-2025", title: "Income Tax Act 1961 vs 2025: Key Differences" },
@@ -1315,7 +1315,7 @@ export const blogPosts: BlogPost[] = [
         type: "outro",
         content_md: "An emergency fund is financial insurance. It's boring, earns modest returns, but gives you freedom to handle life's curveballs without derailing long-term goals."
       }
-    ]
+    ],
   relatedPosts: [
     { slug: "types-of-investments-in-india-beginners-guide", title: "Types of Investments in India: Beginner's Guide" },
     { slug: "risk-profile-explained", title: "Understanding Your Risk Profile Before Investing" },
@@ -1421,7 +1421,7 @@ export const blogPosts: BlogPost[] = [
         type: "outro",
         content_md: "There's no universal winner. Index funds offer simplicity and cost efficiency; active funds offer potential outperformance. Build a strategy that matches your conviction and monitoring capacity."
       }
-    ]
+    ],
   relatedPosts: [
     { slug: "mutual-funds-vs-stocks-which-is-better", title: "Mutual Funds vs Stocks: Which Is Better?" },
     { slug: "sip-calculator-guide-mutual-fund-investments", title: "SIP Calculator Guide: Build Wealth with Mutual Funds" },
@@ -1522,7 +1522,7 @@ export const blogPosts: BlogPost[] = [
         type: "outro",
         content_md: "Capital gains tax is part of investing. Plan your redemptions strategically, maintain good records, and use tax-efficient strategies to maximize post-tax returns."
       }
-    ]
+    ],
   relatedPosts: [
     { slug: "taxation-in-india-complete-guide", title: "Taxation in India: Complete Guide" },
     { slug: "new-vs-old-tax-regime-2025", title: "New vs Old Tax Regime 2025: Which Is Better?" },
@@ -1624,7 +1624,7 @@ export const blogPosts: BlogPost[] = [
         type: "outro",
         content_md: "Retirement planning is a marathon, not a sprint. Start where you are, stay consistent, increase contributions annually, and let time do the heavy lifting. Your 60-year-old self will thank you."
       }
-    ]
+    ],
   relatedPosts: [
     { slug: "elss-vs-ppf-vs-nps-tax-saving-comparison", title: "ELSS vs PPF vs NPS: Tax Saving Comparison" },
     { slug: "sip-calculator-guide-mutual-fund-investments", title: "SIP Calculator Guide: Build Wealth with Mutual Funds" },
@@ -1731,7 +1731,7 @@ export const blogPosts: BlogPost[] = [
         type: "outro",
         content_md: "The right tax regime depends on your income, life stage, and financial discipline. There is no universal answer.\n\nFor most salaried professionals under ₹12.75L gross salary: the **New Regime delivers zero tax** with no tracking required. For those with substantial HRA + home loan + NPS (total deductions > ₹4–5L at ₹15–20L income): the **Old Regime still saves more**.\n\nThe good news: you're not locked in forever (for salaried employees). Calculate both regimes every April, choose the better one, inform your employer, and file your ITR accordingly. Use AiTaxBot's free calculator — it models marginal relief correctly, applies all deductions accurately, and gives you the exact numbers in under 2 minutes.\n\n*Last updated: March 2026 for FY 2025-26 (AY 2026-27). Tax laws are subject to change; consult a CA for complex situations involving capital gains, business income, or surcharge planning.*"
       }
-    ]
+    ],
   relatedPosts: [
     { slug: "section-80c-deductions-list-fy-2026-27", title: "Section 80C Deductions: Complete List FY 2026-27" },
     { slug: "taxation-in-india-complete-guide", title: "Taxation in India: Complete Guide" },
@@ -1825,7 +1825,7 @@ export const blogPosts: BlogPost[] = [
         type: "outro",
         content_md: "Marginal relief is one of the most underutilised and misunderstood provisions in Indian income tax law. As a taxpayer, understanding it means you will never again lose sleep over earning slightly more than a threshold. As a tax professional, applying it correctly is simply good practice.\n\nThe key messages: crossing ₹12 lakh by a small amount costs you a small amount — not a fortune. Crossing ₹50 lakh by ₹10,000 costs you ₹10,400 — not ₹1.15 lakh. The law is designed to be fair, and marginal relief is how that fairness is enforced."
       }
-    ]
+    ],
   relatedPosts: [
     { slug: "new-vs-old-tax-regime-2025", title: "New vs Old Tax Regime 2025: Which Is Better?" },
     { slug: "taxation-in-india-complete-guide", title: "Taxation in India: Complete Guide" },
@@ -1940,7 +1940,7 @@ export const blogPosts: BlogPost[] = [
         type: "outro",
         content_md: "The Income Tax Act, 2025 is a welcome and long-overdue modernisation of India's tax law. Its greatest contribution is **readability** — making the law more accessible to the common taxpayer. The 'Tax Year' concept brings India closer to global standards.\n\nHowever, do not mistake structural reform for tax relief. Your tax liability for Tax Year 2026-27 will be essentially the same as FY 2025-26 — same slabs, same deduction limits, only section numbers changed. The real test will be whether the new Act reduces litigation, speeds up assessments, and genuinely simplifies compliance for India's millions of first-generation taxpayers."
       }
-    ]
+    ],
   relatedPosts: [
     { slug: "taxation-in-india-complete-guide", title: "Taxation in India: Complete Guide" },
     { slug: "new-vs-old-tax-regime-2025", title: "New vs Old Tax Regime 2025: Which Is Better?" },
@@ -2078,7 +2078,7 @@ export const blogPosts: BlogPost[] = [
           { label: "Income Tax Act 2025 vs 1961 — What Changed", href: "/blog/income-tax-act-2025-vs-1961-key-changes" }
         ]
       }
-    ]
+    ],
   relatedPosts: [
     { slug: "elss-vs-ppf-vs-nps-tax-saving-comparison", title: "ELSS vs PPF vs NPS: Tax Saving Comparison" },
     { slug: "new-vs-old-tax-regime-2025", title: "New vs Old Tax Regime 2025: Which Is Better?" },
