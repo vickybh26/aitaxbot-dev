@@ -467,6 +467,25 @@ export default function BlogPost() {
             </div>
           </div>
 
+          {/* Related Posts */}
+          {post.relatedPosts && post.relatedPosts.length > 0 && (
+            <div className="mt-12 pt-8 border-t" data-testid="related-posts">
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Related Articles</h3>
+              <div className="grid gap-3 sm:grid-cols-3">
+                {post.relatedPosts.map((related) => (
+                  <Link key={related.slug} href={`/blog/${related.slug}`}>
+                    <div className="group flex items-start gap-3 p-4 rounded-lg border border-gray-200 hover:border-blue-400 hover:bg-blue-50 transition-colors cursor-pointer">
+                      <ChevronRight className="h-4 w-4 text-blue-500 mt-0.5 shrink-0 group-hover:translate-x-0.5 transition-transform" />
+                      <span className="text-sm font-medium text-gray-700 group-hover:text-blue-700 leading-snug">
+                        {related.title}
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Back to Blog */}
           <div className="mt-8 pt-6 border-t">
             <Link href="/blog">
