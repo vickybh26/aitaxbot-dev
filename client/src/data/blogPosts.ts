@@ -1848,7 +1848,7 @@ export const blogPosts: BlogPost[] = [
     tags: ["Tax Planning", "Income Tax Act 2025", "Tax Year 2026-27", "India"],
     readingTimeMinutes: 14,
     publishedAt: "March 5, 2026",
-    heroImage: "/images/aitaxbot-logo.png",
+    heroImage: "/images/income-tax-act-2025.jpg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -1958,7 +1958,7 @@ export const blogPosts: BlogPost[] = [
     tags: ["Tax Saving", "Section 80C", "Old Tax Regime"],
     readingTimeMinutes: 14,
     publishedAt: "March 12, 2026",
-    heroImage: "/images/section-80c-deductions-guide.jpg",
+    heroImage: "/images/section-80c-deductions.jpg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
