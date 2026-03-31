@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import CookieConsent from "@/components/CookieConsent";
+import WhatsAppButton from "@/components/WhatsAppButton";
 import Layout from "@/components/Layout";
 import Landing from "@/pages/Landing";
 import Login from "@/pages/Login";
@@ -170,6 +171,7 @@ function App() {
             <Toaster />
             <Router />
             <CookieConsent />
+            <WhatsAppButton />
           </TooltipProvider>
         </AuthProvider>
       </QueryClientProvider>

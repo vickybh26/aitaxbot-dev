@@ -602,41 +602,65 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-        {/* ── TAX CALENDAR ── */}
-        <div className="mb-8">
-          <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-blue-600" />
-            FY 2025-26 Tax Calendar
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {[
-              { date: "15 Jun 2025", label: "Advance Tax", sub: "1st instalment — 15% of liability", done: true, color: "green" },
-              { date: "15 Sep 2025", label: "Advance Tax", sub: "2nd instalment — 45% cumulative", done: true, color: "green" },
-              { date: "15 Dec 2025", label: "Advance Tax", sub: "3rd instalment — 75% cumulative", done: true, color: "green" },
-              { date: "15 Mar 2026", label: "Advance Tax", sub: "4th instalment — 100% cumulative", done: false, color: "amber" },
-              { date: "31 Jul 2026", label: "ITR Filing", sub: "Last date to file without penalty", done: false, color: "blue" },
-              { date: "30 Apr 2026", label: "TDS Return Q4", sub: "Form 26Q / 24Q", done: false, color: "purple" },
-              { date: "15 Jun 2026", label: "Form 16", sub: "Employer must issue by this date", done: false, color: "indigo" },
-              { date: "31 Dec 2026", label: "Belated ITR", sub: "Last date with penalty", done: false, color: "red" },
-            ].map((item, i) => (
-              <div key={i} className={`bg-white rounded-xl border p-3 flex items-start gap-3 ${item.done ? 'opacity-60' : ''}`}>
-                <div className={`shrink-0 w-9 h-9 rounded-lg flex items-center justify-center text-white text-xs font-bold
-                  ${item.color === 'green' ? 'bg-green-500' :
-                    item.color === 'amber' ? 'bg-amber-500' :
-                    item.color === 'blue' ? 'bg-blue-600' :
-                    item.color === 'purple' ? 'bg-purple-600' :
-                    item.color === 'indigo' ? 'bg-indigo-600' : 'bg-red-500'}`}>
-                  {item.done ? '✓' : <Calendar className="w-4 h-4" />}
-                </div>
-                <div>
-                  <p className="text-xs font-bold text-gray-900">{item.date}</p>
-                  <p className="text-xs font-semibold text-gray-700">{item.label}</p>
-                  <p className="text-xs text-gray-500 leading-tight">{item.sub}</p>
-                </div>
+        {/* ── TAX CALENDAR — fully dynamic, auto-updates FY and done status ── */}
+        {(() => {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+
+          // FY runs Apr 1 – Mar 31. April = month index 3 (0-based).
+          const fyStart = today.getMonth() >= 3 ? today.getFullYear() : today.getFullYear() - 1;
+          const fyEnd   = fyStart + 1;
+          const fyLabel = `FY ${fyStart}-${String(fyEnd).slice(2)} Tax Calendar`;
+
+          const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+          const fmt = (y: number, m: number, d: number) => {
+            // m is 1-based
+            return `${String(d).padStart(2,'0')} ${MONTHS[m-1]} ${y}`;
+          };
+          const deadline = (y: number, m: number, d: number) => {
+            const dt = new Date(y, m - 1, d); // local midnight
+            return { display: fmt(y, m, d), past: today > dt };
+          };
+
+          const events = [
+            { ...deadline(fyStart, 6, 15),  label: "Advance Tax",  sub: "1st instalment — 15% of liability",    color: "green"  },
+            { ...deadline(fyStart, 9, 15),  label: "Advance Tax",  sub: "2nd instalment — 45% cumulative",       color: "green"  },
+            { ...deadline(fyStart, 12, 15), label: "Advance Tax",  sub: "3rd instalment — 75% cumulative",       color: "green"  },
+            { ...deadline(fyEnd,   3, 15),  label: "Advance Tax",  sub: "4th instalment — 100% cumulative",      color: "amber"  },
+            { ...deadline(fyEnd,   4, 30),  label: "TDS Return Q4",sub: "Form 26Q / 24Q",                        color: "purple" },
+            { ...deadline(fyEnd,   6, 15),  label: "Form 16",      sub: "Employer must issue by this date",      color: "indigo" },
+            { ...deadline(fyEnd,   7, 31),  label: "ITR Filing",   sub: "Last date to file without penalty",     color: "blue"   },
+            { ...deadline(fyEnd,  12, 31),  label: "Belated ITR",  sub: "Last date with penalty",                color: "red"    },
+          ];
+
+          return (
+            <div className="mb-8">
+              <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-blue-600" />
+                {fyLabel}
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                {events.map((item, i) => (
+                  <div key={i} className={`bg-white rounded-xl border p-3 flex items-start gap-3 ${item.past ? 'opacity-60' : ''}`}>
+                    <div className={`shrink-0 w-9 h-9 rounded-lg flex items-center justify-center text-white text-xs font-bold
+                      ${item.past        ? 'bg-green-500'  :
+                        item.color === 'amber'  ? 'bg-amber-500'  :
+                        item.color === 'blue'   ? 'bg-blue-600'   :
+                        item.color === 'purple' ? 'bg-purple-600' :
+                        item.color === 'indigo' ? 'bg-indigo-600' : 'bg-red-500'}`}>
+                      {item.past ? '✓' : <Calendar className="w-4 h-4" />}
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-gray-900">{item.display}</p>
+                      <p className="text-xs font-semibold text-gray-700">{item.label}</p>
+                      <p className="text-xs text-gray-500 leading-tight">{item.sub}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
+            </div>
+          );
+        })()}
 
         </div>
 
