@@ -110,7 +110,8 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
 
     const { annualBasic, annualHra, annualRent } = getAnnualValues();
 
-    // HRA exemption calculation as per Section 10(13A) of Income Tax Act
+    // HRA exemption calculation as per Schedule II (Table: Sl. No. 2) of Income Tax Act, 2025
+    // (formerly Section 10(13A) of the Income Tax Act, 1961)
     const rule1 = annualHra;
     const rule2 = Math.max(0, annualRent - (annualBasic * 0.10));
     const rule3 = cityType === "metro" ? annualBasic * 0.50 : annualBasic * 0.40;

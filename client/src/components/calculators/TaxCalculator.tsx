@@ -319,9 +319,9 @@ export default function TaxCalculator({ onClose }: TaxCalculatorProps = {}) {
     const slabs = getTaxSlabs(regime, formData.financialYear, formData.ageGroup);
     const { totalTax: incomeTax, breakdown: taxBreakdown } = calculateTaxForSlab(taxableAmount, slabs);
 
-    // Correct order per Income Tax Act:
-    // Step 1: Compute slab-wise income tax
-    // Step 2: Apply Section 87A rebate BEFORE cess (rebate is against "amount of income-tax" only)
+    // Correct order per Income Tax Act, 2025 (ITA 2025):
+    // Step 1: Compute slab-wise income tax (Section 202 — new regime; Schedule I — old regime)
+    // Step 2: Apply Section 156 rebate BEFORE cess (formerly Section 87A of ITA 1961)
     // Step 3: Apply marginal relief if applicable (New Regime FY 2025-26+)
     // Step 4: Compute 4% Health & Education Cess on the NET tax (after rebate & relief)
 
@@ -373,7 +373,7 @@ export default function TaxCalculator({ onClose }: TaxCalculatorProps = {}) {
       }
     } else {
       // Old regime and non-2025-26 new regime:
-      // Step 2: Rebate u/s 87A — applied against income tax only, before cess
+      // Step 2: Rebate u/s 156 (ITA 2025) / 87A (ITA 1961) — applied against income tax only, before cess
       if (taxableIncome <= rebateLimit) {
         rebate87A = Math.min(incomeTax, rebateAmount);
       }
