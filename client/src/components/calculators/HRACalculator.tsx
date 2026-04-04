@@ -392,6 +392,12 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
                         <SelectItem value="non-metro">Non-Metro City (40%)</SelectItem>
                       </SelectContent>
                     </Select>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      <span className="font-semibold">Metro cities (50%) from FY 2026-27:</span>{" "}
+                      Delhi, Mumbai, Kolkata, Chennai, Bangalore, Hyderabad, Pune, Ahmedabad.{" "}
+                      All other cities are Non-Metro (40%).{" "}
+                      <span className="text-amber-600 font-medium">Updated under Income Tax Rules 2026.</span>
+                    </p>
                   </div>
                 </CardContent>
               </Card>

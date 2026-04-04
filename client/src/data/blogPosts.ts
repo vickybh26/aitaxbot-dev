@@ -982,7 +982,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h2",
         title: "HRA Exemption Formula",
-        content_md: "HRA Exemption = **Minimum** of:\n\n1. Actual HRA received\n2. 50% of basic salary (metro) or 40% (non-metro)\n3. Rent paid minus 10% of basic salary\n\n**Metro cities:** Delhi, Mumbai, Kolkata, Chennai"
+        content_md: "HRA Exemption = **Minimum** of:\n\n1. Actual HRA received\n2. 50% of basic salary (metro) or 40% (non-metro)\n3. Rent paid minus 10% of basic salary\n\n> ⚠️ **Updated for FY 2026-27 (ITA 2025 / Income Tax Rules 2026):** Metro cities expanded from 4 to 8 cities.\n\n**Metro cities (50% rule) — effective FY 2026-27:** Delhi, Mumbai, Kolkata, Chennai, **Bangalore, Hyderabad, Pune, Ahmedabad**\n\n**Non-metro (40% rule):** All other cities"
       },
       {
         type: "h3",
@@ -992,7 +992,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h3",
         title: "Example: Non-Metro City",
-        content_md: "Same salary profile as above, but city is Pune (non-metro):\n\n| Rule | Calculation | Amount |\n|---|---|---|\n| 1. Actual HRA received | — | ₹20,000 |\n| 2. 40% of basic (non-metro) | 40% × ₹50,000 | ₹20,000 |\n| 3. Rent minus 10% of basic | ₹18,000 − ₹5,000 | ₹13,000 |\n\n**Exemption = ₹13,000 (lowest) | Taxable HRA = ₹7,000**\n\n### Metro vs Non-Metro — Key Difference\n\n| City Type | Cities | % of Basic for Rule 2 |\n|---|---|---|\n| Metro | Delhi, Mumbai, Kolkata, Chennai | 50% |\n| Non-Metro | Bangalore, Pune, Hyderabad, others | 40% |"
+        content_md: "Same salary profile as above, but city is Mysuru (non-metro):\n\n| Rule | Calculation | Amount |\n|---|---|---|\n| 1. Actual HRA received | — | ₹20,000 |\n| 2. 40% of basic (non-metro) | 40% × ₹50,000 | ₹20,000 |\n| 3. Rent minus 10% of basic | ₹18,000 − ₹5,000 | ₹13,000 |\n\n**Exemption = ₹13,000 (lowest) | Taxable HRA = ₹7,000**\n\n### Metro vs Non-Metro — Key Difference (FY 2026-27)\n\n> ⚠️ **Income Tax Rules 2026** expanded metro cities from 4 to 8. If you live in Bangalore, Hyderabad, Pune, or Ahmedabad — you now qualify for the **50% metro rate**.\n\n| City Type | Cities | % of Basic (Rule 2) |\n|---|---|---|\n| Metro (50%) | Delhi, Mumbai, Kolkata, Chennai, Bangalore, Hyderabad, Pune, Ahmedabad | 50% |\n| Non-Metro (40%) | All other cities (Mysuru, Jaipur, Lucknow, Chandigarh, etc.) | 40% |"
       },
       {
         type: "h3",
@@ -1087,7 +1087,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h3",
         title: "Which Should You Choose?",
-        content_md: "| Scenario | Best Choice | Reason |\n|---|---|---|\n| Age 25–35, high risk tolerance | ELSS | Highest return potential with 3-yr liquidity |\n| Risk-averse / conservative | PPF | Government guarantee, EEE tax treatment |\n| Focused on retirement | NPS | Extra ₹50K deduction + low-cost lifecycle funds |\n| Maximum tax saving needed | All three | ELSS + PPF fills ₹1.5L; NPS adds ₹50K more |\n| Short investment horizon (< 5 yr) | PPF / FD | ELSS 3-yr lock-in may not suit |\n\n**Ideal combination (salaried, age 30–40):** 60% ELSS + 20% PPF + 20% NPS contribution = full 80C + extra 80CCD(1B) deduction"
+        content_md: "| Scenario | Best Choice | Reason |\n|---|---|---|\n| Age 25–35, high risk tolerance | ELSS | Highest return potential with 3-yr liquidity |\n| Risk-averse / conservative | PPF | Government guarantee, EEE tax treatment |\n| Focused on retirement | NPS | Extra ₹50K deduction + low-cost lifecycle funds |\n| Maximum tax saving needed | All three | ELSS + PPF fills ₹1.5L; NPS adds ₹50K more |\n| Short investment horizon (< 5 yr) | PPF / FD | ELSS 3-yr lock-in may not suit |\n\n**Ideal combination for Old Tax Regime (salaried, age 30–40):** 60% ELSS + 20% PPF + 20% NPS contribution = full 80C + extra 80CCD(1B) deduction\n\n> ⚠️ **Note:** All deductions in the table above (80C, 80CCD(1B)) are available **only under the Old Tax Regime**. Under the New Tax Regime, only employer NPS contributions under 80CCD(2) remain deductible."
       },
             {
         type: "h2",
@@ -1999,7 +1999,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h2",
         title: "Beyond ₹1,50,000: The Extra ₹50,000 via Section 80CCD(1B)",
-        content_md: "Section 80CCD(1B) allows an **additional deduction of ₹50,000** for NPS Tier I contributions — **over and above** the ₹1.5 lakh cap under 80C. This brings your total potential deduction to **₹2,00,000**.\n\nFor someone in the 30% bracket, this extra ₹50,000 saves an additional ₹15,600 (including cess). NPS offers flexible allocation across equity, corporate bonds, and government securities. This is the most underutilised tax deduction for salaried employees in India."
+        content_md: "> ⚠️ **Old Tax Regime Only** — Section 80CCD(1B) / ITA 2025 Section 124(3) is **not available** under the New Tax Regime.\n\nSection 80CCD(1B) allows an **additional deduction of ₹50,000** for NPS Tier I contributions — **over and above** the ₹1.5 lakh cap under 80C. This brings your total potential deduction to **₹2,00,000**.\n\nFor someone in the 30% bracket (Old Regime), this extra ₹50,000 saves an additional ₹15,600 (including cess). NPS offers flexible allocation across equity, corporate bonds, and government securities. This is the most underutilised tax deduction for salaried employees in India who opt for the Old Tax Regime."
       },
       {
         type: "h2",

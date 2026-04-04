@@ -225,7 +225,13 @@ export default function NPSCalculator() {
               onChange={(e) => setEmployerContribution(Number(e.target.value))}
               className="w-full"
             />
-            <p className="text-xs text-slate-500 mt-1">Leave 0 if self-employed</p>
+            <p className="text-xs text-slate-500 mt-1">
+              Leave 0 if self-employed.{" "}
+              {regime === 'new'
+                ? <span className="text-green-700 font-medium">New Regime: deductible up to 14% of salary for all employers (ITA 2025, S.124(2)).</span>
+                : <span>Old Regime: up to 14% for Govt employees; up to 10% for private employers (ITA 2025, S.124(1)).</span>
+              }
+            </p>
           </div>
 
           <div>
@@ -385,8 +391,8 @@ export default function NPSCalculator() {
                 <p className="text-xl font-bold text-purple-700">{formatCurrency(result.taxSaving80CCD2)}</p>
                 <p className="text-xs text-slate-500 mt-1">
                   {regime === 'new'
-                    ? 'Available in New Regime — up to 14% of salary for govt, 10% for private'
-                    : 'Up to 10% of salary — no upper limit!'}
+                    ? 'Available in New Regime — up to 14% of salary for ALL employers (S.124(2), ITA 2025)'
+                    : 'Old Regime: up to 14% for Govt employees; 10% for private employers (S.124(1))'}
                 </p>
               </div>
             </div>
