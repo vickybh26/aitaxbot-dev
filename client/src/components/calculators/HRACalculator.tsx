@@ -287,7 +287,10 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
                 <div>
                   <p className="text-sm font-semibold text-amber-800">Old Tax Regime Only</p>
                   <p className="text-xs text-amber-700 mt-0.5">
-                    HRA exemption under Section 10(13A) is available <strong>only if you opt for the Old Tax Regime</strong>. Under the New Regime (default from FY 2023-24), your entire HRA received is added to taxable salary with no exemption.
+                    HRA exemption is available <strong>only if you opt for the Old Tax Regime</strong>. Under the New Regime (default from FY 2023-24), your entire HRA received is added to taxable salary with no exemption.
+                  </p>
+                  <p className="text-xs text-amber-600 mt-1">
+                    <span className="font-medium">Applicable section:</span> Section 10(13A) read with Rule 2A — Income Tax Act, 1961 (FY up to 2025-26) · Schedule II, Table Sl. No. 2 — Income Tax Act, 2025 (FY 2026-27 onward)
                   </p>
                 </div>
               </div>

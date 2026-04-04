@@ -347,7 +347,7 @@ export default function PFCalculator() {
                       className="h-12"
                       data-testid="input-interest-rate"
                     />
-                    <p className="text-xs text-slate-500">FY 2025-26 EPF rate: 8.25%</p>
+                    <p className="text-xs text-slate-500">FY 2026-27 EPF rate: 8.25% (declared by EPFO · governed by EPF &amp; MP Act, 1952)</p>
                   </div>
 
                   <div className="space-y-2">
@@ -430,7 +430,7 @@ export default function PFCalculator() {
                       className="h-12"
                       data-testid="input-interest-rate"
                     />
-                    <p className="text-xs text-slate-500">Current PPF rate: 7.1% (Q1 FY 2025-26)</p>
+                    <p className="text-xs text-slate-500">Current PPF rate: 7.1% (Q1 FY 2026-27 · governed by PPF Scheme, 2019 under PFMS Act)</p>
                   </div>
 
                   <div className="space-y-2">

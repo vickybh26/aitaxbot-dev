@@ -171,7 +171,7 @@ export default function TaxCalculator({ onClose }: TaxCalculatorProps = {}) {
     isMetroCity: false,
     otherDeductions: '',
     ageGroup: 'below60' as 'below60' | '60to80' | 'above80',
-    financialYear: '2025-26' as '2024-25' | '2025-26' | '2026-27'
+    financialYear: '2026-27' as '2024-25' | '2025-26' | '2026-27'
   });
 
   const updateFormData = (field: string, value: any) => {
@@ -496,7 +496,7 @@ export default function TaxCalculator({ onClose }: TaxCalculatorProps = {}) {
       isMetroCity: false,
       otherDeductions: '',
       ageGroup: 'below60',
-      financialYear: '2025-26'
+      financialYear: '2026-27'
     });
     setActiveTab('calculator');
   };
@@ -932,9 +932,57 @@ export default function TaxCalculator({ onClose }: TaxCalculatorProps = {}) {
                       <SelectContent>
                         <SelectItem value="2024-25">FY 2024-25 / AY 2025-26</SelectItem>
                         <SelectItem value="2025-26">FY 2025-26 / AY 2026-27</SelectItem>
-                        <SelectItem value="2026-27">FY 2026-27 (AY 2027-28) - Income Tax Act, 2025</SelectItem>
+                        <SelectItem value="2026-27">FY 2026-27 (AY 2027-28) — Income Tax Act, 2025</SelectItem>
                       </SelectContent>
                     </Select>
+
+                    {/* Dynamic Section Reference Panel */}
+                    {formData.financialYear === '2026-27' ? (
+                      <div className="mt-2 rounded-lg border border-green-200 bg-green-50 p-3 text-xs text-green-900">
+                        <p className="font-semibold mb-1.5">📗 Income Tax Act, 2025 — effective Tax Year 2026-27 (1 Apr 2026)</p>
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-0.5">
+                          <span><span className="font-medium">New Regime:</span> Section 202</span>
+                          <span><span className="font-medium">Rebate (≤ ₹12L):</span> Section 156</span>
+                          <span><span className="font-medium">Std. Deduction:</span> Section 19</span>
+                          <span><span className="font-medium">HRA Exemption:</span> Sch. II, Tbl. 2</span>
+                          <span><span className="font-medium">Home Loan Interest:</span> Section 25</span>
+                          <span><span className="font-medium">Employer NPS (14%):</span> Section 124(2)</span>
+                          <span><span className="font-medium">80C equivalent:</span> S.123 + Sch. XV</span>
+                          <span><span className="font-medium">Health Insurance:</span> Section 126</span>
+                          <span className="col-span-2 mt-0.5"><span className="font-medium">Metro cities (8, HRA 50%):</span> Delhi, Mumbai, Kolkata, Chennai, Bangalore, Hyderabad, Pune, Ahmedabad</span>
+                        </div>
+                      </div>
+                    ) : formData.financialYear === '2025-26' ? (
+                      <div className="mt-2 rounded-lg border border-blue-200 bg-blue-50 p-3 text-xs text-blue-900">
+                        <p className="font-semibold mb-1.5">📘 Income Tax Act, 1961 — FY 2025-26 (Budget 2025 slabs)</p>
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-0.5">
+                          <span><span className="font-medium">New Regime:</span> Section 115BAC</span>
+                          <span><span className="font-medium">Rebate (≤ ₹12L):</span> Section 87A</span>
+                          <span><span className="font-medium">Std. Deduction:</span> Section 16(ia)</span>
+                          <span><span className="font-medium">HRA Exemption:</span> Section 10(13A)</span>
+                          <span><span className="font-medium">Home Loan Interest:</span> Section 24(b)</span>
+                          <span><span className="font-medium">Employer NPS:</span> Section 80CCD(2)</span>
+                          <span><span className="font-medium">Investments (80C):</span> Section 80C</span>
+                          <span><span className="font-medium">Health Insurance:</span> Section 80D</span>
+                          <span className="col-span-2 mt-0.5"><span className="font-medium">Metro cities (4, HRA 50%):</span> Delhi, Mumbai, Kolkata, Chennai</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="mt-2 rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs text-slate-700">
+                        <p className="font-semibold mb-1.5">📙 Income Tax Act, 1961 — FY 2024-25 (Budget 2024 slabs)</p>
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-0.5">
+                          <span><span className="font-medium">New Regime:</span> Section 115BAC</span>
+                          <span><span className="font-medium">Rebate (≤ ₹7L):</span> Section 87A</span>
+                          <span><span className="font-medium">Std. Deduction:</span> Section 16(ia)</span>
+                          <span><span className="font-medium">HRA Exemption:</span> Section 10(13A)</span>
+                          <span><span className="font-medium">Home Loan Interest:</span> Section 24(b)</span>
+                          <span><span className="font-medium">Employer NPS:</span> Section 80CCD(2)</span>
+                          <span><span className="font-medium">Investments (80C):</span> Section 80C</span>
+                          <span><span className="font-medium">Health Insurance:</span> Section 80D</span>
+                          <span className="col-span-2 mt-0.5"><span className="font-medium">Metro cities (4, HRA 50%):</span> Delhi, Mumbai, Kolkata, Chennai</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div>
@@ -1168,15 +1216,23 @@ export default function TaxCalculator({ onClose }: TaxCalculatorProps = {}) {
                     />
                   </div>
 
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      id="metro-city"
-                      checked={formData.isMetroCity}
-                      onChange={(e) => updateFormData('isMetroCity', e.target.checked)}
-                      data-testid="checkbox-metro-city"
-                    />
-                    <Label htmlFor="metro-city">Living in Metro City</Label>
+                  <div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="metro-city"
+                        checked={formData.isMetroCity}
+                        onChange={(e) => updateFormData('isMetroCity', e.target.checked)}
+                        data-testid="checkbox-metro-city"
+                      />
+                      <Label htmlFor="metro-city">Living in Metro City (HRA 50% rule)</Label>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1 ml-6">
+                      {formData.financialYear === '2026-27'
+                        ? <><span className="font-semibold">8 metro cities from FY 2026-27 (Income Tax Rules 2026):</span> Delhi, Mumbai, Kolkata, Chennai, Bangalore, Hyderabad, Pune, Ahmedabad</>
+                        : <><span className="font-semibold">4 metro cities (FY {formData.financialYear}):</span> Delhi, Mumbai, Kolkata, Chennai only</>
+                      }
+                    </p>
                   </div>
 
                   <div>

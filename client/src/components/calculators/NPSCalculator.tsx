@@ -156,12 +156,12 @@ export default function NPSCalculator() {
           </div>
           {regime === 'new' && (
             <p className="text-xs text-amber-700 mt-2 bg-amber-50 border border-amber-200 rounded p-2">
-              ⚠️ Under New Regime, 80CCD(1) and 80CCD(1B) deductions for your own NPS contributions are <strong>not available</strong>. Only employer NPS contribution (80CCD(2)) remains deductible.
+              ⚠️ Under New Regime, 80CCD(1) and 80CCD(1B) deductions for your own NPS contributions are <strong>not available</strong>. Only employer NPS contribution remains deductible — up to <strong>14% of salary for all employers</strong> (S.80CCD(2), ITA 1961 up to FY 2025-26 · S.124(2), ITA 2025 from FY 2026-27).
             </p>
           )}
           {regime === 'old' && (
             <p className="text-xs text-green-700 mt-2 bg-green-50 border border-green-200 rounded p-2">
-              ✅ Under Old Regime, all three NPS deductions are available: 80CCD(1), 80CCD(1B) (extra ₹50,000), and 80CCD(2).
+              ✅ Under Old Regime, all three NPS deductions are available: 80CCD(1) / S.124(1), 80CCD(1B) / S.124(3) (extra ₹50,000), and 80CCD(2) / S.124(1) employer contribution (ITA 1961 / ITA 2025 section numbers respectively).
             </p>
           )}
         </div>
