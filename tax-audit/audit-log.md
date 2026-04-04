@@ -207,18 +207,42 @@ The Tax Calculator already handles this correctly in code. However, the UI does 
 
 ## Priority Fix Queue
 
-| Priority | Fix | Effort | Assigned |
-|----------|-----|--------|---------|
-| P0 | CRIT-01: Update HRA blog metro city list to 8 cities | 30 min | Pending |
-| P0 | CRIT-02: Add metro city list/tooltip to HRA Calculator | 1 hr | Pending |
-| P1 | WARN-03: NPS Calculator — employer NPS 14% for new regime | 1 hr | Pending |
-| P1 | WARN-04: 80C blog — add "Old Regime Only" banner | 15 min | Pending |
-| P1 | WARN-02: ELSS/NPS blog — flag 80CCD(1B) as old regime only | 15 min | Pending |
-| P2 | WARN-05: Capital gains blog — add FA 2026 buyback change | 45 min | Pending |
-| P2 | INFO-01: SIP/SWP — add post-tax return calculation | 3 hrs | Pending |
-| P3 | INFO-03: SGB exemption change in blog content | 15 min | Pending |
-| P3 | INFO-04: Two self-occupied houses blog update | 15 min | Pending |
-| P3 | WARN-01: Add ITA 2025 section reference notes to all blogs | Ongoing | Pending |
+| Priority | Fix | Effort | Status |
+|----------|-----|--------|--------|
+| P0 | CRIT-01: Update HRA blog metro city list to 8 cities | 30 min | ✅ FIXED 2026-04-04 |
+| P0 | CRIT-02: Add metro city list/tooltip to HRA Calculator | 1 hr | ✅ FIXED 2026-04-04 |
+| P1 | WARN-03: NPS Calculator — employer NPS 14% for new regime | 1 hr | ✅ FIXED 2026-04-04 |
+| P1 | WARN-04: 80C blog — add "Old Regime Only" banner on 80CCD(1B) | 15 min | ✅ FIXED 2026-04-04 |
+| P1 | WARN-02: ELSS/NPS blog — flag 80CCD(1B) as old regime only | 15 min | ✅ FIXED 2026-04-04 |
+| P2 | WARN-05: Capital gains blog — add FA 2026 buyback change | 45 min | ✅ FIXED 2026-04-04 |
+| P2 | INFO-01: SIP/SWP — add post-tax return calculation | 3 hrs | ⏳ Pending (next sprint) |
+| P3 | INFO-03: SGB exemption change in blog content | 15 min | ✅ FIXED 2026-04-04 |
+| P3 | INFO-04: Two self-occupied houses blog update | 15 min | ✅ FIXED 2026-04-04 |
+| P3 | WARN-01: Add ITA 2025 section reference notes to all blogs | Ongoing | ⏳ Pending (ongoing) |
+
+---
+
+## Fix Log (2026-04-04)
+
+All P0, P1, and P3 fixes applied in session 2026-04-04. Commit: `27a6e88` + subsequent commit (P2/P3 fixes).
+
+### Files modified:
+| File | Changes |
+|------|---------|
+| `client/src/components/calculators/HRACalculator.tsx` | Added 8-city metro list helper text below city type dropdown |
+| `client/src/components/calculators/NPSCalculator.tsx` | Employer NPS helper text: 14% for all employers under new regime (S.124(2)); result card note updated |
+| `client/src/data/blogPosts.ts` (hra-exemption-metro-vs-non-metro) | Metro city table updated to 8 cities; Pune example → Mysuru (non-metro); ⚠️ blockquote added |
+| `client/src/data/blogPosts.ts` (section-80c-deductions-list-fy-2026-27) | 80CCD(1B) paragraph flagged as Old Regime Only (S.124(3)) |
+| `client/src/data/blogPosts.ts` (elss-vs-ppf-vs-nps-tax-saving-comparison) | "Ideal combination" clarified as Old Regime Only; table footnote added |
+| `client/src/data/blogPosts.ts` (capital-gains-tax-stocks-mutual-funds) | New h2 section: FA 2026 buyback taxed in shareholder hands (S.69(2)) |
+| `client/src/data/blogPosts.ts` (best-investment-options-india-2025) | SGB maturity exemption: "original subscribers only" caveat + FA 2026 blockquote |
+| `client/src/data/blogPosts.ts` (alternative-investments-gold-silver-beyond) | SGB inline note + table cell updated |
+| `client/src/data/blogPosts.ts` (income-tax-act-1961-vs-income-tax-act-2025) | "Impact on House Property" updated — two self-occupied houses nil annual value (S.21(7), FA 2026) |
+| `client/src/data/blogPosts.ts` (taxation-in-india-complete-guide) | House Property table row updated to reflect nil annual value on 2 self-occupied properties |
+
+### Outstanding items (next sprint):
+- INFO-01: SIP/SWP calculators — post-tax capital gains return calculation
+- WARN-01: ITA 2025 section reference notes across all 22 blogs (ongoing)
 
 ---
 
