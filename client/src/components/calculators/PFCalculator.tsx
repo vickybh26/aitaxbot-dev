@@ -596,14 +596,14 @@ export default function PFCalculator() {
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="p-3 bg-green-50 rounded-lg border border-green-200">
-                      <div className="text-sm font-medium text-green-800">Section 80C (Old Regime)</div>
+                      <div className="text-sm font-medium text-green-800">Section 80C — Old Regime Only</div>
                       <div className="text-xs text-green-700 mt-1">
-                        Employee PF contribution qualifies for deduction up to ₹1.5 Lakh under Section 80C
+                        Employee PF contribution qualifies for deduction up to ₹1.5 Lakh under Section 80C. <strong>Not available under the New Tax Regime.</strong>
                       </div>
                       <div className="text-lg font-bold text-green-700 mt-2">
                         {formatCurrencyFull(Math.min(result.employeeContributionYearly, 150000))}
                       </div>
-                      <div className="text-xs text-green-600">Eligible for 80C deduction</div>
+                      <div className="text-xs text-green-600">Eligible for 80C deduction (Old Regime)</div>
                     </div>
                     <div className="p-3 bg-amber-50 rounded-lg border border-amber-200">
                       <div className="text-sm font-medium text-amber-800">Interest Taxation</div>

@@ -25,6 +25,7 @@ export default function NPSCalculator() {
   const [expectedReturn, setExpectedReturn] = useState<number>(10);
   const [annuityRate, setAnnuityRate] = useState<number>(6);
   const [taxRate, setTaxRate] = useState<number>(30);
+  const [regime, setRegime] = useState<'new' | 'old'>('new');
   const [result, setResult] = useState<NPSResult | null>(null);
   const chartRef = useRef<HTMLCanvasElement>(null);
   const chartInstance = useRef<any>(null);
@@ -61,11 +62,14 @@ export default function NPSCalculator() {
     // Monthly pension from annuity corpus
     const monthlyPension = (annuityCorpus * (annuityRate / 100)) / 12;
 
-    // Tax savings (approximate, based on 30% slab as default)
+    // Tax savings — regime-aware
+    // New Regime: 80CCD(1) and 80CCD(1B) are NOT available (self-contribution deductions removed).
+    // Only 80CCD(2) employer contribution remains deductible under new regime.
+    // Old Regime: All three deductions available.
     const annualContrib = monthlyContribution * 12;
-    const tax80CCD1 = Math.min(annualContrib, 150000) * (taxRate / 100);  // within 80C limit
-    const tax80CCD1B = 50000 * (taxRate / 100);  // additional ₹50K deduction
-    const tax80CCD2 = employerContribution * 12 * (taxRate / 100);  // employer contrib fully deductible
+    const tax80CCD1 = regime === 'old' ? Math.min(annualContrib, 150000) * (taxRate / 100) : 0;
+    const tax80CCD1B = regime === 'old' ? 50000 * (taxRate / 100) : 0;
+    const tax80CCD2 = employerContribution * 12 * (taxRate / 100);  // available in both regimes
 
     setResult({
       totalCorpus,
@@ -132,6 +136,36 @@ export default function NPSCalculator() {
       {/* Input Card */}
       <Card className="p-6 shadow-soft">
         <h2 className="text-xl font-bold text-slate-900 mb-6">NPS Calculator Inputs</h2>
+
+        {/* Regime Selector */}
+        <div className="mb-6 p-4 rounded-lg border border-slate-200 bg-slate-50">
+          <p className="text-sm font-medium text-slate-700 mb-2">Tax Regime</p>
+          <div className="flex gap-2">
+            <button
+              onClick={() => { setRegime('new'); setResult(null); }}
+              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${regime === 'new' ? 'bg-blue-600 text-white' : 'bg-white border border-slate-300 text-slate-700 hover:bg-slate-50'}`}
+            >
+              New Regime (Default)
+            </button>
+            <button
+              onClick={() => { setRegime('old'); setResult(null); }}
+              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${regime === 'old' ? 'bg-blue-600 text-white' : 'bg-white border border-slate-300 text-slate-700 hover:bg-slate-50'}`}
+            >
+              Old Regime
+            </button>
+          </div>
+          {regime === 'new' && (
+            <p className="text-xs text-amber-700 mt-2 bg-amber-50 border border-amber-200 rounded p-2">
+              ⚠️ Under New Regime, 80CCD(1) and 80CCD(1B) deductions for your own NPS contributions are <strong>not available</strong>. Only employer NPS contribution (80CCD(2)) remains deductible.
+            </p>
+          )}
+          {regime === 'old' && (
+            <p className="text-xs text-green-700 mt-2 bg-green-50 border border-green-200 rounded p-2">
+              ✅ Under Old Regime, all three NPS deductions are available: 80CCD(1), 80CCD(1B) (extra ₹50,000), and 80CCD(2).
+            </p>
+          )}
+        </div>
+
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
 
           <div>
@@ -226,7 +260,7 @@ export default function NPSCalculator() {
 
           <div>
             <Label htmlFor="taxRate" className="text-sm font-medium text-slate-700 mb-1 block">
-              Your Tax Slab (%)
+              Your Marginal Tax Slab (%)
             </Label>
             <select
               id="taxRate"
@@ -234,13 +268,24 @@ export default function NPSCalculator() {
               onChange={(e) => setTaxRate(Number(e.target.value))}
               className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
             >
-              <option value={5}>5% slab (₹3L–₹7L)</option>
-              <option value={10}>10% slab (₹7L–₹10L)</option>
-              <option value={15}>15% slab (₹10L–₹12L)</option>
-              <option value={20}>20% slab (₹12L–₹15L)</option>
-              <option value={30}>30% slab (above ₹15L)</option>
+              {regime === 'new' ? (
+                <>
+                  <option value={5}>5% (₹4L–₹8L)</option>
+                  <option value={10}>10% (₹8L–₹12L)</option>
+                  <option value={15}>15% (₹12L–₹16L)</option>
+                  <option value={20}>20% (₹16L–₹20L)</option>
+                  <option value={25}>25% (₹20L–₹24L)</option>
+                  <option value={30}>30% (above ₹24L)</option>
+                </>
+              ) : (
+                <>
+                  <option value={5}>5% (₹2.5L–₹5L)</option>
+                  <option value={20}>20% (₹5L–₹10L)</option>
+                  <option value={30}>30% (above ₹10L)</option>
+                </>
+              )}
             </select>
-            <p className="text-xs text-slate-500 mt-1">For tax saving calculation</p>
+            <p className="text-xs text-slate-500 mt-1">Your top slab rate — used to estimate tax savings</p>
           </div>
 
         </div>
@@ -320,23 +365,36 @@ export default function NPSCalculator() {
           {/* Tax Saving Breakdown */}
           <Card className="p-6 shadow-soft border-l-4 border-l-green-500">
             <h3 className="text-lg font-bold text-slate-900 mb-4">Annual Tax Savings Breakdown</h3>
-            <div className="grid md:grid-cols-3 gap-4">
-              <div className="bg-green-50 p-4 rounded-lg">
-                <p className="text-xs text-slate-500 mb-1">80CCD(1) — Your NPS contribution</p>
-                <p className="text-xl font-bold text-green-700">{formatCurrency(result.taxSaving80CCD1)}</p>
-                <p className="text-xs text-slate-500 mt-1">Up to 10% of salary, within ₹1.5L 80C limit</p>
-              </div>
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <p className="text-xs text-slate-500 mb-1">80CCD(1B) — Extra NPS deduction</p>
-                <p className="text-xl font-bold text-blue-700">{formatCurrency(result.taxSaving80CCD1B)}</p>
-                <p className="text-xs text-slate-500 mt-1">Additional ₹50,000 over & above 80C</p>
-              </div>
+            <div className={`grid gap-4 ${regime === 'new' ? 'md:grid-cols-1' : 'md:grid-cols-3'}`}>
+              {regime === 'old' && (
+                <div className="bg-green-50 p-4 rounded-lg">
+                  <p className="text-xs text-slate-500 mb-1">80CCD(1) — Your NPS contribution</p>
+                  <p className="text-xl font-bold text-green-700">{formatCurrency(result.taxSaving80CCD1)}</p>
+                  <p className="text-xs text-slate-500 mt-1">Up to 10% of salary, within ₹1.5L 80C limit</p>
+                </div>
+              )}
+              {regime === 'old' && (
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <p className="text-xs text-slate-500 mb-1">80CCD(1B) — Extra NPS deduction</p>
+                  <p className="text-xl font-bold text-blue-700">{formatCurrency(result.taxSaving80CCD1B)}</p>
+                  <p className="text-xs text-slate-500 mt-1">Additional ₹50,000 over & above 80C</p>
+                </div>
+              )}
               <div className="bg-purple-50 p-4 rounded-lg">
                 <p className="text-xs text-slate-500 mb-1">80CCD(2) — Employer contribution</p>
                 <p className="text-xl font-bold text-purple-700">{formatCurrency(result.taxSaving80CCD2)}</p>
-                <p className="text-xs text-slate-500 mt-1">Up to 10% of salary — no upper limit!</p>
+                <p className="text-xs text-slate-500 mt-1">
+                  {regime === 'new'
+                    ? 'Available in New Regime — up to 14% of salary for govt, 10% for private'
+                    : 'Up to 10% of salary — no upper limit!'}
+                </p>
               </div>
             </div>
+            {regime === 'new' && (
+              <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800">
+                80CCD(1) and 80CCD(1B) deductions on your own NPS contributions are <strong>not available under the New Regime</strong>. Switch to Old Regime to unlock up to ₹{formatCurrency(50000 * (taxRate / 100) + Math.min(monthlyContribution * 12, 150000) * (taxRate / 100))} more in tax savings.
+              </div>
+            )}
             <div className="mt-4 bg-slate-50 p-4 rounded-lg flex justify-between items-center">
               <span className="font-semibold text-slate-900">Total Annual Tax Saving</span>
               <span className="text-2xl font-bold text-green-600">{formatCurrency(result.totalTaxSaving)}</span>

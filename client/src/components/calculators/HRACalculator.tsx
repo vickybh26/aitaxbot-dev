@@ -280,6 +280,18 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
 
             {/* Calculator Tab */}
             <TabsContent value="calculator" className="space-y-6">
+
+              {/* Regime Warning */}
+              <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                <AlertTriangle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-semibold text-amber-800">Old Tax Regime Only</p>
+                  <p className="text-xs text-amber-700 mt-0.5">
+                    HRA exemption under Section 10(13A) is available <strong>only if you opt for the Old Tax Regime</strong>. Under the New Regime (default from FY 2023-24), your entire HRA received is added to taxable salary with no exemption.
+                  </p>
+                </div>
+              </div>
+
               <Card className="border-l-4 border-l-blue-500">
                 <CardHeader>
                   <CardTitle className="text-lg">Input Mode</CardTitle>
@@ -470,6 +482,11 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
                     </CardContent>
                   </Card>
 
+                  <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800">
+                    <AlertTriangle className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                    <span>This exemption of ₹{result.hraExemption.toLocaleString()} applies <strong>only under the Old Tax Regime</strong>. If you are on the New Regime, your taxable HRA = ₹{result.hraReceived.toLocaleString()} (full amount received).</span>
+                  </div>
+
                   <div className="flex gap-3">
                     {user && (
                       <Button
@@ -487,7 +504,7 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
                         onClick={() => onApplyHRA(result.hraExemption)}
                         className="flex-1 md:flex-none"
                       >
-                        Apply to Tax Calculator
+                        Apply to Tax Calculator (Old Regime)
                       </Button>
                     )}
                   </div>
