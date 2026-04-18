@@ -48,4 +48,24 @@ export async function verifyFirebaseToken(token: string): Promise<admin.auth.Dec
   }
 }
 
+/**
+ * Verify a Firebase App Check token. Used to confirm that a request is
+ * actually coming from our real web app (reCAPTCHA v3 challenge) and not
+ * from a script hammering public endpoints. Returns the decoded token on
+ * success, or null on failure. Never throws.
+ */
+export async function verifyAppCheckToken(
+  token: string
+): Promise<admin.appCheck.VerifyAppCheckTokenResponse | null> {
+  try {
+    if (!firebaseApp) {
+      initializeFirebase();
+    }
+    return await admin.appCheck().verifyToken(token);
+  } catch (error) {
+    console.error('Error verifying Firebase App Check token:', error);
+    return null;
+  }
+}
+
 export { admin };

@@ -258,12 +258,29 @@ Rules: priority must be "high", "medium", or "low". savingsScore is 0-100 (100 =
       return this.fallbackDashboardInsights(input);
     }
 
+    // Whitelist occupation values before interpolating into the prompt —
+    // otherwise a crafted string becomes a prompt-injection vector.
+    const OCCUPATIONS: Record<string, string> = {
+      salaried: 'Salaried Employee',
+      business: 'Business Owner / Self-Employed',
+      ca: 'Chartered Accountant / Professional',
+      nri: 'NRI (Non-Resident Indian)',
+      student: 'Student',
+      retired: 'Retired',
+    };
+    const occupationKey = (input.occupation || '').toLowerCase();
+    const safeOccupation = OCCUPATIONS[occupationKey] || 'Not specified';
+    // Clamp FY to a safe, expected pattern before interpolating.
+    const safeFy = /^\d{4}-\d{2}$/.test(input.financialYear || '')
+      ? input.financialYear
+      : '2025-26';
+
     const prompt = `You are a friendly Indian tax advisor. Give 3 short, specific insights (1 sentence each) for this user's tax dashboard:
-- Occupation: ${input.occupation || 'Not specified'}
+- Occupation: ${safeOccupation}
 - Annual Income: ₹${(input.totalIncome || 0).toLocaleString('en-IN')}
 - Tax Paid: ₹${(input.lastTaxPaid || 0).toLocaleString('en-IN')}
 - 80C Invested: ₹${(input.section80C || 0).toLocaleString('en-IN')}
-- Financial Year: ${input.financialYear || '2025-26'}
+- Financial Year: ${safeFy}
 
 Return ONLY a JSON array of 3 strings. Each string is one insight. No markdown.
 Example: ["Insight 1", "Insight 2", "Insight 3"]`;

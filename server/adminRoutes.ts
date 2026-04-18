@@ -51,12 +51,18 @@ async function requireAdmin(req: any, res: any, next: any, minLevel = 1) {
       return res.status(403).json({ error: "Not an admin account" });
     }
     const adminData = adminDoc.data()!;
-    if (adminData.level > minLevel) {
+    // Coerce + validate level strictly. A missing/invalid `level` must FAIL CLOSED,
+    // not pass through as undefined (undefined > 1 === false → previous bypass).
+    const level = Number(adminData.level);
+    if (!Number.isInteger(level) || level < 1 || level > 3) {
+      return res.status(403).json({ error: "Invalid admin level" });
+    }
+    if (level > minLevel) {
       return res.status(403).json({ error: `Requires admin level ${minLevel} or higher` });
     }
 
     req.adminUid = decoded.uid;
-    req.adminLevel = adminData.level as number;
+    req.adminLevel = level;
     req.adminEmail = decoded.email;
     next();
   } catch (err) {

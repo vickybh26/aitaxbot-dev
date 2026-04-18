@@ -1,5 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import compression from "compression";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { initializeFirebase } from "./firebase";
@@ -16,6 +18,67 @@ try {
 
 const app = express();
 
+// Trust the first proxy hop (Railway / Cloud Run / Vercel).
+// Required for correct req.ip under rate limiting.
+app.set("trust proxy", 1);
+
+// ─────────────────────────────────────────────────────────────────────
+// Security headers (helmet) — CSP is permissive to accommodate GA,
+// Google Ads, AdSense, Clarity, Firebase, Gemini, and our own CDN usage.
+// Tighten further once all third-party origins are finalised.
+// ─────────────────────────────────────────────────────────────────────
+app.use(helmet({
+  contentSecurityPolicy: {
+    useDefaults: true,
+    directives: {
+      "default-src": ["'self'"],
+      "script-src": [
+        "'self'",
+        "'unsafe-inline'", // needed for inline JSON-LD schema blocks
+        "https://www.googletagmanager.com",
+        "https://www.google-analytics.com",
+        "https://pagead2.googlesyndication.com",
+        "https://adservice.google.com",
+        "https://www.googleadservices.com",
+        "https://www.clarity.ms",
+        "https://www.google.com",
+        "https://www.gstatic.com",
+        "https://apis.google.com",
+      ],
+      "script-src-attr": ["'none'"],
+      "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      "img-src": ["'self'", "data:", "blob:", "https:"],
+      "font-src": ["'self'", "data:", "https://fonts.gstatic.com"],
+      "connect-src": [
+        "'self'",
+        "https://*.googleapis.com",
+        "https://*.firebaseio.com",
+        "https://*.firebaseapp.com",
+        "https://identitytoolkit.googleapis.com",
+        "https://firestore.googleapis.com",
+        "https://firebaseappcheck.googleapis.com",
+        "https://www.google-analytics.com",
+        "https://analytics.google.com",
+        "https://region1.google-analytics.com",
+        "https://www.clarity.ms",
+        "https://b.clarity.ms",
+        "wss://*.firebaseio.com",
+      ],
+      "frame-src": ["'self'", "https://*.firebaseapp.com", "https://www.google.com"],
+      "object-src": ["'none'"],
+      "base-uri": ["'self'"],
+      "form-action": ["'self'"],
+      "frame-ancestors": ["'none'"],
+      "upgrade-insecure-requests": [],
+    },
+  },
+  crossOriginEmbedderPolicy: false, // AdSense/Clarity break under COEP
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" }, // Google OAuth popup needs this
+  strictTransportSecurity: { maxAge: 63072000, includeSubDomains: true, preload: true },
+  referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+}));
+
 // Enable GZIP compression for all responses
 app.use(compression({
   filter: (req, res) => {
@@ -27,33 +90,43 @@ app.use(compression({
   level: 6 // Compression level (0-9, 6 is default)
 }));
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+// JSON body size limit reduces DOS surface — tax payloads are small.
+// `verify` captures the raw request body for the WhatsApp webhook so we can
+// validate Meta's X-Hub-Signature-256 HMAC before trusting any of it.
+app.use(express.json({
+  limit: '1mb',
+  verify: (req: Request, _res, buf) => {
+    if (req.url && req.url.startsWith('/api/webhook/whatsapp')) {
+      (req as any).rawBody = Buffer.from(buf);
+    }
+  },
+}));
+app.use(express.urlencoded({ extended: false, limit: '1mb' }));
 
+// ─────────────────────────────────────────────────────────────────────
+// Rate limiting — applied globally to /api, with stricter caps on
+// expensive endpoints (AI, email send, external proxies).
+// ─────────────────────────────────────────────────────────────────────
+const apiLimiter = rateLimit({
+  windowMs: 60_000,
+  max: 120,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests — please slow down." },
+});
+app.use("/api", apiLimiter);
+
+// Request logger — records method/path/status/duration only.
+// Response bodies are NOT logged — they contain PII (email, PAN, salary, etc.)
+// which would end up in Railway/host logs and breach data-minimisation.
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
-  let capturedJsonResponse: Record<string, any> | undefined = undefined;
-
-  const originalResJson = res.json;
-  res.json = function (bodyJson, ...args) {
-    capturedJsonResponse = bodyJson;
-    return originalResJson.apply(res, [bodyJson, ...args]);
-  };
 
   res.on("finish", () => {
-    const duration = Date.now() - start;
     if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-      }
-
-      if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
-      }
-
-      log(logLine);
+      const duration = Date.now() - start;
+      log(`${req.method} ${path} ${res.statusCode} in ${duration}ms`);
     }
   });
 
@@ -63,12 +136,19 @@ app.use((req, res, next) => {
 (async () => {
   const server = await registerRoutes(app);
 
+  // Error handler — logs internally, returns a minimal message externally.
+  // Does NOT re-throw (previous code did `throw err` after res.json, which
+  // would surface as an unhandledRejection and could crash the process in
+  // Node 18+ strict mode).
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
+    const status = err?.status || err?.statusCode || 500;
+    const exposeMessage = status >= 400 && status < 500 && typeof err?.message === "string";
+    const message = exposeMessage ? err.message : "Internal Server Error";
 
-    res.status(status).json({ message });
-    throw err;
+    console.error("[Express error]", err);
+    if (!res.headersSent) {
+      res.status(status).json({ error: message });
+    }
   });
 
   // importantly only setup vite in development and after

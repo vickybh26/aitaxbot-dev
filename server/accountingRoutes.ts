@@ -174,9 +174,11 @@ router.post("/firms", authenticateFirebaseToken, async (req: AuthenticatedReques
     console.error("Error creating firm:", error);
     console.error("Error details:", error.message, error.stack);
     if (error instanceof z.ZodError) {
-      return res.status(400).json({ error: "Invalid data", details: error.errors });
+      // Don't echo Zod's internal `errors` array — it can expose schema shape.
+      return res.status(400).json({ error: "Invalid data" });
     }
-    res.status(500).json({ error: "Failed to create firm", details: error.message });
+    // Don't leak raw error messages to clients — they can reveal internal paths.
+    res.status(500).json({ error: "Failed to create firm" });
   }
 });
 
@@ -264,7 +266,8 @@ router.post("/firms/:firmId/clients", authenticateFirebaseToken, async (req: Aut
   } catch (error: any) {
     console.error("Error creating client:", error);
     if (error instanceof z.ZodError) {
-      return res.status(400).json({ error: "Invalid data", details: error.errors });
+      // Don't echo Zod's internal `errors` array — it can expose schema shape.
+      return res.status(400).json({ error: "Invalid data" });
     }
     res.status(500).json({ error: "Failed to create client" });
   }
@@ -390,7 +393,8 @@ router.post("/invoices", authenticateFirebaseToken, async (req: AuthenticatedReq
   } catch (error: any) {
     console.error("Error creating invoice:", error);
     if (error instanceof z.ZodError) {
-      return res.status(400).json({ error: "Invalid data", details: error.errors });
+      // Don't echo Zod's internal `errors` array — it can expose schema shape.
+      return res.status(400).json({ error: "Invalid data" });
     }
     res.status(500).json({ error: "Failed to create invoice" });
   }

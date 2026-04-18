@@ -6,6 +6,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import crypto from "crypto";
+import rateLimit from "express-rate-limit";
 import accountingRoutes from "./accountingRoutes";
 import adminRoutes from "./adminRoutes";
 import whatsappRoutes from "./whatsapp/whatsappRoutes";
@@ -14,8 +15,72 @@ import { TransactionalEmailsApi, TransactionalEmailsApiApiKeys } from '@getbrevo
 import { seedTaxRates, getTaxSlabsForCalculation } from "./seedTaxRates";
 import { generateTaxComputationPDF, savePDFToStorage, generateRentReceiptPDF, type TaxComputationData, type RentReceiptData } from "./pdfGenerator";
 import { geminiTaxService, type TaxAdviceInput } from "./geminiTaxService";
+import { authenticateFirebaseToken, appCheckGuard, type AuthenticatedRequest } from "./middleware/auth.js";
 
-// Configure multer for Firebase Storage uploads (store in memory)
+// ─────────────────────────────────────────────────────────────────────
+// Security helpers
+// ─────────────────────────────────────────────────────────────────────
+
+/** Escape user-supplied text before inserting into HTML (email bodies, etc.). */
+function escapeHtml(input: unknown): string {
+  return String(input ?? "").replace(/[&<>"']/g, (c) => (
+    { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c] as string
+  ));
+}
+
+/** Produce a safe filename for disk storage — never include user input. */
+function safeUploadFilename(fileId: string, originalname: string): string {
+  const ext = path.extname(originalname || "").toLowerCase();
+  const allowed = ext === ".pdf" ? ".pdf" : ".bin";
+  return `${fileId}${allowed}`;
+}
+
+/** Ensure a path stays inside a base directory (prevents traversal). */
+function ensureWithin(baseDir: string, candidate: string): boolean {
+  const resolvedBase = path.resolve(baseDir);
+  const resolvedTarget = path.resolve(candidate);
+  return resolvedTarget === resolvedBase || resolvedTarget.startsWith(resolvedBase + path.sep);
+}
+
+/** Verify PDF magic bytes (`%PDF-`) — multer's MIME check is client-supplied. */
+function looksLikePdf(buf: Buffer): boolean {
+  return buf.length >= 5 && buf.slice(0, 5).toString("ascii") === "%PDF-";
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// Rate limiters — stricter on expensive / abuse-prone endpoints.
+// (A general /api limiter is applied in server/index.ts.)
+// ─────────────────────────────────────────────────────────────────────
+const aiLimiter = rateLimit({
+  windowMs: 60_000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "AI rate limit — try again in a minute." },
+});
+const emailLimiter = rateLimit({
+  windowMs: 60_000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many email sends. Please wait." },
+});
+const externalProxyLimiter = rateLimit({
+  windowMs: 60_000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "External API rate limit reached." },
+});
+const uploadLimiter = rateLimit({
+  windowMs: 60_000 * 10,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Upload rate limit reached." },
+});
+
+// Configure multer — memory storage + MIME check (magic-byte check happens after).
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
@@ -120,24 +185,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     next();
   });
   
-  // Mock authentication middleware for accounting module (sets req.user for legacy routes)
-  app.use((req: any, res, next) => {
-    // For now, set a mock user for all requests
-    // This allows the accounting module to work without full auth setup
-    if (!req.user) {
-      req.user = {
-        id: 'default-user-id',
-        email: 'user@example.com',
-        firstName: 'Test',
-        lastName: 'User'
-      };
-    }
-    next();
-  });
-  
+  // NOTE: Global mock-auth middleware REMOVED (security fix).
+  // Every route MUST authenticate via authenticateFirebaseToken — never fall back to a
+  // default user. Accounting routes already use the middleware; any other route that
+  // needs req.user must derive it from the verified Firebase token.
+
   // Mount accounting routes
   app.use("/api/accounting", accountingRoutes);
-  app.use("/api", whatsappRoutes);
+
+  // WhatsApp integration is gated behind an env flag so the server can boot
+  // cleanly in environments where Meta / WhatsApp Business isn't available
+  // (e.g., while the WABA is under Commerce Policy appeal). To enable, set
+  // WHATSAPP_ENABLED=true along with WHATSAPP_APP_SECRET, WHATSAPP_VERIFY_TOKEN,
+  // and ADMIN_KEY in the runtime environment.
+  if (process.env.WHATSAPP_ENABLED === "true") {
+    app.use("/api", whatsappRoutes);
+    console.log("[whatsapp] routes mounted (WHATSAPP_ENABLED=true)");
+  } else {
+    console.log("[whatsapp] routes DISABLED (set WHATSAPP_ENABLED=true to enable)");
+  }
 
   // Mount admin routes
   app.use("/api/admin", adminRoutes);
@@ -206,29 +272,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Save tax computation PDF to object storage
-  app.post("/api/tax-computation/save-pdf", async (req, res) => {
+  app.post("/api/tax-computation/save-pdf", authenticateFirebaseToken, async (req: AuthenticatedRequest, res) => {
     try {
-      const authHeader = req.headers.authorization;
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ error: "Unauthorized" });
-      }
-      
-      const token = authHeader.split(' ')[1];
-      const decodedToken = await verifyFirebaseToken(token);
-      if (!decodedToken) {
-        return res.status(401).json({ error: "Invalid token" });
-      }
-      
       const computationData: TaxComputationData = req.body;
-      
-      if (!computationData.personalInfo || !computationData.taxBreakdown) {
+
+      if (!computationData?.personalInfo || !computationData?.taxBreakdown) {
         return res.status(400).json({ error: "Missing required computation data" });
       }
-      
+
       computationData.computationDate = new Date();
-      
+
       const pdfBuffer = await generateTaxComputationPDF(computationData);
-      const objectPath = await savePDFToStorage(pdfBuffer, decodedToken.uid);
+      const objectPath = await savePDFToStorage(pdfBuffer, req.userId!);
       
       res.json({ 
         success: true, 
@@ -246,7 +301,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ==========================================
 
   // POST /api/ai/tax-advice — Gemini-powered personalized tips after calculation
-  app.post("/api/ai/tax-advice", async (req, res) => {
+  // AUTH: required (prevents anonymous quota drain). Rate limited to 10/min/user.
+  app.post("/api/ai/tax-advice", aiLimiter, authenticateFirebaseToken, async (req: AuthenticatedRequest, res) => {
     try {
       const input: TaxAdviceInput = req.body;
       if (!input || typeof input.totalIncome !== 'number') {
@@ -261,7 +317,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // POST /api/stats/track-calculation — fire-and-forget hit from any calculator on the site
-  app.post("/api/stats/track-calculation", async (req, res) => {
+  // App Check keeps a bot from inflating the "X calculations done" counter.
+  app.post("/api/stats/track-calculation", appCheckGuard, async (req, res) => {
     res.json({ ok: true }); // respond immediately — don't make the client wait
     try {
       const db = getFirestore();
@@ -288,7 +345,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // POST /api/ai/dashboard-insights — Short AI insights for the dashboard
-  app.post("/api/ai/dashboard-insights", async (req, res) => {
+  // AUTH: required. Rate limited to 10/min/user.
+  app.post("/api/ai/dashboard-insights", aiLimiter, authenticateFirebaseToken, async (req: AuthenticatedRequest, res) => {
     try {
       const insights = await geminiTaxService.getDashboardInsights(req.body);
       res.json({ insights });
@@ -303,13 +361,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ==========================================
 
   // Sync user on login — creates or updates user record from Firebase token
-  app.post("/api/user/sync", async (req, res) => {
+  app.post("/api/user/sync", authenticateFirebaseToken, async (req: AuthenticatedRequest, res) => {
     try {
-      const authHeader = req.headers.authorization;
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ error: "Unauthorized" });
-      }
-      const token = authHeader.split(' ')[1];
+      // Re-decode to get the full claims object (name, picture, provider).
+      // authenticateFirebaseToken already verified the token, so this is safe.
+      const authHeader = req.headers.authorization!;
+      const token = authHeader.substring(7);
       const decodedToken = await verifyFirebaseToken(token);
       if (!decodedToken) {
         return res.status(401).json({ error: "Invalid token" });
@@ -341,30 +398,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get user profile
-  app.get("/api/user/profile", async (req, res) => {
+  app.get("/api/user/profile", authenticateFirebaseToken, async (req: AuthenticatedRequest, res) => {
     try {
-      const authHeader = req.headers.authorization;
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ error: "Unauthorized" });
-      }
-      
-      const token = authHeader.split(' ')[1];
-      const decodedToken = await verifyFirebaseToken(token);
-      if (!decodedToken) {
-        return res.status(401).json({ error: "Invalid token" });
-      }
-      
-      const user = await storage.getUser(decodedToken.uid);
+      const user = await storage.getUser(req.userId!);
       if (!user) {
         // User not in Firestore yet (race condition on first login) —
-        // return a minimal profile built from the Firebase Auth token
-        const nameParts = (decodedToken.name || "").split(" ");
+        // return a minimal profile built from the Firebase Auth token.
+        // Re-decode the token to surface name/picture for the stub response.
+        const token = req.headers.authorization!.substring(7);
+        const decodedToken = await verifyFirebaseToken(token);
+        const nameParts = (decodedToken?.name || "").split(" ");
         return res.json({
-          id: decodedToken.uid,
-          email: decodedToken.email || "",
+          id: req.userId!,
+          email: req.userEmail || "",
           firstName: nameParts[0] || "",
           lastName: nameParts.slice(1).join(" ") || "",
-          profileImageUrl: decodedToken.picture || null,
+          profileImageUrl: decodedToken?.picture || null,
           mobile: "",
           occupation: "",
           city: "",
@@ -382,21 +431,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to get user profile" });
     }
   });
-  
+
   // Update user profile
-  app.put("/api/user/profile", async (req, res) => {
+  app.put("/api/user/profile", authenticateFirebaseToken, async (req: AuthenticatedRequest, res) => {
     try {
-      const authHeader = req.headers.authorization;
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ error: "Unauthorized" });
-      }
-      
-      const token = authHeader.split(' ')[1];
-      const decodedToken = await verifyFirebaseToken(token);
-      if (!decodedToken) {
-        return res.status(401).json({ error: "Invalid token" });
-      }
-      
       const { firstName, lastName, mobile, gender, occupation, city, state } = req.body;
 
       // Build update object — strip undefined values because Firestore rejects them
@@ -410,30 +448,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (state !== undefined) profileUpdate.state = state;
       profileUpdate.isProfileComplete = !!(firstName && lastName && mobile);
 
-      const updatedUser = await storage.updateUser(decodedToken.uid, profileUpdate as any);
-      
+      const updatedUser = await storage.updateUser(req.userId!, profileUpdate as any);
+
       res.json(updatedUser);
     } catch (error) {
       console.error("Error updating user profile:", error);
       res.status(500).json({ error: "Failed to update user profile" });
     }
   });
-  
+
   // Get user profile change logs
-  app.get("/api/user/profile/logs", async (req, res) => {
+  app.get("/api/user/profile/logs", authenticateFirebaseToken, async (req: AuthenticatedRequest, res) => {
     try {
-      const authHeader = req.headers.authorization;
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ error: "Unauthorized" });
-      }
-      
-      const token = authHeader.split(' ')[1];
-      const decodedToken = await verifyFirebaseToken(token);
-      if (!decodedToken) {
-        return res.status(401).json({ error: "Invalid token" });
-      }
-      
-      const logs = await storage.getProfileLogs(decodedToken.uid);
+      const logs = await storage.getProfileLogs(req.userId!);
       res.json(logs);
     } catch (error) {
       console.error("Error getting profile logs:", error);
@@ -442,20 +469,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Contact Form API - Save to Firebase Firestore
-  app.post("/api/contact", async (req, res) => {
+  // Contact form — public endpoint, rate-limited to 5/min to slow spam.
+  // Wrapped in App Check so scripts can't hit the form from outside our app.
+  app.post("/api/contact", emailLimiter, appCheckGuard, async (req, res) => {
     try {
       const validation = contactInquirySchema.safeParse(req.body);
-      
+
       if (!validation.success) {
-        return res.status(400).json({ 
-          error: "Validation failed", 
-          details: validation.error.errors 
-        });
+        // Generic validation error — avoid echoing Zod's internal structure.
+        return res.status(400).json({ error: "Invalid input" });
       }
-      
+
       const { name, email, subject, message } = validation.data;
       const db = getFirestore();
-      
+
       const contactData = {
         name,
         email,
@@ -466,11 +493,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: 'new',
         replied: false
       };
-      
+
       const docRef = await db.collection('contactInquiries').add(contactData);
-      
+
       console.log(`✉️ New contact inquiry received from ${email} - ID: ${docRef.id}`);
-      
+
+      // Escape every user-controlled field before interpolating into HTML.
+      const safeName    = escapeHtml(name);
+      const safeEmail   = escapeHtml(email);
+      const safeSubject = escapeHtml(subject || "");
+      const safeMessage = escapeHtml(message);
+      const safeRefId   = escapeHtml(docRef.id);
+
       // ── Send emails via Brevo ──────────────────────────────────────────────
       try {
         if (!process.env.BREVO_API_KEY) {
@@ -498,18 +532,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 </div>
                 <div style="background:#f8fafc;border:1px solid #e2e8f0;border-top:none;padding:20px;border-radius:0 0 8px 8px">
                   <table style="width:100%;border-collapse:collapse">
-                    <tr><td style="padding:6px 0;font-weight:bold;width:100px;color:#64748b;font-size:13px">Name</td><td style="padding:6px 0;font-size:14px">${name}</td></tr>
-                    <tr><td style="padding:6px 0;font-weight:bold;color:#64748b;font-size:13px">Email</td><td style="padding:6px 0;font-size:14px"><a href="mailto:${email}" style="color:#2563eb">${email}</a></td></tr>
-                    ${subject ? `<tr><td style="padding:6px 0;font-weight:bold;color:#64748b;font-size:13px">Subject</td><td style="padding:6px 0;font-size:14px">${subject}</td></tr>` : ''}
+                    <tr><td style="padding:6px 0;font-weight:bold;width:100px;color:#64748b;font-size:13px">Name</td><td style="padding:6px 0;font-size:14px">${safeName}</td></tr>
+                    <tr><td style="padding:6px 0;font-weight:bold;color:#64748b;font-size:13px">Email</td><td style="padding:6px 0;font-size:14px"><a href="mailto:${encodeURIComponent(email)}" style="color:#2563eb">${safeEmail}</a></td></tr>
+                    ${subject ? `<tr><td style="padding:6px 0;font-weight:bold;color:#64748b;font-size:13px">Subject</td><td style="padding:6px 0;font-size:14px">${safeSubject}</td></tr>` : ''}
                     <tr><td style="padding:6px 0;font-weight:bold;color:#64748b;font-size:13px">Time</td><td style="padding:6px 0;font-size:14px">${submittedAt} IST</td></tr>
-                    <tr><td style="padding:6px 0;font-weight:bold;color:#64748b;font-size:13px">Ref ID</td><td style="padding:6px 0;font-size:13px;color:#94a3b8">${docRef.id}</td></tr>
+                    <tr><td style="padding:6px 0;font-weight:bold;color:#64748b;font-size:13px">Ref ID</td><td style="padding:6px 0;font-size:13px;color:#94a3b8">${safeRefId}</td></tr>
                   </table>
                   <div style="margin-top:16px">
                     <p style="font-weight:bold;color:#64748b;font-size:13px;margin:0 0 6px">Message</p>
-                    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:12px;font-size:14px;line-height:1.6;white-space:pre-wrap">${message}</div>
+                    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:12px;font-size:14px;line-height:1.6;white-space:pre-wrap">${safeMessage}</div>
                   </div>
                   <div style="margin-top:16px;text-align:center">
-                    <a href="mailto:${email}?subject=Re: ${encodeURIComponent(subject || 'Your AiTaxBot inquiry')}" style="background:#2563eb;color:#fff;padding:10px 24px;border-radius:6px;text-decoration:none;font-size:14px;font-weight:bold">Reply to ${name}</a>
+                    <a href="mailto:${encodeURIComponent(email)}?subject=Re: ${encodeURIComponent(subject || 'Your AiTaxBot inquiry')}" style="background:#2563eb;color:#fff;padding:10px 24px;border-radius:6px;text-decoration:none;font-size:14px;font-weight:bold">Reply to ${safeName}</a>
                   </div>
                 </div>
                 <p style="text-align:center;font-size:11px;color:#94a3b8;margin-top:12px">AiTaxBot · aitaxbot.in</p>
@@ -531,11 +565,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   <p style="color:#93C5FD;margin:4px 0 0;font-size:13px">www.aitaxbot.in · Smart Tax Calculator for India</p>
                 </div>
                 <div style="background:#f8fafc;border:1px solid #e2e8f0;border-top:none;padding:24px;border-radius:0 0 8px 8px">
-                  <p style="font-size:16px;margin:0 0 12px">Hi <strong>${name}</strong>,</p>
+                  <p style="font-size:16px;margin:0 0 12px">Hi <strong>${safeName}</strong>,</p>
                   <p style="font-size:14px;line-height:1.6;color:#475569">
                     Thank you for reaching out! We have received your message and our team will get back to you within <strong>24 hours</strong> on business days.
                   </p>
-                  ${subject ? `<p style="font-size:13px;color:#64748b">Your inquiry: <em>${subject}</em></p>` : ''}
+                  ${subject ? `<p style="font-size:13px;color:#64748b">Your inquiry: <em>${safeSubject}</em></p>` : ''}
                   <div style="background:#EFF6FF;border-left:4px solid #2563eb;padding:12px 16px;margin:16px 0;border-radius:0 6px 6px 0">
                     <p style="margin:0;font-size:13px;color:#1d4ed8">
                       While you wait, you can explore our free tax calculators at <a href="https://aitaxbot.in" style="color:#1d4ed8">aitaxbot.in</a> — no sign-up required!
@@ -544,7 +578,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   <p style="font-size:13px;color:#64748b;margin:16px 0 4px">If you have an urgent query, you can also reach us directly:</p>
                   <p style="font-size:13px;margin:0">📧 <a href="mailto:info@aitaxbot.in" style="color:#2563eb">info@aitaxbot.in</a> &nbsp;|&nbsp; 📞 <a href="tel:+917899869036" style="color:#2563eb">+91 78998 69036</a></p>
                   <hr style="border:none;border-top:1px solid #e2e8f0;margin:20px 0">
-                  <p style="font-size:12px;color:#94a3b8;margin:0">Reference ID: ${docRef.id}</p>
+                  <p style="font-size:12px;color:#94a3b8;margin:0">Reference ID: ${safeRefId}</p>
                 </div>
                 <p style="text-align:center;font-size:11px;color:#94a3b8;margin-top:12px">
                   This is an automated confirmation. Please do not reply to this email.
@@ -603,7 +637,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Also checks if the email belongs to a registered user:
   //   • Registered  → PDF + link to their dashboard
   //   • Unregistered → PDF + sign-up invitation
-  app.post("/api/rent-receipt/email", async (req, res) => {
+  // Rate-limited to block email-bombing via arbitrary addresses.
+  // App Check ensures the caller is actually our web app (reCAPTCHA-backed).
+  app.post("/api/rent-receipt/email", emailLimiter, appCheckGuard, async (req, res) => {
     try {
       const { receipts, email, recipientName } = req.body as {
         receipts: RentReceiptData[];
@@ -616,6 +652,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         return res.status(400).json({ error: "A valid email address is required" });
+      }
+      // Cap batch size — a runaway client shouldn't be able to generate
+      // hundreds of receipts in a single request.
+      if (receipts.length > 24) {
+        return res.status(400).json({ error: "Too many receipts in a single request (max 24)" });
       }
 
       // 1. Generate PDF
@@ -645,6 +686,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ? `${receipts[0].rentPeriodFrom} – ${receipts[0].rentPeriodTo}`
         : `${receipts[0].rentPeriodFrom} to ${receipts[receipts.length - 1].rentPeriodTo}`;
 
+      // Escape every user-controlled field before interpolating into HTML.
+      const safeName            = escapeHtml(name);
+      const safePeriodLabel     = escapeHtml(periodLabel);
+      const safePropertyAddress = escapeHtml(receipts[0].propertyAddress || "");
+
       const ctaHtml = userExists
         ? `<a href="https://aitaxbot.co.in/dashboard" style="background:#1E3A8A;color:#fff;padding:10px 24px;border-radius:6px;text-decoration:none;font-size:14px;font-weight:bold;display:inline-block">View My Dashboard</a>`
         : `<a href="https://aitaxbot.co.in/login" style="background:#1E3A8A;color:#fff;padding:10px 24px;border-radius:6px;text-decoration:none;font-size:14px;font-weight:bold;display:inline-block">Create Free Account →</a>`;
@@ -667,12 +713,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
               <p style="color:#93C5FD;margin:4px 0 0;font-size:13px">www.aitaxbot.co.in · Smart Tax Tools for India</p>
             </div>
             <div style="background:#f8fafc;border:1px solid #e2e8f0;border-top:none;padding:24px;border-radius:0 0 8px 8px">
-              <p style="font-size:16px;margin:0 0 12px">Hi <strong>${name}</strong>,</p>
+              <p style="font-size:16px;margin:0 0 12px">Hi <strong>${safeName}</strong>,</p>
               <p style="font-size:14px;line-height:1.6;color:#475569">${ctaNote}</p>
               <div style="background:#EFF6FF;border-left:4px solid #2563eb;padding:12px 16px;margin:16px 0;border-radius:0 6px 6px 0">
                 <p style="margin:0 0 4px;font-size:13px;color:#1d4ed8;font-weight:bold">📄 Receipt Details</p>
-                <p style="margin:0;font-size:13px;color:#1d4ed8">Period: ${periodLabel}</p>
-                <p style="margin:4px 0 0;font-size:13px;color:#1d4ed8">Property: ${receipts[0].propertyAddress}</p>
+                <p style="margin:0;font-size:13px;color:#1d4ed8">Period: ${safePeriodLabel}</p>
+                <p style="margin:4px 0 0;font-size:13px;color:#1d4ed8">Property: ${safePropertyAddress}</p>
               </div>
               <div style="margin:20px 0;text-align:center">${ctaHtml}</div>
               <hr style="border:none;border-top:1px solid #e2e8f0;margin:20px 0">
@@ -697,183 +743,231 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Tax Document Upload API with Firebase Storage
-  app.post("/api/tax-documents/upload", upload.single('document'), async (req, res) => {
-    try {
-      if (!req.file) {
-        return res.status(400).json({ error: "No file uploaded" });
-      }
+  // ─────────────────────────────────────────────────────────────────────
+  // TAX DOCUMENTS — Form 16 / AIS / 26AS uploads
+  // EVERY endpoint requires auth. userId is always derived from the
+  // verified Firebase token (req.userId), never from req.body / req.query.
+  // Reads and deletes re-verify document.userId === req.userId (IDOR guard).
+  // ─────────────────────────────────────────────────────────────────────
 
-      const { documentType, userId = "default-user" } = req.body;
-      
-      if (!documentType || !['form16', 'ais', '26as'].includes(documentType)) {
-        return res.status(400).json({ error: "Invalid document type. Must be: form16, ais, or 26as" });
-      }
-
-      // Use local storage
-      console.log('Using local storage for document upload');
-      
-      const uploadDir = 'uploads';
-      if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir, { recursive: true });
-      }
-      
-      const fileId = crypto.randomUUID();
-      const localFileName = `${fileId}_${req.file.originalname}`;
-      const localFilePath = path.join(uploadDir, localFileName);
-      
-      // Write file to local storage
-      await fs.promises.writeFile(localFilePath, req.file.buffer);
-      const filePath = localFilePath;
-      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
-      
-      console.log('Document uploaded to local storage successfully');
-
-      // Create tax document record
-      const taxDocument = await storage.createTaxDocument({
-        userId,
-        documentType,
-        fileName: req.file.originalname,
-        filePath: filePath,
-        firebaseFileId: null,
-        downloadUrl: null,
-        fileSize: req.file.size,
-        expiresAt: expiresAt,
-        processingStatus: 'pending'
-      });
-
-      // Process PDF in background
-      processDocumentAsync(taxDocument.id, filePath, documentType, null);
-
-      res.json({
-        success: true,
-        documentId: taxDocument.id,
-        message: "Document uploaded successfully. Processing started.",
-        status: "pending"
-      });
-
-    } catch (error) {
-      console.error("Upload error:", error);
-      res.status(500).json({ error: "Failed to upload document" });
-    }
-  });
-
-  app.get("/api/tax-documents/:documentId/status", async (req, res) => {
-    try {
-      const document = await storage.getTaxDocument(req.params.documentId);
-      if (!document) {
-        return res.status(404).json({ error: "Document not found" });
-      }
-
-      const extractedData = await storage.getExtractedTaxData(document.id);
-      
-      res.json({
-        documentId: document.id,
-        status: document.processingStatus,
-        isProcessed: document.isProcessed,
-        errorMessage: document.errorMessage,
-        extractedData: extractedData || null
-      });
-
-    } catch (error) {
-      console.error("Status check error:", error);
-      res.status(500).json({ error: "Failed to check document status" });
-    }
-  });
-
-  app.get("/api/tax-documents", async (req, res) => {
-    try {
-      const userId = String(req.query.userId || "default-user");
-      const documents = await storage.getTaxDocuments(userId);
-      res.json(documents);
-    } catch (error) {
-      console.error("Fetch documents error:", error);
-      res.status(500).json({ error: "Failed to fetch documents" });
-    }
-  });
-
-  // Firebase Storage cleanup endpoint
-  app.post("/api/firebase/cleanup", async (req, res) => {
-    try {
-      const { userId = 'default-user' } = req.body;
-      
-      let deletedCount = 0;
+  // POST /api/tax-documents/upload — authed, rate-limited, PDF magic-byte check,
+  // sanitised filename on disk (no original user filename persisted on disk).
+  app.post(
+    "/api/tax-documents/upload",
+    uploadLimiter,
+    authenticateFirebaseToken,
+    upload.single("document"),
+    async (req: AuthenticatedRequest, res) => {
       try {
-        console.log('No external storage cleanup needed');
-        console.log(`Cleaned up ${deletedCount} expired Firebase documents for user ${userId}`);
-      } catch (firebaseError) {
-        console.log('Firebase cleanup failed, continuing with local cleanup:', firebaseError);
-      }
-      
-      res.json({ 
-        success: true, 
-        deletedCount,
-        message: `Cleaned up ${deletedCount} expired documents` 
-      });
-    } catch (error) {
-      console.error("Cleanup error:", error);
-      res.status(500).json({ error: "Failed to cleanup documents" });
-    }
-  });
-
-  // Firebase Storage session cleanup endpoint with local storage cleanup
-  app.post("/api/firebase/cleanup-session", async (req, res) => {
-    try {
-      const { userId = 'default-user' } = req.body;
-      console.log(`Starting session cleanup for user: ${userId}`);
-      
-      let firebaseDeletedCount = 0;
-      let localDeletedCount = 0;
-      
-      // Clean up Firebase documents
-      try {
-        console.log('No external storage cleanup needed');
-        console.log(`Cleaned up ${firebaseDeletedCount} Firebase documents for user session ${userId}`);
-      } catch (firebaseError) {
-        console.log('Firebase session cleanup failed:', firebaseError);
-      }
-      
-      // Clean up local storage documents and database records
-      let userDocuments: any[] = [];
-      try {
-        userDocuments = await storage.getTaxDocumentsByUserId(userId);
-        
-        for (const doc of userDocuments) {
-          // Delete local file if it exists
-          if (doc.filePath && !doc.filePath.startsWith('firebase:') && fs.existsSync(doc.filePath)) {
-            try {
-              await fs.promises.unlink(doc.filePath);
-              localDeletedCount++;
-              console.log(`Deleted local file: ${doc.filePath}`);
-            } catch (fileError) {
-              console.log(`Failed to delete local file ${doc.filePath}:`, fileError);
-            }
-          }
-          
-          // Remove database record
-          await storage.deleteTaxDocument(doc.id);
+        if (!req.file) {
+          return res.status(400).json({ error: "No file uploaded" });
         }
-        
-        console.log(`Cleaned up ${userDocuments.length} database records and ${localDeletedCount} local files for user session ${userId}`);
-      } catch (localError) {
-        console.log('Local storage cleanup failed:', localError);
+
+        // MIME was checked by multer — now verify the actual magic bytes.
+        if (!looksLikePdf(req.file.buffer)) {
+          return res.status(400).json({ error: "Uploaded file is not a valid PDF" });
+        }
+
+        const { documentType } = req.body;
+        if (!documentType || !["form16", "ais", "26as"].includes(documentType)) {
+          return res.status(400).json({ error: "Invalid document type. Must be: form16, ais, or 26as" });
+        }
+
+        const userId = req.userId!;
+
+        const uploadDir = "uploads";
+        if (!fs.existsSync(uploadDir)) {
+          fs.mkdirSync(uploadDir, { recursive: true });
+        }
+
+        const fileId = crypto.randomUUID();
+        // NEVER use req.file.originalname in the on-disk name. We only store
+        // a UUID with a `.pdf` extension, then belt-and-braces check that the
+        // resolved path is inside uploadDir to block any path traversal.
+        const localFileName = safeUploadFilename(fileId, req.file.originalname);
+        const localFilePath = path.join(uploadDir, localFileName);
+        if (!ensureWithin(uploadDir, localFilePath)) {
+          return res.status(400).json({ error: "Invalid upload path" });
+        }
+
+        await fs.promises.writeFile(localFilePath, req.file.buffer);
+        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+        // We keep the original filename in the DB (display-only) — escape it
+        // if ever rendered in HTML. Never use it for filesystem operations.
+        const safeOriginalName = path.basename(req.file.originalname || "document.pdf");
+
+        const taxDocument = await storage.createTaxDocument({
+          userId,
+          documentType,
+          fileName: safeOriginalName,
+          filePath: localFilePath,
+          firebaseFileId: null,
+          downloadUrl: null,
+          fileSize: req.file.size,
+          expiresAt: expiresAt,
+          processingStatus: "pending",
+        });
+
+        // Process PDF in background
+        processDocumentAsync(taxDocument.id, localFilePath, documentType, null);
+
+        res.json({
+          success: true,
+          documentId: taxDocument.id,
+          message: "Document uploaded successfully. Processing started.",
+          status: "pending",
+        });
+      } catch (error) {
+        console.error("Upload error:", error);
+        res.status(500).json({ error: "Failed to upload document" });
       }
-      
-      const totalDeleted = firebaseDeletedCount + localDeletedCount + userDocuments.length;
-      
-      res.json({ 
-        success: true, 
-        deletedCount: totalDeleted,
-        firebaseDeleted: firebaseDeletedCount,
-        localDeleted: localDeletedCount,
-        databaseDeleted: userDocuments.length,
-        message: `Session cleanup completed. Removed ${totalDeleted} total documents` 
-      });
-    } catch (error) {
-      console.error("Session cleanup error:", error);
-      res.status(500).json({ error: "Failed to cleanup session documents" });
     }
-  });
+  );
+
+  // GET /api/tax-documents/:documentId/status — authed + IDOR-guarded.
+  app.get(
+    "/api/tax-documents/:documentId/status",
+    authenticateFirebaseToken,
+    async (req: AuthenticatedRequest, res) => {
+      try {
+        const document = await storage.getTaxDocument(req.params.documentId);
+        if (!document) {
+          return res.status(404).json({ error: "Document not found" });
+        }
+        // Ownership check — DB row must belong to the caller.
+        if (document.userId !== req.userId) {
+          // Return 404 (not 403) to avoid leaking existence of other users' docs.
+          return res.status(404).json({ error: "Document not found" });
+        }
+
+        const extractedData = await storage.getExtractedTaxData(document.id);
+
+        res.json({
+          documentId: document.id,
+          status: document.processingStatus,
+          isProcessed: document.isProcessed,
+          errorMessage: document.errorMessage,
+          extractedData: extractedData || null,
+        });
+      } catch (error) {
+        console.error("Status check error:", error);
+        res.status(500).json({ error: "Failed to check document status" });
+      }
+    }
+  );
+
+  // GET /api/tax-documents — list caller's own documents only.
+  app.get(
+    "/api/tax-documents",
+    authenticateFirebaseToken,
+    async (req: AuthenticatedRequest, res) => {
+      try {
+        const documents = await storage.getTaxDocuments(req.userId!);
+        res.json(documents);
+      } catch (error) {
+        console.error("Fetch documents error:", error);
+        res.status(500).json({ error: "Failed to fetch documents" });
+      }
+    }
+  );
+
+  // POST /api/firebase/cleanup — cleanup the *caller's* expired docs only.
+  app.post(
+    "/api/firebase/cleanup",
+    authenticateFirebaseToken,
+    async (req: AuthenticatedRequest, res) => {
+      try {
+        const userId = req.userId!;
+        let deletedCount = 0;
+        try {
+          console.log("No external storage cleanup needed");
+          console.log(`Cleaned up ${deletedCount} expired Firebase documents for user ${userId}`);
+        } catch (firebaseError) {
+          console.log("Firebase cleanup failed, continuing with local cleanup:", firebaseError);
+        }
+
+        res.json({
+          success: true,
+          deletedCount,
+          message: `Cleaned up ${deletedCount} expired documents`,
+        });
+      } catch (error) {
+        console.error("Cleanup error:", error);
+        res.status(500).json({ error: "Failed to cleanup documents" });
+      }
+    }
+  );
+
+  // POST /api/firebase/cleanup-session — wipes the caller's docs (DB + disk).
+  // Each file path is checked to be inside the uploads/ directory before unlink.
+  app.post(
+    "/api/firebase/cleanup-session",
+    authenticateFirebaseToken,
+    async (req: AuthenticatedRequest, res) => {
+      try {
+        const userId = req.userId!;
+        console.log(`Starting session cleanup for user: ${userId}`);
+
+        let firebaseDeletedCount = 0;
+        let localDeletedCount = 0;
+
+        try {
+          console.log("No external storage cleanup needed");
+          console.log(`Cleaned up ${firebaseDeletedCount} Firebase documents for user session ${userId}`);
+        } catch (firebaseError) {
+          console.log("Firebase session cleanup failed:", firebaseError);
+        }
+
+        const uploadDir = "uploads";
+        let userDocuments: any[] = [];
+        try {
+          userDocuments = await storage.getTaxDocumentsByUserId(userId);
+
+          for (const doc of userDocuments) {
+            // Defensive: ignore docs that somehow aren't owned by the caller.
+            if (doc.userId !== userId) continue;
+
+            if (doc.filePath && !doc.filePath.startsWith("firebase:")) {
+              // Only unlink files that resolve inside uploads/ — blocks any
+              // stored path-traversal from ever touching system paths.
+              if (ensureWithin(uploadDir, doc.filePath) && fs.existsSync(doc.filePath)) {
+                try {
+                  await fs.promises.unlink(doc.filePath);
+                  localDeletedCount++;
+                  console.log(`Deleted local file: ${doc.filePath}`);
+                } catch (fileError) {
+                  console.log(`Failed to delete local file ${doc.filePath}:`, fileError);
+                }
+              } else {
+                console.warn(`Refused to unlink unsafe path: ${doc.filePath}`);
+              }
+            }
+
+            await storage.deleteTaxDocument(doc.id);
+          }
+
+          console.log(`Cleaned up ${userDocuments.length} database records and ${localDeletedCount} local files for user session ${userId}`);
+        } catch (localError) {
+          console.log("Local storage cleanup failed:", localError);
+        }
+
+        const totalDeleted = firebaseDeletedCount + localDeletedCount + userDocuments.length;
+
+        res.json({
+          success: true,
+          deletedCount: totalDeleted,
+          firebaseDeleted: firebaseDeletedCount,
+          localDeleted: localDeletedCount,
+          databaseDeleted: userDocuments.length,
+          message: `Session cleanup completed. Removed ${totalDeleted} total documents`,
+        });
+      } catch (error) {
+        console.error("Session cleanup error:", error);
+        res.status(500).json({ error: "Failed to cleanup session documents" });
+      }
+    }
+  );
 
   // PDF processing pipeline status endpoint
   app.post("/api/adobe/test-access", async (req, res) => {
@@ -952,26 +1046,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // External MF API proxy to avoid CORS
-  app.get("/api/external/mutual-funds", async (req, res) => {
-    try {
-      const response = await fetch("https://api.mfapi.in/mf");
-      const data = await response.json();
-      res.json(data);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch external mutual funds data" });
-    }
-  });
+  // ─────────────────────────────────────────────────────────────────────
+  // EXTERNAL PROXIES — rate-limited, auth-required, and strictly scoped.
+  // These wrap third-party APIs so browser code doesn't expose our keys
+  // and so we can cap fan-out + apply a clean SSRF surface (no user-
+  // controlled hostnames; only fixed templates with whitelisted values).
+  // ─────────────────────────────────────────────────────────────────────
 
-  app.get("/api/external/mutual-funds/:code", async (req, res) => {
-    try {
-      const response = await fetch(`https://api.mfapi.in/mf/${req.params.code}`);
-      const data = await response.json();
-      res.json(data);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch mutual fund details" });
+  // External MF API proxy to avoid CORS
+  app.get(
+    "/api/external/mutual-funds",
+    externalProxyLimiter,
+    authenticateFirebaseToken,
+    async (_req: AuthenticatedRequest, res) => {
+      try {
+        const response = await fetch("https://api.mfapi.in/mf");
+        const data = await response.json();
+        res.json(data);
+      } catch (error) {
+        res.status(500).json({ error: "Failed to fetch external mutual funds data" });
+      }
     }
-  });
+  );
+
+  app.get(
+    "/api/external/mutual-funds/:code",
+    externalProxyLimiter,
+    authenticateFirebaseToken,
+    async (req: AuthenticatedRequest, res) => {
+      try {
+        // MFAPI scheme codes are numeric — reject anything else to prevent
+        // injection of path segments or malicious hostnames.
+        if (!/^\d{1,10}$/.test(req.params.code)) {
+          return res.status(400).json({ error: "Invalid mutual fund code" });
+        }
+        const response = await fetch(`https://api.mfapi.in/mf/${req.params.code}`);
+        const data = await response.json();
+        res.json(data);
+      } catch (error) {
+        res.status(500).json({ error: "Failed to fetch mutual fund details" });
+      }
+    }
+  );
 
   // Market Data API
   app.get("/api/market-data", async (req, res) => {
@@ -996,47 +1112,98 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // External Alpha Vantage API proxy
-  app.get("/api/external/alpha-vantage", async (req, res) => {
-    try {
-      const { function: func, symbol, interval, apikey } = req.query;
-      const funcParam = String(func || '');
-      const symbolParam = String(symbol || '');
-      const intervalParam = String(interval || '');
-      const apikeyParam = String(apikey || '');
-      
-      if (!funcParam || !symbolParam) {
-        return res.status(400).json({ error: "Function and symbol parameters are required" });
-      }
-      const API_KEY = process.env.ALPHA_VANTAGE_API_KEY || apikeyParam || 'demo';
-      
-      const url = new URL("https://www.alphavantage.co/query");
-      url.searchParams.set("function", funcParam);
-      url.searchParams.set("symbol", symbolParam);
-      if (intervalParam) url.searchParams.set("interval", intervalParam);
-      url.searchParams.set("apikey", API_KEY);
+  // - Whitelists function names so we never proxy a crafted function string.
+  // - Never forwards a client-supplied apikey — always use the server key.
+  const ALPHA_VANTAGE_FUNCTIONS = new Set([
+    "TIME_SERIES_INTRADAY",
+    "TIME_SERIES_DAILY",
+    "TIME_SERIES_WEEKLY",
+    "TIME_SERIES_MONTHLY",
+    "GLOBAL_QUOTE",
+    "SYMBOL_SEARCH",
+    "OVERVIEW",
+  ]);
+  const ALPHA_VANTAGE_INTERVALS = new Set(["1min", "5min", "15min", "30min", "60min"]);
 
-      const response = await fetch(url.toString());
-      const data = await response.json();
-      res.json(data);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch Alpha Vantage data" });
+  app.get(
+    "/api/external/alpha-vantage",
+    externalProxyLimiter,
+    authenticateFirebaseToken,
+    async (req: AuthenticatedRequest, res) => {
+      try {
+        const funcParam = String(req.query.function || "");
+        const symbolParam = String(req.query.symbol || "");
+        const intervalParam = String(req.query.interval || "");
+
+        if (!funcParam || !symbolParam) {
+          return res.status(400).json({ error: "Function and symbol parameters are required" });
+        }
+        if (!ALPHA_VANTAGE_FUNCTIONS.has(funcParam)) {
+          return res.status(400).json({ error: "Unsupported function" });
+        }
+        if (!/^[A-Za-z0-9.:-]{1,16}$/.test(symbolParam)) {
+          return res.status(400).json({ error: "Invalid symbol" });
+        }
+        if (intervalParam && !ALPHA_VANTAGE_INTERVALS.has(intervalParam)) {
+          return res.status(400).json({ error: "Invalid interval" });
+        }
+
+        const API_KEY = process.env.ALPHA_VANTAGE_API_KEY || "demo";
+
+        const url = new URL("https://www.alphavantage.co/query");
+        url.searchParams.set("function", funcParam);
+        url.searchParams.set("symbol", symbolParam);
+        if (intervalParam) url.searchParams.set("interval", intervalParam);
+        url.searchParams.set("apikey", API_KEY);
+
+        const response = await fetch(url.toString());
+        const data = await response.json();
+        res.json(data);
+      } catch (error) {
+        res.status(500).json({ error: "Failed to fetch Alpha Vantage data" });
+      }
     }
-  });
+  );
 
   // External Finnhub API proxy
-  app.get("/api/external/finnhub", async (req, res) => {
-    try {
-      const { endpoint, symbol } = req.query;
-      const API_KEY = process.env.FINNHUB_API_KEY || 'demo';
-      
-      const url = `https://finnhub.io/api/v1/${String(endpoint)}?symbol=${String(symbol)}&token=${API_KEY}`;
-      const response = await fetch(url);
-      const data = await response.json();
-      res.json(data);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch Finnhub data" });
+  // - Whitelists endpoint names; path is fixed (no user-controlled host/path).
+  const FINNHUB_ENDPOINTS = new Set([
+    "quote",
+    "stock/profile2",
+    "stock/candle",
+    "company-news",
+    "stock/symbol",
+  ]);
+
+  app.get(
+    "/api/external/finnhub",
+    externalProxyLimiter,
+    authenticateFirebaseToken,
+    async (req: AuthenticatedRequest, res) => {
+      try {
+        const endpoint = String(req.query.endpoint || "");
+        const symbol = String(req.query.symbol || "");
+
+        if (!FINNHUB_ENDPOINTS.has(endpoint)) {
+          return res.status(400).json({ error: "Unsupported endpoint" });
+        }
+        if (!/^[A-Za-z0-9.:-]{1,16}$/.test(symbol)) {
+          return res.status(400).json({ error: "Invalid symbol" });
+        }
+        const API_KEY = process.env.FINNHUB_API_KEY || "demo";
+
+        const url = new URL(`https://finnhub.io/api/v1/${endpoint}`);
+        url.searchParams.set("symbol", symbol);
+        url.searchParams.set("token", API_KEY);
+
+        const response = await fetch(url.toString());
+        const data = await response.json();
+        res.json(data);
+      } catch (error) {
+        res.status(500).json({ error: "Failed to fetch Finnhub data" });
+      }
     }
-  });
+  );
 
   // News API
   app.get("/api/news", async (req, res) => {
@@ -1049,21 +1216,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // External News API proxy
-  app.get("/api/external/news", async (req, res) => {
-    try {
-      const API_KEY = process.env.NEWS_API_KEY || 'demo';
-      const category = String(req.query.category || 'business');
-      const country = String(req.query.country || 'in');
-      
-      const url = `https://newsapi.org/v2/top-headlines?country=${country}&category=${category}&apiKey=${API_KEY}`;
-      const response = await fetch(url);
-      const data = await response.json();
-      res.json(data);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch external news" });
+  // External News API proxy — whitelist category + country, no free-form input.
+  const NEWS_CATEGORIES = new Set([
+    "business", "entertainment", "general", "health",
+    "science", "sports", "technology",
+  ]);
+  const NEWS_COUNTRIES = new Set([
+    "in", "us", "gb", "ae", "sg", "au", "ca",
+  ]);
+
+  app.get(
+    "/api/external/news",
+    externalProxyLimiter,
+    authenticateFirebaseToken,
+    async (req: AuthenticatedRequest, res) => {
+      try {
+        const API_KEY = process.env.NEWS_API_KEY || "demo";
+        const category = String(req.query.category || "business");
+        const country = String(req.query.country || "in");
+
+        if (!NEWS_CATEGORIES.has(category)) {
+          return res.status(400).json({ error: "Invalid category" });
+        }
+        if (!NEWS_COUNTRIES.has(country)) {
+          return res.status(400).json({ error: "Invalid country" });
+        }
+
+        const url = new URL("https://newsapi.org/v2/top-headlines");
+        url.searchParams.set("country", country);
+        url.searchParams.set("category", category);
+        url.searchParams.set("apiKey", API_KEY);
+
+        const response = await fetch(url.toString());
+        const data = await response.json();
+        res.json(data);
+      } catch (error) {
+        res.status(500).json({ error: "Failed to fetch external news" });
+      }
     }
-  });
+  );
 
   // IPO Data API
   app.get("/api/ipo-data", async (req, res) => {
@@ -1645,20 +1836,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ==========================================
 
   // Get user's tax calculation history
-  app.get("/api/tax-calculations", async (req, res) => {
+  app.get("/api/tax-calculations", authenticateFirebaseToken, async (req: AuthenticatedRequest, res) => {
     try {
-      const authHeader = req.headers.authorization;
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ error: "Unauthorized" });
-      }
-
-      const token = authHeader.split(' ')[1];
-      const decodedToken = await verifyFirebaseToken(token);
-      if (!decodedToken) {
-        return res.status(401).json({ error: "Invalid token" });
-      }
-
-      const calculations = await storage.getTaxCalculationHistory(decodedToken.uid);
+      const calculations = await storage.getTaxCalculationHistory(req.userId!);
       res.json(calculations);
     } catch (error) {
       console.error("Error getting tax calculations:", error);
@@ -1666,29 +1846,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get single tax calculation by ID
-  app.get("/api/tax-calculations/:id", async (req, res) => {
+  // Get single tax calculation by ID — IDOR-guarded (returns 404 instead of
+  // 403 on a mismatch so the endpoint doesn't leak existence of others' rows).
+  app.get("/api/tax-calculations/:id", authenticateFirebaseToken, async (req: AuthenticatedRequest, res) => {
     try {
-      const authHeader = req.headers.authorization;
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ error: "Unauthorized" });
-      }
-
-      const token = authHeader.split(' ')[1];
-      const decodedToken = await verifyFirebaseToken(token);
-      if (!decodedToken) {
-        return res.status(401).json({ error: "Invalid token" });
-      }
-
       const calculation = await storage.getTaxCalculationById(req.params.id);
-      if (!calculation) {
+      if (!calculation || calculation.userId !== req.userId) {
         return res.status(404).json({ error: "Calculation not found" });
       }
-
-      if (calculation.userId !== decodedToken.uid) {
-        return res.status(403).json({ error: "Forbidden" });
-      }
-
       res.json(calculation);
     } catch (error) {
       console.error("Error getting tax calculation:", error);
@@ -1696,26 +1861,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Save a new tax calculation
-  app.post("/api/tax-calculations", async (req, res) => {
+  // Save a new tax calculation — userId always overridden from the token.
+  app.post("/api/tax-calculations", authenticateFirebaseToken, async (req: AuthenticatedRequest, res) => {
     try {
-      const authHeader = req.headers.authorization;
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ error: "Unauthorized" });
-      }
-
-      const token = authHeader.split(' ')[1];
-      const decodedToken = await verifyFirebaseToken(token);
-      if (!decodedToken) {
-        return res.status(401).json({ error: "Invalid token" });
-      }
-
       const thirtyDaysFromNow = new Date();
       thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
 
+      // Spread FIRST, then overwrite — a malicious client sending `userId`
+      // in the body cannot smuggle another user's id past us.
       const calculationData = {
         ...req.body,
-        userId: decodedToken.uid,
+        userId: req.userId!,
         expiresAt: thirtyDaysFromNow,
       };
 
@@ -1727,27 +1883,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Delete a tax calculation
-  app.delete("/api/tax-calculations/:id", async (req, res) => {
+  // Delete a tax calculation — IDOR-guarded via ownership re-check.
+  app.delete("/api/tax-calculations/:id", authenticateFirebaseToken, async (req: AuthenticatedRequest, res) => {
     try {
-      const authHeader = req.headers.authorization;
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ error: "Unauthorized" });
-      }
-
-      const token = authHeader.split(' ')[1];
-      const decodedToken = await verifyFirebaseToken(token);
-      if (!decodedToken) {
-        return res.status(401).json({ error: "Invalid token" });
-      }
-
       const calculation = await storage.getTaxCalculationById(req.params.id);
-      if (!calculation) {
+      if (!calculation || calculation.userId !== req.userId) {
         return res.status(404).json({ error: "Calculation not found" });
-      }
-
-      if (calculation.userId !== decodedToken.uid) {
-        return res.status(403).json({ error: "Forbidden" });
       }
 
       await storage.deleteTaxCalculation(req.params.id);
