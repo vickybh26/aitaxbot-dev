@@ -969,60 +969,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   );
 
-  // PDF processing pipeline status endpoint
-  app.post("/api/adobe/test-access", async (req, res) => {
-    try {
-      const hasGemini = !!(process.env.GOOGLE_API_KEY);
-      res.json({
-        success: true,
-        configured: true,
-        geminiAvailable: hasGemini,
-        message: hasGemini
-          ? 'PDF processing ready: pdfplumber + Gemini AI'
-          : 'PDF processing ready: pdfplumber + regex fallback (set GOOGLE_API_KEY for AI extraction)',
-        processingMethod: hasGemini ? 'gemini_ai' : 'regex_fallback'
-      });
-    } catch (error) {
-      res.status(500).json({ success: false, error: "Failed to check PDF processing configuration" });
-    }
-  });
+  // PDF processing pipeline status — admin-only diagnostic endpoint.
+  // Returns configuration state without exposing secret values.
+  app.post(
+    "/api/adobe/test-access",
+    authenticateFirebaseToken,
+    async (req: AuthenticatedRequest, res) => {
+      try {
+        // Restrict to admin accounts only (adminLevel must be set on the token)
+        const adminLevel = (req as any).adminLevel;
+        if (!adminLevel) {
+          return res.status(403).json({ error: "Admin access required" });
+        }
 
-  // Test document processing pipeline
-  app.post("/api/test-document-processing", async (req, res) => {
-    try {
-      const { testData } = req.body;
-      
-      // Import the LLM processor
-      const { structureDataWithLLM, createFallbackStructuredData } = await import('./llmProcessor');
-      
-      // Test LLM structuring
-      const structuredData = await structureDataWithLLM(testData || 'Sample tax document text');
-      
-      if (structuredData) {
+        const hasGemini = !!(process.env.GOOGLE_API_KEY);
         res.json({
           success: true,
-          message: 'Document processing pipeline working',
-          processingMethod: 'llm_structured',
-          data: structuredData
+          configured: true,
+          geminiAvailable: hasGemini,
+          message: hasGemini
+            ? 'PDF processing ready: pdfplumber + Gemini AI'
+            : 'PDF processing ready: pdfplumber + regex fallback (set GOOGLE_API_KEY for AI extraction)',
+          processingMethod: hasGemini ? 'gemini_ai' : 'regex_fallback'
         });
-      } else {
-        // Test fallback
-        const fallbackData = createFallbackStructuredData(testData || 'Sample tax document text');
-        res.json({
-          success: true,
-          message: 'Document processing pipeline working (fallback)',
-          processingMethod: 'fallback_structured',
-          data: fallbackData
+      } catch (error) {
+        res.status(500).json({ success: false, error: "Failed to check PDF processing configuration" });
+      }
+    }
+  );
+
+  // Test document processing pipeline — admin-only diagnostic endpoint.
+  // Allows admins to verify the LLM extraction pipeline is functioning.
+  app.post(
+    "/api/test-document-processing",
+    authenticateFirebaseToken,
+    async (req: AuthenticatedRequest, res) => {
+      try {
+        // Restrict to admin accounts only
+        const adminLevel = (req as any).adminLevel;
+        if (!adminLevel) {
+          return res.status(403).json({ error: "Admin access required" });
+        }
+
+        const { testData } = req.body;
+
+        // Import the LLM processor
+        const { structureDataWithLLM, createFallbackStructuredData } = await import('./llmProcessor');
+
+        // Test LLM structuring
+        const structuredData = await structureDataWithLLM(testData || 'Sample tax document text');
+
+        if (structuredData) {
+          res.json({
+            success: true,
+            message: 'Document processing pipeline working',
+            processingMethod: 'llm_structured',
+            data: structuredData
+          });
+        } else {
+          // Test fallback
+          const fallbackData = createFallbackStructuredData(testData || 'Sample tax document text');
+          res.json({
+            success: true,
+            message: 'Document processing pipeline working (fallback)',
+            processingMethod: 'fallback_structured',
+            data: fallbackData
+          });
+        }
+      } catch (error) {
+        res.status(500).json({
+          success: false,
+          error: "Failed to test document processing",
+          details: (error as any)?.message
         });
       }
-    } catch (error) {
-      res.status(500).json({ 
-        success: false,
-        error: "Failed to test document processing",
-        details: (error as any)?.message
-      });
     }
-  });
+  );
 
   // Mutual Funds API
   app.get("/api/mutual-funds", async (req, res) => {
@@ -1148,7 +1170,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(400).json({ error: "Invalid interval" });
         }
 
-        const API_KEY = process.env.ALPHA_VANTAGE_API_KEY || "demo";
+        const API_KEY = process.env.ALPHA_VANTAGE_API_KEY;
+        if (!API_KEY) {
+          return res.status(503).json({ error: "Market data service not configured" });
+        }
 
         const url = new URL("https://www.alphavantage.co/query");
         url.searchParams.set("function", funcParam);
@@ -1190,7 +1215,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (!/^[A-Za-z0-9.:-]{1,16}$/.test(symbol)) {
           return res.status(400).json({ error: "Invalid symbol" });
         }
-        const API_KEY = process.env.FINNHUB_API_KEY || "demo";
+        const API_KEY = process.env.FINNHUB_API_KEY;
+        if (!API_KEY) {
+          return res.status(503).json({ error: "Market data service not configured" });
+        }
 
         const url = new URL(`https://finnhub.io/api/v1/${endpoint}`);
         url.searchParams.set("symbol", symbol);
@@ -1231,7 +1259,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     authenticateFirebaseToken,
     async (req: AuthenticatedRequest, res) => {
       try {
-        const API_KEY = process.env.NEWS_API_KEY || "demo";
+        const API_KEY = process.env.NEWS_API_KEY;
+        if (!API_KEY) {
+          return res.status(503).json({ error: "News service not configured" });
+        }
         const category = String(req.query.category || "business");
         const country = String(req.query.country || "in");
 
@@ -1921,12 +1952,24 @@ async function processDocumentAsync(documentId: string, filePath: string, docume
       return;
     }
 
-    // Call Python processor (pdfplumber extraction + Gemini structuring)
+    // Call Python processor (pdfplumber extraction + Gemini structuring).
+    // SECURITY: Pass only the specific env vars the script needs.
+    // Never spread process.env — that would expose Firebase service account,
+    // Adobe credentials, Brevo keys, and all other secrets to the subprocess.
     const { spawn } = await import('child_process');
-    
+
+    const pythonEnv: Record<string, string> = {
+      // Required for Python itself to locate libraries and temp dirs
+      PATH: process.env.PATH ?? "",
+      HOME: process.env.HOME ?? "",
+      TMPDIR: process.env.TMPDIR ?? "/tmp",
+      // Only secret the script actually reads (for Gemini AI extraction)
+      GOOGLE_API_KEY: process.env.GOOGLE_API_KEY ?? "",
+    };
+
     const result = await new Promise<any>((resolve, reject) => {
       const python = spawn('python3', ['server/pdfProcessor.py', filePath, documentType], {
-        env: { ...process.env },
+        env: pythonEnv,
         timeout: 120000 // 2 minute timeout
       });
 
