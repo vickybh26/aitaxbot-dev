@@ -100,18 +100,13 @@ export default function SIPCalculatorPage() {
         {/* Misconception Buster */}
         <section className="py-6 px-6">
           <div className="max-w-6xl mx-auto">
-            <div className="bg-red-50 border border-red-200 rounded-xl p-6">
-              <h3 className="text-lg font-bold text-red-800 mb-2">
-                ⚠️ Common SIP Misconception — Most Investors Don't Plan for LTCG Tax
-              </h3>
-              <p className="text-red-700 mb-2">
-                Most SIP investors focus only on returns and ignore capital gains tax (LTCG). When equity funds
-                are redeemed after 1 year, <strong>12.5% LTCG tax applies on gains above ₹1.25 lakh per financial year</strong> (Finance Act 2024).
-              </p>
-              <p className="text-red-700">
-                A ₹50 lakh SIP corpus with ₹30 lakh gains could mean ₹3.5+ lakh in tax if redeemed in one year.
-                But by spreading redemptions across 2-3 financial years (₹10-15 lakh gains/year), you stay under
-                ₹1.25L limit in each year and pay <strong>zero LTCG tax</strong>. Plan your exit strategy now, not at maturity.
+            <div className="border-l-4 border-amber-500 bg-slate-50 px-5 py-4 rounded-r-lg">
+              <p className="text-xs font-semibold text-amber-600 uppercase tracking-wide mb-1">Tax Planning</p>
+              <p className="text-sm font-semibold text-slate-800 mb-1">Most SIP investors don't plan for LTCG tax — and it costs them.</p>
+              <p className="text-sm text-slate-600">
+                When equity funds are redeemed after 1 year, <strong>12.5% LTCG tax applies on gains above ₹1.25 lakh per year</strong> (Finance Act 2024).
+                A ₹50L corpus with ₹30L gains means ₹3.5L+ tax if redeemed in one shot.
+                Spread redemptions across 2–3 years, stay under ₹1.25L per year, and pay zero LTCG tax.
               </p>
             </div>
           </div>
