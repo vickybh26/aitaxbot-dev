@@ -196,53 +196,50 @@ export default function HRACalculatorPage() {
             </div>
 
             {/* Metro vs Non-Metro */}
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Metro vs Non-Metro Cities</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">Metro vs Non-Metro Cities — Updated for FY 2026-27</h2>
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
+              <p className="text-sm text-blue-900 font-semibold">
+                🆕 Rule Change from FY 2026-27 (IT Rules 2026, Rule 280): The list of metro cities for HRA has expanded from 4 to 8.
+                Bengaluru, Hyderabad, Pune and Ahmedabad are now metro cities — qualifying for 50% HRA cap instead of 40%.
+                This change applies to FY 2026-27 onwards. For FY 2025-26 and earlier, only the original 4 cities applied.
+              </p>
+            </div>
             <div className="grid md:grid-cols-2 gap-6 mb-8">
               <div className="bg-green-50 border border-green-200 rounded-xl p-5">
-                <h3 className="text-lg font-bold text-green-800 mb-3">Metro Cities (50% cap)</h3>
-                <ul className="space-y-2 text-sm text-slate-700">
-                  <li className="flex gap-2">
-                    <span className="text-green-600 font-bold">✓</span>
-                    <span>Mumbai</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="text-green-600 font-bold">✓</span>
-                    <span>Delhi (NCT)</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="text-green-600 font-bold">✓</span>
-                    <span>Kolkata</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="text-green-600 font-bold">✓</span>
-                    <span>Chennai</span>
-                  </li>
-                </ul>
+                <h3 className="text-lg font-bold text-green-800 mb-3">8 Metro Cities (50% cap) — FY 2026-27 onwards</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  {["Mumbai", "Delhi (NCT)", "Kolkata", "Chennai", "Bengaluru", "Hyderabad", "Pune", "Ahmedabad"].map(city => (
+                    <div key={city} className="flex gap-2 text-sm text-slate-700">
+                      <span className="text-green-600 font-bold">✓</span>
+                      <span>{city}</span>
+                    </div>
+                  ))}
+                </div>
                 <p className="text-xs text-green-700 mt-3 bg-green-100 rounded p-2">
-                  Only these 4 cities qualify as metro for HRA purposes under IT Act Section 10(13A).
+                  Source: IT Rules 2026, Rule 280 — effective April 1, 2026. HRA exemption cap = 50% of basic salary for these 8 cities.
                 </p>
               </div>
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
-                <h3 className="text-lg font-bold text-amber-800 mb-3">Non-Metro Cities (40% cap)</h3>
+                <h3 className="text-lg font-bold text-amber-800 mb-3">All Other Cities (40% cap)</h3>
                 <p className="text-sm text-slate-700 mb-3">
-                  All other cities and towns, including:
+                  Every city not in the 8-metro list qualifies for 40% of basic salary:
                 </p>
                 <ul className="space-y-2 text-sm text-slate-700">
-                  <li className="flex gap-2">
-                    <span className="text-amber-600 font-bold">→</span>
-                    <span>Bangalore, Hyderabad, Pune, Ahmedabad</span>
-                  </li>
                   <li className="flex gap-2">
                     <span className="text-amber-600 font-bold">→</span>
                     <span>Chandigarh, Jaipur, Lucknow, Surat</span>
                   </li>
                   <li className="flex gap-2">
                     <span className="text-amber-600 font-bold">→</span>
-                    <span>And ALL other cities across India</span>
+                    <span>Bhopal, Nagpur, Kochi, Coimbatore</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="text-amber-600 font-bold">→</span>
+                    <span>All Tier 2 and Tier 3 cities</span>
                   </li>
                 </ul>
                 <p className="text-xs text-amber-700 mt-3 bg-amber-100 rounded p-2">
-                  Most common mistake: Claiming 50% for Bangalore/Hyderabad. This triggers tax notices.
+                  If your city is not in the 8-metro list above, select Non-Metro in the calculator (40% cap applies).
                 </p>
               </div>
             </div>
@@ -267,9 +264,9 @@ export default function HRACalculatorPage() {
                 </div>
               </div>
 
-              {/* Example 2: Hyderabad Non-Metro Mistake */}
+              {/* Example 2: Hyderabad now Metro FY 2026-27 */}
               <div className="bg-slate-50 border rounded-xl p-6">
-                <h3 className="font-bold text-slate-900 mb-3">Example 2 — Hyderabad (Common Mistake!)</h3>
+                <h3 className="font-bold text-slate-900 mb-3">Example 2 — Hyderabad (Now Metro from FY 2026-27!)</h3>
                 <div className="space-y-1 text-sm text-slate-700">
                   <div className="flex justify-between"><span>Basic Salary (annual):</span><span className="font-semibold">₹10,00,000</span></div>
                   <div className="flex justify-between"><span>HRA received (annual):</span><span className="font-semibold">₹5,00,000</span></div>
@@ -277,9 +274,10 @@ export default function HRACalculatorPage() {
                   <div className="border-t border-slate-300 my-2"></div>
                   <div className="flex justify-between"><span>① Actual HRA:</span><span className="font-semibold">₹5,00,000</span></div>
                   <div className="flex justify-between"><span>② Rent − 10% basic:</span><span className="font-semibold">₹3,80,000</span></div>
-                  <div className="flex justify-between text-amber-700"><span>③ 40% of basic (NON-metro):</span><span className="font-semibold">₹4,00,000</span></div>
+                  <div className="flex justify-between text-green-700"><span>③ 50% of basic (METRO now!):</span><span className="font-semibold">₹5,00,000</span></div>
                   <div className="border-t border-slate-300 my-2"></div>
-                  <div className="flex justify-between"><span className="font-bold text-amber-700">HRA Exempt (min):</span><span className="font-bold text-amber-700">₹3,80,000</span></div>
+                  <div className="flex justify-between"><span className="font-bold text-green-700">HRA Exempt (min):</span><span className="font-bold text-green-700">₹3,80,000</span></div>
+                  <div className="text-xs text-blue-700 mt-2">📌 Under old rules (FY 2025-26), ③ would have been 40% = ₹4,00,000. Same result here, but at higher incomes the 50% cap gives more exemption.</div>
                 </div>
               </div>
 
@@ -314,11 +312,11 @@ export default function HRACalculatorPage() {
             {/* Pro Tips */}
             <h2 className="text-2xl font-bold text-slate-900 mb-4">Pro Tips on HRA — Maximize Your Exemption</h2>
             <div className="grid md:grid-cols-2 gap-4 mb-8">
-              <div className="flex gap-3 p-4 bg-amber-50 border border-amber-100 rounded-lg">
-                <span className="text-amber-600 text-lg font-bold shrink-0">1</span>
+              <div className="flex gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <span className="text-blue-600 text-lg font-bold shrink-0">1</span>
                 <div>
-                  <p className="font-semibold text-slate-900 text-sm">Hyderabad/Bangalore are non-metro — 40% not 50%</p>
-                  <p className="text-slate-600 text-sm mt-1">Only Mumbai, Delhi, Kolkata, Chennai qualify as metro. Claiming 50% for Bangalore or Hyderabad is a costly error that commonly triggers IT notices. Use our calculator with the correct city type.</p>
+                  <p className="font-semibold text-slate-900 text-sm">Bengaluru/Hyderabad/Pune/Ahmedabad are NOW metro from FY 2026-27 — use 50%</p>
+                  <p className="text-slate-600 text-sm mt-1">IT Rules 2026 (Rule 280) expanded the metro list from 4 to 8 cities. If you're in Bengaluru, Hyderabad, Pune or Ahmedabad, you now qualify for the 50% HRA cap from FY 2026-27 — a meaningful boost to your exemption. Make sure your employer has updated their payroll system.</p>
                 </div>
               </div>
               <div className="flex gap-3 p-4 bg-amber-50 border border-amber-100 rounded-lg">
