@@ -311,6 +311,127 @@ export default function SIPCalculatorPage() {
               </table>
             </div>
 
+            {/* SIP Returns Table */}
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">SIP Returns Table — How Much Will ₹1,000/Month Grow? (at 12% p.a.)</h2>
+            <p className="text-slate-600 mb-4">
+              One of the most searched questions in India: "If I invest ₹5,000/month in SIP for 10 years, how much will I get?" This table answers it instantly.
+              All values assume 12% annual return (historical Nifty 50 average). Actual returns may vary.
+            </p>
+            <div className="overflow-x-auto mb-3">
+              <table className="w-full border-collapse text-sm">
+                <thead>
+                  <tr className="bg-blue-700 text-white">
+                    <th className="border border-blue-600 p-3 text-left font-semibold">Monthly SIP</th>
+                    <th className="border border-blue-600 p-3 text-center font-semibold">5 Years</th>
+                    <th className="border border-blue-600 p-3 text-center font-semibold">10 Years</th>
+                    <th className="border border-blue-600 p-3 text-center font-semibold">15 Years</th>
+                    <th className="border border-blue-600 p-3 text-center font-semibold">20 Years</th>
+                    <th className="border border-blue-600 p-3 text-center font-semibold">25 Years</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="border border-slate-200 p-3 font-semibold text-slate-800">₹1,000/month</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹82,486</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹2.32 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹5.05 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹9.99 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹18.98 L</td>
+                  </tr>
+                  <tr className="bg-slate-50">
+                    <td className="border border-slate-200 p-3 font-semibold text-slate-800">₹2,000/month</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹1.65 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹4.65 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹10.10 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹19.98 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹37.95 L</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-slate-200 p-3 font-semibold text-slate-800">₹5,000/month</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹4.12 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹11.62 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹25.23 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-blue-700 font-semibold">₹49.96 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-purple-700 font-semibold">₹94.88 L</td>
+                  </tr>
+                  <tr className="bg-slate-50">
+                    <td className="border border-slate-200 p-3 font-semibold text-slate-800">₹10,000/month</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹8.25 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹23.23 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹50.46 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">₹1.00 Cr 🎯</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">₹1.90 Cr</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-slate-200 p-3 font-semibold text-slate-800">₹20,000/month</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹16.49 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹46.47 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">₹1.01 Cr 🎯</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">₹1.99 Cr</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">₹3.79 Cr</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p className="text-xs text-slate-500 mb-8">*Assumes 12% annual return, compounded monthly. Past performance does not guarantee future returns. LTCG tax applicable on equity fund gains above ₹1.25L/year.</p>
+
+            {/* How Much SIP to Reach ₹1 Crore */}
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">How Much SIP Do I Need to Reach ₹1 Crore?</h2>
+            <p className="text-slate-600 mb-4">
+              ₹1 crore is the most searched SIP goal in India. The answer depends entirely on <strong>how many years you have</strong>.
+              The earlier you start, the smaller the monthly investment needed — this is the power of compounding in action.
+            </p>
+            <div className="overflow-x-auto mb-3">
+              <table className="w-full border-collapse text-sm">
+                <thead>
+                  <tr className="bg-indigo-700 text-white">
+                    <th className="border border-indigo-600 p-3 text-left font-semibold">Time Horizon</th>
+                    <th className="border border-indigo-600 p-3 text-center font-semibold">Monthly SIP Needed</th>
+                    <th className="border border-indigo-600 p-3 text-center font-semibold">Total Invested</th>
+                    <th className="border border-indigo-600 p-3 text-center font-semibold">Total Gains</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="border border-slate-200 p-3 font-semibold text-slate-800">10 Years</td>
+                    <td className="border border-slate-200 p-3 text-center text-red-700 font-bold">₹43,041/month</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹51.65 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹48.35 L</td>
+                  </tr>
+                  <tr className="bg-slate-50">
+                    <td className="border border-slate-200 p-3 font-semibold text-slate-800">15 Years</td>
+                    <td className="border border-slate-200 p-3 text-center text-orange-700 font-bold">₹19,819/month</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹35.67 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹64.33 L</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-slate-200 p-3 font-semibold text-slate-800">20 Years</td>
+                    <td className="border border-slate-200 p-3 text-center text-blue-700 font-bold">₹10,009/month</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹24.02 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹75.98 L</td>
+                  </tr>
+                  <tr className="bg-slate-50">
+                    <td className="border border-slate-200 p-3 font-semibold text-slate-800">25 Years</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">₹5,270/month</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹15.81 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹84.19 L</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-slate-200 p-3 font-semibold text-slate-800">30 Years</td>
+                    <td className="border border-slate-200 p-3 text-center text-purple-700 font-bold">₹2,833/month</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹10.20 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹89.80 L</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div className="bg-indigo-50 border border-indigo-100 rounded-lg p-4 mb-8">
+              <p className="text-sm text-indigo-900">
+                <strong>Key insight:</strong> Starting 10 years earlier reduces your required monthly SIP by 83% — from ₹43,041 to ₹5,270.
+                In other words, time in the market is worth 4× more than the amount you invest. The best time to start a SIP was yesterday. The second best time is today.
+              </p>
+            </div>
+
             {/* FAQs */}
             <h2 className="text-2xl font-bold text-slate-900 mb-4">Frequently Asked Questions</h2>
             <div className="space-y-4">
