@@ -260,6 +260,93 @@ export default function SIPCalculatorPage() {
               </div>
             </div>
 
+            {/* Which Fund Type Is Right for You */}
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">Which Type of Mutual Fund Should You SIP In?</h2>
+            <p className="text-slate-600 mb-4">
+              Before starting a SIP, you need to pick a fund category that matches your risk tolerance and time horizon.
+              Here are the four most popular categories for Indian investors:
+            </p>
+            <div className="grid md:grid-cols-2 gap-4 mb-3">
+              <div className="p-4 bg-blue-50 border border-blue-100 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="bg-blue-700 text-white text-xs font-bold px-2 py-0.5 rounded">LOW RISK</span>
+                  <h3 className="font-bold text-slate-900">Large Cap Funds</h3>
+                </div>
+                <p className="text-sm text-slate-700 mb-2">Invest in India's top 100 companies (Reliance, TCS, HDFC Bank etc). Most stable equity category — lower volatility but lower upside vs mid/small cap.</p>
+                <div className="text-xs text-slate-600 space-y-1">
+                  <div className="flex justify-between"><span>Historical 10-yr return:</span><span className="font-semibold">10–13% p.a.</span></div>
+                  <div className="flex justify-between"><span>Ideal horizon:</span><span className="font-semibold">7+ years</span></div>
+                  <div className="flex justify-between"><span>Best for:</span><span className="font-semibold">First-time SIP investors</span></div>
+                </div>
+              </div>
+              <div className="p-4 bg-purple-50 border border-purple-100 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="bg-purple-700 text-white text-xs font-bold px-2 py-0.5 rounded">MEDIUM RISK</span>
+                  <h3 className="font-bold text-slate-900">Flexi Cap Funds</h3>
+                </div>
+                <p className="text-sm text-slate-700 mb-2">Fund manager allocates freely across large, mid and small caps based on market conditions. Best balance of growth potential and risk management.</p>
+                <div className="text-xs text-slate-600 space-y-1">
+                  <div className="flex justify-between"><span>Historical 10-yr return:</span><span className="font-semibold">12–15% p.a.</span></div>
+                  <div className="flex justify-between"><span>Ideal horizon:</span><span className="font-semibold">7+ years</span></div>
+                  <div className="flex justify-between"><span>Best for:</span><span className="font-semibold">Most salaried investors</span></div>
+                </div>
+              </div>
+              <div className="p-4 bg-green-50 border border-green-100 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="bg-green-700 text-white text-xs font-bold px-2 py-0.5 rounded">TAX SAVING</span>
+                  <h3 className="font-bold text-slate-900">ELSS Funds</h3>
+                </div>
+                <p className="text-sm text-slate-700 mb-2">Equity Linked Saving Scheme — the only mutual fund category with a 3-year lock-in that gives ₹1.5L tax deduction under Section 123 (Old Regime). Dual benefit: wealth creation + tax saving.</p>
+                <div className="text-xs text-slate-600 space-y-1">
+                  <div className="flex justify-between"><span>Historical 10-yr return:</span><span className="font-semibold">12–14% p.a.</span></div>
+                  <div className="flex justify-between"><span>Lock-in:</span><span className="font-semibold">3 years (mandatory)</span></div>
+                  <div className="flex justify-between"><span>Best for:</span><span className="font-semibold">Old regime taxpayers</span></div>
+                </div>
+              </div>
+              <div className="p-4 bg-orange-50 border border-orange-100 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="bg-orange-600 text-white text-xs font-bold px-2 py-0.5 rounded">HIGH RISK</span>
+                  <h3 className="font-bold text-slate-900">Mid & Small Cap Funds</h3>
+                </div>
+                <p className="text-sm text-slate-700 mb-2">Invest in companies ranked 101–500. Higher growth potential but 30–50% drawdowns are common in bear markets. Only suitable if you won't need the money for 10+ years.</p>
+                <div className="text-xs text-slate-600 space-y-1">
+                  <div className="flex justify-between"><span>Historical 10-yr return:</span><span className="font-semibold">14–18% p.a.</span></div>
+                  <div className="flex justify-between"><span>Ideal horizon:</span><span className="font-semibold">10+ years</span></div>
+                  <div className="flex justify-between"><span>Best for:</span><span className="font-semibold">Investors under 35</span></div>
+                </div>
+              </div>
+            </div>
+            <p className="text-xs text-slate-500 mb-8">*Category-level historical averages. Individual fund performance varies. This is educational information, not investment advice. Consult a SEBI Registered Investment Adviser before investing.</p>
+
+            {/* Where to Start Your SIP */}
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">Where to Start Your SIP — Top Platforms in India</h2>
+            <p className="text-slate-600 mb-4">
+              Once you know your target amount and fund category, you can start a SIP in minutes on any of these SEBI-registered platforms. All are free, paperless (Aadhaar-based KYC), and allow SIPs starting from ₹100/month.
+            </p>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-3">
+              <a href="https://groww.in" target="_blank" rel="noopener noreferrer" className="block p-4 bg-white border border-slate-200 rounded-lg hover:border-green-400 hover:shadow-md transition-all group">
+                <div className="font-bold text-slate-900 mb-1 group-hover:text-green-700">Groww</div>
+                <p className="text-xs text-slate-600 mb-3">Beginner-friendly UI. Direct plans only. Largest retail MF platform in India. Great for first-time investors.</p>
+                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded font-medium">Start SIP →</span>
+              </a>
+              <a href="https://zerodha.com/coin" target="_blank" rel="noopener noreferrer" className="block p-4 bg-white border border-slate-200 rounded-lg hover:border-blue-400 hover:shadow-md transition-all group">
+                <div className="font-bold text-slate-900 mb-1 group-hover:text-blue-700">Zerodha Coin</div>
+                <p className="text-xs text-slate-600 mb-3">Zero commission direct plans. Linked to Zerodha Demat. Best if you also trade stocks/ETFs alongside SIP.</p>
+                <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded font-medium">Start SIP →</span>
+              </a>
+              <a href="https://kuvera.in" target="_blank" rel="noopener noreferrer" className="block p-4 bg-white border border-slate-200 rounded-lg hover:border-indigo-400 hover:shadow-md transition-all group">
+                <div className="font-bold text-slate-900 mb-1 group-hover:text-indigo-700">Kuvera</div>
+                <p className="text-xs text-slate-600 mb-3">Fully free direct-plan platform with goal-based investing tools. Ideal for long-term systematic investors.</p>
+                <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded font-medium">Start SIP →</span>
+              </a>
+              <a href="https://www.etmoney.com" target="_blank" rel="noopener noreferrer" className="block p-4 bg-white border border-slate-200 rounded-lg hover:border-orange-400 hover:shadow-md transition-all group">
+                <div className="font-bold text-slate-900 mb-1 group-hover:text-orange-700">ET Money</div>
+                <p className="text-xs text-slate-600 mb-3">Smart fund recommendations, SIP tracker, and insurance in one app. Good for users who want guided investing.</p>
+                <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded font-medium">Start SIP →</span>
+              </a>
+            </div>
+            <p className="text-xs text-slate-500 mb-8">AiTaxBot does not recommend specific funds or schemes. The platforms listed are SEBI-registered and widely used in India. Always read the SID/KIM before investing.</p>
+
             {/* SIP vs Lump Sum Comparison */}
             <h2 className="text-2xl font-bold text-slate-900 mb-4">SIP vs Lump Sum — When to Choose What</h2>
             <div className="overflow-x-auto mb-8">
