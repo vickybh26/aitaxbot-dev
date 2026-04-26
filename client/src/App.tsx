@@ -26,6 +26,8 @@ import SIPCalculator from "@/pages/SIPCalculator";
 import SWPCalculator from "@/pages/SWPCalculator";
 import PFCalculator from "@/pages/PFCalculator";
 import NPSCalculator from "@/pages/NPSCalculator";
+import HomeLoanCalculator from "@/pages/HomeLoanCalculator";
+import VehicleLoanCalculator from "@/pages/VehicleLoanCalculator";
 import NRICorner from "@/pages/NRICorner";
 import DTAACalculator from "@/pages/nri/DTAACalculator";
 import NRONREComparison from "@/pages/nri/NRONREComparison";
@@ -146,6 +148,8 @@ function Router() {
         <Route path="/calculators/swp" component={SWPCalculator} />
         <Route path="/calculators/pf" component={PFCalculator} />
         <Route path="/calculators/nps" component={NPSCalculator} />
+        <Route path="/calculators/home-loan" component={HomeLoanCalculator} />
+        <Route path="/calculators/vehicle-loan" component={VehicleLoanCalculator} />
         <Route path="/nri" component={NRICorner} />
         <Route path="/nri/dtaa-calculator" component={DTAACalculator} />
         <Route path="/nri/nro-nre-comparison" component={NRONREComparison} />

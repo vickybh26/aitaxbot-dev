@@ -113,6 +113,32 @@ const investmentCalculators = [
       'Lump sum + monthly pension split',
       'NPS vs PPF vs EPF comparison'
     ]
+  },
+  {
+    title: 'Home Loan Calculator',
+    description: 'Check how much home loan you qualify for on your salary, calculate EMI, total interest and annual tax savings under Section 24 (₹2L) and Section 80C principal repayment.',
+    icon: TrendingUp,
+    link: '/calculators/home-loan',
+    color: 'blue',
+    features: [
+      'Loan eligibility from your income (FOIR)',
+      'EMI + total interest over tenure',
+      'Section 24 & 80C tax benefit calculation',
+      'EMI reference table for all amounts'
+    ]
+  },
+  {
+    title: 'Vehicle Loan Calculator',
+    description: 'Calculate two-wheeler and car loan EMI, total interest and on-road cost breakdown. Switch between bike and car with pre-filled defaults for each vehicle type.',
+    icon: TrendingUp,
+    link: '/calculators/vehicle-loan',
+    color: 'orange',
+    features: [
+      'Two-wheeler & four-wheeler toggle',
+      'On-road price to EMI in seconds',
+      'Total interest cost breakdown',
+      'Pre-filled rates for 2026 market'
+    ]
   }
 ];
 
