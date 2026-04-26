@@ -15,11 +15,11 @@ import HRACalculator from '@/components/calculators/HRACalculator';
 const hraFAQs = [
   {
     question: "What are the 4 metro cities for HRA calculation in India?",
-    answer: "Under Section 10(13A), only four cities qualify as metro cities for HRA purposes: Mumbai, Delhi (NCT), Kolkata, and Chennai. Metro city employees can claim up to 50% of basic salary as HRA exemption cap. All other cities (including Bangalore, Hyderabad, Pune, Ahmedabad) are classified as non-metro with a 40% cap. This distinction is critical — claiming the wrong percentage is one of the most common HRA mistakes."
+    answer: "Under Section 10(13A) (Schedule II, Table Sl. No. 2 under ITA 2025), only four cities qualify as metro cities for HRA purposes: Mumbai, Delhi (NCT), Kolkata, and Chennai. Metro city employees can claim up to 50% of basic salary as HRA exemption cap. All other cities (including Bangalore, Hyderabad, Pune, Ahmedabad) are classified as non-metro with a 40% cap. This distinction is critical — claiming the wrong percentage is one of the most common HRA mistakes."
   },
   {
     question: "Can I claim HRA and home loan interest deduction together?",
-    answer: "Yes — this is one of the biggest myths in Indian taxation. You can claim both HRA exemption (Section 10(13A)) and home loan interest deduction (Section 24(b)) simultaneously. This works when you are living in rented accommodation in your city of employment and own a property in a different city, or if you haven't yet moved into your purchased flat. Both claims must be genuine and supported by proper documentation (rent agreement, rent receipts, home loan documents)."
+    answer: "Yes — this is one of the biggest myths in Indian taxation. You can claim both HRA exemption (Section 10(13A) / Schedule II, Table Sl. No. 2 under ITA 2025) and home loan interest deduction (Section 24(b) / Section 22(2) under ITA 2025) simultaneously. This works when you are living in rented accommodation in your city of employment and own a property in a different city, or if you haven't yet moved into your purchased flat. Both claims must be genuine and supported by proper documentation (rent agreement, rent receipts, home loan documents)."
   },
   {
     question: "How is HRA exemption calculated — what is the three-part formula?",
@@ -35,7 +35,7 @@ const hraFAQs = [
   },
   {
     question: "Can self-employed people claim HRA exemption?",
-    answer: "No, HRA exemption under Section 10(13A) is available only to salaried employees who receive HRA as part of their salary structure. Self-employed individuals, professionals, and business owners cannot claim HRA exemption, even if they pay rent for their residence. However, they can claim rent paid as a business expense or use it under other provisions depending on their business structure."
+    answer: "No, HRA exemption under Section 10(13A) (Schedule II, Table Sl. No. 2 under ITA 2025) is available only to salaried employees who receive HRA as part of their salary structure. Self-employed individuals, professionals, and business owners cannot claim HRA exemption, even if they pay rent for their residence. However, they can claim rent paid as a business expense or use it under other provisions depending on their business structure."
   }
 ];
 

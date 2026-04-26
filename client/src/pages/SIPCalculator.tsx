@@ -296,7 +296,7 @@ export default function SIPCalculatorPage() {
                   <span className="bg-green-700 text-white text-xs font-bold px-2 py-0.5 rounded">TAX SAVING</span>
                   <h3 className="font-bold text-slate-900">ELSS Funds</h3>
                 </div>
-                <p className="text-sm text-slate-700 mb-2">Equity Linked Saving Scheme — the only mutual fund category with a 3-year lock-in that gives ₹1.5L tax deduction under Section 123 (Old Regime). Dual benefit: wealth creation + tax saving.</p>
+                <p className="text-sm text-slate-700 mb-2">Equity Linked Saving Scheme — the only mutual fund category with a 3-year lock-in that gives ₹1.5L tax deduction under Section 80C (Section 123 under ITA 2025 in Old Regime). Dual benefit: wealth creation + tax saving.</p>
                 <div className="text-xs text-slate-600 space-y-1">
                   <div className="flex justify-between"><span>Historical 10-yr return:</span><span className="font-semibold">12–14% p.a.</span></div>
                   <div className="flex justify-between"><span>Lock-in:</span><span className="font-semibold">3 years (mandatory)</span></div>

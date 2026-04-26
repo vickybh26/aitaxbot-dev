@@ -19,7 +19,7 @@ const homeLoanFAQs = [
   },
   {
     question: "What is the tax benefit on home loan in FY 2026-27?",
-    answer: "Under the Old Tax Regime: Section 24 allows deduction of up to ₹2 lakh per year on home loan interest for self-occupied property. Section 80C allows deduction on principal repayment (within the ₹1.5L overall 80C limit). Together, a 30% taxpayer can save ₹1.09 lakh per year. Note: these deductions are NOT available under the New Tax Regime (Section 202 of ITA 2025)."
+    answer: "Under the Old Tax Regime: Section 24 (Section 22(2) under ITA 2025) allows deduction of up to ₹2 lakh per year on home loan interest for self-occupied property. Section 80C (Section 123 under ITA 2025) allows deduction on principal repayment (within the ₹1.5L overall 80C limit). Together, a 30% taxpayer can save ₹1.09 lakh per year. Note: these deductions are NOT available under the New Tax Regime (Section 202 of ITA 2025)."
   },
   {
     question: "What is LTV ratio and why does it matter?",
@@ -31,7 +31,7 @@ const homeLoanFAQs = [
   },
   {
     question: "Can I claim home loan tax benefits under the New Tax Regime?",
-    answer: "No. Home loan interest deduction (Section 24 / Section 22 under ITA 2025) and principal repayment under Section 80C (Section 123 under ITA 2025) are not available under the New Tax Regime. This is one of the key reasons high-income salaried individuals with home loans often benefit more from the Old Tax Regime. Use our Income Tax Calculator to compare both regimes with and without home loan deductions."
+    answer: "No. Home loan interest deduction (Section 24 / Section 22(2) under ITA 2025) and principal repayment under Section 80C (Section 123 under ITA 2025) are not available under the New Tax Regime. This is one of the key reasons high-income salaried individuals with home loans often benefit more from the Old Tax Regime. Use our Income Tax Calculator to compare both regimes with and without home loan deductions."
   },
   {
     question: "What documents are needed for a home loan application?",
