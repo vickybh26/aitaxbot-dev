@@ -73,7 +73,7 @@ export default function Header({ showModal }: HeaderProps = {}) {
             <img
               src={logoImage}
               alt="AiTaxBot Logo"
-              className="h-10 w-auto"
+              className="h-14 w-auto"
             />
           </Link>
 
