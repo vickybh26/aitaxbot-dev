@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 type VehicleType = "two-wheeler" | "four-wheeler";
+type RateType = "reducing" | "flat";
 
 interface VehicleLoanResult {
   loanAmount: number;
@@ -11,7 +12,14 @@ interface VehicleLoanResult {
   totalInterest: number;
   totalPayment: number;
   downPaymentPct: number;
-  effectiveRate: number;
+  rateType: RateType;
+  // For comparison: always compute both
+  reducingEmi: number;
+  reducingInterest: number;
+  reducingTotal: number;
+  flatEmi: number;
+  flatInterest: number;
+  flatTotal: number;
 }
 
 function formatINR(n: number): string {
@@ -47,12 +55,32 @@ const DEFAULTS = {
   },
 };
 
+function computeReducing(principal: number, annualRate: number, tenureYears: number) {
+  const r = annualRate / 12 / 100;
+  const n = tenureYears * 12;
+  const emi = r > 0
+    ? (principal * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1)
+    : principal / n;
+  const total = emi * n;
+  const interest = total - principal;
+  return { emi, total, interest };
+}
+
+function computeFlat(principal: number, annualRate: number, tenureYears: number) {
+  const n = tenureYears * 12;
+  const totalInterest = principal * (annualRate / 100) * tenureYears;
+  const emi = (principal + totalInterest) / n;
+  const total = principal + totalInterest;
+  return { emi, total, interest: totalInterest };
+}
+
 export default function VehicleLoanCalculator() {
   const [vehicleType, setVehicleType] = useState<VehicleType>("four-wheeler");
   const [onRoadPrice, setOnRoadPrice] = useState<number>(DEFAULTS["four-wheeler"].onRoadPrice);
   const [downPayment, setDownPayment] = useState<number>(DEFAULTS["four-wheeler"].downPayment);
   const [tenure, setTenure] = useState<number>(DEFAULTS["four-wheeler"].tenure);
   const [rate, setRate] = useState<number>(DEFAULTS["four-wheeler"].rate);
+  const [rateType, setRateType] = useState<RateType>("reducing");
   const [result, setResult] = useState<VehicleLoanResult | null>(null);
 
   const switchVehicle = (type: VehicleType) => {
@@ -67,24 +95,36 @@ export default function VehicleLoanCalculator() {
 
   const calculate = () => {
     const loanAmount = Math.max(0, onRoadPrice - downPayment);
-    const r = rate / 12 / 100;
-    const n = tenure * 12;
-    const emi = r > 0
-      ? (loanAmount * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1)
-      : loanAmount / n;
-    const totalPayment = emi * n;
-    const totalInterest = totalPayment - loanAmount;
     const downPaymentPct = onRoadPrice > 0 ? (downPayment / onRoadPrice) * 100 : 0;
-    const effectiveRate = loanAmount > 0 ? (totalInterest / loanAmount / tenure) * 100 : 0;
+
+    const red = computeReducing(loanAmount, rate, tenure);
+    const flat = computeFlat(loanAmount, rate, tenure);
+
+    const active = rateType === "reducing" ? red : flat;
 
     fetch('/api/stats/track-calculation', { method: 'POST' }).catch(() => {});
 
-    setResult({ loanAmount, emi, totalInterest, totalPayment, downPaymentPct, effectiveRate });
+    setResult({
+      loanAmount,
+      emi: active.emi,
+      totalInterest: active.interest,
+      totalPayment: active.total,
+      downPaymentPct,
+      rateType,
+      reducingEmi: red.emi,
+      reducingInterest: red.interest,
+      reducingTotal: red.total,
+      flatEmi: flat.emi,
+      flatInterest: flat.interest,
+      flatTotal: flat.total,
+    });
   };
 
   const d = DEFAULTS[vehicleType];
   const loanAmount = Math.max(0, onRoadPrice - downPayment);
   const downPct = onRoadPrice > 0 ? ((downPayment / onRoadPrice) * 100).toFixed(1) : "0";
+  const accentBtn = vehicleType === "four-wheeler" ? "bg-blue-600 hover:bg-blue-700" : "bg-orange-500 hover:bg-orange-600";
+  const accentBg = vehicleType === "four-wheeler" ? "bg-blue-50 border-blue-200 text-blue-700" : "bg-orange-50 border-orange-200 text-orange-600";
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
@@ -108,6 +148,72 @@ export default function VehicleLoanCalculator() {
         </div>
         <h2 className="text-xl font-bold text-white">{d.emoji} {d.label} Loan EMI Calculator</h2>
         <p className="text-white/80 text-sm mt-1">{d.typical}</p>
+      </div>
+
+      {/* Rate Type Caution Banner */}
+      <div className="bg-amber-50 border-b border-amber-200 px-6 py-4">
+        <div className="flex gap-2 items-start mb-3">
+          <span className="text-amber-600 text-lg shrink-0">⚠️</span>
+          <div>
+            <p className="font-semibold text-amber-900 text-sm">Always ask your bank: Is this a Flat Rate or Reducing Balance Rate?</p>
+            <p className="text-amber-800 text-xs mt-0.5">
+              Dealers and some lenders quote <strong>flat rates</strong> which look lower but cost significantly more interest.
+              A 10% flat rate is equivalent to ~18–19% reducing balance rate. Always compare on the same basis.
+            </p>
+          </div>
+        </div>
+
+        {/* Rate Type Toggle */}
+        <div className="flex items-center gap-3">
+          <span className="text-sm font-medium text-slate-700">Interest Rate Type:</span>
+          <div className="flex bg-white border border-slate-200 rounded-lg p-0.5 gap-0.5">
+            <button
+              onClick={() => { setRateType("reducing"); setResult(null); }}
+              className={`px-4 py-1.5 rounded-md text-sm font-semibold transition-all ${
+                rateType === "reducing"
+                  ? "bg-green-600 text-white shadow-sm"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              Reducing Balance
+            </button>
+            <button
+              onClick={() => { setRateType("flat"); setResult(null); }}
+              className={`px-4 py-1.5 rounded-md text-sm font-semibold transition-all ${
+                rateType === "flat"
+                  ? "bg-red-500 text-white shadow-sm"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              Flat Rate
+            </button>
+          </div>
+        </div>
+
+        {/* Explanation of selected type */}
+        <div className="mt-3 text-xs">
+          {rateType === "reducing" ? (
+            <div className="flex gap-2 bg-green-50 border border-green-200 rounded-lg p-2.5">
+              <span className="text-green-600 shrink-0">✅</span>
+              <div className="text-green-900">
+                <strong>Reducing Balance (Diminishing Balance):</strong> Interest is charged only on the outstanding
+                principal each month. As you repay, the principal reduces — so the interest component of your EMI
+                keeps decreasing. <strong>This is the standard method used by banks and NBFCs for most loans.</strong> It is
+                cheaper than flat rate.
+              </div>
+            </div>
+          ) : (
+            <div className="flex gap-2 bg-red-50 border border-red-200 rounded-lg p-2.5">
+              <span className="text-red-600 shrink-0">🚨</span>
+              <div className="text-red-900">
+                <strong>Flat Rate (Simple Interest on Full Principal):</strong> Interest is calculated on the
+                <strong> original loan amount for the entire tenure</strong>, even though you are repaying monthly.
+                This means you pay interest on money you've already repaid. Common in dealer-finance schemes and
+                some two-wheeler loans. <strong>At the same quoted %, flat rate costs ~80–90% more interest than reducing balance.</strong>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="p-6">
@@ -155,7 +261,12 @@ export default function VehicleLoanCalculator() {
                 <p className="text-xs text-slate-500 mt-1">Max {vehicleType === "two-wheeler" ? "5" : "7"} years</p>
               </div>
               <div>
-                <Label className="text-sm font-medium text-slate-700">Interest Rate (% p.a.)</Label>
+                <Label className="text-sm font-medium text-slate-700">
+                  Interest Rate (% p.a.)
+                  <span className={`ml-1 text-xs font-normal px-1.5 py-0.5 rounded ${rateType === "reducing" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+                    {rateType === "reducing" ? "Reducing" : "Flat"}
+                  </span>
+                </Label>
                 <Input
                   type="number"
                   value={rate}
@@ -176,9 +287,7 @@ export default function VehicleLoanCalculator() {
 
             <Button
               onClick={calculate}
-              className={`w-full font-semibold py-3 text-white ${
-                vehicleType === "four-wheeler" ? "bg-blue-600 hover:bg-blue-700" : "bg-orange-500 hover:bg-orange-600"
-              }`}
+              className={`w-full font-semibold py-3 text-white ${accentBtn}`}
             >
               Calculate EMI
             </Button>
@@ -189,12 +298,17 @@ export default function VehicleLoanCalculator() {
             {result ? (
               <div className="space-y-4">
                 {/* EMI highlight */}
-                <div className={`rounded-xl p-5 text-center ${vehicleType === "four-wheeler" ? "bg-blue-50 border border-blue-200" : "bg-orange-50 border border-orange-200"}`}>
-                  <p className="text-sm text-slate-600 mb-1">Your Monthly EMI</p>
+                <div className={`rounded-xl p-5 text-center border ${accentBg}`}>
+                  <p className="text-sm text-slate-600 mb-1">
+                    Your Monthly EMI
+                    <span className={`ml-2 text-xs px-1.5 py-0.5 rounded font-semibold ${result.rateType === "reducing" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+                      {result.rateType === "reducing" ? "Reducing Balance" : "Flat Rate"}
+                    </span>
+                  </p>
                   <p className={`text-4xl font-bold mb-1 ${vehicleType === "four-wheeler" ? "text-blue-700" : "text-orange-600"}`}>
                     {formatINR(result.emi)}
                   </p>
-                  <p className="text-xs text-slate-500">for {tenure} years at {rate}% p.a.</p>
+                  <p className="text-xs text-slate-500">for {tenure} years at {rate}% p.a. ({result.rateType === "reducing" ? "reducing balance" : "flat rate"})</p>
                 </div>
 
                 {/* Breakdown */}
@@ -226,7 +340,45 @@ export default function VehicleLoanCalculator() {
                   </div>
                 </div>
 
-                {/* Interest tip */}
+                {/* Side-by-side comparison */}
+                <div className="rounded-xl border border-slate-200 overflow-hidden">
+                  <div className="bg-slate-800 text-white text-xs font-bold px-4 py-2">
+                    📊 Same {rate}% Rate — Reducing vs Flat Comparison
+                  </div>
+                  <div className="grid grid-cols-2 divide-x divide-slate-200">
+                    <div className={`p-3 text-xs ${result.rateType === "reducing" ? "bg-green-50" : "bg-white"}`}>
+                      <p className="font-bold text-green-700 mb-2 flex items-center gap-1">
+                        ✅ Reducing Balance
+                        {result.rateType === "reducing" && <span className="bg-green-600 text-white px-1.5 rounded text-[10px]">Selected</span>}
+                      </p>
+                      <div className="space-y-1 text-slate-700">
+                        <div className="flex justify-between"><span>EMI:</span><span className="font-bold">{formatINR(result.reducingEmi)}</span></div>
+                        <div className="flex justify-between"><span>Total Interest:</span><span className="font-bold text-green-700">{formatINR(result.reducingInterest)}</span></div>
+                        <div className="flex justify-between"><span>Total Payable:</span><span className="font-bold">{formatINR(result.reducingTotal)}</span></div>
+                      </div>
+                    </div>
+                    <div className={`p-3 text-xs ${result.rateType === "flat" ? "bg-red-50" : "bg-white"}`}>
+                      <p className="font-bold text-red-600 mb-2 flex items-center gap-1">
+                        🚨 Flat Rate
+                        {result.rateType === "flat" && <span className="bg-red-500 text-white px-1.5 rounded text-[10px]">Selected</span>}
+                      </p>
+                      <div className="space-y-1 text-slate-700">
+                        <div className="flex justify-between"><span>EMI:</span><span className="font-bold">{formatINR(result.flatEmi)}</span></div>
+                        <div className="flex justify-between"><span>Total Interest:</span><span className="font-bold text-red-600">{formatINR(result.flatInterest)}</span></div>
+                        <div className="flex justify-between"><span>Total Payable:</span><span className="font-bold">{formatINR(result.flatTotal)}</span></div>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Extra interest from flat rate */}
+                  <div className="bg-slate-100 px-4 py-2.5 text-xs text-slate-800 text-center border-t border-slate-200">
+                    <strong>Flat rate costs you {formatINR(result.flatInterest - result.reducingInterest)} more in interest</strong> than reducing balance at the same quoted rate.
+                    {result.flatInterest > result.reducingInterest && (
+                      <span className="ml-1">({(((result.flatInterest - result.reducingInterest) / result.reducingInterest) * 100).toFixed(0)}% extra)</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Down payment tip */}
                 <div className="bg-amber-50 border border-amber-100 rounded-lg p-3 text-xs text-amber-900">
                   <strong>💡 Save on interest:</strong> Every ₹10,000 increase in down payment reduces total interest by approximately ₹{Math.round((result.totalInterest / result.loanAmount) * 10000).toLocaleString("en-IN")} over the loan tenure.
                   Maximize your down payment where possible.
@@ -237,7 +389,7 @@ export default function VehicleLoanCalculator() {
                 <div className="text-center text-slate-400">
                   <div className="text-5xl mb-3">{d.emoji}</div>
                   <p className="font-medium text-slate-500">Enter details and click Calculate</p>
-                  <p className="text-sm mt-1">Get your EMI and total cost instantly</p>
+                  <p className="text-sm mt-1">Compare Reducing vs Flat rate impact</p>
                 </div>
               </div>
             )}
