@@ -316,6 +316,92 @@ export default function NPSCalculatorPage() {
               <p className="text-xs text-slate-500 mt-2">*EPF interest taxable if contribution exceeds ₹2.5L/year</p>
             </div>
 
+            {/* NPS Corpus Projection Table */}
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">NPS Corpus Projection Table — How Much Will You Accumulate? (at 10% p.a.)</h2>
+            <p className="text-slate-600 mb-4">
+              NPS invests in a mix of equity (E), corporate bonds (C) and government securities (G). Active Choice with 75% equity has historically returned 10–12% p.a.
+              The table below uses a conservative 10% assumption. Your actual returns may vary based on asset allocation.
+            </p>
+            <div className="overflow-x-auto mb-3">
+              <table className="w-full border-collapse text-sm">
+                <thead>
+                  <tr className="bg-indigo-700 text-white">
+                    <th className="border border-indigo-600 p-3 text-left font-semibold">Monthly Contribution</th>
+                    <th className="border border-indigo-600 p-3 text-center font-semibold">10 Years</th>
+                    <th className="border border-indigo-600 p-3 text-center font-semibold">15 Years</th>
+                    <th className="border border-indigo-600 p-3 text-center font-semibold">20 Years</th>
+                    <th className="border border-indigo-600 p-3 text-center font-semibold">25 Years</th>
+                    <th className="border border-indigo-600 p-3 text-center font-semibold">30 Years</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="border border-slate-200 p-3 font-semibold text-slate-800">₹2,000/month</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹4.13 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹8.36 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹15.31 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹26.76 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹45.59 L</td>
+                  </tr>
+                  <tr className="bg-slate-50">
+                    <td className="border border-slate-200 p-3 font-semibold text-slate-800">₹5,000/month</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹10.33 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹20.90 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹38.28 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-blue-700 font-semibold">₹66.89 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-purple-700 font-semibold">₹1.14 Cr</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-slate-200 p-3 font-semibold text-slate-800">₹10,000/month</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹20.66 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹41.79 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">₹76.57 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">₹1.34 Cr</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">₹2.28 Cr</td>
+                  </tr>
+                  <tr className="bg-slate-50">
+                    <td className="border border-slate-200 p-3 font-semibold text-slate-800">₹20,000/month</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹41.31 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹83.58 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">₹1.53 Cr</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">₹2.68 Cr</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">₹4.56 Cr</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p className="text-xs text-slate-500 mb-8">*Assumes 10% annual return compounded monthly. Does not include employer's 80CCD(2) contribution — add your employer's share to significantly increase these numbers. Past returns are not guaranteed.</p>
+
+            {/* Where to Open NPS */}
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">Where to Open Your NPS Account</h2>
+            <p className="text-slate-600 mb-4">
+              NPS accounts can be opened online (paperless, Aadhaar-based KYC) or through any NPS Point of Presence (POP).
+              eNPS is the fastest route — takes 15 minutes and is completely free.
+            </p>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-3">
+              <a href="https://enps.nsdl.com" target="_blank" rel="noopener noreferrer" className="block p-4 bg-white border border-slate-200 rounded-lg hover:border-indigo-400 hover:shadow-md transition-all group">
+                <div className="font-bold text-slate-900 mb-1 group-hover:text-indigo-700">eNPS (NSDL)</div>
+                <p className="text-xs text-slate-600 mb-3">Official government NPS portal. Directly under PFRDA. Aadhaar-based KYC. Zero charges. Best for self-employed & unorganised sector.</p>
+                <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded font-medium">Open Online →</span>
+              </a>
+              <a href="https://www.sbi.co.in/web/personal-banking/investments-and-insurance/nps" target="_blank" rel="noopener noreferrer" className="block p-4 bg-white border border-slate-200 rounded-lg hover:border-blue-400 hover:shadow-md transition-all group">
+                <div className="font-bold text-slate-900 mb-1 group-hover:text-blue-700">SBI NPS</div>
+                <p className="text-xs text-slate-600 mb-3">Open via SBI branch or YONO app. Preferred for SBI account holders — contributions auto-debited from savings account.</p>
+                <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded font-medium">Open via SBI →</span>
+              </a>
+              <a href="https://www.hdfcbank.com/personal/save/accounts/nps" target="_blank" rel="noopener noreferrer" className="block p-4 bg-white border border-slate-200 rounded-lg hover:border-red-400 hover:shadow-md transition-all group">
+                <div className="font-bold text-slate-900 mb-1 group-hover:text-red-700">HDFC Bank NPS</div>
+                <p className="text-xs text-slate-600 mb-3">Open via HDFC NetBanking. Good for HDFC account holders wanting auto-debit integration with their existing accounts.</p>
+                <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded font-medium">Open via HDFC →</span>
+              </a>
+              <a href="https://zerodha.com/nps" target="_blank" rel="noopener noreferrer" className="block p-4 bg-white border border-slate-200 rounded-lg hover:border-orange-400 hover:shadow-md transition-all group">
+                <div className="font-bold text-slate-900 mb-1 group-hover:text-orange-700">Zerodha NPS</div>
+                <p className="text-xs text-slate-600 mb-3">Fully digital via Zerodha Coin. Best if you already invest in mutual funds via Zerodha — single dashboard for NPS + SIP.</p>
+                <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded font-medium">Open via Zerodha →</span>
+              </a>
+            </div>
+            <p className="text-xs text-slate-500 mb-8">NPS is regulated by PFRDA (Pension Fund Regulatory and Development Authority). All platforms listed are official NPS Points of Presence (POPs). AiTaxBot does not provide investment advice.</p>
+
             {/* FAQs */}
             <h2 className="text-2xl font-bold text-slate-900 mb-4">Frequently Asked Questions</h2>
             <div className="space-y-4">

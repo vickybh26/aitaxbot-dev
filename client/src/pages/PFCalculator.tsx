@@ -538,6 +538,68 @@ export default function PFCalculatorPage() {
               </div>
             </div>
 
+            {/* EPF Corpus Table */}
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">EPF Corpus Projection Table — How Much Will Your PF Grow? (at 8.25% p.a.)</h2>
+            <p className="text-slate-600 mb-4">
+              EPF earns 8.25% p.a. (FY 2026-27 rate) — tax-free, guaranteed by the government. The table below shows projected corpus
+              based on your basic salary, combining both your 12% contribution and employer's 3.67% EPF share (total 15.67% of basic).
+            </p>
+            <div className="overflow-x-auto mb-3">
+              <table className="w-full border-collapse text-sm">
+                <thead>
+                  <tr className="bg-emerald-700 text-white">
+                    <th className="border border-emerald-600 p-3 text-left font-semibold">Basic Salary</th>
+                    <th className="border border-emerald-600 p-3 text-center font-semibold">10 Years</th>
+                    <th className="border border-emerald-600 p-3 text-center font-semibold">15 Years</th>
+                    <th className="border border-emerald-600 p-3 text-center font-semibold">20 Years</th>
+                    <th className="border border-emerald-600 p-3 text-center font-semibold">25 Years</th>
+                    <th className="border border-emerald-600 p-3 text-center font-semibold">30 Years</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="border border-slate-200 p-3 font-semibold text-slate-800">₹15,000/mo basic</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹4.4 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹8.4 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹14.4 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹23.4 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹37.1 L</td>
+                  </tr>
+                  <tr className="bg-slate-50">
+                    <td className="border border-slate-200 p-3 font-semibold text-slate-800">₹25,000/mo basic</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹7.3 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹14.0 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹24.0 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-blue-700 font-semibold">₹39.1 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-blue-700 font-semibold">₹61.9 L</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-slate-200 p-3 font-semibold text-slate-800">₹40,000/mo basic</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹11.7 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹22.3 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹38.3 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">₹62.5 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">₹99.0 L</td>
+                  </tr>
+                  <tr className="bg-slate-50">
+                    <td className="border border-slate-200 p-3 font-semibold text-slate-800">₹60,000/mo basic</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹17.6 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹33.5 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹57.5 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">₹93.8 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">₹1.48 Cr</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div className="bg-emerald-50 border border-emerald-100 rounded-lg p-4 mb-8">
+              <p className="text-sm text-emerald-900">
+                <strong>Key insight:</strong> These numbers assume zero salary growth. In reality, your basic salary increases every year,
+                meaning more PF contribution and a significantly larger corpus. Add VPF (Voluntary Provident Fund) on top — same 8.25% rate,
+                same EEE tax status, no upper limit — and you can double your retirement corpus without any extra risk.
+              </p>
+            </div>
+
             {/* FAQs */}
             <h2 className="text-2xl font-bold text-slate-900 mb-4">Frequently Asked Questions</h2>
             <div className="space-y-4">

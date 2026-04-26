@@ -365,6 +365,127 @@ export default function SWPCalculatorPage() {
               </table>
             </div>
 
+            {/* SWP Sustainability Table */}
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">SWP Sustainability Table — How Long Does Your Corpus Last? (at 9% p.a.)</h2>
+            <p className="text-slate-600 mb-4">
+              The most critical question in SWP planning: will my money outlast me? This table shows how many years a given corpus lasts
+              at different monthly withdrawal amounts, assuming 9% annual return.
+              "∞" means the corpus never depletes — the return keeps pace with withdrawals.
+            </p>
+            <div className="overflow-x-auto mb-3">
+              <table className="w-full border-collapse text-sm">
+                <thead>
+                  <tr className="bg-purple-700 text-white">
+                    <th className="border border-purple-600 p-3 text-left font-semibold">Corpus</th>
+                    <th className="border border-purple-600 p-3 text-center font-semibold">₹20K/mo</th>
+                    <th className="border border-purple-600 p-3 text-center font-semibold">₹30K/mo</th>
+                    <th className="border border-purple-600 p-3 text-center font-semibold">₹40K/mo</th>
+                    <th className="border border-purple-600 p-3 text-center font-semibold">₹50K/mo</th>
+                    <th className="border border-purple-600 p-3 text-center font-semibold">₹75K/mo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="border border-slate-200 p-3 font-semibold text-slate-800">₹30 Lakh</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">∞</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">16 yrs</td>
+                    <td className="border border-slate-200 p-3 text-center text-red-600">9 yrs</td>
+                    <td className="border border-slate-200 p-3 text-center text-red-600">7 yrs</td>
+                    <td className="border border-slate-200 p-3 text-center text-red-600">4 yrs</td>
+                  </tr>
+                  <tr className="bg-slate-50">
+                    <td className="border border-slate-200 p-3 font-semibold text-slate-800">₹50 Lakh</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">∞</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">∞</td>
+                    <td className="border border-slate-200 p-3 text-center text-blue-700 font-semibold">31 yrs</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">16 yrs</td>
+                    <td className="border border-slate-200 p-3 text-center text-red-600">8 yrs</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-slate-200 p-3 font-semibold text-slate-800">₹75 Lakh</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">∞</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">∞</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">∞</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">∞</td>
+                    <td className="border border-slate-200 p-3 text-center text-blue-700 font-semibold">16 yrs</td>
+                  </tr>
+                  <tr className="bg-slate-50">
+                    <td className="border border-slate-200 p-3 font-semibold text-slate-800">₹1 Crore</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">∞</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">∞</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">∞</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">∞</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">∞</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-slate-200 p-3 font-semibold text-slate-800">₹1.5 Crore</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">∞</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">∞</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">∞</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">∞</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">∞</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p className="text-xs text-slate-500 mb-8">*At 9% annual return. "∞" = corpus never depletes. Green = safe zone. Red = corpus depletes in retirement. Target: always aim for ∞ or 30+ years.</p>
+
+            {/* How Much Corpus Do I Need */}
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">How Much Corpus Do I Need for My Target Monthly Income?</h2>
+            <p className="text-slate-600 mb-4">
+              Planning your retirement SWP in reverse: if you know how much monthly income you need, here's the corpus required to sustain it for 30 years at 9% annual return.
+            </p>
+            <div className="overflow-x-auto mb-3">
+              <table className="w-full border-collapse text-sm">
+                <thead>
+                  <tr className="bg-slate-700 text-white">
+                    <th className="border border-slate-600 p-3 text-left font-semibold">Monthly Income Target</th>
+                    <th className="border border-slate-600 p-3 text-center font-semibold">Corpus Needed (30 yrs)</th>
+                    <th className="border border-slate-600 p-3 text-center font-semibold">Monthly SIP to Build This</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="border border-slate-200 p-3 font-semibold text-slate-800">₹20,000/month</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹24.9 Lakh</td>
+                    <td className="border border-slate-200 p-3 text-center text-blue-700">₹2,500/mo for 25 years</td>
+                  </tr>
+                  <tr className="bg-slate-50">
+                    <td className="border border-slate-200 p-3 font-semibold text-slate-800">₹30,000/month</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹37.3 Lakh</td>
+                    <td className="border border-slate-200 p-3 text-center text-blue-700">₹4,000/mo for 25 years</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-slate-200 p-3 font-semibold text-slate-800">₹40,000/month</td>
+                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹49.7 Lakh</td>
+                    <td className="border border-slate-200 p-3 text-center text-blue-700">₹5,300/mo for 25 years</td>
+                  </tr>
+                  <tr className="bg-slate-50">
+                    <td className="border border-slate-200 p-3 font-semibold text-slate-800">₹50,000/month</td>
+                    <td className="border border-slate-200 p-3 text-center font-semibold text-slate-700">₹62.1 Lakh</td>
+                    <td className="border border-slate-200 p-3 text-center text-blue-700">₹6,600/mo for 25 years</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-slate-200 p-3 font-semibold text-slate-800">₹75,000/month</td>
+                    <td className="border border-slate-200 p-3 text-center font-semibold text-slate-700">₹93.2 Lakh</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-semibold">₹9,900/mo for 25 years</td>
+                  </tr>
+                  <tr className="bg-slate-50">
+                    <td className="border border-slate-200 p-3 font-semibold text-slate-800">₹1,00,000/month</td>
+                    <td className="border border-slate-200 p-3 text-center font-bold text-green-700">₹1.24 Crore</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-semibold">₹13,200/mo for 25 years</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div className="bg-purple-50 border border-purple-100 rounded-lg p-4 mb-8">
+              <p className="text-sm text-purple-900">
+                <strong>Planning tip:</strong> Start your SIP today, accumulate the corpus, then switch to SWP at retirement.
+                A ₹5,000/month SIP for 25 years at 12% p.a. builds ₹94.88L — enough to fund ₹75,000/month SWP for retirement.
+                Use our <a href="/calculators/sip" className="underline font-medium">SIP Calculator</a> to plan your accumulation phase.
+              </p>
+            </div>
+
             {/* FAQs */}
             <h2 className="text-2xl font-bold text-slate-900 mb-4">Frequently Asked Questions</h2>
             <div className="space-y-4">
