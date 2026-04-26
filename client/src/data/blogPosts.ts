@@ -576,7 +576,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h2",
         title: "80C (Illustrative Instruments)",
-        content_md: "### Section 80C Instruments — FY 2025-26 (Limit: ₹1,50,000)\n\n| Instrument | Type | Lock-in | Returns | Risk | Best For |\n|---|---|---|---|---|---|\n| ELSS | Equity mutual fund | 3 years | 12–15% (market) | High | Wealth + tax |\n| PPF | Govt debt scheme | 15 years | ~7.1% (fixed) | Nil | Safety + retirement |\n| EPF | Mandatory PF | Till retirement | ~8.15% (fixed) | Nil | Salaried employees |\n| NSC | Post office bond | 5 years | ~7.7% (fixed) | Nil | Conservative savers |\n| SCSS | Senior citizens | 5 years | ~8.2% (fixed) | Nil | Senior citizens only |\n| 5-yr FD | Bank FD | 5 years | 6–7.5% (fixed) | Very Low | Capital safety |\n| Home Loan Principal | Repayment | None | N/A | N/A | Home loan borrowers |\n| Life Insurance | LIC/ULIP premium | Varies | 5–12% | Low–High | Protection + savings |\n\n*ELSS gives the shortest lock-in (3 years) among equity instruments and is the only 80C option with market-linked growth potential.*"
+        content_md: "### Section 80C Instruments — FY 2026-27 (Limit: ₹1,50,000)\n\n| Instrument | Type | Lock-in | Returns | Risk | Best For |\n|---|---|---|---|---|---|\n| ELSS | Equity mutual fund | 3 years | 12–15% (market) | High | Wealth + tax |\n| PPF | Govt debt scheme | 15 years | ~7.1% (fixed) | Nil | Safety + retirement |\n| EPF | Mandatory PF | Till retirement | ~8.15% (fixed) | Nil | Salaried employees |\n| NSC | Post office bond | 5 years | ~7.7% (fixed) | Nil | Conservative savers |\n| SCSS | Senior citizens | 5 years | ~8.2% (fixed) | Nil | Senior citizens only |\n| 5-yr FD | Bank FD | 5 years | 6–7.5% (fixed) | Very Low | Capital safety |\n| Home Loan Principal | Repayment | None | N/A | N/A | Home loan borrowers |\n| Life Insurance | LIC/ULIP premium | Varies | 5–12% | Low–High | Protection + savings |\n\n*ELSS gives the shortest lock-in (3 years) among equity instruments and is the only 80C option with market-linked growth potential.*"
       },
       {
         type: "h2",
@@ -1398,7 +1398,7 @@ export const blogPosts: BlogPost[] = [
       },
             {
         type: "h3",
-        title: "Top Index Funds in India by AUM (FY 2025-26)",
+        title: "Top Index Funds in India by AUM (FY 2026-27)",
         content_md: "| Fund | Index Tracked | Expense Ratio (Direct) | AUM |\n|---|---|---|---|\n| UTI Nifty 50 Index Fund | Nifty 50 | 0.18% | ₹22,000+ cr |\n| HDFC Index Fund – Nifty 50 Plan | Nifty 50 | 0.20% | ₹18,000+ cr |\n| Nippon India Index Fund – Nifty 50 | Nifty 50 | 0.20% | ₹8,000+ cr |\n| UTI Nifty Next 50 Index Fund | Nifty Next 50 | 0.31% | ₹5,000+ cr |\n| Motilal Oswal Nifty Midcap 150 | Nifty Midcap 150 | 0.30% | ₹3,000+ cr |\n\nPrefer funds with AUM above ₹1,000 crore to avoid tracking error from liquidity constraints. Check the fund's tracking error (TE) — aim for TE below 0.10% for Nifty 50 funds. Lower TE means the fund more closely mirrors the index it tracks.",
       },
       {
@@ -1470,7 +1470,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h2",
         title: "Tax Rates (FY 2024-25)",
-        content_md: "### Capital Gains Tax Rates — FY 2025-26 (AY 2026-27)\n\n| Asset Class | Holding for STCG | STCG Rate | Holding for LTCG | LTCG Rate | LTCG Exemption |\n|---|---|---|---|---|---|\n| Listed equity shares | ≤ 12 months | 20% | > 12 months | 12.5% | ₹1.25L/year |\n| Equity mutual funds | ≤ 12 months | 20% | > 12 months | 12.5% | ₹1.25L/year |\n| Debt mutual funds | ≤ 24 months | Slab rate | > 24 months | 12.5% | Nil |\n| Real estate | ≤ 24 months | Slab rate | > 24 months | 12.5% | Sec 54 reinvestment |\n| Gold / jewellery | ≤ 24 months | Slab rate | > 24 months | 12.5% | Nil |\n| Unlisted shares | ≤ 24 months | Slab rate | > 24 months | 12.5% | Nil |\n\n*Budget 2024 unified LTCG at 12.5% and raised STCG on equity to 20%. Indexation benefit removed for most assets.*\n\n> ⚠️ **Debt Mutual Fund Exception (Finance Act 2023 — still in force):** For debt mutual funds where equity allocation is **less than 35%**, purchased **on or after April 1, 2023**, there is **no LTCG benefit regardless of holding period** — all gains are taxed at your applicable slab rate. The 12.5% LTCG rate above applies only to debt MFs purchased before April 1, 2023. Verify latest provisions before filing.*"
+        content_md: "### Capital Gains Tax Rates — FY 2026-27 (AY 2027-28)\n\n| Asset Class | Holding for STCG | STCG Rate | Holding for LTCG | LTCG Rate | LTCG Exemption |\n|---|---|---|---|---|---|\n| Listed equity shares | ≤ 12 months | 20% | > 12 months | 12.5% | ₹1.25L/year |\n| Equity mutual funds | ≤ 12 months | 20% | > 12 months | 12.5% | ₹1.25L/year |\n| Debt mutual funds | ≤ 24 months | Slab rate | > 24 months | 12.5% | Nil |\n| Real estate | ≤ 24 months | Slab rate | > 24 months | 12.5% | Sec 54 reinvestment |\n| Gold / jewellery | ≤ 24 months | Slab rate | > 24 months | 12.5% | Nil |\n| Unlisted shares | ≤ 24 months | Slab rate | > 24 months | 12.5% | Nil |\n\n*Budget 2024 unified LTCG at 12.5% and raised STCG on equity to 20%. Indexation benefit removed for most assets.*\n\n> ⚠️ **Debt Mutual Fund Exception (Finance Act 2023 — still in force):** For debt mutual funds where equity allocation is **less than 35%**, purchased **on or after April 1, 2023**, there is **no LTCG benefit regardless of holding period** — all gains are taxed at your applicable slab rate. The 12.5% LTCG rate above applies only to debt MFs purchased before April 1, 2023. Verify latest provisions before filing.*"
       },
       {
         type: "h3",
@@ -1494,7 +1494,7 @@ export const blogPosts: BlogPost[] = [
       },
             {
         type: "h2",
-        title: "Capital Gains Tax Planning Strategies for FY 2025-26",
+        title: "Capital Gains Tax Planning Strategies for FY 2026-27",
         content_md: "Capital gains tax is legal and expected—but with proper planning, you can minimise it substantially without deferring investments or taking undue risk.\n\n**Strategy 1 — Annual LTCG harvesting (₹1.25 lakh exemption):**\nEach financial year, long-term equity capital gains up to ₹1.25 lakh are tax-free. If you have accumulated unrealised gains on equity or equity funds, sell and immediately rebuy to reset the cost basis. This books gains tax-free and raises your future cost price, reducing future tax liability. Do this every March before year-end.\n\n*Example:* You have ₹4 lakh in unrealised LTCG. Harvest ₹1.25 lakh in Year 1, Year 2, Year 3, and Year 4. Tax saved vs. selling all at once in Year 4: approximately ₹34,000 at 12.5% rate.\n\n**Strategy 2 — Tax loss harvesting:**\nIf you hold positions with unrealised losses, sell them in the same year you have capital gains to offset gains with losses. Both STCG and LTCG can be set off against same-type losses (STCL can set off STCG and LTCG; LTCL can only set off LTCG). Unused losses can be carried forward for 8 years.\n\n**Strategy 3 — Timing redemptions across financial years:**\nIf you're planning a large redemption (say ₹50 lakh from equity funds), split it across two financial years to utilise the ₹1.25 lakh annual exemption twice and potentially stay below a higher tax slab.\n\n**Strategy 4 — Gifting to lower-income family members:**\nGifting listed shares or mutual fund units to a spouse or parent in a lower tax bracket is legal and common. However, clubbing provisions apply for spouses—the income earned from gifted assets is clubbed back with the donor's income. Gifts to parents (not spouse) do not attract clubbing, making this effective for parent-child wealth transfer.\n\n**Strategy 5 — Hold equity for 12 months minimum:**\nThe difference between STCG (20%) and LTCG (12.5%) is 7.5 percentage points. On ₹5 lakh of gains, this is ₹37,500. A deliberate holding period just beyond 12 months captures this saving on every equity position.",
       },
             {
@@ -1639,19 +1639,19 @@ export const blogPosts: BlogPost[] = [
   {
     slug: "new-vs-old-tax-regime-2025",
     status: "published",
-    metaTitle: "New vs Old Tax Regime FY 2025-26 (AY 2026-27): Complete Guide | AiTaxBot",
-    metaDescription: "Complete comparison of New vs Old tax regime for FY 2025-26. Updated slabs, rebate up to ₹12L, marginal relief, HRA, 80C deductions, worked examples at ₹9L/₹15L/₹20L. Which saves you more tax?",
-    keywords: ["new tax regime 2025-26", "old tax regime", "income tax slabs FY 2025-26", "section 80C", "HRA exemption", "marginal relief", "section 87A rebate", "tax regime comparison", "new vs old regime calculator", "AY 2026-27 tax"],
-    ogTitle: "New vs Old Tax Regime FY 2025-26 — Full Guide with Examples, Marginal Relief & Decision Framework",
-    ogDescription: "Updated FY 2025-26 comparison: correct slabs, ₹12.75L zero-tax window, marginal relief table, 3 worked examples, deduction guide, switching rules — all in one place.",
-    tags: ["tax", "salary", "planning", "marginal relief", "FY 2025-26", "80C", "HRA"],
+    metaTitle: "New vs Old Tax Regime FY 2026-27 (AY 2027-28): Complete Guide | AiTaxBot",
+    metaDescription: "Complete comparison of New vs Old tax regime for FY 2026-27. Updated slabs, rebate up to ₹12L, marginal relief, HRA, 80C deductions, worked examples at ₹9L/₹15L/₹20L. Which saves you more tax?",
+    keywords: ["new tax regime 2026-27", "old tax regime", "income tax slabs FY 2026-27", "section 80C", "HRA exemption", "marginal relief", "section 87A rebate", "tax regime comparison", "new vs old regime calculator", "AY 2027-28 tax"],
+    ogTitle: "New vs Old Tax Regime FY 2026-27 — Full Guide with Examples, Marginal Relief & Decision Framework",
+    ogDescription: "Updated FY 2026-27 comparison: correct slabs, ₹12.75L zero-tax window, marginal relief table, 3 worked examples, deduction guide, switching rules — all in one place.",
+    tags: ["tax", "salary", "planning", "marginal relief", "FY 2026-27", "80C", "HRA"],
     readingTimeMinutes: 15,
     publishedAt: "February 5, 2026",
     heroImage: "/images/tax-regime-comparison-2025.jpg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
-      "headline": "New vs Old Tax Regime FY 2025-26 — Complete Comparison, Marginal Relief & Decision Framework",
+      "headline": "New vs Old Tax Regime FY 2026-27 — Complete Comparison, Marginal Relief & Decision Framework",
       "author": {"@type": "Person", "name": "AiTaxBot Editorial"},
       "publisher": {"@type": "Organization", "name": "AiTaxBot"},
       "mainEntityOfPage": "https://aitaxbot.co.in/blog/new-vs-old-tax-regime-2025",
@@ -1667,7 +1667,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         type: "h2",
-        title: "Updated Tax Slabs: FY 2025-26 (AY 2026-27)",
+        title: "Updated Tax Slabs: FY 2026-27 (AY 2027-28)",
         content_md: "### New Tax Regime Slabs — FY 2025-26\n\nThe New Regime was overhauled in Budget 2025 with revised (lower) slabs effective from 1 April 2025:\n\n| Income Slab | Tax Rate |\n|---|---|\n| Up to ₹4,00,000 | Nil |\n| ₹4,00,001 – ₹8,00,000 | 5% |\n| ₹8,00,001 – ₹12,00,000 | 10% |\n| ₹12,00,001 – ₹16,00,000 | 15% |\n| ₹16,00,001 – ₹20,00,000 | 20% |\n| ₹20,00,001 – ₹24,00,000 | 25% |\n| Above ₹24,00,000 | 30% |\n\n**Key new-regime benefits for salaried employees:**\n- **Standard deduction:** ₹75,000 (enhanced from ₹50,000 in FY 2023-24)\n- **Section 156 rebate** (formerly Section 87A): Up to ₹60,000 if net taxable income ≤ ₹12,00,000\n- **Employer NPS contribution:** Up to 14% of basic salary exempt (ITA 2025: Section 125)\n- **Family pension deduction:** Raised to 1/3 of pension or **₹25,000** (whichever is lower) under new regime — up from ₹15,000 under old regime (ITA 2025: Section 93)\n- **Zero effective tax** for gross salary up to ₹12,75,000 (after ₹75K standard deduction)\n\n### Old Tax Regime Slabs — FY 2025-26\n\nThe Old Regime slabs remain unchanged from previous years:\n\n| Income Slab | Tax Rate |\n|---|---|\n| Up to ₹2,50,000 | Nil |\n| ₹2,50,001 – ₹5,00,000 | 5% |\n| ₹5,00,001 – ₹10,00,000 | 20% |\n| Above ₹10,00,000 | 30% |\n\n**Key old-regime features:**\n- **Standard deduction:** ₹50,000\n- **Section 156 rebate** (formerly Section 87A): Up to ₹12,500 if taxable income ≤ ₹5,00,000\n- **All deductions available:** HRA, 80C, 80D, 80CCD(1B), home loan interest, LTA, and more\n\n**Both regimes:** 4% Health & Education Cess applies on income tax + surcharge. Senior citizens (60+) get ₹3L basic exemption; super seniors (80+) get ₹5L, but **only in the old regime**."
       },
       {
@@ -1709,7 +1709,7 @@ export const blogPosts: BlogPost[] = [
         type: "cta",
         content_md: "Stop guessing — enter your actual salary, HRA, deductions and investments to get the **exact tax comparison and recommendation** from AiTaxBot's free calculator. It applies marginal relief correctly, models all deductions, and tells you which regime saves more — instantly.",
         internal_links: [
-          {"label": "Free Income Tax Calculator FY 2025-26", "href": "/calculators/income-tax"},
+          {"label": "Free Income Tax Calculator FY 2026-27", "href": "/calculators/income-tax"},
           {"label": "HRA Exemption Calculator", "href": "/calculators/hra"},
           {"label": "NPS Calculator", "href": "/calculators/nps"}
         ]
@@ -1729,12 +1729,12 @@ export const blogPosts: BlogPost[] = [
       },
       {
         type: "h2",
-        title: "Key Changes Summary: FY 2025-26 vs Previous Years",
+        title: "Key Changes Summary: FY 2026-27 vs Previous Years",
         content_md: "| Feature | FY 2024-25 | FY 2025-26 (Current) |\n|---|---|---|\n| New regime basic exemption | ₹3,00,000 | ₹4,00,000 |\n| New regime rebate (87A) | ₹25,000 (income ≤ ₹7L) | ₹60,000 (income ≤ ₹12L) |\n| Effective zero-tax limit (new) | ₹7,75,000 gross | ₹12,75,000 gross |\n| New regime standard deduction | ₹75,000 | ₹75,000 (unchanged) |\n| New regime 2nd slab rate | 5% (₹3L–₹7L) | 5% (₹4L–₹8L) |\n| New regime top slab | 30% above ₹15L | 30% above ₹24L |\n| Old regime slabs | Unchanged | Unchanged |\n| Old regime standard deduction | ₹50,000 | ₹50,000 (unchanged) |\n\n**Bottom line:** FY 2025-26 made the new regime significantly more attractive, especially for incomes between ₹7L–₹15L. The expanded slabs and doubled rebate are Budget 2025's most impactful provisions for middle-class taxpayers."
       },
       {
         type: "outro",
-        content_md: "The right tax regime depends on your income, life stage, and financial discipline. There is no universal answer.\n\nFor most salaried professionals under ₹12.75L gross salary: the **New Regime delivers zero tax** with no tracking required. For those with substantial HRA + home loan + NPS (total deductions > ₹4–5L at ₹15–20L income): the **Old Regime still saves more**.\n\nThe good news: you're not locked in forever (for salaried employees). Calculate both regimes every April, choose the better one, inform your employer, and file your ITR accordingly. Use AiTaxBot's free calculator — it models marginal relief correctly, applies all deductions accurately, and gives you the exact numbers in under 2 minutes.\n\n*Last updated: March 2026 for FY 2025-26 (AY 2026-27). Tax laws are subject to change; consult a CA for complex situations involving capital gains, business income, or surcharge planning.*"
+        content_md: "The right tax regime depends on your income, life stage, and financial discipline. There is no universal answer.\n\nFor most salaried professionals under ₹12.75L gross salary: the **New Regime delivers zero tax** with no tracking required. For those with substantial HRA + home loan + NPS (total deductions > ₹4–5L at ₹15–20L income): the **Old Regime still saves more**.\n\nThe good news: you're not locked in forever (for salaried employees). Calculate both regimes every April, choose the better one, inform your employer, and file your ITR accordingly. Use AiTaxBot's free calculator — it models marginal relief correctly, applies all deductions accurately, and gives you the exact numbers in under 2 minutes.\n\n*Last updated: April 2026 for FY 2026-27 (AY 2027-28). Tax laws are subject to change; consult a CA for complex situations involving capital gains, business income, or surcharge planning.*"
       }
     ],
   relatedPosts: [
@@ -1758,7 +1758,7 @@ export const blogPosts: BlogPost[] = [
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
-      "headline": "Marginal Relief on Income Tax: Complete Guide for FY 2025-26",
+      "headline": "Marginal Relief on Income Tax: Complete Guide for FY 2026-27",
       "author": {"@type": "Person", "name": "AiTaxBot Editorial"},
       "publisher": {"@type": "Organization", "name": "AiTaxBot"},
       "mainEntityOfPage": "https://aitaxbot.co.in/blog/marginal-relief-income-tax-guide",
@@ -1779,7 +1779,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         type: "h2",
-        title: "The Five Marginal Relief Thresholds in FY 2025-26",
+        title: "The Five Marginal Relief Thresholds in FY 2026-27",
         content_md: "Marginal relief applies at every point where a cliff-edge tax event occurs:\n\n| Threshold | What Triggers | Without Relief | With Relief |\n|---|---|---|---|\n| ₹12 Lakh | Rebate (Section 87A) expires | Tax jumps from ₹0 to ₹60,000+ | Tax = only excess over ₹12L |\n| ₹50 Lakh | 10% surcharge applies | Tax jumps by ~10-11% of income tax | Tax increase ≤ extra income |\n| ₹1 Crore | 15% surcharge applies | Tax jumps by ~5% of income tax | Tax increase ≤ extra income |\n| ₹2 Crore | 25% surcharge applies | Tax jumps by ~10% of income tax | Tax increase ≤ extra income |\n| ₹5 Crore | 37% surcharge (old regime) | Significant jump | Tax increase ≤ extra income |\n\n*Note: Under the new regime, surcharge is capped at 25% even for income above ₹5 crore. The 37% surcharge applies only under the old regime.*"
       },
       {

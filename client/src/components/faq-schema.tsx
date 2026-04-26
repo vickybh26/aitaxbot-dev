@@ -42,8 +42,8 @@ export const taxFAQs: FAQItem[] = [
     answer: "The choice depends on your income level and deductions. New regime offers lower tax rates but fewer deductions. Old regime allows more deductions but has higher rates. Use our AI tax calculator to compare both regimes for your specific situation."
   },
   {
-    question: "What is the standard deduction for FY 2025-26 (AY 2026-27)?",
-    answer: "The standard deduction for salaried individuals is ₹75,000 under the New Tax Regime and ₹50,000 under the Old Tax Regime for FY 2025-26 (AY 2026-27) and Tax Year 2026-27 (IT Act 2025) onwards. This deduction is automatically applied to reduce your taxable income."
+    question: "What is the standard deduction for FY 2026-27 (AY 2027-28)?",
+    answer: "The standard deduction for salaried individuals is ₹75,000 under the New Tax Regime and ₹50,000 under the Old Tax Regime for FY 2026-27 (AY 2027-28) and Tax Year 2026-27 (IT Act 2025). This deduction is automatically applied to reduce your taxable income."
   },
   {
     question: "Can I switch between tax regimes every year?",
@@ -55,7 +55,7 @@ export const taxFAQs: FAQItem[] = [
   },
   {
     question: "How accurate is the AiTaxBot tax calculator?",
-    answer: "Our AI tax calculator uses official government tax slabs and rates for FY 2025-26 (AY 2026-27). It includes all applicable deductions, rebates, and cess calculations. The results are verified by certified tax experts for maximum accuracy."
+    answer: "Our AI tax calculator uses official government tax slabs and rates for FY 2026-27 (AY 2027-28). It includes all applicable deductions, rebates, and cess calculations. The results are verified by certified tax experts for maximum accuracy."
   },
   {
     question: "What documents do I need for tax calculation?",

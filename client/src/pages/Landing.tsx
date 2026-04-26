@@ -175,17 +175,17 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
   return (
     <>
       <Helmet>
-        <title>AiTaxBot - Income Tax Calculator India FY 2025-26 | AY 2026-27</title>
-        <meta name="description" content="AI-powered tax calculator for India. Compare old vs new regime, ₹12L tax-free under Section 87A. Free SIP, SWP, HRA, PF calculators. CA-reviewed. FY 2025-26 & Tax Year 2026-27 ready." />
-        <meta name="keywords" content="income tax calculator, tax calculator India, AI tax calculator, new tax regime, old tax regime, SIP calculator, SWP calculator, HRA calculator, PF calculator, AY 2026-27, Income Tax Act 2025" />
+        <title>AiTaxBot - Income Tax Calculator India FY 2026-27 | AY 2027-28</title>
+        <meta name="description" content="AI-powered tax calculator for India. Compare old vs new regime, ₹12L tax-free under Section 87A. Free SIP, SWP, HRA, PF calculators. CA-reviewed. FY 2026-27 & Tax Year 2026-27 ready." />
+        <meta name="keywords" content="income tax calculator, tax calculator India, AI tax calculator, new tax regime, old tax regime, SIP calculator, SWP calculator, HRA calculator, PF calculator, AY 2027-28, Income Tax Act 2025" />
         <link rel="canonical" href="https://aitaxbot.co.in/" />
-        <meta property="og:title" content="AiTaxBot - Income Tax Calculator India FY 2025-26 | AY 2026-27" />
+        <meta property="og:title" content="AiTaxBot - Income Tax Calculator India FY 2026-27 | AY 2027-28" />
         <meta property="og:description" content="AI-powered income tax calculator with ₹12L tax-free limit. CA-reviewed calculators for salaried, freelancers & investors. Income Tax Act 2025 ready." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://aitaxbot.co.in/" />
         <meta property="og:image" content="https://aitaxbot.co.in/images/aitaxbot-logo.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="AiTaxBot - Income Tax Calculator India FY 2025-26 | AY 2026-27" />
+        <meta name="twitter:title" content="AiTaxBot - Income Tax Calculator India FY 2026-27 | AY 2027-28" />
         <meta name="twitter:description" content="AI-powered income tax calculator for India. ₹12L tax-free under new regime. Compare tax regimes instantly." />
         <script type="application/ld+json">{JSON.stringify(generateHomePageSchema())}</script>
       </Helmet>
@@ -203,7 +203,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/30 to-white rounded-3xl"></div>
                 <div className="relative z-10 px-4 lg:px-8">
                   <Badge className="mb-4 bg-white/80 backdrop-blur-sm text-persian-blue-700 border-persian-blue-200 shadow-soft px-3 py-1 text-xs font-semibold">
-                    ✨ FY 2025-26 (AY 2026-27) & Tax Year 2026-27 Ready
+                    ✨ FY 2026-27 (AY 2027-28) & Tax Year 2026-27 Ready
                   </Badge>
                   <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-4 leading-tight">
                     {t("hero.headline").split("\n")[0]}
@@ -375,7 +375,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                       <Shield className="h-5 w-5 text-green-600" />
                     </div>
                     <h3 className="text-base font-bold text-slate-900 mb-1">CA-reviewed, not generic</h3>
-                    <p className="text-slate-500 text-sm leading-relaxed">Every calculator covers IT Act 1961 (FY 2025-26) and IT Act 2025 (Tax Year 2026-27). Logic reviewed by Chartered Accountants.</p>
+                    <p className="text-slate-500 text-sm leading-relaxed">Every calculator covers IT Act 1961 (FY 2026-27) and IT Act 2025 (Tax Year 2026-27). Logic reviewed by Chartered Accountants.</p>
                   </div>
                   <div className="p-5 rounded-2xl bg-slate-50 border border-slate-100">
                     <div className="w-11 h-11 bg-orange-100 rounded-xl flex items-center justify-center mb-3">
@@ -424,12 +424,12 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                       a: "It depends on your deductions. If your total 80C + HRA + home loan deductions exceed ₹3.75 lakh, the Old Regime usually saves more. Below that threshold, the New Regime is typically better. Use our calculator above to get your exact answer in seconds."
                     },
                     {
-                      q: "Is income up to ₹12 lakh really tax-free in FY 2025-26?",
-                      a: "Yes — under the New Regime for FY 2025-26, the rebate under Section 87A has been enhanced so that taxpayers with net taxable income up to ₹12 lakh pay zero tax. The ₹75,000 standard deduction means a salaried person earning up to ₹12.75 lakh pays no tax."
+                      q: "Is income up to ₹12 lakh really tax-free in FY 2026-27?",
+                      a: "Yes — under the New Regime for FY 2026-27, the rebate under Section 87A has been enhanced so that taxpayers with net taxable income up to ₹12 lakh pay zero tax. The ₹75,000 standard deduction means a salaried person earning up to ₹12.75 lakh pays no tax."
                     },
                     {
                       q: "What is the 87A rebate and am I eligible?",
-                      a: "Section 87A gives a full rebate on tax if your net taxable income is within the specified limit (₹12 lakh under New Regime for FY 2025-26). Our calculator automatically applies this rebate and shows you whether you qualify."
+                      a: "Section 87A gives a full rebate on tax if your net taxable income is within the specified limit (₹12 lakh under New Regime for FY 2026-27). Our calculator automatically applies this rebate and shows you whether you qualify."
                     },
                     {
                       q: "Can I switch between Old and New Regime every year?",
@@ -441,7 +441,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                     },
                     {
                       q: "How is AY (Assessment Year) different from FY (Financial Year)?",
-                      a: "Financial Year (FY) is when you earn the income — e.g., FY 2025-26 runs from April 2025 to March 2026. Assessment Year (AY) is when you file and pay tax on that income — so AY 2026-27 corresponds to FY 2025-26."
+                      a: "Financial Year (FY) is when you earn the income — e.g., FY 2026-27 runs from April 2025 to March 2026. Assessment Year (AY) is when you file and pay tax on that income — so AY 2027-28 corresponds to FY 2026-27."
                     },
                   ].map(({ q, a }, i) => (
                     <details key={i} className="group rounded-xl border border-slate-200 bg-white open:border-persian-blue-200 transition-all">
@@ -666,7 +666,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                 <a href="/privacy-policy" className="hover:text-white transition-colors">Privacy</a>
                 <a href="/terms-of-service" className="hover:text-white transition-colors">Terms</a>
                 <a href="/contact" className="hover:text-white transition-colors">Contact</a>
-                <span>FY 2025-26 / AY 2026-27 Compliant</span>
+                <span>FY 2026-27 / AY 2027-28 Compliant</span>
               </div>
             </div>
           </div>

@@ -37,7 +37,7 @@ const TAG_TO_CATEGORY: Record<string, Category> = {
   "tax": "Tax Planning",
   "Tax Updates": "Tax Planning",
   "planning": "Tax Planning",
-  "FY 2025-26": "Tax Planning",
+  "FY 2026-27": "Tax Planning",
   "80C": "Tax Planning",
   "HRA": "Tax Planning",
   "salary": "Tax Planning",
@@ -176,7 +176,7 @@ export default function Blog() {
         <title>Tax & Finance Blog — Expert Guides for Indian Taxpayers | AiTaxBot</title>
         <meta
           name="description"
-          content="In-depth guides on Indian taxation, ITR filing, tax saving, capital gains, GST, SIP, and the new Income Tax Act 2025. CA-verified articles updated for FY 2025-26 & Tax Year 2026-27."
+          content="In-depth guides on Indian taxation, ITR filing, tax saving, capital gains, GST, SIP, and the new Income Tax Act 2025. CA-verified articles updated for FY 2026-27 & Tax Year 2026-27."
         />
         <meta name="keywords" content="income tax blog India, tax saving tips, IT act 2025, capital gains tax, GST guide, SIP calculator, AiTaxBot blog" />
         <link rel="canonical" href="https://aitaxbot.co.in/blog" />

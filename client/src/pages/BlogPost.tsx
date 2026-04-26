@@ -299,7 +299,7 @@ export default function BlogPost() {
                   Written by AiTaxBot Editorial Team
                 </p>
                 <p className="text-xs text-gray-500">
-                  Reviewed by a Chartered Accountant · Updated {post.publishedAt || "2025"} · All tax figures follow CBDT guidelines for FY 2025-26
+                  Reviewed by a Chartered Accountant · Updated {post.publishedAt || "2025"} · All tax figures follow CBDT guidelines for FY 2026-27
                 </p>
               </div>
             </div>

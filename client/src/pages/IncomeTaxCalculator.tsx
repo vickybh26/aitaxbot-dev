@@ -14,7 +14,7 @@ import TaxCalculator from '@/components/calculators/TaxCalculator';
 
 const incomeTaxFAQs = [
   {
-    question: "Which tax regime should I choose - Old or New for FY 2025-26?",
+    question: "Which tax regime should I choose - Old or New for FY 2026-27?",
     answer: "Use the AiTaxBot Income Tax Calculator to compare both regimes. Generally, the Old Regime is better if you have significant 80C investments (₹1.5L+) and HRA. The New Regime (Section 202 under Income Tax Act, 2025) is better if you have minimal deductions and prefer lower rates."
   },
   {
@@ -41,12 +41,12 @@ const incomeTaxFAQs = [
 
 export default function IncomeTaxCalculatorPage() {
   useEffect(() => {
-    trackPageView('/calculators/income-tax', 'Income Tax Calculator India FY 2025-26 — New vs Old Regime | AiTaxBot');
+    trackPageView('/calculators/income-tax', 'Income Tax Calculator India FY 2026-27 — New vs Old Regime | AiTaxBot');
   }, []);
 
   const calculatorSchema = generateCalculatorSchema({
-    name: "Income Tax Calculator FY 2025-26 (AY 2026-27)",
-    description: "Free Income Tax Calculator for FY 2025-26 (AY 2026-27). Compare Old vs New tax regime, calculate Section 87A rebate and marginal relief.",
+    name: "Income Tax Calculator FY 2026-27 (AY 2027-28)",
+    description: "Free Income Tax Calculator for FY 2026-27 (AY 2027-28). Compare Old vs New tax regime, calculate Section 87A rebate and marginal relief.",
     url: "https://aitaxbot.co.in/calculators/income-tax",
     applicationCategory: "FinanceApplication"
   });
@@ -62,12 +62,12 @@ export default function IncomeTaxCalculatorPage() {
   return (
     <>
       <Helmet>
-        <title>Income Tax Calculator India FY 2025-26 (AY 2026-27) — New vs Old Regime | AiTaxBot</title>
-        <meta name="description" content="Free Income Tax Calculator for FY 2025-26 (AY 2026-27). Compare Old vs New regime, Section 87A rebate & marginal relief. Latest tax slabs & deductions." />
-        <meta name="keywords" content="income tax calculator, tax calculator India, FY 2025-26, AY 2026-27, old vs new regime, section 87a rebate, marginal relief, tax calculation, income tax slab" />
+        <title>Income Tax Calculator India FY 2026-27 (AY 2027-28) — New vs Old Regime | AiTaxBot</title>
+        <meta name="description" content="Free Income Tax Calculator for FY 2026-27 (AY 2027-28). Compare Old vs New regime, Section 87A rebate & marginal relief. Latest tax slabs & deductions." />
+        <meta name="keywords" content="income tax calculator, tax calculator India, FY 2026-27, AY 2027-28, old vs new regime, section 87a rebate, marginal relief, tax calculation, income tax slab" />
         <link rel="canonical" href="https://aitaxbot.co.in/calculators/income-tax" />
-        <meta property="og:title" content="Income Tax Calculator India FY 2025-26 (AY 2026-27) — New vs Old Regime | AiTaxBot" />
-        <meta property="og:description" content="Free Income Tax Calculator for FY 2025-26 (AY 2026-27). Compare Old vs New regime, Section 87A rebate & marginal relief." />
+        <meta property="og:title" content="Income Tax Calculator India FY 2026-27 (AY 2027-28) — New vs Old Regime | AiTaxBot" />
+        <meta property="og:description" content="Free Income Tax Calculator for FY 2026-27 (AY 2027-28). Compare Old vs New regime, Section 87A rebate & marginal relief." />
         <meta property="og:url" content="https://aitaxbot.co.in/calculators/income-tax" />
         <meta property="og:image" content="https://aitaxbot.co.in/images/aitaxbot-logo.png" />
         <meta property="og:type" content="website" />
@@ -95,12 +95,12 @@ export default function IncomeTaxCalculatorPage() {
         <section className="py-12 px-6 bg-gradient-to-r from-blue-700 to-blue-800">
           <div className="max-w-6xl mx-auto">
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Income Tax Calculator India FY 2025-26 — New vs Old Regime
+              Income Tax Calculator India FY 2026-27 — New vs Old Regime
             </h1>
             <p className="text-lg text-white/90 max-w-3xl">
               Calculate your income tax liability with our free calculator. Compare Old vs New tax regime,
               check Section 87A rebate eligibility, and get detailed tax breakdown with marginal relief computation.
-              CA verified and updated for FY 2025-26.
+              CA verified and updated for FY 2026-27.
             </p>
           </div>
         </section>
@@ -137,7 +137,7 @@ export default function IncomeTaxCalculatorPage() {
         <section className="py-12 px-6 bg-white">
           <div className="max-w-6xl mx-auto">
 
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">Income Tax Slabs FY 2025-26</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-6">Income Tax Slabs FY 2026-27</h2>
 
             <div className="overflow-x-auto mb-8">
               <table className="w-full border-collapse text-sm">
@@ -219,7 +219,7 @@ export default function IncomeTaxCalculatorPage() {
                   <span className="bg-green-600 text-white text-xs font-bold px-2 py-1 rounded">EXAMPLE 1</span>
                   ₹12 Lakh — Zero Tax
                 </h3>
-                <p className="text-sm text-slate-600 mb-4">Salaried person, New Regime, FY 2025-26</p>
+                <p className="text-sm text-slate-600 mb-4">Salaried person, New Regime, FY 2026-27</p>
                 <div className="space-y-1 text-sm">
                   <div className="flex justify-between"><span>Gross Salary</span><span className="font-semibold">₹12,75,000</span></div>
                   <div className="flex justify-between"><span>Less: Standard Deduction</span><span className="font-semibold">−₹75,000</span></div>
@@ -350,7 +350,7 @@ export default function IncomeTaxCalculatorPage() {
               </div>
             </div>
 
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">FY 2025-26 Tax Regime Comparison</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-6">FY 2026-27 Tax Regime Comparison</h2>
 
             <div className="overflow-x-auto mb-8">
               <table className="w-full border-collapse text-sm">
@@ -469,7 +469,7 @@ export default function IncomeTaxCalculatorPage() {
         <footer className="bg-slate-900 text-white py-8 px-6">
           <div className="max-w-6xl mx-auto text-center">
             <p className="text-sm text-slate-400">
-              © 2026 AiTaxBot. All rights reserved. | Income Tax Calculator FY 2025-26
+              © 2026 AiTaxBot. All rights reserved. | Income Tax Calculator FY 2026-27
             </p>
           </div>
         </footer>

@@ -41,12 +41,12 @@ const hraFAQs = [
 
 export default function HRACalculatorPage() {
   useEffect(() => {
-    trackPageView('/calculators/hra', 'HRA Calculator India FY 2025-26 - House Rent Allowance Exemption | AiTaxBot');
+    trackPageView('/calculators/hra', 'HRA Calculator India FY 2026-27 - House Rent Allowance Exemption | AiTaxBot');
   }, []);
 
   const calculatorSchema = generateCalculatorSchema({
     name: "HRA Calculator - House Rent Allowance",
-    description: "Free HRA Calculator to compute House Rent Allowance tax exemption under Section 10(13A) for metro and non-metro cities in India FY 2025-26.",
+    description: "Free HRA Calculator to compute House Rent Allowance tax exemption under Section 10(13A) for metro and non-metro cities in India FY 2026-27.",
     url: "https://www.aitaxbot.co.in/calculators/hra",
     applicationCategory: "FinanceApplication"
   });
@@ -62,12 +62,12 @@ export default function HRACalculatorPage() {
   return (
     <>
       <Helmet>
-        <title>HRA Calculator India FY 2025-26 - House Rent Allowance Exemption | AiTaxBot</title>
-        <meta name="description" content="Free HRA Calculator for FY 2025-26. Calculate House Rent Allowance exemption under Section 10(13A) for metro & non-metro cities. Compute 3-part formula: actual HRA, rent minus 10% basic, 50%/40% basic. CA verified." />
+        <title>HRA Calculator India FY 2026-27 - House Rent Allowance Exemption | AiTaxBot</title>
+        <meta name="description" content="Free HRA Calculator for FY 2026-27. Calculate House Rent Allowance exemption under Section 10(13A) for metro & non-metro cities. Compute 3-part formula: actual HRA, rent minus 10% basic, 50%/40% basic. CA verified." />
         <meta name="keywords" content="HRA calculator, house rent allowance, section 10 13a, HRA exemption, HRA deduction, metro HRA, non-metro HRA, rent calculator India, Section 10(13A)" />
         <link rel="canonical" href="https://aitaxbot.co.in/calculators/hra" />
-        <meta property="og:title" content="HRA Calculator India FY 2025-26 - House Rent Allowance Exemption | AiTaxBot" />
-        <meta property="og:description" content="Free HRA Calculator FY 2025-26. Compute House Rent Allowance exemption under Section 10(13A) for metro & non-metro cities using the 3-part minimum formula." />
+        <meta property="og:title" content="HRA Calculator India FY 2026-27 - House Rent Allowance Exemption | AiTaxBot" />
+        <meta property="og:description" content="Free HRA Calculator FY 2026-27. Compute House Rent Allowance exemption under Section 10(13A) for metro & non-metro cities using the 3-part minimum formula." />
         <meta property="og:url" content="https://aitaxbot.co.in/calculators/hra" />
         <meta property="og:image" content="https://www.aitaxbot.co.in/apple-touch-icon.png" />
         <meta property="og:type" content="website" />
@@ -95,12 +95,12 @@ export default function HRACalculatorPage() {
         <section className="py-12 px-6 bg-gradient-to-r from-green-600 to-green-700">
           <div className="max-w-6xl mx-auto">
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              HRA Calculator India — House Rent Allowance Exemption FY 2025-26
+              HRA Calculator India — House Rent Allowance Exemption FY 2026-27
             </h1>
             <p className="text-lg text-white/90 max-w-3xl">
               Calculate your House Rent Allowance (HRA) tax exemption under Section 10(13A).
               Determine the maximum HRA deduction based on your basic salary, actual rent paid, metro/non-metro city classification.
-              CA verified and updated for FY 2025-26. Old Tax Regime only.
+              CA verified and updated for FY 2026-27. Old Tax Regime only.
             </p>
           </div>
         </section>
@@ -387,8 +387,8 @@ export default function HRACalculatorPage() {
                   </tr>
                   <tr className="bg-slate-50">
                     <td className="border border-slate-200 p-3 text-slate-700">Standard Deduction</td>
-                    <td className="border border-slate-200 p-3 text-center">₹50,000 (FY 2025-26)</td>
-                    <td className="border border-slate-200 p-3 text-center text-green-700 font-semibold">₹75,000 (FY 2025-26)</td>
+                    <td className="border border-slate-200 p-3 text-center">₹50,000 (FY 2026-27)</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-semibold">₹75,000 (FY 2026-27)</td>
                   </tr>
                   <tr>
                     <td className="border border-slate-200 p-3 text-slate-700">Best For</td>

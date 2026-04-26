@@ -16,11 +16,11 @@ import {
 const hubFAQs = [
   {
     question: "Are the AiTaxBot calculators free to use?",
-    answer: "Yes, all calculators on AiTaxBot are 100% free with unlimited usage. No registration is required. We offer Income Tax, HRA, SIP, SWP, and PF calculators updated for FY 2025-26 (AY 2026-27)."
+    answer: "Yes, all calculators on AiTaxBot are 100% free with unlimited usage. No registration is required. We offer Income Tax, HRA, SIP, SWP, and PF calculators updated for FY 2026-27 (AY 2027-28)."
   },
   {
     question: "Are the calculators updated for the latest tax rules?",
-    answer: "Yes, all tax calculators cover FY 2025-26 (AY 2026-27) under Income Tax Act, 1961 and Tax Year 2026-27 under the new Income Tax Act, 2025. We update our tools immediately when tax laws or interest rates change."
+    answer: "Yes, all tax calculators cover FY 2026-27 (AY 2027-28) under Income Tax Act, 1961 and Tax Year 2026-27 under the new Income Tax Act, 2025. We update our tools immediately when tax laws or interest rates change."
   },
   {
     question: "Who reviews the calculator accuracy?",
@@ -35,7 +35,7 @@ const hubFAQs = [
 const taxCalculators = [
   {
     title: 'Income Tax Calculator',
-    description: 'Calculate your income tax liability for FY 2025-26 (AY 2026-27). Compare Old vs New regime with Section 87A rebate and marginal relief.',
+    description: 'Calculate your income tax liability for FY 2026-27 (AY 2027-28). Compare Old vs New regime with Section 87A rebate and marginal relief.',
     icon: Calculator,
     link: '/calculators/income-tax',
     color: 'persian-blue',
@@ -48,7 +48,7 @@ const taxCalculators = [
   },
   {
     title: 'HRA Calculator',
-    description: 'Compute your House Rent Allowance exemption under Section 10(13A) for FY 2025-26. Find out how much HRA you can claim as tax deduction.',
+    description: 'Compute your House Rent Allowance exemption under Section 10(13A) for FY 2026-27. Find out how much HRA you can claim as tax deduction.',
     icon: Home,
     link: '/calculators/hra',
     color: 'green',
@@ -90,7 +90,7 @@ const investmentCalculators = [
   },
   {
     title: 'PF Calculator',
-    description: 'Calculate EPF, VPF & PPF contributions for FY 2025-26 with employer split breakdown and year-wise retirement corpus projection at 8.25% interest.',
+    description: 'Calculate EPF, VPF & PPF contributions for FY 2026-27 with employer split breakdown and year-wise retirement corpus projection at 8.25% interest.',
     icon: Shield,
     link: '/calculators/pf',
     color: 'indigo',
@@ -176,7 +176,7 @@ function CalculatorCard({ calc }: { calc: typeof taxCalculators[0] }) {
 
 export default function Calculators() {
   useEffect(() => {
-    trackPageView('/calculators', 'Free Tax & Financial Calculators India FY 2025-26 - AiTaxBot');
+    trackPageView('/calculators', 'Free Tax & Financial Calculators India FY 2026-27 - AiTaxBot');
   }, []);
 
   const breadcrumbSchema = generateBreadcrumbSchema([
@@ -189,12 +189,12 @@ export default function Calculators() {
   return (
     <>
       <Helmet>
-        <title>Free Tax & Financial Calculators India FY 2025-26 | AiTaxBot</title>
-        <meta name="description" content="Free tax & financial calculators for India, updated for FY 2025-26 (AY 2026-27). Income Tax, HRA, SIP, SWP & PF calculators. Reviewed by Chartered Accountant." />
-        <meta name="keywords" content="tax calculators india, income tax calculator, HRA calculator, SIP calculator, SWP calculator, PF calculator, EPF calculator, financial planning tools india, FY 2025-26" />
+        <title>Free Tax & Financial Calculators India FY 2026-27 | AiTaxBot</title>
+        <meta name="description" content="Free tax & financial calculators for India, updated for FY 2026-27 (AY 2027-28). Income Tax, HRA, SIP, SWP & PF calculators. Reviewed by Chartered Accountant." />
+        <meta name="keywords" content="tax calculators india, income tax calculator, HRA calculator, SIP calculator, SWP calculator, PF calculator, EPF calculator, financial planning tools india, FY 2026-27" />
         <link rel="canonical" href="https://aitaxbot.co.in/calculators" />
-        <meta property="og:title" content="Free Tax & Financial Calculators India FY 2025-26 | AiTaxBot" />
-        <meta property="og:description" content="Free tax & financial calculators for India. Income Tax, HRA, SIP, SWP & PF calculators updated for FY 2025-26. Reviewed by CA." />
+        <meta property="og:title" content="Free Tax & Financial Calculators India FY 2026-27 | AiTaxBot" />
+        <meta property="og:description" content="Free tax & financial calculators for India. Income Tax, HRA, SIP, SWP & PF calculators updated for FY 2026-27. Reviewed by CA." />
         <meta property="og:url" content="https://aitaxbot.co.in/calculators" />
         <meta property="og:type" content="website" />
 
@@ -223,11 +223,11 @@ export default function Calculators() {
               <Calculator className="h-12 w-12 text-white" />
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Free Tax & Financial Calculators India - FY 2025-26
+              Free Tax & Financial Calculators India - FY 2026-27
             </h1>
             <p className="text-xl text-white/90 mb-4 max-w-3xl mx-auto">
               Plan your taxes and investments with our comprehensive suite of free financial calculators,
-              designed specifically for Indian taxpayers and investors. Updated for FY 2025-26 (AY 2026-27)
+              designed specifically for Indian taxpayers and investors. Updated for FY 2026-27 (AY 2027-28)
               under Income Tax Act, 1961 and Tax Year 2026-27 under the new Income Tax Act, 2025.
             </p>
             <p className="text-base text-white/80 max-w-2xl mx-auto">
@@ -256,7 +256,7 @@ export default function Calculators() {
             <div className="mb-10">
               <h2 className="text-2xl font-bold text-slate-900 mb-2">Income Tax & Salary Calculators</h2>
               <p className="text-slate-600 mb-6">
-                Calculate your income tax liability and salary-related deductions for FY 2025-26. 
+                Calculate your income tax liability and salary-related deductions for FY 2026-27. 
                 Compare tax regimes, compute HRA exemption, and optimise your take-home pay.
               </p>
               <div className="grid gap-8 md:grid-cols-2">
@@ -322,7 +322,7 @@ export default function Calculators() {
                 <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <TrendingUp className="h-8 w-8 text-purple-600" />
                 </div>
-                <h3 className="text-xl font-semibold text-slate-900 mb-3">Updated for FY 2025-26</h3>
+                <h3 className="text-xl font-semibold text-slate-900 mb-3">Updated for FY 2026-27</h3>
                 <p className="text-slate-600">
                   We update our calculators immediately when tax laws or interest rates change to ensure you always get current information.
                 </p>
@@ -359,7 +359,7 @@ export default function Calculators() {
         <footer className="bg-slate-900 text-white py-8 px-6">
           <div className="max-w-6xl mx-auto text-center">
             <p className="text-sm text-slate-400">
-              &copy; 2026 AiTaxBot. All rights reserved. | Financial Calculators updated for FY 2025-26 (AY 2026-27)
+              &copy; 2026 AiTaxBot. All rights reserved. | Financial Calculators updated for FY 2026-27 (AY 2027-28)
             </p>
           </div>
         </footer>

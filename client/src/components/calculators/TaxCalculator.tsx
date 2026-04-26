@@ -954,7 +954,7 @@ export default function TaxCalculator({ onClose }: TaxCalculatorProps = {}) {
                       </div>
                     ) : formData.financialYear === '2025-26' ? (
                       <div className="mt-2 rounded-lg border border-blue-200 bg-blue-50 p-3 text-xs text-blue-900">
-                        <p className="font-semibold mb-1.5">📘 Income Tax Act, 1961 — FY 2025-26 (Budget 2025 slabs)</p>
+                        <p className="font-semibold mb-1.5">📘 Income Tax Act, 2025 — FY 2026-27 (Budget 2026 slabs)</p>
                         <div className="grid grid-cols-2 gap-x-4 gap-y-0.5">
                           <span><span className="font-medium">New Regime:</span> Section 115BAC</span>
                           <span><span className="font-medium">Rebate (≤ ₹12L):</span> Section 87A</span>

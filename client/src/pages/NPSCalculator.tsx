@@ -41,12 +41,12 @@ const npsFAQs = [
 
 export default function NPSCalculatorPage() {
   useEffect(() => {
-    trackPageView('/calculators/nps', 'NPS Calculator India FY 2025-26 | AiTaxBot');
+    trackPageView('/calculators/nps', 'NPS Calculator India FY 2026-27 | AiTaxBot');
   }, []);
 
   const calculatorSchema = generateCalculatorSchema({
     name: "NPS Calculator - National Pension System",
-    description: "Free NPS Calculator India FY 2025-26. Calculate NPS corpus, lump sum, monthly pension and tax savings under Section 80CCD(1), 80CCD(1B) and 80CCD(2).",
+    description: "Free NPS Calculator India FY 2026-27. Calculate NPS corpus, lump sum, monthly pension and tax savings under Section 80CCD(1), 80CCD(1B) and 80CCD(2).",
     url: "https://aitaxbot.co.in/calculators/nps",
     applicationCategory: "FinanceApplication"
   });
@@ -62,12 +62,12 @@ export default function NPSCalculatorPage() {
   return (
     <>
       <Helmet>
-        <title>NPS Calculator India FY 2025-26 - Pension Corpus & Tax Saving | AiTaxBot</title>
+        <title>NPS Calculator India FY 2026-27 - Pension Corpus & Tax Saving | AiTaxBot</title>
         <meta name="description" content="Free NPS Calculator India. Calculate National Pension System corpus, monthly pension, lump sum and tax savings under 80CCD(1), 80CCD(1B) +₹50,000 extra deduction. CA verified." />
         <meta name="keywords" content="NPS calculator, National Pension System calculator, NPS tax benefit, 80CCD 1B, NPS corpus calculator, NPS pension calculator, NPS tax saving India, PRAN calculator" />
         <link rel="canonical" href="https://aitaxbot.co.in/calculators/nps" />
-        <meta property="og:title" content="NPS Calculator India FY 2025-26 - Corpus, Pension & ₹50,000 Extra Tax Saving" />
-        <meta property="og:description" content="Calculate your NPS retirement corpus, monthly pension and extra ₹50,000 tax saving under Section 80CCD(1B). CA verified, updated for FY 2025-26." />
+        <meta property="og:title" content="NPS Calculator India FY 2026-27 - Corpus, Pension & ₹50,000 Extra Tax Saving" />
+        <meta property="og:description" content="Calculate your NPS retirement corpus, monthly pension and extra ₹50,000 tax saving under Section 80CCD(1B). CA verified, updated for FY 2026-27." />
         <meta property="og:url" content="https://aitaxbot.co.in/calculators/nps" />
         <meta property="og:image" content="https://aitaxbot.co.in/images/aitaxbot-logo.png" />
         <meta property="og:type" content="website" />
@@ -95,12 +95,12 @@ export default function NPSCalculatorPage() {
         <section className="py-12 px-6 bg-gradient-to-r from-indigo-600 to-indigo-700">
           <div className="max-w-6xl mx-auto">
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              NPS Calculator India — Pension Corpus & Tax Saving FY 2025-26
+              NPS Calculator India — Pension Corpus & Tax Saving FY 2026-27
             </h1>
             <p className="text-lg text-white/90 max-w-3xl">
               Calculate your National Pension System (NPS) retirement corpus, estimated monthly pension,
               and total tax savings including the exclusive ₹50,000 extra deduction under Section 80CCD(1B).
-              CA verified and updated for FY 2025-26.
+              CA verified and updated for FY 2026-27.
             </p>
           </div>
         </section>

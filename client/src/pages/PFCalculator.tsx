@@ -18,8 +18,8 @@ import { Separator } from '@/components/ui/separator';
 
 const pfFAQs = [
   {
-    question: "What is the current EPF interest rate for FY 2025-26?",
-    answer: "The EPF interest rate for FY 2025-26 is 8.25% per annum. However, interest on employee contributions exceeding ₹2.5 Lakh/year becomes taxable from FY 2021-22 onwards. This applies to both EPF and VPF contributions combined."
+    question: "What is the current EPF interest rate for FY 2026-27?",
+    answer: "The EPF interest rate for FY 2026-27 is 8.25% per annum. However, interest on employee contributions exceeding ₹2.5 Lakh/year becomes taxable from FY 2021-22 onwards. This applies to both EPF and VPF contributions combined."
   },
   {
     question: "Is EPF maturity amount completely tax-free?",
@@ -50,7 +50,7 @@ export default function PFCalculatorPage() {
 
   const calculatorSchema = generateCalculatorSchema({
     name: "PF Calculator - EPF VPF PPF",
-    description: "Free PF Calculator India FY 2025-26. Calculate EPF, VPF and PPF corpus with employer contribution split, 8.25% interest growth, withdrawal rules, and retirement planning.",
+    description: "Free PF Calculator India FY 2026-27. Calculate EPF, VPF and PPF corpus with employer contribution split, 8.25% interest growth, withdrawal rules, and retirement planning.",
     url: "https://aitaxbot.co.in/calculators/pf",
     applicationCategory: "FinanceApplication"
   });
@@ -66,12 +66,12 @@ export default function PFCalculatorPage() {
   return (
     <>
       <Helmet>
-        <title>PF Calculator India FY 2025-26 - EPF VPF PPF Corpus | AiTaxBot</title>
-        <meta name="description" content="Free PF Calculator India FY 2025-26. Calculate EPF, VPF and PPF corpus with employer split, 8.25% tax-free interest, withdrawal guide, and retirement planning. CA verified." />
-        <meta name="keywords" content="PF calculator, EPF calculator, VPF calculator, PPF calculator, provident fund calculator, EPF interest rate 2025-26, PF withdrawal rules, employee pension scheme, PF tax rules" />
+        <title>PF Calculator India FY 2026-27 - EPF VPF PPF Corpus | AiTaxBot</title>
+        <meta name="description" content="Free PF Calculator India FY 2026-27. Calculate EPF, VPF and PPF corpus with employer split, 8.25% tax-free interest, withdrawal guide, and retirement planning. CA verified." />
+        <meta name="keywords" content="PF calculator, EPF calculator, VPF calculator, PPF calculator, provident fund calculator, EPF interest rate 2026-27, PF withdrawal rules, employee pension scheme, PF tax rules" />
         <link rel="canonical" href="https://aitaxbot.co.in/calculators/pf" />
-        <meta property="og:title" content="PF Calculator India FY 2025-26 - EPF VPF PPF Corpus & Withdrawal Guide" />
-        <meta property="og:description" content="Calculate your EPF, VPF, and PPF retirement corpus with employer contribution breakdown, tax implications, and complete withdrawal rules. Updated for FY 2025-26." />
+        <meta property="og:title" content="PF Calculator India FY 2026-27 - EPF VPF PPF Corpus & Withdrawal Guide" />
+        <meta property="og:description" content="Calculate your EPF, VPF, and PPF retirement corpus with employer contribution breakdown, tax implications, and complete withdrawal rules. Updated for FY 2026-27." />
         <meta property="og:url" content="https://aitaxbot.co.in/calculators/pf" />
         <meta property="og:image" content="https://aitaxbot.co.in/images/aitaxbot-logo.png" />
         <meta property="og:type" content="website" />
@@ -99,12 +99,12 @@ export default function PFCalculatorPage() {
         <section className="py-12 px-6 bg-gradient-to-r from-emerald-600 to-emerald-700">
           <div className="max-w-6xl mx-auto">
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              PF Calculator India — EPF, VPF & PPF Corpus FY 2025-26
+              PF Calculator India — EPF, VPF & PPF Corpus FY 2026-27
             </h1>
             <p className="text-lg text-white/90 max-w-3xl">
               Calculate your Provident Fund retirement corpus, employer contribution split, 8.25% tax-free interest growth,
               and explore complete withdrawal rules. Understand EPF vs VPF vs PPF for better retirement planning.
-              CA verified and updated for FY 2025-26.
+              CA verified and updated for FY 2026-27.
             </p>
           </div>
         </section>
@@ -182,7 +182,7 @@ export default function PFCalculatorPage() {
                     <td className="border border-slate-200 p-3 text-center">Any resident</td>
                   </tr>
                   <tr className="bg-slate-50">
-                    <td className="border border-slate-200 p-3 text-slate-700">Interest Rate FY 2025-26</td>
+                    <td className="border border-slate-200 p-3 text-slate-700">Interest Rate FY 2026-27</td>
                     <td className="border border-slate-200 p-3 text-center font-semibold">8.25%</td>
                     <td className="border border-slate-200 p-3 text-center font-semibold">8.25%</td>
                     <td className="border border-slate-200 p-3 text-center font-semibold">7.1%</td>

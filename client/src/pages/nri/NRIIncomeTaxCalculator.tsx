@@ -145,13 +145,13 @@ export default function NRIIncomeTaxCalculator() {
   return (
     <>
       <Helmet>
-        <title>NRI Income Tax Calculator FY 2025-26 — No 87A Rebate | AiTaxBot</title>
+        <title>NRI Income Tax Calculator FY 2026-27 — No 87A Rebate | AiTaxBot</title>
         <meta
           name="description"
-          content="Calculate your Indian income tax as an NRI for FY 2025-26. NRIs cannot claim Section 87A rebate. Includes NRO TDS, DTAA benefits, and capital gains calculation."
+          content="Calculate your Indian income tax as an NRI for FY 2026-27. NRIs cannot claim Section 87A rebate. Includes NRO TDS, DTAA benefits, and capital gains calculation."
         />
         <meta name="keywords" content="NRI, income tax calculator, India, DTAA, NRO interest, capital gains" />
-        <meta property="og:title" content="NRI Income Tax Calculator FY 2025-26 | AiTaxBot" />
+        <meta property="og:title" content="NRI Income Tax Calculator FY 2026-27 | AiTaxBot" />
         <meta
           property="og:description"
           content="Calculate your Indian income tax as an NRI with NRO TDS, DTAA benefits, and capital gains calculation."
@@ -191,7 +191,7 @@ export default function NRIIncomeTaxCalculator() {
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-3">NRI Income Tax Calculator</h1>
           <p className="text-lg text-rose-100 max-w-2xl">
-            Calculate your Indian income tax as an NRI for FY 2025-26. Different rules apply — no Section 87A rebate, special TDS rates, DTAA benefits.
+            Calculate your Indian income tax as an NRI for FY 2026-27. Different rules apply — no Section 87A rebate, special TDS rates, DTAA benefits.
           </p>
         </div>
       </section>

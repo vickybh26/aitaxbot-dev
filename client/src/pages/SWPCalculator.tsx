@@ -41,12 +41,12 @@ const swpFAQs = [
 
 export default function SWPCalculatorPage() {
   useEffect(() => {
-    trackPageView('/calculators/swp', 'SWP Calculator India FY 2025-26 | AiTaxBot');
+    trackPageView('/calculators/swp', 'SWP Calculator India FY 2026-27 | AiTaxBot');
   }, []);
 
   const calculatorSchema = generateCalculatorSchema({
     name: "SWP Calculator - Systematic Withdrawal Plan",
-    description: "Free SWP Calculator India FY 2025-26. Calculate how long your retirement corpus lasts with systematic monthly withdrawals. Plan tax-efficient retirement income through SWP.",
+    description: "Free SWP Calculator India FY 2026-27. Calculate how long your retirement corpus lasts with systematic monthly withdrawals. Plan tax-efficient retirement income through SWP.",
     url: "https://aitaxbot.co.in/calculators/swp",
     applicationCategory: "FinanceApplication"
   });
@@ -62,11 +62,11 @@ export default function SWPCalculatorPage() {
   return (
     <>
       <Helmet>
-        <title>SWP Calculator India FY 2025-26 - Retirement Income Planning | AiTaxBot</title>
-        <meta name="description" content="Free SWP Calculator India FY 2025-26. Calculate systematic withdrawals, corpus sustainability, and tax-efficient retirement income planning. See how long your corpus lasts with monthly SWP withdrawals." />
+        <title>SWP Calculator India FY 2026-27 - Retirement Income Planning | AiTaxBot</title>
+        <meta name="description" content="Free SWP Calculator India FY 2026-27. Calculate systematic withdrawals, corpus sustainability, and tax-efficient retirement income planning. See how long your corpus lasts with monthly SWP withdrawals." />
         <meta name="keywords" content="SWP calculator, systematic withdrawal plan, retirement income planning, mutual fund withdrawal, monthly pension calculator, corpus calculator, tax-efficient withdrawal, SWP LTCG tax, retirement planning India" />
         <link rel="canonical" href="https://aitaxbot.co.in/calculators/swp" />
-        <meta property="og:title" content="SWP Calculator India FY 2025-26 - Retirement Income Planning | AiTaxBot" />
+        <meta property="og:title" content="SWP Calculator India FY 2026-27 - Retirement Income Planning | AiTaxBot" />
         <meta property="og:description" content="Calculate systematic withdrawals and corpus longevity. Plan tax-efficient retirement income with SWP. See LTCG tax benefits vs FD interest." />
         <meta property="og:url" content="https://aitaxbot.co.in/calculators/swp" />
         <meta property="og:image" content="https://aitaxbot.co.in/images/aitaxbot-logo.png" />
@@ -95,12 +95,12 @@ export default function SWPCalculatorPage() {
         <section className="py-12 px-6 bg-gradient-to-r from-purple-600 to-purple-700">
           <div className="max-w-6xl mx-auto">
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              SWP Calculator India — Retirement Income Planning FY 2025-26
+              SWP Calculator India — Retirement Income Planning FY 2026-27
             </h1>
             <p className="text-lg text-white/90 max-w-3xl">
               Calculate your Systematic Withdrawal Plan (SWP) retirement income, corpus sustainability, and tax-efficient
               withdrawals from mutual funds. Plan how long your investment corpus will last with monthly withdrawals while
-              your remaining funds continue to grow. CA verified and updated for FY 2025-26.
+              your remaining funds continue to grow. CA verified and updated for FY 2026-27.
             </p>
           </div>
         </section>

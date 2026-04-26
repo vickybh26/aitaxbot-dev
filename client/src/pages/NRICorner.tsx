@@ -38,7 +38,7 @@ const nriTools = [
     icon: Calculator,
     link: "/nri/income-tax-calculator",
     color: "rose",
-    badge: "FY 2025-26",
+    badge: "FY 2026-27",
     features: [
       "No 87A rebate for NRIs",
       "NRO interest at 30% flat",
