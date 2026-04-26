@@ -19,7 +19,7 @@ const sipFAQs = [
   },
   {
     question: "Do I have to pay LTCG tax on SIP mutual fund returns?",
-    answer: "Yes, Long-Term Capital Gains (LTCG) tax applies to equity fund redemptions after 1 year. The tax is 10% on gains above ₹1.25 lakh per financial year. For debt funds held over 2 years, LTCG is taxed at your slab rate with indexation benefit. Plan your SIP redemptions across multiple financial years to keep gains below ₹1.25L and minimize tax liability."
+    answer: "Yes, Long-Term Capital Gains (LTCG) tax applies to equity fund redemptions after 1 year. The tax is 12.5% on gains above ₹1.25 lakh per financial year (rate revised from 10% to 12.5% by Finance Act 2024, effective July 23, 2024). For debt funds, LTCG is taxed at your slab rate. Plan your SIP redemptions across multiple financial years to keep gains below ₹1.25L and minimize tax liability."
   },
   {
     question: "What is step-up SIP and how does it work?",
@@ -121,10 +121,10 @@ export default function SIPCalculatorPage() {
               </h3>
               <p className="text-red-700 mb-2">
                 Most SIP investors focus only on returns and ignore capital gains tax (LTCG). When equity funds
-                are redeemed after 1 year, <strong>10% LTCG tax applies on gains above ₹1.25 lakh per financial year</strong>.
+                are redeemed after 1 year, <strong>12.5% LTCG tax applies on gains above ₹1.25 lakh per financial year</strong> (Finance Act 2024).
               </p>
               <p className="text-red-700">
-                A ₹50 lakh SIP corpus with ₹30 lakh gains could mean ₹1.7+ lakh in tax if redeemed in one year.
+                A ₹50 lakh SIP corpus with ₹30 lakh gains could mean ₹3.5+ lakh in tax if redeemed in one year.
                 But by spreading redemptions across 2-3 financial years (₹10-15 lakh gains/year), you stay under
                 ₹1.25L limit in each year and pay <strong>zero LTCG tax</strong>. Plan your exit strategy now, not at maturity.
               </p>
@@ -191,7 +191,7 @@ export default function SIPCalculatorPage() {
                   <div className="flex justify-between"><span>Total Invested:</span><span className="font-bold text-blue-700">₹12,00,000</span></div>
                   <div className="flex justify-between"><span>Capital Gains:</span><span className="font-bold text-green-700">₹36,00,000</span></div>
                   <div className="flex justify-between"><span>Final Corpus:</span><span className="font-bold text-purple-700">₹48,00,000</span></div>
-                  <div className="flex justify-between"><span>LTCG Tax (if redeemed in 1 yr):</span><span className="font-bold text-orange-700">~₹2,10,000</span></div>
+                  <div className="flex justify-between"><span>LTCG Tax @ 12.5% (if redeemed in 1 yr):</span><span className="font-bold text-orange-700">~₹4,34,000</span></div>
                   <div className="flex justify-between"><span className="text-xs">Tax with 3-year spread:</span><span className="font-bold text-green-700 text-xs">₹0 tax</span></div>
                 </div>
               </div>
@@ -241,7 +241,7 @@ export default function SIPCalculatorPage() {
                 <span className="text-amber-600 text-lg font-bold shrink-0">4</span>
                 <div>
                   <p className="font-semibold text-slate-900 text-sm">Plan LTCG tax — spread redemptions across years</p>
-                  <p className="text-slate-600 text-sm mt-1">Redeem ₹10-15 lakh per year to keep gains under ₹1.25L per financial year and pay zero LTCG tax. Redeem everything in one year and you could pay 10% tax on the full surplus. Tax planning can save ₹50,000-₹200,000+ on a mature corpus.</p>
+                  <p className="text-slate-600 text-sm mt-1">Redeem ₹10-15 lakh per year to keep gains under ₹1.25L per financial year and pay zero LTCG tax. Redeem everything in one year and you could pay 12.5% tax on the full surplus (Finance Act 2024). Tax planning can save ₹1–5 lakh+ on a mature corpus.</p>
                 </div>
               </div>
               <div className="flex gap-3 p-4 bg-amber-50 border border-amber-100 rounded-lg">
