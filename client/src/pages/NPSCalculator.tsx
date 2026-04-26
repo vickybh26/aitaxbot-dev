@@ -10,6 +10,7 @@ import {
 import { FAQSchema } from '@/components/faq-schema';
 import AuthorBox from '@/components/AuthorBox';
 import { ResponsiveAd, RectangleAd } from '@/components/AdBanner';
+import CalcPageHeader from '@/components/CalcPageHeader';
 import NPSCalculator from '@/components/calculators/NPSCalculator';
 
 const npsFAQs = [
@@ -78,32 +79,16 @@ export default function NPSCalculatorPage() {
 
       <div className="min-h-screen bg-slate-50">
 
-        {/* Breadcrumb */}
-        <header className="bg-white shadow-sm">
-          <div className="max-w-6xl mx-auto px-6 py-4">
-            <div className="flex items-center gap-2 text-sm text-slate-600">
-              <Link href="/" className="hover:text-persian-blue-600">Home</Link>
-              <span>/</span>
-              <Link href="/calculators" className="hover:text-persian-blue-600">Calculators</Link>
-              <span>/</span>
-              <span className="text-slate-900 font-medium">NPS Calculator</span>
-            </div>
-          </div>
-        </header>
-
-        {/* Hero */}
-        <section className="py-12 px-6 bg-gradient-to-r from-indigo-600 to-indigo-700">
-          <div className="max-w-6xl mx-auto">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              NPS Calculator India — Pension Corpus & Tax Saving FY 2026-27
-            </h1>
-            <p className="text-lg text-white/90 max-w-3xl">
-              Calculate your National Pension System (NPS) retirement corpus, estimated monthly pension,
-              and total tax savings including the exclusive ₹50,000 extra deduction under Section 80CCD(1B).
-              CA verified and updated for FY 2026-27.
-            </p>
-          </div>
-        </section>
+        <CalcPageHeader
+          title="NPS Calculator — National Pension System Corpus"
+          subtitle="Calculate your NPS retirement corpus and annual pension estimate. Includes Section 80CCD(1B) extra ₹50,000 deduction and employer contribution benefits."
+          breadcrumbs={[
+            { label: "Home", href: "/" },
+            { label: "Calculators", href: "/calculators" },
+            { label: "NPS Calculator" }
+          ]}
+          badge="FY 2026-27 ✓"
+        />
 
         {/* Calculator */}
         <section className="py-12 px-6">

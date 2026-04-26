@@ -10,6 +10,7 @@ import {
 import { FAQSchema } from '@/components/faq-schema';
 import AuthorBox from '@/components/AuthorBox';
 import { ResponsiveAd, RectangleAd } from '@/components/AdBanner';
+import CalcPageHeader from '@/components/CalcPageHeader';
 import PFCalculator from '@/components/calculators/PFCalculator';
 import { AlertCircle, Shield, Clock, IndianRupee, FileWarning, CheckCircle2, XCircle, ArrowRight, Badge as BadgeIcon } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -82,32 +83,16 @@ export default function PFCalculatorPage() {
 
       <div className="min-h-screen bg-slate-50">
 
-        {/* Breadcrumb */}
-        <header className="bg-white shadow-sm">
-          <div className="max-w-6xl mx-auto px-6 py-4">
-            <div className="flex items-center gap-2 text-sm text-slate-600">
-              <Link href="/" className="hover:text-emerald-600">Home</Link>
-              <span>/</span>
-              <Link href="/calculators" className="hover:text-emerald-600">Calculators</Link>
-              <span>/</span>
-              <span className="text-slate-900 font-medium">PF Calculator</span>
-            </div>
-          </div>
-        </header>
-
-        {/* Hero */}
-        <section className="py-12 px-6 bg-gradient-to-r from-emerald-600 to-emerald-700">
-          <div className="max-w-6xl mx-auto">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              PF Calculator India — EPF, VPF & PPF Corpus FY 2026-27
-            </h1>
-            <p className="text-lg text-white/90 max-w-3xl">
-              Calculate your Provident Fund retirement corpus, employer contribution split, 8.25% tax-free interest growth,
-              and explore complete withdrawal rules. Understand EPF vs VPF vs PPF for better retirement planning.
-              CA verified and updated for FY 2026-27.
-            </p>
-          </div>
-        </section>
+        <CalcPageHeader
+          title="EPF Calculator — Provident Fund Corpus Projection"
+          subtitle="Project your Employee Provident Fund corpus at 8.25% p.a. See how regular contributions and employer matching build retirement wealth over time."
+          breadcrumbs={[
+            { label: "Home", href: "/" },
+            { label: "Calculators", href: "/calculators" },
+            { label: "PF Calculator" }
+          ]}
+          badge="FY 2026-27 ✓"
+        />
 
         {/* Calculator */}
         <section className="py-12 px-6">

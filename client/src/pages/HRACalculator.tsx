@@ -10,6 +10,7 @@ import {
 import { FAQSchema } from '@/components/faq-schema';
 import AuthorBox from '@/components/AuthorBox';
 import { ResponsiveAd, RectangleAd } from '@/components/AdBanner';
+import CalcPageHeader from '@/components/CalcPageHeader';
 import HRACalculator from '@/components/calculators/HRACalculator';
 
 const hraFAQs = [
@@ -78,32 +79,16 @@ export default function HRACalculatorPage() {
 
       <div className="min-h-screen bg-slate-50">
 
-        {/* Breadcrumb */}
-        <header className="bg-white shadow-sm">
-          <div className="max-w-6xl mx-auto px-6 py-4">
-            <div className="flex items-center gap-2 text-sm text-slate-600">
-              <Link href="/" className="hover:text-persian-blue-600">Home</Link>
-              <span>/</span>
-              <Link href="/calculators" className="hover:text-persian-blue-600">Calculators</Link>
-              <span>/</span>
-              <span className="text-slate-900 font-medium">HRA Calculator</span>
-            </div>
-          </div>
-        </header>
-
-        {/* Hero */}
-        <section className="py-12 px-6 bg-gradient-to-r from-green-600 to-green-700">
-          <div className="max-w-6xl mx-auto">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              HRA Calculator India — House Rent Allowance Exemption FY 2026-27
-            </h1>
-            <p className="text-lg text-white/90 max-w-3xl">
-              Calculate your House Rent Allowance (HRA) tax exemption under Section 10(13A).
-              Determine the maximum HRA deduction based on your basic salary, actual rent paid, metro/non-metro city classification.
-              CA verified and updated for FY 2026-27. Old Tax Regime only.
-            </p>
-          </div>
-        </section>
+        <CalcPageHeader
+          title="HRA Exemption Calculator FY 2026-27"
+          subtitle="Calculate your exact HRA exemption under 8 metro cities rule (IT Rules 2026). Includes Old Regime only — HRA is not available under New Regime."
+          breadcrumbs={[
+            { label: "Home", href: "/" },
+            { label: "Calculators", href: "/calculators" },
+            { label: "HRA Calculator" }
+          ]}
+          badge="FY 2026-27 ✓"
+        />
 
         {/* Calculator */}
         <section className="py-12 px-6">

@@ -10,6 +10,7 @@ import {
 import { FAQSchema } from '@/components/faq-schema';
 import AuthorBox from '@/components/AuthorBox';
 import { ResponsiveAd, RectangleAd } from '@/components/AdBanner';
+import CalcPageHeader from '@/components/CalcPageHeader';
 import SIPCalculator from '@/components/calculators/SIPCalculator';
 
 const sipFAQs = [
@@ -78,32 +79,16 @@ export default function SIPCalculatorPage() {
 
       <div className="min-h-screen bg-slate-50">
 
-        {/* Breadcrumb */}
-        <header className="bg-white shadow-sm">
-          <div className="max-w-6xl mx-auto px-6 py-4">
-            <div className="flex items-center gap-2 text-sm text-slate-600">
-              <Link href="/" className="hover:text-persian-blue-600">Home</Link>
-              <span>/</span>
-              <Link href="/calculators" className="hover:text-persian-blue-600">Calculators</Link>
-              <span>/</span>
-              <span className="text-slate-900 font-medium">SIP Calculator</span>
-            </div>
-          </div>
-        </header>
-
-        {/* Hero */}
-        <section className="py-12 px-6 bg-gradient-to-r from-blue-600 to-blue-700">
-          <div className="max-w-6xl mx-auto">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              SIP Calculator India — Mutual Fund Returns FY 2026-27
-            </h1>
-            <p className="text-lg text-white/90 max-w-3xl">
-              Calculate your Systematic Investment Plan (SIP) mutual fund returns with rupee cost averaging,
-              LTCG tax planning, and step-up SIP strategies. See how small, regular investments compound into
-              significant wealth. CA verified and updated for FY 2026-27.
-            </p>
-          </div>
-        </section>
+        <CalcPageHeader
+          title="SIP Calculator — Mutual Fund Returns & Wealth Planning"
+          subtitle="Calculate SIP returns with rupee cost averaging and LTCG tax planning. See how small monthly investments compound into long-term wealth."
+          breadcrumbs={[
+            { label: "Home", href: "/" },
+            { label: "Calculators", href: "/calculators" },
+            { label: "SIP Calculator" }
+          ]}
+          badge="FY 2026-27 ✓"
+        />
 
         {/* Calculator */}
         <section className="py-12 px-6">

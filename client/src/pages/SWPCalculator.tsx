@@ -10,6 +10,7 @@ import {
 import { FAQSchema } from '@/components/faq-schema';
 import AuthorBox from '@/components/AuthorBox';
 import { ResponsiveAd, RectangleAd } from '@/components/AdBanner';
+import CalcPageHeader from '@/components/CalcPageHeader';
 import SWPCalculator from '@/components/calculators/SWPCalculator';
 
 const swpFAQs = [
@@ -78,32 +79,16 @@ export default function SWPCalculatorPage() {
 
       <div className="min-h-screen bg-slate-50">
 
-        {/* Breadcrumb */}
-        <header className="bg-white shadow-sm">
-          <div className="max-w-6xl mx-auto px-6 py-4">
-            <div className="flex items-center gap-2 text-sm text-slate-600">
-              <Link href="/" className="hover:text-persian-blue-600">Home</Link>
-              <span>/</span>
-              <Link href="/calculators" className="hover:text-persian-blue-600">Calculators</Link>
-              <span>/</span>
-              <span className="text-slate-900 font-medium">SWP Calculator</span>
-            </div>
-          </div>
-        </header>
-
-        {/* Hero */}
-        <section className="py-12 px-6 bg-gradient-to-r from-purple-600 to-purple-700">
-          <div className="max-w-6xl mx-auto">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              SWP Calculator India — Retirement Income Planning FY 2026-27
-            </h1>
-            <p className="text-lg text-white/90 max-w-3xl">
-              Calculate your Systematic Withdrawal Plan (SWP) retirement income, corpus sustainability, and tax-efficient
-              withdrawals from mutual funds. Plan how long your investment corpus will last with monthly withdrawals while
-              your remaining funds continue to grow. CA verified and updated for FY 2026-27.
-            </p>
-          </div>
-        </section>
+        <CalcPageHeader
+          title="SWP Calculator — Systematic Withdrawal Planning"
+          subtitle="Plan your monthly income from a mutual fund corpus. Find out how long your investment lasts and the minimum corpus for your target withdrawal."
+          breadcrumbs={[
+            { label: "Home", href: "/" },
+            { label: "Calculators", href: "/calculators" },
+            { label: "SWP Calculator" }
+          ]}
+          badge="FY 2026-27 ✓"
+        />
 
         {/* Calculator */}
         <section className="py-12 px-6">

@@ -10,6 +10,7 @@ import {
 import { FAQSchema } from '@/components/faq-schema';
 import AuthorBox from '@/components/AuthorBox';
 import { ResponsiveAd, RectangleAd } from '@/components/AdBanner';
+import CalcPageHeader from '@/components/CalcPageHeader';
 import HomeLoanCalculator from '@/components/calculators/HomeLoanCalculator';
 
 const homeLoanFAQs = [
@@ -78,32 +79,16 @@ export default function HomeLoanCalculatorPage() {
 
       <div className="min-h-screen bg-slate-50">
 
-        {/* Breadcrumb */}
-        <header className="bg-white shadow-sm">
-          <div className="max-w-6xl mx-auto px-6 py-4">
-            <div className="flex items-center gap-2 text-sm text-slate-600">
-              <Link href="/" className="hover:text-blue-600">Home</Link>
-              <span>/</span>
-              <Link href="/calculators" className="hover:text-blue-600">Calculators</Link>
-              <span>/</span>
-              <span className="text-slate-900 font-medium">Home Loan Calculator</span>
-            </div>
-          </div>
-        </header>
-
-        {/* Hero */}
-        <section className="py-12 px-6 bg-gradient-to-r from-blue-600 to-indigo-700">
-          <div className="max-w-6xl mx-auto">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Home Loan Affordability Calculator India — FY 2026-27
-            </h1>
-            <p className="text-lg text-white/90 max-w-3xl">
-              Find out exactly how much home loan you qualify for based on your income,
-              calculate your exact EMI, total interest and annual tax savings under Section 24 and Section 80C.
-              CA verified. Updated for FY 2026-27.
-            </p>
-          </div>
-        </section>
+        <CalcPageHeader
+          title="Home Loan EMI & Affordability Calculator"
+          subtitle="Check how much loan you're eligible for based on income, calculate your EMI, and see your Section 24 + Section 80C tax benefits under the Old Regime."
+          breadcrumbs={[
+            { label: "Home", href: "/" },
+            { label: "Calculators", href: "/calculators" },
+            { label: "Home Loan Calculator" }
+          ]}
+          badge="FY 2026-27 ✓"
+        />
 
         {/* Calculator */}
         <section className="py-12 px-6">

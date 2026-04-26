@@ -10,6 +10,7 @@ import {
 import { FAQSchema } from '@/components/faq-schema';
 import AuthorBox from '@/components/AuthorBox';
 import { ResponsiveAd, RectangleAd } from '@/components/AdBanner';
+import CalcPageHeader from '@/components/CalcPageHeader';
 import VehicleLoanCalculator from '@/components/calculators/VehicleLoanCalculator';
 
 const vehicleFAQs = [
@@ -82,29 +83,16 @@ export default function VehicleLoanCalculatorPage() {
 
       <div className="min-h-screen bg-slate-50">
 
-        <header className="bg-white shadow-sm">
-          <div className="max-w-6xl mx-auto px-6 py-4">
-            <div className="flex items-center gap-2 text-sm text-slate-600">
-              <Link href="/" className="hover:text-blue-600">Home</Link>
-              <span>/</span>
-              <Link href="/calculators" className="hover:text-blue-600">Calculators</Link>
-              <span>/</span>
-              <span className="text-slate-900 font-medium">Vehicle Loan Calculator</span>
-            </div>
-          </div>
-        </header>
-
-        <section className="py-12 px-6 bg-gradient-to-r from-orange-500 to-blue-600">
-          <div className="max-w-6xl mx-auto">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Vehicle Loan EMI Calculator India — Two-Wheeler & Car Loan 2026
-            </h1>
-            <p className="text-lg text-white/90 max-w-3xl">
-              Calculate your exact monthly EMI, total interest and cost breakdown for any two-wheeler or four-wheeler loan.
-              Switch between bike and car — defaults pre-filled for each vehicle type.
-            </p>
-          </div>
-        </section>
+        <CalcPageHeader
+          title="Vehicle Loan EMI Calculator — Two-Wheeler & Car Loan"
+          subtitle="Calculate EMI for two-wheeler or car loans. Compare flat rate vs reducing balance to see the real cost difference before you sign."
+          breadcrumbs={[
+            { label: "Home", href: "/" },
+            { label: "Calculators", href: "/calculators" },
+            { label: "Vehicle Loan Calculator" }
+          ]}
+          badge="FY 2026-27 ✓"
+        />
 
         <section className="py-12 px-6">
           <div className="max-w-6xl mx-auto">

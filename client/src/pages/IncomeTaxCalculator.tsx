@@ -10,6 +10,7 @@ import {
 import { FAQSchema } from '@/components/faq-schema';
 import AuthorBox from '@/components/AuthorBox';
 import { ResponsiveAd, RectangleAd } from '@/components/AdBanner';
+import CalcPageHeader from '@/components/CalcPageHeader';
 import TaxCalculator from '@/components/calculators/TaxCalculator';
 
 const incomeTaxFAQs = [
@@ -78,32 +79,16 @@ export default function IncomeTaxCalculatorPage() {
 
       <div className="min-h-screen bg-slate-50">
 
-        {/* Breadcrumb */}
-        <header className="bg-white shadow-sm">
-          <div className="max-w-6xl mx-auto px-6 py-4">
-            <div className="flex items-center gap-2 text-sm text-slate-600">
-              <Link href="/" className="hover:text-blue-600">Home</Link>
-              <span>/</span>
-              <Link href="/calculators" className="hover:text-blue-600">Calculators</Link>
-              <span>/</span>
-              <span className="text-slate-900 font-medium">Income Tax Calculator</span>
-            </div>
-          </div>
-        </header>
-
-        {/* Hero */}
-        <section className="py-12 px-6 bg-gradient-to-r from-blue-700 to-blue-800">
-          <div className="max-w-6xl mx-auto">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Income Tax Calculator India FY 2026-27 — New vs Old Regime
-            </h1>
-            <p className="text-lg text-white/90 max-w-3xl">
-              Calculate your income tax liability with our free calculator. Compare Old vs New tax regime,
-              check Section 87A rebate eligibility, and get detailed tax breakdown with marginal relief computation.
-              CA verified and updated for FY 2026-27.
-            </p>
-          </div>
-        </section>
+        <CalcPageHeader
+          title="Income Tax Calculator — New vs Old Regime FY 2026-27"
+          subtitle="Compare your tax liability under both regimes. Includes Section 87A rebate, marginal relief, and all deductions for AY 2027-28."
+          breadcrumbs={[
+            { label: "Home", href: "/" },
+            { label: "Calculators", href: "/calculators" },
+            { label: "Income Tax Calculator" }
+          ]}
+          badge="FY 2026-27 ✓"
+        />
 
         {/* Calculator */}
         <section className="py-12 px-6">
