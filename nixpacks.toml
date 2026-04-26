@@ -1,0 +1,12 @@
+# nixpacks.toml — Railway build configuration for AiTaxBot
+#
+# Problem: nixpacks auto-generates a build phase that runs
+#   `npm install && npm run build`
+# The second `npm install` runs with NODE_ENV=production (set by Dockerfile ENV),
+# which strips devDependencies (including vite), causing `vite: not found`.
+#
+# Fix: override the build phase to skip the re-install and just build.
+# The install phase (`npm ci`) already installs all deps including devDependencies.
+
+[phases.build]
+cmds = ["npm run build"]
