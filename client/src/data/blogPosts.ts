@@ -2783,7 +2783,405 @@ export const blogPosts: BlogPost[] = [
       { slug: "section-80c-deductions-list-fy-2026-27", title: "Section 80C Deductions: Complete List" }
     ]
   },
+,
 
+  // ═══════════════════════════════════════════════════════════
+  // ITR FILING SEASON 2025-26 (added April 2026)
+  // ═══════════════════════════════════════════════════════════
+
+  {
+    slug: "itr-filing-deadline-2026-july-31",
+    status: "published",
+    metaTitle: "ITR Filing Deadline 2026 — What Happens If You Miss July 31?",
+    metaDescription: "ITR filing due date for FY 2025-26 is July 31, 2026. Find out the late fee, interest charges, what you lose if you file late, and when the belated return deadline is.",
+    keywords: ["ITR filing deadline 2026", "last date to file ITR", "belated return", "late filing fee", "Section 234A", "income tax return due date FY 2025-26"],
+    ogTitle: "ITR Filing Deadline 2026 — What Happens If You Miss July 31?",
+    ogDescription: "Miss the July 31 ITR deadline and you face late fees, interest on unpaid tax, and permanent loss of carry-forward losses. Here is exactly what happens month by month.",
+    tags: ["ITR Filing", "Tax Deadlines", "Income Tax", "FY 2025-26"],
+    readingTimeMinutes: 6,
+    publishedAt: "April 28, 2026",
+    heroImage: "/images/taxation-india-guide.jpg",
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "ITR Filing Deadline 2026 — What Happens If You Miss July 31?",
+      "author": { "@type": "Organization", "name": "AiTaxBot" },
+      "publisher": { "@type": "Organization", "name": "AiTaxBot" },
+      "datePublished": "2026-04-28",
+      "dateModified": "2026-04-28",
+      "wordCount": 1050,
+      "reviewedBy": { "@type": "Organization", "name": "AiTaxBot Tax Research Team" }
+    },
+    bodySections: [
+      {
+        type: "intro",
+        content_md: "The due date for filing your Income Tax Return (ITR) for FY 2025-26 (Assessment Year 2026-27) is **July 31, 2026** for individual taxpayers, salaried employees, and non-audit cases. If you miss this date, you are not locked out — you can still file a belated return up to December 31, 2026 — but there are real financial consequences that get worse the longer you wait.\n\nThis article explains exactly what happens if you miss the July 31 deadline, month by month, and what you permanently lose that no late filing can recover."
+      },
+      {
+        type: "h2",
+        heading: "Key Dates for ITR Filing FY 2025-26",
+        content_md: "**July 31, 2026** — Due date for non-audit individuals (salaried, pensioners, small investors)\n\n**October 31, 2026** — Due date for accounts requiring tax audit under Section 44AB\n\n**November 30, 2026** — Due date for transfer pricing audit cases\n\n**December 31, 2026** — Last date to file a belated or revised return for FY 2025-26\n\nAfter December 31, 2026, no return can be filed for FY 2025-26 unless the Income Tax Department issues a notice requiring you to file."
+      },
+      {
+        type: "h2",
+        heading: "What Happens If You Miss July 31, 2026?",
+        content_md: "**1. Late filing fee under Section 234F**\n\nA mandatory fee applies the moment you file after July 31:\n\n- Income above ₹5 lakh: ₹5,000 flat late fee\n- Income up to ₹5 lakh: ₹1,000 flat late fee\n\nThis is not a penalty that can be waived — it is built into the system automatically when you submit a belated return.\n\n**2. Interest on unpaid tax under Section 234A**\n\nIf you had any tax liability remaining as of July 31 (self-assessment tax unpaid), interest runs at **1% per month** (simple interest) from August 1 until you pay. This applies even if you eventually file before December 31.\n\nFor example, if you owed ₹20,000 in tax and filed on September 30, you owe 2 months × 1% × ₹20,000 = **₹400 extra interest**. File on November 30 and it becomes ₹800.\n\n**3. No regime switch for next year**\n\nIf you are in the Old Tax Regime and wanted to formally opt for the New Tax Regime (or vice versa) for FY 2025-26, you can only do so by filing on time. A belated return filed after July 31 cannot carry a valid regime election under the revised rules — you are locked into the default regime (New Regime) for that year."
+      },
+      {
+        type: "h2",
+        heading: "What You Permanently Lose If You File Late",
+        content_md: "Some losses from a late filing cannot be recovered, regardless of whether you eventually file a belated return before December 31.\n\n**Carry-forward of capital losses**\nIf you made a loss on stocks, mutual funds, or real estate in FY 2025-26, you can only carry that loss forward to set off against future gains if you file your return on or before July 31, 2026. A belated return filed after the deadline permanently forfeits the carry-forward benefit for those losses.\n\nFor example: if you have ₹1.5 lakh in short-term capital loss from equity shares in FY 2025-26, filing on time lets you carry it forward and offset future STCG for up to 8 years. Miss July 31, and that ₹1.5 lakh loss is gone forever.\n\n**Carry-forward of business losses**\nSimilarly, business losses (other than losses from house property and depreciation) cannot be carried forward if the return is filed after the due date.\n\n**Note:** Loss from house property (interest on home loan) and unabsorbed depreciation can still be carried forward even in a belated return. But all other losses — especially capital losses — require timely filing."
+      },
+      {
+        type: "h2",
+        heading: "Belated Return vs Revised Return — What Is the Difference?",
+        content_md: "**Belated Return (Section 139(4))**\nA return filed after July 31, 2026 but before December 31, 2026. It attracts late filing fee (Section 234F) and forfeits carry-forward of capital/business losses. You can still claim refunds and deductions.\n\n**Revised Return (Section 139(5))**\nIf you filed on time by July 31 but made a mistake — wrong income figure, missed a deduction, wrong bank account — you can revise it any number of times before December 31, 2026 with no penalty.\n\nThe key difference: **a revised return corrects a timely filing**. A belated return is a late filing and carries the associated consequences.\n\nIf you filed on time and missed a deduction, file a revised return. Do not miss the original July 31 deadline hoping to fix it later."
+      },
+      {
+        type: "h2",
+        heading: "What About Refunds? Can You Still Claim Them?",
+        content_md: "Yes — you can claim a tax refund even in a belated return filed before December 31, 2026. Refunds are not forfeited for late filers.\n\nHowever, there is a practical consequence: refund processing takes time, and the Income Tax Department is not obligated to pay interest on refunds for belated returns in the same manner as timely ones under Section 244A rules.\n\nIf you have significant TDS deducted (Form 16, bank TDS on FD) and expect a refund, filing on time is strongly in your interest — both for faster processing and potential interest on the delayed refund."
+      },
+      {
+        type: "h2",
+        heading: "Can the Department Charge Penalty Over and Above the Late Fee?",
+        content_md: "Yes, in some cases. The ₹5,000 late fee under Section 234F is automatic and applies to all belated filers. Separately, the Assessing Officer can levy a penalty under Section 271F for **not filing** — this is distinct from filing late. However, in practice, Section 271F penalties are typically invoked when there is deliberate non-compliance or after a notice has been issued, not for ordinary late filers who file before December 31.\n\nFor most salaried taxpayers, the realistic consequence of missing July 31 is: ₹5,000 late fee + 1% per month interest on unpaid tax + loss of capital loss carry-forward (if applicable)."
+      },
+      {
+        type: "faq",
+        heading: "Frequently Asked Questions",
+        items: [
+          {
+            q: "What is the last date to file ITR for FY 2025-26?",
+            a: "July 31, 2026 for individuals (non-audit cases). Belated returns can be filed up to December 31, 2026."
+          },
+          {
+            q: "What is the late fee for filing ITR after July 31, 2026?",
+            a: "₹5,000 if total income exceeds ₹5 lakh. ₹1,000 if total income is ₹5 lakh or below. This is mandated under Section 234F and cannot be waived."
+          },
+          {
+            q: "Can I carry forward a capital loss if I file after July 31?",
+            a: "No. Carry-forward of capital losses (and most business losses) requires filing on or before the due date. A belated return permanently forfeits the carry-forward benefit for that year."
+          },
+          {
+            q: "Is interest charged even if I have paid all my tax?",
+            a: "Interest under Section 234A is charged only on the unpaid tax amount. If you have already paid all tax through TDS, advance tax, or self-assessment tax, no interest applies — only the late filing fee (₹5,000 or ₹1,000)."
+          },
+          {
+            q: "Can I switch from Old to New Regime in a belated return?",
+            a: "No. The regime election must be made in the return filed on or before the due date. A belated return defaults to the New Tax Regime and cannot override this."
+          }
+        ]
+      },
+      {
+        type: "cta",
+        content_md: "**File by July 31 — calculate your tax liability now, free.**\n\nUse AiTaxBot's Income Tax Calculator to check your FY 2025-26 tax, compare Old vs New Regime, and know exactly how much (if any) self-assessment tax you need to pay before the deadline.",
+        internal_links: [
+          { label: "Income Tax Calculator FY 2025-26", href: "/calculators/income-tax" },
+          { label: "HRA Exemption Calculator", href: "/calculators/hra" },
+          { label: "Rent Receipt Generator", href: "/tools/rent-receipt" }
+        ]
+      }
+    ],
+    disclaimer: "Tax due dates are as per the Income Tax Act, 1961 and circulars issued by CBDT. The government may extend deadlines — always check the official Income Tax portal (incometax.gov.in) closer to the filing date for the latest notifications.",
+    relatedPosts: [
+      { slug: "new-vs-old-tax-regime-2025", title: "New vs Old Tax Regime: Which Is Better for You?" },
+      { slug: "income-tax-act-1961-vs-income-tax-act-2025", title: "Income Tax Act 2025 vs 1961: Key Differences" },
+      { slug: "section-80c-deductions-list-fy-2026-27", title: "Section 80C Deductions: Complete List FY 2026-27" }
+    ]
+  },
+
+  {
+    slug: "ais-vs-form-26as-difference",
+    status: "published",
+    metaTitle: "AIS vs Form 26AS: What Is the Difference and Which One to Trust?",
+    metaDescription: "AIS (Annual Information Statement) vs Form 26AS — understand what each contains, how to access them, which one to use for ITR filing, and how to handle mismatches.",
+    keywords: ["AIS annual information statement", "Form 26AS", "AIS vs 26AS", "income tax statement", "ITR filing FY 2025-26", "tax credit statement"],
+    ogTitle: "AIS vs Form 26AS: Differences, What Each Contains, and Which to Trust",
+    ogDescription: "AIS captures all your financial transactions — dividends, SFT, securities, MF redemptions. Form 26AS shows only TDS and tax credits. Here is how to use both for ITR filing.",
+    tags: ["ITR Filing", "AIS", "Form 26AS", "Income Tax", "FY 2025-26"],
+    readingTimeMinutes: 7,
+    publishedAt: "April 28, 2026",
+    heroImage: "/images/taxation-india-guide.jpg",
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "AIS vs Form 26AS: What Is the Difference and Which One to Trust?",
+      "author": { "@type": "Organization", "name": "AiTaxBot" },
+      "publisher": { "@type": "Organization", "name": "AiTaxBot" },
+      "datePublished": "2026-04-28",
+      "dateModified": "2026-04-28",
+      "wordCount": 1100,
+      "reviewedBy": { "@type": "Organization", "name": "AiTaxBot Tax Research Team" }
+    },
+    bodySections: [
+      {
+        type: "intro",
+        content_md: "When you sit down to file your Income Tax Return, two documents are critical: **Form 26AS** and the **Annual Information Statement (AIS)**. Both are available on the Income Tax e-filing portal, both contain tax-related data about you — but they show very different things and serve different purposes.\n\nMany taxpayers either rely only on Form 26AS (missing significant income that AIS captures) or get confused when the two documents show different numbers. This article explains exactly what each document contains, how to access it, which to use for which purpose, and what to do when they don't match."
+      },
+      {
+        type: "h2",
+        heading: "What Is Form 26AS?",
+        content_md: "Form 26AS is your **Tax Credit Statement** — it shows all tax that has been deposited to the government on your behalf during the financial year. It is generated by the TRACES (TDS Reconciliation Analysis and Correction Enabling System) and has been available for over a decade.\n\n**What Form 26AS shows:**\n\n- TDS deducted by your employer (salary) — from Form 16\n- TDS on interest income from banks (Form 16A)\n- TDS on professional fees (194J), rent (194I), contractor payments (194C)\n- Advance tax paid by you (challan details)\n- Self-assessment tax paid\n- Refunds received from the Income Tax Department\n- High-value financial transactions above specified thresholds (SFT — Statement of Financial Transactions)\n\n**What Form 26AS does NOT show:**\n\nForm 26AS does not show the full picture of your income — it only shows tax that has already been deducted or paid. If you received dividend income from which no TDS was deducted (dividends below the TDS threshold), it will not appear in 26AS."
+      },
+      {
+        type: "h2",
+        heading: "What Is AIS (Annual Information Statement)?",
+        content_md: "The Annual Information Statement (AIS) is a far more comprehensive document introduced in November 2021. It captures **all financial transactions** reported to the Income Tax Department from various sources — not just TDS. Think of it as the government's complete dossier of your financial life for the year.\n\n**What AIS shows:**\n\n- Salary and pension income (from TDS returns filed by employers)\n- Interest income — savings accounts, FDs, post office (from banks, NSDL, CBDTs AIR)\n- Dividend income (from companies and mutual funds — even if below TDS threshold)\n- Securities transactions — purchase and sale of listed equity shares (from BSE/NSE)\n- Mutual fund transactions — SIP purchases, lump sum, redemptions (from RTA data like CAMS/KFintech)\n- Foreign remittances received in India (from authorised dealers)\n- GST turnover (for business owners)\n- Rental income (from tenants who have deducted TDS under 194I)\n- Foreign travel (credit card high-value transactions from SFT)\n- Cash deposits and withdrawals above specified limits\n\nAIS also contains a **Taxpayer Information Summary (TIS)** which aggregates the AIS data and shows the pre-filled figures that flow into your ITR."
+      },
+      {
+        type: "h2",
+        heading: "How to Access AIS and Form 26AS",
+        content_md: "**Accessing Form 26AS:**\n1. Go to the Income Tax e-filing portal: incometax.gov.in\n2. Login with your PAN and password\n3. Under \"e-File,\" go to \"Income Tax Returns\" → \"View Form 26AS\"\n4. You will be redirected to the TRACES portal\n5. Download as PDF or view online\n\n**Accessing AIS:**\n1. Login to incometax.gov.in\n2. Click on \"Services\" → \"Annual Information Statement (AIS)\"\n3. Download the full AIS PDF or view the TIS summary\n4. AIS also shows a \"Feedback\" option where you can mark transactions as incorrect or duplicate\n\nBoth are available free of cost. AIS is the more current and comprehensive document — check it every year before filing."
+      },
+      {
+        type: "h2",
+        heading: "Key Differences at a Glance",
+        content_md: "| Feature | Form 26AS | AIS |
+|---------|-----------|-----|
+| What it shows | TDS, advance tax, refunds | All financial transactions |
+| Source | TRACES (TDS returns) | Multiple agencies (banks, exchanges, RTA, GST) |
+| Dividend income | Only if TDS deducted | All dividends, including below TDS threshold |
+| MF transactions | Only high-value SFT | All purchases and redemptions |
+| Stock transactions | Only high-value SFT | All buy/sell transactions |
+| Introduced | ~2008 | November 2021 |
+| Feedback option | No | Yes — you can mark errors |
+| Carries into ITR pre-fill | Partially | Yes — via TIS |
+
+The key takeaway: **Form 26AS tells you what tax has been paid. AIS tells you what income the department knows about.** Both matter for filing an accurate return."
+      },
+      {
+        type: "h2",
+        heading: "Which One to Use While Filing ITR?",
+        content_md: "Use both — they serve different purposes:\n\n**Use Form 26AS to:**\n- Verify TDS credits match what your employer/bank deducted\n- Confirm advance tax payments are reflected\n- Check that self-assessment tax challans are captured\n- Ensure refunds previously received are correctly noted\n\n**Use AIS to:**\n- Cross-check all income sources you may have forgotten (dividend, interest, small MF redemptions)\n- Identify transactions the department has recorded that you need to report in ITR\n- Verify capital gains transactions from stocks and mutual funds\n- Check for any foreign remittances or high-value cash transactions flagged\n\nA practical approach: Download AIS first, go through every entry in \"Part B - AIS\" systematically, then cross-match against your own records (Form 16, bank passbook, broker statement, CAS from CAMS/KFintech). Use Form 26AS to confirm the TDS credits are correct before filing."
+      },
+      {
+        type: "h2",
+        heading: "What to Do When AIS and Your Records Don't Match",
+        content_md: "Mismatches happen frequently — AIS may show a transaction you don't recognise, or may report a higher figure than your actual income. Here is the correct process:\n\n**Step 1: Verify your own records first.** Before assuming AIS is wrong, check your bank passbook, broker statement, CAS report, and company dividend warrants. Sometimes the discrepancy is because you forgot a small FD maturity or a minor dividend.\n\n**Step 2: Submit feedback on the AIS portal.** Every entry in AIS has a \"Feedback\" button. If you believe a transaction is incorrect (e.g., duplicate entry, income belongs to a different year, incorrect TDS amount), select the appropriate reason and submit feedback. The feedback is visible to the Assessing Officer.\n\n**Step 3: Report income accurately in your ITR.** Do not under-report income just because you disagree with an AIS entry. If there is a mismatch, the safer approach is to report the higher figure and flag the discrepancy via feedback. Underreporting income is riskier than overpaying tax (which you can always claim as a refund).\n\n**Step 4: If TDS credit is missing in 26AS**, contact the deductor (employer, bank) to correct the TDS return — you cannot claim credit for TDS that does not appear in your 26AS."
+      },
+      {
+        type: "faq",
+        heading: "Frequently Asked Questions",
+        items: [
+          {
+            q: "Is AIS more reliable than Form 26AS for income reporting?",
+            a: "AIS is more comprehensive — it captures income from more sources. But both can have errors. Always cross-verify AIS entries against your own records (bank statements, Form 16, CAS reports) before using the figures in your ITR."
+          },
+          {
+            q: "Does dividend income appear in Form 26AS?",
+            a: "Only if TDS was deducted on the dividend (which happens when dividends exceed ₹5,000 from a single company). Small dividends without TDS appear in AIS but not Form 26AS."
+          },
+          {
+            q: "My AIS shows an entry I don't recognise. What should I do?",
+            a: "Submit feedback on the AIS portal marking the entry as 'Information is not fully correct' or 'Information relates to other PAN/person'. This creates a record of your objection. Still report it in ITR if you are unsure — you can file a revised return if the matter is resolved."
+          },
+          {
+            q: "Can I file ITR without checking AIS?",
+            a: "Technically yes, but it is inadvisable. The department uses AIS to compare against your filed return. Discrepancies can trigger notices under Section 143(1) and Section 143(2) for scrutiny. Checking AIS before filing reduces the risk of mismatches and consequent notices."
+          }
+        ]
+      },
+      {
+        type: "cta",
+        content_md: "**Start with your tax calculation before you download AIS — know your expected liability first.**\n\nUse AiTaxBot's free Income Tax Calculator to estimate your FY 2025-26 tax under both regimes. Then cross-check against your AIS and Form 26AS to file an accurate return.",
+        internal_links: [
+          { label: "Income Tax Calculator FY 2025-26", href: "/calculators/income-tax" },
+          { label: "HRA Exemption Calculator", href: "/calculators/hra" }
+        ]
+      }
+    ],
+    disclaimer: "AIS data is based on information reported by third parties (banks, companies, exchanges) to the Income Tax Department. Errors in AIS do not mean errors in your actual income. Always verify independently and use the AIS feedback mechanism to flag discrepancies.",
+    relatedPosts: [
+      { slug: "itr-filing-deadline-2026-july-31", title: "ITR Filing Deadline 2026: What Happens If You Miss July 31?" },
+      { slug: "capital-gains-tax-stocks-mutual-funds", title: "Capital Gains Tax on Stocks and Mutual Funds" },
+      { slug: "new-vs-old-tax-regime-2025", title: "New vs Old Tax Regime: Which Is Better for You?" }
+    ]
+  },
+
+  {
+    slug: "how-to-file-itr-1-online-fy-2025-26",
+    status: "published",
+    metaTitle: "How to File ITR-1 Online for FY 2025-26 (AY 2026-27) — Step by Step",
+    metaDescription: "Step-by-step guide to file ITR-1 online for FY 2025-26 (AY 2026-27). Covers who should file ITR-1, documents needed, how to claim deductions, and how to e-verify.",
+    keywords: ["how to file ITR-1 online", "ITR-1 FY 2025-26", "income tax return filing", "e-filing income tax India", "ITR-1 step by step", "AY 2026-27"],
+    ogTitle: "How to File ITR-1 Online for FY 2025-26 — Step-by-Step Guide",
+    ogDescription: "Salaried? File ITR-1 online for FY 2025-26 in under 30 minutes with this step-by-step guide covering eligibility, documents, regime choice, deductions, and e-verification.",
+    tags: ["ITR Filing", "ITR-1", "E-Filing", "Income Tax", "FY 2025-26"],
+    readingTimeMinutes: 8,
+    publishedAt: "April 28, 2026",
+    heroImage: "/images/taxation-india-guide.jpg",
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "How to File ITR-1 Online for FY 2025-26 — Step by Step",
+      "author": { "@type": "Organization", "name": "AiTaxBot" },
+      "publisher": { "@type": "Organization", "name": "AiTaxBot" },
+      "datePublished": "2026-04-28",
+      "dateModified": "2026-04-28",
+      "wordCount": 1200,
+      "reviewedBy": { "@type": "Organization", "name": "AiTaxBot Tax Research Team" }
+    },
+    bodySections: [
+      {
+        type: "intro",
+        content_md: "For most salaried employees, ITR-1 (also called Sahaj) is the simplest income tax return form — and it can be filed online in 20–30 minutes if you have your documents ready. This guide walks through every step, from logging into the portal to e-verifying your return, for FY 2025-26 (Assessment Year 2026-27).\n\nDue date: **July 31, 2026** (for individuals with non-audit income)."
+      },
+      {
+        type: "h2",
+        heading: "Who Should File ITR-1?",
+        content_md: "ITR-1 (Sahaj) is for **resident individuals** with:\n\n- **Salary or pension income** from one employer\n- **Income from one house property** (rented out or self-occupied)\n- **Other income** — bank interest, savings account interest (up to the ₹50 lakh total income limit)\n- **Agricultural income** up to ₹5,000\n\n**You CANNOT file ITR-1 if you have:**\n\n- Total income exceeding ₹50 lakh\n- Capital gains (from stocks, mutual funds, property) — file ITR-2 instead\n- Business or professional income (even a single freelance invoice) — file ITR-3 or ITR-4\n- Income from more than one house property\n- Directorship in a company\n- Foreign assets or income\n- Agricultural income exceeding ₹5,000\n- Investments in unlisted equity shares\n\nIf you switched jobs and have two Form 16s, you can still file ITR-1 — both employers' salary is reported in the same form."
+      },
+      {
+        type: "h2",
+        heading: "Documents to Collect Before You Start",
+        content_md: "Gather these before opening the e-filing portal:\n\n**Mandatory:**\n- Form 16 Part A and Part B from your employer(s)\n- PAN card and Aadhaar number\n- Bank account details (account number and IFSC) for refund\n- Form 26AS (download from TRACES via the portal)\n- AIS — Annual Information Statement (download from the portal)\n\n**For deductions (if opting for Old Regime):**\n- 80C investment proofs (LIC, ELSS, PPF passbook, home loan principal statement)\n- 80D premium receipts (health insurance)\n- 80TTA/80TTB — savings account interest certificate\n- HRA documents (rent receipts and landlord PAN if rent > ₹1 lakh/year)\n- Home loan interest certificate from the bank\n\n**For house property income (if rented):**\n- Rental income amount\n- Home loan interest paid (for deduction)"
+      },
+      {
+        type: "h2",
+        heading: "Step-by-Step: Filing ITR-1 Online",
+        content_md: "**Step 1 — Login to the portal**\nGo to incometax.gov.in → Click \"Login\" → Enter PAN, password, and CAPTCHA.\n\n**Step 2 — Navigate to ITR filing**\nDashboard → \"e-File\" (top menu) → \"Income Tax Returns\" → \"File Income Tax Return\"\n\n**Step 3 — Select the correct year and mode**\n- Assessment Year: **2026-27** (for FY 2025-26 income)\n- Mode: **Online** (recommended — no software download needed)\n- Click \"Continue\"\n\n**Step 4 — Choose ITR-1**\nThe portal may suggest a form based on your profile. Select **ITR-1 (Sahaj)** if you are eligible. If the portal suggests ITR-2 (e.g., because it has detected capital gain data in AIS), and you do have capital gains, do not override — use ITR-2 instead.\n\n**Step 5 — Verify pre-filled data**\nThe form will auto-fill from Form 26AS, AIS, and previous year's return. Check:\n- Personal details: PAN, Aadhaar, date of birth, address, bank account\n- Salary income from Form 16 (Gross salary, standard deduction, professional tax)\n- TDS deducted — verify against your Form 16 Part A\n\n**Step 6 — Enter remaining income**\nReview and enter any income not captured in pre-fill:\n- Interest from savings account and FDs (cross-check with AIS)\n- Rental income from house property (if applicable)\n- Any other income not in pre-fill\n\n**Step 7 — Choose your tax regime**\nFor AY 2026-27, you will be asked which regime to apply:\n- **New Tax Regime** (default): Lower slab rates, no HRA/80C/80D/HRA deductions, standard deduction ₹75,000\n- **Old Tax Regime**: Higher slab rates, but deductions like 80C (₹1.5L), 80D, HRA, home loan interest all available\n\nUse AiTaxBot's Income Tax Calculator to compare before choosing.\n\n**Step 8 — Enter deductions (Old Regime only)**\nIf you chose the Old Regime:\n- Section 80C: ELSS, PPF, LIC premium, home loan principal, ULIP, children's tuition — maximum ₹1,50,000\n- Section 80D: Health insurance premiums — ₹25,000 for self/family, extra ₹25,000 for parents\n- Section 24(b): Home loan interest on let-out property (unlimited), self-occupied (cap ₹2 lakh)\n- Section 80TTA: Savings account interest exemption — maximum ₹10,000\n\n**Step 9 — Review tax computation**\nThe portal shows your tax liability calculation. Verify:\n- Gross total income\n- Deductions applied\n- Tax computed before rebate\n- Section 87A rebate (₹25,000 if income ≤ ₹7L in Old Regime; ₹60,000 if income ≤ ₹12L in New Regime)\n- Net tax payable\n- TDS already deducted\n- Balance payable or refund due\n\n**Step 10 — Pay any remaining tax**\nIf there is outstanding tax, pay it via the portal using NEFT, IMPS, or debit card before submitting. Note the challan number.\n\n**Step 11 — Submit the return**\nReview the complete return once more → Click \"Preview and Submit\" → Submit.\n\n**Step 12 — E-verify (mandatory)**\nAfter submission, you must e-verify within **30 days** — otherwise the return is treated as not filed:\n- **Aadhaar OTP** (fastest and most reliable) — OTP sent to mobile number linked to Aadhaar\n- **Net banking** — login to your bank's net banking and verify from there\n- **Demat account** — if you have a CDSL/NSDL demat\n- **Physical signature** — send signed ITR-V to CPC Bengaluru by speed post (slowest option)"
+      },
+      {
+        type: "h2",
+        heading: "After E-Verification: What to Expect",
+        content_md: "Once e-verified, you will receive an acknowledgement email with a 15-digit acknowledgement number. Save this.\n\nThe Income Tax Department typically processes straightforward returns within **30–60 days**. If a refund is due, it is credited directly to your bank account (ensure IFSC and account number are correct in the return).\n\nIf there is a mismatch between your filed income and AIS data, you may receive an intimation under Section 143(1) — this is a system-generated notice, not a full scrutiny. It is common and usually resolved by submitting a response on the portal."
+      },
+      {
+        type: "faq",
+        heading: "Frequently Asked Questions",
+        items: [
+          {
+            q: "What if I have two Form 16s from two different employers?",
+            a: "You can still file ITR-1. Add both employers' salary separately in the ITR. The portal allows multiple salary entries. Ensure total salary matches the aggregate of both Form 16s."
+          },
+          {
+            q: "Can I file ITR-1 if I have interest income from FDs?",
+            a: "Yes. FD interest is reported under 'Income from Other Sources' in ITR-1. Cross-check the amount with your AIS and bank passbook."
+          },
+          {
+            q: "I have a small capital gain from selling mutual funds — can I still file ITR-1?",
+            a: "No. Any capital gain — even ₹100 from a single mutual fund redemption — makes you ineligible for ITR-1. You must file ITR-2."
+          },
+          {
+            q: "What is the deadline to e-verify after submission?",
+            a: "30 days from the date of submission. If you do not e-verify within 30 days, the return is treated as invalid and you need to file again."
+          },
+          {
+            q: "I missed the Aadhaar OTP. Can I e-verify later?",
+            a: "Yes. You can e-verify later through other methods (net banking, Demat) as long as you are within the 30-day window after submission."
+          }
+        ]
+      },
+      {
+        type: "cta",
+        content_md: "**Not sure which regime saves you more tax? Calculate in 60 seconds.**\n\nUse AiTaxBot's Income Tax Calculator to compare Old vs New Regime for FY 2025-26 before you open the e-filing portal.",
+        internal_links: [
+          { label: "Income Tax Calculator FY 2025-26", href: "/calculators/income-tax" },
+          { label: "HRA Exemption Calculator", href: "/calculators/hra" },
+          { label: "Rent Receipt Generator", href: "/tools/rent-receipt" }
+        ]
+      }
+    ],
+    disclaimer: "This guide reflects the ITR-1 filing process for FY 2025-26 (AY 2026-27). The exact steps on the portal may vary slightly based on CBDT system updates. Always refer to the official Income Tax portal at incometax.gov.in for the latest instructions.",
+    relatedPosts: [
+      { slug: "itr-filing-deadline-2026-july-31", title: "ITR Filing Deadline 2026: What Happens If You Miss July 31?" },
+      { slug: "ais-vs-form-26as-difference", title: "AIS vs Form 26AS: What Is the Difference?" },
+      { slug: "new-vs-old-tax-regime-2025", title: "New vs Old Tax Regime: Which Is Better for You?" }
+    ]
+  },
+
+  {
+    slug: "capital-gains-itr-where-to-report",
+    status: "published",
+    metaTitle: "Capital Gains from Stocks and Mutual Funds: Where to Report in ITR (AY 2026-27)",
+    metaDescription: "Sold stocks or mutual funds in FY 2025-26? Here is which ITR form to use, which schedule to fill, and how STCG and LTCG are reported for equity, debt MF, and property.",
+    keywords: ["capital gains ITR", "where to report capital gains", "ITR-2 capital gains", "Schedule CG", "Schedule 112A", "STCG LTCG ITR FY 2025-26", "equity mutual fund tax"],
+    ogTitle: "Where to Report Capital Gains in ITR — Stocks, Mutual Funds, Property",
+    ogDescription: "Capital gains go in ITR-2 (or ITR-3). Know which schedule (CG, 112A, 115AD) captures which gain, and how STCG and LTCG rates changed after July 23, 2024.",
+    tags: ["Capital Gains", "ITR Filing", "ITR-2", "Stocks", "Mutual Funds", "FY 2025-26"],
+    readingTimeMinutes: 8,
+    publishedAt: "April 28, 2026",
+    heroImage: "/images/tax-saving-investments.jpg",
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Capital Gains from Stocks and Mutual Funds: Where to Report in ITR",
+      "author": { "@type": "Organization", "name": "AiTaxBot" },
+      "publisher": { "@type": "Organization", "name": "AiTaxBot" },
+      "datePublished": "2026-04-28",
+      "dateModified": "2026-04-28",
+      "wordCount": 1150,
+      "reviewedBy": { "@type": "Organization", "name": "AiTaxBot Tax Research Team" }
+    },
+    bodySections: [
+      {
+        type: "intro",
+        content_md: "If you sold shares, redeemed mutual funds, or sold any capital asset during FY 2025-26, you have capital gains — and you must report them in your ITR. Capital gains cannot be reported in ITR-1 (Sahaj). You need **ITR-2** (for salaried individuals with capital gains) or ITR-3 (if you also have business income).\n\nThis article explains which schedules capture which types of gains, the applicable tax rates (including the important rate changes from Finance Act 2024 effective July 23, 2024), and how to report them correctly."
+      },
+      {
+        type: "h2",
+        heading: "Which ITR Form for Capital Gains?",
+        content_md: "| If you have | Use this form |\n|-------------|---------------|\n| Salary + capital gains only | ITR-2 |\n| Business/professional income + capital gains | ITR-3 |\n| Presumptive business (44AD/44ADA) + capital gains | ITR-3 |\n| Salary only, no capital gains | ITR-1 |\n\n**Important**: Even a single small redemption — say ₹500 from a liquid fund — is a capital gain and disqualifies you from ITR-1. Always use ITR-2 for any capital gains."
+      },
+      {
+        type: "h2",
+        heading: "Tax Rates After Finance Act 2024 (Effective July 23, 2024)",
+        content_md: "The Finance Act 2024 changed capital gains tax rates for transactions from July 23, 2024 onwards. This means FY 2025-26 (April 2025 to March 2026) is entirely under the new rates.\n\n**Equity Shares and Equity-Oriented Mutual Funds:**\n\n| Holding period | Classification | Tax rate |\n|----------------|----------------|----------|\n| Up to 12 months | Short-Term Capital Gain (STCG) | 20% (was 15% before July 23, 2024) |\n| More than 12 months | Long-Term Capital Gain (LTCG) | 12.5% over ₹1.25 lakh exemption (was 10% over ₹1L before July 23, 2024) |\n\n**Note on LTCG exemption**: The annual ₹1.25 lakh LTCG exemption for equity applies per financial year. Gains up to ₹1.25 lakh per year are tax-free. Gains above ₹1.25 lakh are taxed at 12.5% — **without indexation benefit**.\n\n**Debt Mutual Funds (purchased on or after April 1, 2023):**\nAll gains are treated as short-term regardless of holding period — taxed at your applicable income tax slab rate. The concept of LTCG no longer applies to new debt fund investments.\n\n**Debt Mutual Funds (purchased before April 1, 2023):**\nHolding > 36 months → LTCG at 12.5% without indexation (Finance Act 2024 removed indexation benefit for all asset classes from July 23, 2024)\nHolding ≤ 36 months → STCG at slab rate\n\n**Property and Land:**\nFor sales after July 23, 2024: LTCG (holding > 24 months) taxed at **12.5% without indexation**. Sellers can choose 20% with indexation for properties acquired before July 23, 2024 — compare both to pick the lower option."
+      },
+      {
+        type: "h2",
+        heading: "Where in ITR-2: The Capital Gain Schedules",
+        content_md: "In ITR-2, capital gains are reported in **Schedule CG** (Capital Gains). The schedule has multiple parts:\n\n**Schedule CG — Part A: Short-Term Capital Gains**\n- A1: STCG on sale of equity shares/units (taxed at 20%) — covered by STT\n- A2: STCG on other assets taxed at special rates\n- A3: STCG taxed at slab rate (debt MF, property, gold held < 24/36 months)\n\n**Schedule CG — Part B: Long-Term Capital Gains**\n- B1: LTCG on equity shares/units at 12.5% — use this for listed shares and equity MF held > 12 months\n- B2: LTCG on other assets at 12.5% (property, gold, debt MF)\n\n**Schedule 112A: LTCG on Equity (Mandatory Detail)**\nFor LTCG on listed equity shares and equity-oriented mutual funds, you must fill **Schedule 112A** with individual transaction details:\n- ISIN code of the share or fund\n- Name of the share/unit\n- Number of units/shares sold\n- Date of acquisition\n- Date of sale\n- Full value of consideration (sale price)\n- Cost of acquisition (purchase price)\nThe schedule auto-computes the gain and checks against the ₹1.25 lakh exemption.\n\n**Source for Schedule 112A data**: Download your Consolidated Account Statement (CAS) from CAMS or KFintech for mutual funds. Download broker's P&L statement or Capital Gains Report for shares. Cross-check with AIS."
+      },
+      {
+        type: "h2",
+        heading: "Set-Off and Carry-Forward of Capital Losses",
+        content_md: "Capital losses can be set off in a specific sequence — not all losses can be set off against all gains:\n\n**Within the same year:**\n- STCG loss can be set off against STCG or LTCG from any capital asset\n- LTCG loss can only be set off against LTCG — not against STCG\n\n**Carry-forward (up to 8 years):**\n- Losses can be carried forward to future years, but only if you file your ITR on time (by July 31, 2026)\n- In subsequent years, the set-off rules apply the same way\n\n**Debt MF losses** (if redeemed at a loss) are treated as STCG losses if held less than the relevant period, and LTCG losses if held longer — applicable to old-regime debt funds.\n\n**Equity MF / share STCG loss** — sets off against STCG or LTCG from any capital asset in the same year."
+      },
+      {
+        type: "h2",
+        heading: "Common Mistakes to Avoid",
+        content_md: "**1. Not reporting zero-tax LTCG**\nEven if your LTCG from equity is below ₹1.25 lakh (and therefore fully exempt), you must still report it in Schedule 112A. The exemption is applied automatically in the computation — you cannot simply skip the schedule.\n\n**2. Using wrong purchase cost for pre-2018 equity**\nFor shares bought before January 31, 2018, the cost of acquisition is the higher of: (a) actual purchase price, or (b) the Fair Market Value (FMV) as on January 31, 2018. This \"grandfathering\" rule prevents taxation of gains that accrued before the LTCG tax was reintroduced. Your broker's capital gains report should reflect this correctly — verify before entering.\n\n**3. Treating debt MF as LTCG**\nAny debt mutual fund purchased after April 1, 2023 has no LTCG benefit — all gains are STCG at slab rate, regardless of how long you held it. A common error is treating a 3-year debt fund redemption as LTCG. It is not.\n\n**4. Netting gains before reporting**\nDo not net gains and losses before entering them in ITR. Report each transaction in the appropriate schedule. The portal applies set-off rules automatically."
+      },
+      {
+        type: "faq",
+        heading: "Frequently Asked Questions",
+        items: [
+          {
+            q: "I sold stocks through a broker. Where do I get the capital gain details?",
+            a: "Download the Capital Gains Report or P&L Statement from your broker's portal (Zerodha, Groww, HDFC Securities, etc.). Most brokers provide a pre-formatted statement that can be directly used for ITR filing. Also cross-check with your AIS on the income tax portal."
+          },
+          {
+            q: "My LTCG from equity is ₹80,000 — below the exemption. Do I still need to file ITR-2?",
+            a: "Yes. You still need to file ITR-2 (not ITR-1) and report the gain in Schedule 112A. The ₹1.25 lakh exemption means your tax is zero, but the gain must still be disclosed."
+          },
+          {
+            q: "What is the LTCG tax rate for equity mutual funds sold in FY 2025-26?",
+            a: "12.5% on gains above ₹1.25 lakh. This rate applied from July 23, 2024 onwards under Finance Act 2024 (previously it was 10% on gains above ₹1 lakh)."
+          },
+          {
+            q: "Can I claim indexation on property sold in FY 2025-26?",
+            a: "For property acquired before July 23, 2024 and sold after that date, you can choose between: 12.5% without indexation OR 20% with indexation. Calculate both and pick whichever results in lower tax. For property acquired after July 23, 2024, indexation is not available — 12.5% flat."
+          }
+        ]
+      },
+      {
+        type: "cta",
+        content_md: "**Check your income tax estimate for FY 2025-26 — including capital gains impact — with AiTaxBot.**\n\nOur calculator covers salary, HRA, deductions, and tax regime comparison. For detailed capital gains calculation, use your broker's report alongside the calculator.",
+        internal_links: [
+          { label: "Income Tax Calculator FY 2025-26", href: "/calculators/income-tax" },
+          { label: "SIP Calculator — MF Returns", href: "/calculators/sip" }
+        ]
+      }
+    ],
+    disclaimer: "Capital gains tax rates and holding period rules reflect Finance Act 2024 changes effective July 23, 2024. Tax applicability may vary based on individual circumstances, type of fund, residency status, and other factors. Consult a CA for complex capital gain scenarios involving multiple asset classes.",
+    relatedPosts: [
+      { slug: "itr-filing-deadline-2026-july-31", title: "ITR Filing Deadline 2026: What Happens If You Miss July 31?" },
+      { slug: "capital-gains-tax-stocks-mutual-funds", title: "Capital Gains Tax on Stocks and Mutual Funds" },
+      { slug: "ais-vs-form-26as-difference", title: "AIS vs Form 26AS: What Is the Difference?" }
+    ]
+  }
 ];
 
 export function getBlogPost(slug: string): BlogPost | undefined {
