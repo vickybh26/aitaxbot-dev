@@ -198,16 +198,12 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
             <div className="flex-1 min-w-0">
 
               {/* Hero */}
-              <section className="relative py-12 lg:py-16 overflow-hidden">
-                <div className="absolute inset-0 gradient-mesh opacity-40 rounded-3xl"></div>
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/30 to-white rounded-3xl"></div>
-                <div className="relative z-10 px-4 lg:px-8">
-                  <Badge className="mb-4 bg-white/80 backdrop-blur-sm text-persian-blue-700 border-persian-blue-200 shadow-soft px-3 py-1 text-xs font-semibold">
-                    ✨ FY 2026-27 (AY 2027-28) & Tax Year 2026-27 Ready
-                  </Badge>
-                  <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-4 leading-tight">
+              <section className="py-12 lg:py-16 border-b border-slate-100">
+                <div className="px-4 lg:px-8">
+                  <p className="text-xs font-semibold text-blue-600 uppercase tracking-widest mb-4">FY 2026-27 · AY 2027-28 · IT Act 2025 Ready</p>
+                  <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-3 leading-tight">
                     {t("hero.headline").split("\n")[0]}
-                    <span className="gradient-text block mt-1">{t("hero.headline").split("\n")[1] ?? "Indian Taxpayers"}</span>
+                    <span className="block mt-1 text-blue-600">{t("hero.headline").split("\n")[1] ?? "Indian Taxpayers"}</span>
                   </h1>
                   <p className="text-base lg:text-lg text-slate-600 mb-6 leading-relaxed max-w-2xl">
                     {t("hero.subheadline")}
@@ -216,7 +212,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                     <Button
                       size="lg"
                       onClick={() => window.location.href = "/calculators/income-tax"}
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-5 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 font-semibold hover:scale-105 transform"
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-lg font-semibold transition-colors"
                       data-testid="button-calculate-tax"
                     >
                       <Calculator className="mr-2 h-5 w-5" />
@@ -225,7 +221,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                     <Button
                       variant="outline"
                       onClick={() => window.location.href = "/blog"}
-                      className="border-2 border-persian-blue-600 text-persian-blue-600 hover:bg-persian-blue-600 hover:text-white px-6 py-5 rounded-xl"
+                      className="border border-slate-300 text-slate-700 hover:border-slate-400 px-6 py-4 rounded-lg font-semibold transition-colors"
                     >
                       <Newspaper className="mr-2 h-4 w-4" />
                       Tax Guides
@@ -235,24 +231,24 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                   {/* Trust signals */}
                   <div className="flex flex-wrap items-center gap-4 mt-8 pt-6 border-t border-slate-200/60">
                     <div className="flex items-center gap-1.5 text-sm text-slate-600">
-                      <span className="text-green-500 font-bold text-base">✓</span>
+                      <CheckCircle2 className="h-4 w-4 text-green-500 flex-shrink-0" />
                       <span>{t("hero.ctaFree")}</span>
                     </div>
                     <div className="flex items-center gap-1.5 text-sm text-slate-600">
-                      <span className="text-green-500 font-bold text-base">✓</span>
+                      <CheckCircle2 className="h-4 w-4 text-green-500 flex-shrink-0" />
                       <span>Built &amp; reviewed by Chartered Accountants</span>
                     </div>
                     <div className="flex items-center gap-1.5 text-sm text-slate-600">
-                      <span className="text-purple-500 font-bold text-base">✦</span>
+                      <Zap className="h-4 w-4 text-blue-500 flex-shrink-0" />
                       <span>AI Powered</span>
                     </div>
                     <div className="flex items-center gap-1.5 text-sm text-slate-600">
-                      <span className="text-blue-500 font-bold text-base">✓</span>
+                      <CheckCircle2 className="h-4 w-4 text-blue-500 flex-shrink-0" />
                       <span>IT Act 1961 &amp; IT Act 2025 Ready</span>
                     </div>
                     {calcCountDisplay && (
                       <div className="flex items-center gap-1.5 text-sm text-slate-600">
-                        <span className="text-orange-500 font-bold text-base">📊</span>
+                        <BarChart2 className="h-4 w-4 text-orange-500 flex-shrink-0" />
                         <span><strong className="text-orange-600">{calcCountDisplay} calculations done</strong></span>
                       </div>
                     )}
@@ -263,7 +259,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
               {/* How It Works */}
               <section className="py-8">
                 <h2 className="text-xl font-bold text-slate-900 mb-6">
-                  How It Works — <span className="gradient-text">3 Simple Steps</span>
+                  How It Works — 3 Simple Steps
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {[
@@ -286,20 +282,20 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
               {/* Key Stats — with context */}
               <section className="py-6">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  <div ref={stat1.ref} className="glass-card text-center p-4 rounded-xl hover:scale-105 transition-transform duration-300">
-                    <div className="text-2xl md:text-3xl font-bold text-persian-blue-700 mb-1">₹{stat1.count}L</div>
+                  <div ref={stat1.ref} className="bg-white border border-slate-200 text-center p-5 rounded-xl">
+                    <div className="text-2xl md:text-3xl font-bold text-slate-900 mb-1">₹{stat1.count}L</div>
                     <div className="text-slate-700 font-medium text-xs">Zero tax at this income under New Regime</div>
                   </div>
-                  <div ref={stat2.ref} className="glass-card text-center p-4 rounded-xl hover:scale-105 transition-transform duration-300">
-                    <div className="text-2xl md:text-3xl font-bold text-persian-blue-700 mb-1">₹{stat2.count >= 100 ? "1.5L" : stat2.count + "K"}</div>
+                  <div ref={stat2.ref} className="bg-white border border-slate-200 text-center p-5 rounded-xl">
+                    <div className="text-2xl md:text-3xl font-bold text-slate-900 mb-1">₹{stat2.count >= 100 ? "1.5L" : stat2.count + "K"}</div>
                     <div className="text-slate-700 font-medium text-xs">Save up to ₹46,800 via 80C deduction</div>
                   </div>
-                  <div ref={stat3.ref} className="glass-card text-center p-4 rounded-xl hover:scale-105 transition-transform duration-300">
-                    <div className="text-2xl md:text-3xl font-bold text-persian-blue-700 mb-1">₹{stat3.count}K</div>
+                  <div ref={stat3.ref} className="bg-white border border-slate-200 text-center p-5 rounded-xl">
+                    <div className="text-2xl md:text-3xl font-bold text-slate-900 mb-1">₹{stat3.count}K</div>
                     <div className="text-slate-700 font-medium text-xs">Standard deduction for salaried employees</div>
                   </div>
-                  <div ref={stat4.ref} className="glass-card text-center p-4 rounded-xl hover:scale-105 transition-transform duration-300">
-                    <div className="text-2xl md:text-3xl font-bold text-persian-blue-700 mb-1">{stat4.count}%</div>
+                  <div ref={stat4.ref} className="bg-white border border-slate-200 text-center p-5 rounded-xl">
+                    <div className="text-2xl md:text-3xl font-bold text-slate-900 mb-1">{stat4.count}%</div>
                     <div className="text-slate-700 font-medium text-xs">Flat tax on crypto / VDA income</div>
                   </div>
                 </div>
@@ -308,13 +304,13 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
               {/* Features */}
               <section id="features" className="py-8">
                 <h2 className="text-xl font-bold text-slate-900 mb-6">
-                  Everything You Need for <span className="gradient-text">Tax Planning</span>
+                  Everything You Need for Tax Planning
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Card className="p-5 border-2 border-persian-blue-100 hover:border-persian-blue-300 transition-all duration-300 shadow-soft hover:shadow-medium">
+                  <Card className="p-5 border border-slate-200 hover:border-blue-200 transition-all duration-200">
                     <div className="flex items-start space-x-3">
-                      <div className="w-10 h-10 gradient-blue rounded-lg flex items-center justify-center shadow-colored flex-shrink-0">
-                        <Calculator className="h-5 w-5 text-white" />
+                      <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Calculator className="h-5 w-5 text-blue-600" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="text-lg font-bold text-slate-900 mb-2">Income Tax Calculator</h3>
@@ -325,7 +321,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                         </ul>
                         <Button
                           onClick={() => window.location.href = "/calculators/income-tax"}
-                          className="bg-emerald-600 hover:bg-emerald-700 transition-all duration-300 text-white w-full py-4 text-sm font-semibold"
+                          className="bg-blue-600 hover:bg-blue-700 text-white w-full py-3 text-sm font-semibold transition-colors"
                         >
                           Calculate Now
                         </Button>
@@ -333,10 +329,10 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                     </div>
                   </Card>
 
-                  <Card className="p-5 border-2 border-green-100 hover:border-green-300 transition-all duration-300 shadow-soft hover:shadow-medium">
+                  <Card className="p-5 border border-slate-200 hover:border-slate-300 transition-all duration-200">
                     <div className="flex items-start space-x-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-soft flex-shrink-0">
-                        <FileText className="h-5 w-5 text-white" />
+                      <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <FileText className="h-5 w-5 text-green-600" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="text-lg font-bold text-slate-900 mb-2">GST Invoicing</h3>
@@ -347,7 +343,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                         </ul>
                         <Button
                           variant="outline"
-                          className="border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white w-full py-4 text-sm font-semibold transition-all duration-300"
+                          className="border border-slate-300 text-slate-700 hover:bg-slate-50 w-full py-3 text-sm font-semibold transition-colors"
                           onClick={() => window.location.href = "/accounting"}
                           data-testid="button-start-invoicing"
                         >
@@ -361,26 +357,20 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
 
               {/* Why AiTaxBot — specific differentiators */}
               <section className="py-8">
-                <h2 className="text-xl font-bold text-slate-900 mb-6">Why Choose AiTaxBot?</h2>
+                <h2 className="text-xl font-bold text-slate-900 mb-6">Why AiTaxBot</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="p-5 rounded-2xl bg-slate-50 border border-slate-100">
-                    <div className="w-11 h-11 bg-persian-blue-100 rounded-xl flex items-center justify-center mb-3">
-                      <Zap className="h-5 w-5 text-persian-blue-600" />
-                    </div>
+                    <Zap className="h-6 w-6 text-blue-600 mb-3" />
                     <h3 className="text-base font-bold text-slate-900 mb-1">Regime comparison in 30 seconds</h3>
                     <p className="text-slate-500 text-sm leading-relaxed">Enter your salary and deductions once — see Old vs New Regime results instantly, with the saving amount highlighted.</p>
                   </div>
                   <div className="p-5 rounded-2xl bg-slate-50 border border-slate-100">
-                    <div className="w-11 h-11 bg-green-100 rounded-xl flex items-center justify-center mb-3">
-                      <Shield className="h-5 w-5 text-green-600" />
-                    </div>
+                    <Shield className="h-6 w-6 text-green-600 mb-3" />
                     <h3 className="text-base font-bold text-slate-900 mb-1">CA-reviewed, not generic</h3>
                     <p className="text-slate-500 text-sm leading-relaxed">Every calculator covers IT Act 1961 (FY 2026-27) and IT Act 2025 (Tax Year 2026-27). Logic reviewed by Chartered Accountants.</p>
                   </div>
                   <div className="p-5 rounded-2xl bg-slate-50 border border-slate-100">
-                    <div className="w-11 h-11 bg-orange-100 rounded-xl flex items-center justify-center mb-3">
-                      <BookOpen className="h-5 w-5 text-orange-500" />
-                    </div>
+                    <BookOpen className="h-6 w-6 text-orange-500 mb-3" />
                     <h3 className="text-base font-bold text-slate-900 mb-1">Guides for every situation</h3>
                     <p className="text-slate-500 text-sm leading-relaxed">Salaried? Freelancer? Crypto investor? Our blog covers HRA, 80C, capital gains, marginal relief, and the new IT Act 2025 — in plain language.</p>
                   </div>
@@ -388,26 +378,13 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
               </section>
 
               {/* Disclaimer — condensed */}
-              <section className="py-4">
-                <div className="rounded-2xl border border-amber-200 bg-amber-50/60 p-5">
-                  <div className="flex items-start gap-3 mb-3">
-                    <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                    <h2 className="text-base font-bold text-amber-800">Important Disclaimers</h2>
-                  </div>
-                  <p className="text-sm text-slate-600 leading-relaxed mb-3">
-                    All calculations on AiTaxBot are <strong>indicative and for general reference only</strong> — not legal, financial, or professional tax advice. AiTaxBot is an independent private platform, not affiliated with the Income Tax Department, CBDT, or any government body. We are not a registered Tax Return Preparer and do not file returns on your behalf. For official ITR filing or complex cases (capital gains, business income, foreign assets), please consult a qualified CA.
-                  </p>
-                  <div className="flex flex-wrap gap-2 pt-3 border-t border-amber-200">
-                    {["IT Act 1961 & 2025 Compliant", "DPDP Act 2023 Aware", "CA-Reviewed", "No Govt. Affiliation"].map(label => (
-                      <span key={label} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white border border-amber-200 text-xs font-medium text-amber-700">
-                        <CheckCircle2 className="h-3 w-3" /> {label}
-                      </span>
-                    ))}
-                    <a href="/privacy-policy" className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white border border-amber-200 text-xs font-medium text-persian-blue-600 hover:underline">
-                      Privacy Policy →
-                    </a>
-                  </div>
-                </div>
+              <section className="py-3">
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Calculations are indicative only — not professional tax advice. AiTaxBot is not affiliated with the Income Tax Department or CBDT.{" "}
+                  <a href="/privacy-policy" className="underline hover:text-slate-600">Privacy Policy</a>
+                  {" · "}
+                  <a href="/about" className="underline hover:text-slate-600">About Us</a>
+                </p>
               </section>
 
               {/* Contact — simple strip (no embedded form) */}
@@ -462,7 +439,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                   <Mail className="h-5 w-5 text-persian-blue-600" />
                   <h2 className="text-xl font-bold text-slate-900">Get in Touch</h2>
                 </div>
-                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+                <div className="rounded-xl border border-slate-200 bg-white p-6">
                   <div className="grid md:grid-cols-3 gap-4 mb-5">
                     <a href="mailto:info@aitaxbot.in" className="flex items-center gap-3 p-4 bg-white rounded-xl border border-slate-100 hover:border-persian-blue-200 hover:shadow-soft transition-all group">
                       <div className="w-9 h-9 bg-persian-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -516,7 +493,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
               <div className="lg:sticky lg:top-20 space-y-6">
 
                 {/* Quick Calculators */}
-                <div className="bg-gradient-to-br from-slate-50 to-white rounded-2xl p-5 border border-slate-100 shadow-soft">
+                <div className="bg-white rounded-xl p-5 border border-slate-200">
                   <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
                     <Calculator className="h-5 w-5 text-persian-blue-600" />
                     Quick Calculators
@@ -526,11 +503,11 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                       <a
                         key={index}
                         href={calc.href}
-                        className="flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-100 hover:border-persian-blue-200 hover:shadow-medium transition-all duration-300 group"
+                        className="flex items-center gap-3 p-3 rounded-lg bg-white border border-slate-100 hover:border-blue-200 transition-colors group"
                         data-testid={`calc-link-${index}`}
                       >
-                        <div className={`w-10 h-10 bg-gradient-to-br ${calc.color} rounded-lg flex items-center justify-center shadow-soft group-hover:scale-110 transition-transform duration-300`}>
-                          <calc.icon className="h-5 w-5 text-white" />
+                        <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+                          <calc.icon className="h-5 w-5 text-slate-600" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
@@ -550,13 +527,13 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                 </div>
 
                 {/* Latest from Blog */}
-                <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-soft">
+                <div className="bg-white rounded-xl p-5 border border-slate-200">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                      <BookOpen className="h-4 w-4 text-persian-blue-600" />
+                      <BookOpen className="h-4 w-4 text-blue-600" />
                       Latest Articles
                     </h3>
-                    <a href="/blog" className="text-xs text-persian-blue-600 hover:underline flex items-center gap-1">
+                    <a href="/blog" className="text-xs text-blue-600 hover:underline flex items-center gap-1">
                       View All <ExternalLink className="h-3 w-3" />
                     </a>
                   </div>
@@ -565,13 +542,13 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                       <a
                         key={post.slug}
                         href={`/blog/${post.slug}`}
-                        className="block p-3 rounded-xl bg-slate-50 hover:bg-persian-blue-50 border border-transparent hover:border-persian-blue-100 transition-all group"
+                        className="block p-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-transparent hover:border-slate-200 transition-colors group"
                       >
-                        <h4 className="text-sm font-semibold text-slate-800 group-hover:text-persian-blue-700 transition-colors line-clamp-2 mb-1.5 leading-snug">
+                        <h4 className="text-sm font-semibold text-slate-800 group-hover:text-slate-900 transition-colors line-clamp-2 mb-1.5 leading-snug">
                           {post.title}
                         </h4>
                         <div className="flex items-center gap-2">
-                          <span className="text-xs bg-persian-blue-50 text-persian-blue-600 px-2 py-0.5 rounded-full font-medium border border-persian-blue-100">
+                          <span className="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-medium border border-blue-100">
                             {post.tag}
                           </span>
                           <span className="text-xs text-slate-400 flex items-center gap-1">
@@ -584,7 +561,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                 </div>
 
                 {/* Tax & Finance News */}
-                <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-soft">
+                <div className="bg-white rounded-xl p-5 border border-slate-200">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
                       <Newspaper className="h-4 w-4 text-blue-600" />
