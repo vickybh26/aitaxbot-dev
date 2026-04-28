@@ -426,14 +426,14 @@ export default function SIPCalculatorPage() {
                     <td className="border border-slate-200 p-3 text-center text-slate-700">₹8.25 L</td>
                     <td className="border border-slate-200 p-3 text-center text-slate-700">₹23.23 L</td>
                     <td className="border border-slate-200 p-3 text-center text-slate-700">₹50.46 L</td>
-                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">₹1.00 Cr 🎯</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">₹1.00 Cr</td>
                     <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">₹1.90 Cr</td>
                   </tr>
                   <tr>
                     <td className="border border-slate-200 p-3 font-semibold text-slate-800">₹20,000/month</td>
                     <td className="border border-slate-200 p-3 text-center text-slate-700">₹16.49 L</td>
                     <td className="border border-slate-200 p-3 text-center text-slate-700">₹46.47 L</td>
-                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">₹1.01 Cr 🎯</td>
+                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">₹1.01 Cr</td>
                     <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">₹1.99 Cr</td>
                     <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">₹3.79 Cr</td>
                   </tr>

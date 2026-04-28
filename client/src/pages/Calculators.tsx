@@ -162,25 +162,24 @@ function CalculatorCard({ calc }: { calc: typeof taxCalculators[0] }) {
   const Icon = calc.icon;
   return (
     <Card
-      className={`border-2 border-${calc.color}-100 hover:border-${calc.color}-300 hover:shadow-lg transition-all duration-300`}
+      className="border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all duration-200"
       data-testid={`calculator-card-${calc.link.split('/').pop()}`}
     >
       <CardHeader>
-        <div className={`w-14 h-14 bg-${calc.color}-100 rounded-full flex items-center justify-center mb-4`}>
-          <Icon className={`h-7 w-7 text-${calc.color}-600`} />
+        <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center mb-3">
+          <Icon className="h-6 w-6 text-blue-600" />
         </div>
-        <CardTitle className="text-2xl">{calc.title}</CardTitle>
-        <CardDescription className="text-base">
+        <CardTitle className="text-xl">{calc.title}</CardTitle>
+        <CardDescription className="text-sm text-slate-500">
           {calc.description}
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="mb-6">
-          <h4 className="font-semibold text-sm text-slate-700 mb-3">Key Features:</h4>
-          <ul className="space-y-2">
+        <div className="mb-5">
+          <ul className="space-y-1.5">
             {calc.features.map((feature, idx) => (
               <li key={idx} className="flex items-start gap-2 text-sm text-slate-600">
-                <span className={`text-${calc.color}-600 mt-0.5`}>&#10003;</span>
+                <span className="text-blue-500 mt-0.5 shrink-0">&#10003;</span>
                 <span>{feature}</span>
               </li>
             ))}
@@ -188,7 +187,7 @@ function CalculatorCard({ calc }: { calc: typeof taxCalculators[0] }) {
         </div>
         <Link href={calc.link}>
           <Button
-            className={`w-full bg-${calc.color}-600 hover:bg-${calc.color}-700`}
+            className="w-full bg-blue-600 hover:bg-blue-700"
             data-testid={`button-open-${calc.link.split('/').pop()}`}
           >
             <Calculator className="mr-2 h-4 w-4" />
@@ -243,23 +242,23 @@ export default function Calculators() {
           </div>
         </header>
 
-        <section className="py-16 px-6 bg-gradient-to-r from-persian-blue-600 to-persian-blue-700">
-          <div className="max-w-6xl mx-auto text-center">
-            <div className="inline-block p-4 bg-white/10 rounded-full mb-6">
-              <Calculator className="h-12 w-12 text-white" />
+        <section className="bg-white border-b border-slate-100 py-8 px-6">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+              <div>
+                <h1 className="text-3xl md:text-4xl font-bold text-slate-900 border-l-4 border-blue-600 pl-4 mb-3">
+                  Free Tax & Financial Calculators
+                </h1>
+                <p className="text-base text-slate-500 max-w-2xl pl-4">
+                  Tax and investment calculators built for Indian taxpayers. Income Tax, HRA, SIP, SWP, PF, NPS, Home Loan, and Vehicle Loan — all updated for FY 2026-27 (AY 2027-28).
+                </p>
+              </div>
+              <div className="md:shrink-0">
+                <span className="inline-block px-3 py-1 bg-slate-100 text-slate-500 text-xs rounded-full font-medium">
+                  FY 2026-27 · AY 2027-28
+                </span>
+              </div>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Free Tax & Financial Calculators India - FY 2026-27
-            </h1>
-            <p className="text-xl text-white/90 mb-4 max-w-3xl mx-auto">
-              Plan your taxes and investments with our comprehensive suite of free financial calculators,
-              designed specifically for Indian taxpayers and investors. Updated for FY 2026-27 (AY 2027-28)
-              under Income Tax Act, 1961 and Tax Year 2026-27 under the new Income Tax Act, 2025.
-            </p>
-            <p className="text-base text-white/80 max-w-2xl mx-auto">
-              All calculators are reviewed by a Chartered Accountant for accuracy and comply with CBDT rules, 
-              EPFO guidelines, and SEBI regulations. No registration required.
-            </p>
           </div>
         </section>
 
@@ -327,29 +326,29 @@ export default function Calculators() {
             </h2>
             <div className="grid gap-8 md:grid-cols-3">
               <div className="text-center">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Award className="h-8 w-8 text-green-600" />
+                <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <Award className="h-6 w-6 text-blue-600" />
                 </div>
-                <h3 className="text-xl font-semibold text-slate-900 mb-3">CA Reviewed</h3>
-                <p className="text-slate-600">
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">CA Reviewed</h3>
+                <p className="text-sm text-slate-500">
                   All calculations are reviewed by a Chartered Accountant and follow the latest Income Tax Act provisions for maximum accuracy.
                 </p>
               </div>
               <div className="text-center">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <PiggyBank className="h-8 w-8 text-blue-600" />
+                <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <PiggyBank className="h-6 w-6 text-blue-600" />
                 </div>
-                <h3 className="text-xl font-semibold text-slate-900 mb-3">Always Free</h3>
-                <p className="text-slate-600">
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">Always Free</h3>
+                <p className="text-sm text-slate-500">
                   Use all our calculators unlimited times at no cost. No hidden fees, no registration required.
                 </p>
               </div>
               <div className="text-center">
-                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <TrendingUp className="h-8 w-8 text-purple-600" />
+                <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <TrendingUp className="h-6 w-6 text-blue-600" />
                 </div>
-                <h3 className="text-xl font-semibold text-slate-900 mb-3">Updated for FY 2026-27</h3>
-                <p className="text-slate-600">
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">Updated for FY 2026-27</h3>
+                <p className="text-sm text-slate-500">
                   We update our calculators immediately when tax laws or interest rates change to ensure you always get current information.
                 </p>
               </div>

@@ -175,8 +175,8 @@ export default function HRACalculatorPage() {
                   </div>
                 </div>
               </div>
-              <p className="text-sm text-blue-700 font-semibold bg-blue-100 rounded p-3">
-                💡 The lowest of these three values is your HRA exemption. Most often, component ② (Rent − 10% of basic) is the binding constraint.
+              <p className="text-sm text-slate-700 font-semibold bg-slate-50 border-l-4 border-blue-400 pl-3 py-2 rounded-r">
+                The lowest of these three values is your HRA exemption. Most often, component ② (Rent − 10% of basic) is the binding constraint.
               </p>
             </div>
 

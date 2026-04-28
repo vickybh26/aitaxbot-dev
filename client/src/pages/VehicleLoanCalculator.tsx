@@ -107,7 +107,7 @@ export default function VehicleLoanCalculatorPage() {
             <h2 className="text-2xl font-bold text-slate-900 mb-6">Vehicle Loan EMI Reference Tables</h2>
 
             {/* Two-Wheeler Table */}
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">🛵 Two-Wheeler Loan EMI Table (at 12.5% p.a.)</h3>
+            <h3 className="text-xl font-semibold text-slate-900 mb-2">Two-Wheeler Loan EMI Table (at 12.5% p.a.)</h3>
             <div className="overflow-x-auto mb-3">
               <table className="w-full border-collapse text-sm">
                 <thead>
@@ -140,7 +140,7 @@ export default function VehicleLoanCalculatorPage() {
             <p className="text-xs text-slate-500 mb-6">*At 12.5% p.a. Actual rates vary by lender and credit profile.</p>
 
             {/* Car Loan Table */}
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">🚗 Car Loan EMI Table (at 9.25% p.a.)</h3>
+            <h3 className="text-xl font-semibold text-slate-900 mb-2">Car Loan EMI Table (at 9.25% p.a.)</h3>
             <div className="overflow-x-auto mb-3">
               <table className="w-full border-collapse text-sm">
                 <thead>
@@ -182,7 +182,7 @@ export default function VehicleLoanCalculatorPage() {
             {/* What each means */}
             <div className="grid md:grid-cols-2 gap-4 mb-6">
               <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-                <h3 className="font-bold text-green-800 mb-2 flex items-center gap-2">✅ Reducing Balance Rate</h3>
+                <h3 className="font-bold text-green-800 mb-2">Reducing Balance Rate</h3>
                 <p className="text-green-900 text-sm mb-2">
                   Interest is charged only on the <strong>outstanding principal</strong> each month. As you repay, the
                   principal shrinks — so your interest charge reduces every month. The EMI stays the same, but the
@@ -191,7 +191,7 @@ export default function VehicleLoanCalculatorPage() {
                 <p className="text-xs text-green-800 font-medium">Used by: All scheduled banks (SBI, HDFC, ICICI, Axis), most NBFCs</p>
               </div>
               <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-                <h3 className="font-bold text-red-700 mb-2 flex items-center gap-2">🚨 Flat Rate (Simple Interest on Full Principal)</h3>
+                <h3 className="font-bold text-red-700 mb-2">Flat Rate (Simple Interest on Full Principal)</h3>
                 <p className="text-red-900 text-sm mb-2">
                   Interest is calculated on the <strong>original loan amount for the entire tenure</strong> — even though you're
                   repaying monthly. You pay interest on money you've already returned to the lender.
@@ -202,7 +202,7 @@ export default function VehicleLoanCalculatorPage() {
             </div>
 
             {/* Example table */}
-            <h3 className="text-lg font-semibold text-slate-900 mb-2">📊 Example: ₹5 Lakh Car Loan at 9% — Flat vs Reducing</h3>
+            <h3 className="text-lg font-semibold text-slate-900 mb-2">Example: ₹5 Lakh Car Loan at 9% — Flat vs Reducing</h3>
             <div className="overflow-x-auto mb-2">
               <table className="w-full border-collapse text-sm">
                 <thead>
