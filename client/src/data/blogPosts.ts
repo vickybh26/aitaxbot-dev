@@ -2937,18 +2937,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "h2",
         heading: "Key Differences at a Glance",
-        content_md: "| Feature | Form 26AS | AIS |
-|---------|-----------|-----|
-| What it shows | TDS, advance tax, refunds | All financial transactions |
-| Source | TRACES (TDS returns) | Multiple agencies (banks, exchanges, RTA, GST) |
-| Dividend income | Only if TDS deducted | All dividends, including below TDS threshold |
-| MF transactions | Only high-value SFT | All purchases and redemptions |
-| Stock transactions | Only high-value SFT | All buy/sell transactions |
-| Introduced | ~2008 | November 2021 |
-| Feedback option | No | Yes — you can mark errors |
-| Carries into ITR pre-fill | Partially | Yes — via TIS |
-
-The key takeaway: **Form 26AS tells you what tax has been paid. AIS tells you what income the department knows about.** Both matter for filing an accurate return."
+        content_md: "| Feature | Form 26AS | AIS |\n|---------|-----------|-----|\n| What it shows | TDS, advance tax, refunds | All financial transactions |\n| Source | TRACES (TDS returns) | Multiple agencies (banks, exchanges, RTA, GST) |\n| Dividend income | Only if TDS deducted | All dividends, including below TDS threshold |\n| MF transactions | Only high-value SFT | All purchases and redemptions |\n| Stock transactions | Only high-value SFT | All buy/sell transactions |\n| Introduced | ~2008 | November 2021 |\n| Feedback option | No | Yes — you can mark errors |\n| Carries into ITR pre-fill | Partially | Yes — via TIS |\n\nThe key takeaway: **Form 26AS tells you what tax has been paid. AIS tells you what income the department knows about.** Both matter for filing an accurate return."
       },
       {
         type: "h2",
