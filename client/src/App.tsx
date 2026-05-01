@@ -28,6 +28,7 @@ import PFCalculator from "@/pages/PFCalculator";
 import NPSCalculator from "@/pages/NPSCalculator";
 import HomeLoanCalculator from "@/pages/HomeLoanCalculator";
 import VehicleLoanCalculator from "@/pages/VehicleLoanCalculator";
+import TradingTaxCalculatorPage from "@/pages/TradingTaxCalculator";
 import NRICorner from "@/pages/NRICorner";
 import DTAACalculator from "@/pages/nri/DTAACalculator";
 import NRONREComparison from "@/pages/nri/NRONREComparison";
@@ -150,6 +151,7 @@ function Router() {
         <Route path="/calculators/nps" component={NPSCalculator} />
         <Route path="/calculators/home-loan" component={HomeLoanCalculator} />
         <Route path="/calculators/vehicle-loan" component={VehicleLoanCalculator} />
+        <Route path="/calculators/trading-tax" component={TradingTaxCalculatorPage} />
         <Route path="/nri" component={NRICorner} />
         <Route path="/nri/dtaa-calculator" component={DTAACalculator} />
         <Route path="/nri/nro-nre-comparison" component={NRONREComparison} />

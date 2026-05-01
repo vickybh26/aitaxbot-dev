@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'wouter';
-import { Calculator, Home, TrendingUp, PiggyBank, Wallet, Shield, Award, FileText } from 'lucide-react';
+import { Calculator, Home, TrendingUp, PiggyBank, Wallet, Shield, Award, FileText, Globe } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useEffect } from 'react';
@@ -138,6 +138,23 @@ const investmentCalculators = [
       'On-road price to EMI in seconds',
       'Total interest cost breakdown',
       'Pre-filled rates for 2026 market'
+    ]
+  }
+];
+
+const tradingTools = [
+  {
+    title: 'US Stock & F&O Trading Tax Calculator',
+    description: 'Calculate capital gains tax on US stocks (INDmoney/Vested) with auto USD/INR rate fetch, F&O business income tax, US dividend DTAA credit, and Schedule FA compliance checklist.',
+    icon: Globe,
+    link: '/calculators/trading-tax',
+    color: 'blue',
+    features: [
+      'US stocks: STCG (slab) vs LTCG 12.5% at 24 months',
+      'Auto USD/INR rate fetch per trade date',
+      'US dividend DTAA 25% tax credit (Form 67)',
+      'Indian & US F&O business income + audit flag',
+      'Schedule FA disclosure guide + ITR form selector'
     ]
   }
 ];
@@ -299,6 +316,19 @@ export default function Calculators() {
               </p>
               <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
                 {investmentCalculators.map((calc, index) => (
+                  <CalculatorCard key={index} calc={calc} />
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-14">
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">Trading & Investing Tax Tools</h2>
+              <p className="text-slate-600 mb-6">
+                Specialised calculators for Indian investors trading US stocks, F&amp;O, and forex.
+                Handles multi-currency conversion, DTAA credits, and compliance checklist.
+              </p>
+              <div className="grid gap-8 md:grid-cols-2">
+                {tradingTools.map((calc, index) => (
                   <CalculatorCard key={index} calc={calc} />
                 ))}
               </div>
