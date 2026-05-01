@@ -343,9 +343,11 @@ function USDividendsTab({ dividends, setDividends, slabRate }: {
   return (
     <div className="space-y-5">
       <InfoBox>
-        US dividends are taxable in India at your slab rate. The US withholds 25% tax under India-USA DTAA.
-        You can claim <strong>Foreign Tax Credit (FTC)</strong> for the US tax withheld — reduces your Indian tax.
-        File <strong>Form 67</strong> to claim FTC (must be filed before the ITR due date).
+        US dividends are taxable in India at your slab rate. The US withholds tax at source —
+        <strong> 15% if you submitted W-8BEN</strong> (most INDmoney / Vested users), or <strong>25% default</strong> without it.
+        Enter the actual amount withheld from your broker statement.
+        You can claim <strong>Foreign Tax Credit (FTC)</strong> for that US tax withheld — reduces your Indian tax.
+        File <strong>Form 67</strong> before the ITR due date to claim FTC.
       </InfoBox>
 
       {dividends.map((d, i) => {
