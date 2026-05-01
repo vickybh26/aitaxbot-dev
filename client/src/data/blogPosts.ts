@@ -3170,6 +3170,103 @@ export const blogPosts: BlogPost[] = [
       { slug: "capital-gains-tax-stocks-mutual-funds", title: "Capital Gains Tax on Stocks and Mutual Funds" },
       { slug: "ais-vs-form-26as-difference", title: "AIS vs Form 26AS: What Is the Difference?" }
     ]
+  },
+  {
+    slug: "us-stock-trading-tax-india",
+    status: "published",
+    metaTitle: "US Stock Trading Tax in India — INDmoney, Vested, Stockal | FY 2025-26 Guide",
+    metaDescription: "How to calculate and pay tax on US stocks in India. LTCG vs STCG (24-month rule), USD/INR conversion, F&O income, DTAA dividend credit, Schedule FA — complete guide for FY 2025-26.",
+    keywords: ["US stock tax India", "INDmoney tax", "Vested tax India", "LTCG US stocks 24 months", "USD INR exchange rate capital gains", "Schedule FA US stocks", "F&O tax India", "DTAA dividend India USA", "ITR-2 foreign stocks", "ITR-3 F&O income"],
+    ogTitle: "US Stock Trading Tax in India FY 2025-26 — Complete Guide",
+    ogDescription: "Own US stocks via INDmoney or Vested? Here is exactly how your gains are taxed in India — LTCG at 12.5% after 24 months, STCG at slab, USD/INR conversion, DTAA credit, and Schedule FA.",
+    tags: ["capital gains", "US stocks", "F&O", "international investing", "ITR filing"],
+    readingTimeMinutes: 9,
+    publishedAt: "2026-05-01",
+    heroImage: "/blog/us-stock-trading-tax-india.jpg",
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "US Stock Trading Tax in India — INDmoney, Vested, Stockal Guide FY 2025-26",
+      "author": { "@type": "Organization", "name": "AiTaxBot Expert Team" },
+      "publisher": { "@type": "Organization", "name": "AiTaxBot" },
+      "datePublished": "2026-05-01",
+      "dateModified": "2026-05-01",
+      "wordCount": 1100,
+      "reviewedBy": { "@type": "Organization", "name": "AiTaxBot CA Team" }
+    },
+    bodySections: [
+      {
+        type: "intro",
+        content_md: "Millions of young Indians are investing in US stocks through platforms like INDmoney, Vested, and Stockal. Buying Apple, Tesla, or an S&P 500 ETF from your phone feels seamless — but when ITR filing season arrives in July, many investors discover they have no idea how to calculate and report their US stock gains in India.\n\nThe confusion is understandable. US stock taxation in India involves multiple steps: converting USD profits to INR using the RBI exchange rate on specific dates, applying different tax rates based on whether you held the stock for more or less than 24 months, claiming a DTAA credit for US dividend withholding tax, and disclosing all foreign holdings in Schedule FA. If you also trade Indian F&O, the rules add another layer of complexity.\n\nThis guide explains everything you need to know to file your ITR correctly for FY 2025-26."
+      },
+      {
+        type: "h2",
+        heading: "The 24-Month Rule — LTCG vs STCG for US Stocks",
+        content_md: "The first and most important rule: the long-term capital gains (LTCG) threshold for US stocks is **24 months**, not 12 months.\n\nFor domestic listed equity shares and equity mutual funds, LTCG applies after 12 months of holding. But US stocks are classified as **unlisted foreign equity** for Indian tax purposes — and for all unlisted assets, the long-term threshold is 24 months.\n\n**Short-Term Capital Gain (STCG):** If you held a US stock for less than 24 months, any gain is STCG. It is added to your total income and taxed at your applicable slab rate — 5%, 10%, 20%, or 30% depending on your income bracket under the New Regime for FY 2025-26.\n\n**Long-Term Capital Gain (LTCG):** If you held a US stock for 24 months or more, the gain is taxed at **12.5% without indexation** under Section 112A, as introduced by the Finance Act 2024 (effective for transfers on or after July 23, 2024).\n\n**Example:** You bought 10 shares of Apple at $150 on January 1, 2023, and sold them at $210 on April 1, 2025. Holding period = 27 months. This is LTCG taxed at 12.5% after USD/INR conversion."
+      },
+      {
+        type: "h2",
+        heading: "How to Convert USD Gains to INR — The Exchange Rate Calculation",
+        content_md: "You cannot simply use today's USD/INR rate or an average rate. Indian tax law requires you to use the **RBI/FBIL Telegraphic Transfer (TT) buying rate** on the exact date of each transaction.\n\n**Step 1 — Cost of acquisition in INR:**\nCost (INR) = Quantity × Buy price (USD) × RBI rate on buy date\n\n**Step 2 — Sale proceeds in INR:**\nProceeds (INR) = Quantity × Sell price (USD) × RBI rate on sell date\n\n**Step 3 — Capital gain:**\nCapital gain = Proceeds (INR) − Cost (INR) − Brokerage/transfer charges\n\n**Step 4 — Classify:**\nHeld ≥ 24 months → LTCG at 12.5%. Held < 24 months → STCG at slab rate.\n\n**Where to find official rates:** The FBIL publishes historical reference rates at fbil.org.in. You can also use the RBI's official FBIL rate archive. Our [US Stock Trading Tax Calculator](/calculators/trading-tax) auto-fetches approximate historical rates for each trade date as a starting point — always verify with official FBIL rates before filing.\n\n**Important:** Even if the stock price in USD did not change much, the exchange rate movement between your buy date and sell date can create a taxable gain — or reduce a real gain. Both the dollar appreciation AND the stock movement are captured in the INR calculation."
+      },
+      {
+        type: "h2",
+        heading: "US Dividend Tax in India — DTAA Credit for Withholding Tax",
+        content_md: "When a US company pays you a dividend, the US government withholds 25% as withholding tax under the India-USA Double Tax Avoidance Agreement (DTAA). Your brokerage statement will show both the gross dividend and the amount withheld.\n\n**How it is taxed in India:**\nThe gross dividend (before US withholding) is added to your income under 'Income from Other Sources' and taxed at your applicable slab rate in India.\n\n**DTAA credit (Foreign Tax Credit):**\nYou can claim the 25% already withheld by the US government as a Foreign Tax Credit (FTC), preventing double taxation. If your Indian tax rate on the dividend income is 30%, you owe 30% − 25% = 5% additional tax in India. If your Indian rate is 20%, you have paid more in the US than you owe in India — no additional tax due, but you cannot claim a refund on the excess US tax.\n\n**How to claim FTC:**\nFile **Form 67** on the income tax portal before submitting your ITR. This is mandatory — you cannot claim FTC without filing Form 67.\n\n**ITR form:** Use ITR-2 if dividends are your only foreign income. File ITR-3 if you also have F&O income."
+      },
+      {
+        type: "h2",
+        heading: "Indian F&O Trading — Business Income, Not Capital Gains",
+        content_md: "One of the biggest misunderstandings among new traders: **Indian F&O (Futures & Options) income is not capital gains.** It is non-speculative business income under the proviso to Section 43(5) of the Income Tax Act, 1961.\n\n**Tax rate:** Slab rate — there is no special flat tax on F&O. If your total income (salary + F&O profit) pushes you into the 30% bracket, you pay 30% on the F&O profit.\n\n**F&O turnover calculation:**\nTurnover = Absolute sum of all P&L entries (not net P&L). Example: +₹50,000, −₹30,000, +₹80,000 → Turnover = ₹1,60,000 (not ₹1,00,000 net).\n\n**Tax audit threshold:** If F&O turnover exceeds ₹10 crore (or ₹1 crore and profit is less than 6% of turnover), a tax audit under Section 44AB is required. You must maintain books of account and file ITR-3 with auditor details.\n\n**F&O losses:**\nF&O losses are non-speculative business losses. They can be set off against any business income in the same year and carried forward for 8 years. However, to carry forward losses, you must file ITR-3 on time — by July 31, 2026."
+      },
+      {
+        type: "h2",
+        heading: "Schedule FA — Mandatory Foreign Asset Disclosure",
+        content_md: "Every Indian resident holding US stocks must disclose them in **Schedule FA** (Foreign Assets) in their ITR. This is not about paying extra tax — it is a disclosure requirement under the Black Money (Undisclosed Foreign Income and Assets) and Imposition of Tax Act, 2015.\n\n**What must be disclosed:**\n- Name and ISIN of each US stock held on **December 31** of the relevant tax year\n- Name of the foreign brokerage/platform (INDmoney, Vested, Stockal, etc.)\n- Date of acquisition and cost of acquisition in INR\n- Peak value during the year and closing value as on December 31\n\n**Who must file:** Anyone who held US stocks at any point during the financial year — even if they sold them before March 31.\n\n**Penalty for non-disclosure:** ₹10,00,000 (₹10 lakh) per foreign account or asset not disclosed, under the Black Money Act. This penalty applies even if the asset generated no income.\n\n**ITR form:** If you have foreign assets, you cannot file ITR-1. Use ITR-2 (for capital gains / other sources) or ITR-3 (if you also have F&O income)."
+      },
+      {
+        type: "h2",
+        heading: "Which ITR Form to File — Quick Guide",
+        content_md: "| Your trading activity | ITR form |\n|---|---|\n| Only US stocks (capital gains) | ITR-2 |\n| US stocks + US dividends | ITR-2 + Form 67 |\n| Only Indian F&O | ITR-3 |\n| US stocks + Indian F&O | ITR-3 + Form 67 |\n| US F&O / Options | ITR-3 |\n| Any foreign asset held | Cannot use ITR-1 or ITR-4 |\n\nIf you have salary income in addition to any of the above, add it to the same ITR-2 or ITR-3. Salary income is not a reason to switch forms — just add it to the existing form."
+      },
+      {
+        type: "faq",
+        heading: "Frequently Asked Questions",
+        items: [
+          {
+            q: "I invested ₹1 lakh in US stocks via INDmoney and my total portfolio is now worth ₹1.3 lakh. Do I owe any tax?",
+            a: "Only if you have sold shares. Unrealised gains (paper profits) are not taxed in India until you actually sell. When you sell, convert the sale proceeds to INR using the RBI rate on the sell date, deduct the INR cost (purchase price × RBI rate on buy date), and classify the gain as STCG or LTCG based on the holding period."
+          },
+          {
+            q: "My INDmoney app shows my gain in USD. Can I just convert that to INR at today's rate?",
+            a: "No. Indian tax law requires you to convert the buy price and sell price to INR separately using the RBI/FBIL rate on each respective transaction date. The difference between those two INR amounts is your capital gain. Using a single conversion of your USD gain will give the wrong number, especially if the rupee has moved significantly."
+          },
+          {
+            q: "I had F&O losses of ₹2 lakh this year. Can I set them off against my salary?",
+            a: "No. F&O losses (non-speculative business losses) cannot be set off against salary income. They can only be set off against other business income in the same year. Unabsorbed F&O losses can be carried forward for 8 years to set off against future business income. To carry forward, you must file ITR-3 on time."
+          },
+          {
+            q: "Is US options trading (on platforms like Tastytrade or through US brokers) taxed the same as US stocks?",
+            a: "Options gains from US exchanges are generally treated as business income in India (similar to Indian F&O), not capital gains. The reasoning is that options are derivative instruments with short-term speculative characteristics. Report them under ITR-3 as business income. However, if you held long-dated options as an investment, consult a CA for the appropriate classification."
+          }
+        ]
+      },
+      {
+        type: "cta",
+        content_md: "**Calculate your US stock and F&O tax liability in minutes.**\n\nOur Trading Tax Calculator handles USD/INR rate conversion automatically, classifies STCG vs LTCG based on your holding period, computes DTAA credit on dividends, and gives you a complete compliance checklist — including which ITR form to file.",
+        internal_links: [
+          { label: "US Stock & F&O Trading Tax Calculator", href: "/calculators/trading-tax" },
+          { label: "Income Tax Calculator FY 2025-26", href: "/calculators/income-tax" },
+          { label: "Capital Gains in ITR — Where to Report", href: "/blog/capital-gains-itr-where-to-report" }
+        ]
+      }
+    ],
+    disclaimer: "This article is for general informational purposes only. Tax treatment of US stock gains may vary based on residency status, type of instrument, and individual circumstances. Always verify exchange rates with official FBIL data at fbil.org.in. Consult a Chartered Accountant for personalized advice before filing your ITR.",
+    relatedPosts: [
+      { slug: "capital-gains-itr-where-to-report", title: "Capital Gains in ITR: Where to Report in Schedule CG" },
+      { slug: "capital-gains-tax-stocks-mutual-funds", title: "Capital Gains Tax on Stocks and Mutual Funds" },
+      { slug: "itr-filing-deadline-2026-july-31", title: "ITR Filing Deadline 2026: What Happens If You Miss July 31?" }
+    ]
   }
 ];
 
