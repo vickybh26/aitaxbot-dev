@@ -490,3 +490,31 @@ export const insertCAContactRequestSchema = z.object({
   userPhone: optStr,
   taxIssue: z.string().min(10, "Please describe your tax issue (min 10 chars)").max(500),
 });
+
+// ─── Lead Capture ──────────────────────────────────────────────────────────
+
+export interface Lead {
+  id: string;
+  name: string;
+  email: string;
+  whatsapp?: string | null;
+  source: string;           // e.g. "Income Tax Calculator", "HRA Calculator"
+  summaryText?: string | null; // e.g. "Tax: ₹42,000 | New Regime | Income: ₹8L"
+  utmSource?: string | null;
+  utmMedium?: string | null;
+  utmCampaign?: string | null;
+  createdAt?: Date | string;
+}
+
+export type InsertLead = Omit<Lead, "id" | "createdAt">;
+
+export const insertLeadSchema = z.object({
+  name: z.string().min(1, "Name is required").max(100),
+  email: z.string().email("Valid email required"),
+  whatsapp: optStr,
+  source: z.string().min(1),
+  summaryText: optStr,
+  utmSource: optStr,
+  utmMedium: optStr,
+  utmCampaign: optStr,
+});

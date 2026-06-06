@@ -2,6 +2,8 @@ import { Helmet } from 'react-helmet-async';
 import { Link } from 'wouter';
 import { useEffect } from 'react';
 import { trackPageView } from '@/lib/analytics';
+import FindCABanner from '@/components/FindCABanner';
+import LeadCaptureForm from '@/components/LeadCaptureForm';
 import {
   generateCalculatorSchema,
   generateBreadcrumbSchema,
@@ -327,6 +329,11 @@ export default function VehicleLoanCalculatorPage() {
           </div>
         </footer>
 
+        {/* Lead Capture + CA Banner */}
+        <div className="max-w-3xl mx-auto px-4 pb-10">
+          <LeadCaptureForm source="Vehicle Loan Calculator" />
+          <FindCABanner context="planning your vehicle loan" />
+        </div>
       </div>
     </>
   );

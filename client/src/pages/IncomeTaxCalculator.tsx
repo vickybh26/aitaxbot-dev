@@ -3,6 +3,7 @@ import { Link } from 'wouter';
 import { useEffect } from 'react';
 import { trackPageView } from '@/lib/analytics';
 import FindCABanner from '@/components/FindCABanner';
+import LeadCaptureForm from '@/components/LeadCaptureForm';
 import {
   generateCalculatorSchema,
   generateBreadcrumbSchema,
@@ -460,8 +461,9 @@ export default function IncomeTaxCalculatorPage() {
           </div>
         </footer>
 
-        {/* CA Banner */}
+        {/* Lead Capture + CA Banner */}
         <div className="max-w-3xl mx-auto px-4 pb-10">
+          <LeadCaptureForm source="Income Tax Calculator" />
           <FindCABanner context="filing your ITR" />
         </div>
 
