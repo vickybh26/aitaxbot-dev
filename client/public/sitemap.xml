@@ -97,6 +97,22 @@
     <priority>0.90</priority>
   </url>
 
+  <!-- Find a CA Directory -->
+  <url>
+    <loc>https://aitaxbot.co.in/find-ca</loc>
+    <lastmod>2026-06-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.90</priority>
+  </url>
+
+  <!-- CA Register -->
+  <url>
+    <loc>https://aitaxbot.co.in/ca/register</loc>
+    <lastmod>2026-06-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.70</priority>
+  </url>
+
   <!-- Blog Listing -->
   <url>
     <loc>https://aitaxbot.co.in/blog</loc>

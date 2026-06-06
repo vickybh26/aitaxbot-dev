@@ -10,6 +10,7 @@ import rateLimit from "express-rate-limit";
 import accountingRoutes from "./accountingRoutes";
 import adminRoutes from "./adminRoutes";
 import whatsappRoutes from "./whatsapp/whatsappRoutes";
+import caRoutes from "./caRoutes";
 import { getFirestore, verifyFirebaseToken, admin } from "./firebase";
 import { TransactionalEmailsApi, TransactionalEmailsApiApiKeys } from '@getbrevo/brevo';
 import { seedTaxRates, getTaxSlabsForCalculation } from "./seedTaxRates";
@@ -207,6 +208,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Mount admin routes
   app.use("/api/admin", adminRoutes);
+  app.use("/api/ca", caRoutes);
   
   
   // Seed tax rates on startup (only runs once if empty)

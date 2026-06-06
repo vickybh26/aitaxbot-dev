@@ -396,3 +396,97 @@ export interface PurchaseRegister {
 }
 
 export type InsertPurchaseRegister = Omit<PurchaseRegister, "id" | "createdAt" | "updatedAt">;
+
+// ─── CA Profile (Chartered Accountant Act compliant) ───────────────────────
+// Factual directory listing only. No ratings, no rankings, no testimonials.
+// Platform is a technology introduction service, not a tax practice.
+
+export const CA_PRACTICE_AREAS = [
+  "itr_filing",
+  "tax_planning",
+  "nri_taxation",
+  "capital_gains",
+  "gst",
+  "business_tax",
+  "salary_income",
+  "freelancer_tax",
+  "startup_advisory",
+  "international_tax",
+] as const;
+
+export type CAPracticeArea = typeof CA_PRACTICE_AREAS[number];
+
+export const CA_PRACTICE_AREA_LABELS: Record<CAPracticeArea, string> = {
+  itr_filing: "ITR Filing",
+  tax_planning: "Tax Planning",
+  nri_taxation: "NRI Taxation",
+  capital_gains: "Capital Gains",
+  gst: "GST",
+  business_tax: "Business Tax",
+  salary_income: "Salary Income",
+  freelancer_tax: "Freelancer Tax",
+  startup_advisory: "Startup Advisory",
+  international_tax: "International Tax",
+};
+
+export interface CAProfile {
+  id: string;
+  icaiMembershipNumber: string;    // e.g. "123456"
+  fullName: string;                // As per ICAI records
+  firmName?: string | null;
+  city: string;
+  state: string;
+  practiceAreas: CAPracticeArea[];
+  languages: string[];
+  yearsOfPractice: number;
+  email: string;                   // Shown publicly for contact
+  whatsappNumber?: string | null;  // Shown as wa.me link if provided
+  bio?: string | null;             // Max 200 chars, factual only
+  status: "pending" | "approved" | "rejected";
+  rejectedReason?: string | null;
+  createdAt?: Date | string;
+  approvedAt?: Date | string;
+}
+
+export type InsertCAProfile = Omit<CAProfile, "id" | "createdAt" | "approvedAt" | "status" | "rejectedReason">;
+
+export const insertCAProfileSchema = z.object({
+  icaiMembershipNumber: z.string().min(4, "Valid ICAI membership number required").max(10),
+  fullName: z.string().min(2, "Full name required").max(100),
+  firmName: optStr,
+  city: z.string().min(2, "City required"),
+  state: z.string().min(2, "State required"),
+  practiceAreas: z.array(z.enum(CA_PRACTICE_AREAS)).min(1, "Select at least one area"),
+  languages: z.array(z.string()).min(1, "Select at least one language"),
+  yearsOfPractice: z.number().min(0).max(60),
+  email: z.string().email("Valid email required"),
+  whatsappNumber: optStr,
+  bio: z.string().max(200, "Bio must be under 200 characters").optional().nullable(),
+  agreeToEthics: z.literal(true, { errorMap: () => ({ message: "You must confirm compliance with ICAI Code of Ethics" }) }),
+});
+
+// ─── CA Contact Request ────────────────────────────────────────────────────
+
+export interface CAContactRequest {
+  id: string;
+  caId: string;
+  caName: string;
+  caEmail: string;
+  userName: string;
+  userEmail: string;
+  userPhone?: string | null;
+  taxIssue: string;
+  createdAt?: Date | string;
+}
+
+export type InsertCAContactRequest = Omit<CAContactRequest, "id" | "createdAt">;
+
+export const insertCAContactRequestSchema = z.object({
+  caId: z.string().min(1),
+  caName: z.string().min(1),
+  caEmail: z.string().email(),
+  userName: z.string().min(1, "Your name is required"),
+  userEmail: z.string().email("Valid email required"),
+  userPhone: optStr,
+  taxIssue: z.string().min(10, "Please describe your tax issue (min 10 chars)").max(500),
+});

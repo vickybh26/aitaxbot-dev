@@ -209,5 +209,7 @@ export const COLLECTIONS = {
   MUTUAL_FUNDS: 'mutualFunds',
   MARKET_DATA: 'marketData',
   NEWS_ARTICLES: 'newsArticles',
-  IPO_DATA: 'ipoData'
+  IPO_DATA: 'ipoData',
+  CA_PROFILES: 'caProfiles',
+  CA_CONTACT_REQUESTS: 'caContactRequests'
 } as const;

@@ -35,6 +35,8 @@ import NRONREComparison from "@/pages/nri/NRONREComparison";
 import NRIIncomeTaxCalculator from "@/pages/nri/NRIIncomeTaxCalculator";
 import RepatriationPlanner from "@/pages/nri/RepatriationPlanner";
 import RentReceiptGenerator from "@/pages/RentReceiptGenerator";
+import FindCA from "@/pages/FindCA";
+import CARegister from "@/pages/CARegister";
 import Profile from "@/pages/Profile";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminUsers from "@/pages/admin/AdminUsers";
@@ -158,6 +160,8 @@ function Router() {
         <Route path="/nri/income-tax-calculator" component={NRIIncomeTaxCalculator} />
         <Route path="/nri/repatriation-planner" component={RepatriationPlanner} />
         <Route path="/tools/rent-receipt" component={RentReceiptGenerator} />
+        <Route path="/find-ca" component={FindCA} />
+        <Route path="/ca/register" component={CARegister} />
         <Route path="/about" component={About} />
         <Route path="/contact" component={Contact} />
         <Route path="/privacy-policy" component={PrivacyPolicy} />
