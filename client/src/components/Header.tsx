@@ -106,6 +106,17 @@ export default function Header({ showModal }: HeaderProps = {}) {
               Blog
             </Link>
 
+            {/* Find a CA — prominent direct link */}
+            <Link
+              href="/find-ca"
+              onClick={() => trackButtonClick("Find a CA", "Header Navigation")}
+              className="flex items-center gap-1.5 text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+              data-testid="link-header-find-ca"
+            >
+              <UserCheck className="w-4 h-4" />
+              Find a CA
+            </Link>
+
             {/* More dropdown */}
             <div ref={moreRef} className="relative">
               <button
@@ -117,11 +128,6 @@ export default function Header({ showModal }: HeaderProps = {}) {
               </button>
               {moreOpen && (
                 <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-slate-200 rounded-xl shadow-lg py-1.5 z-50">
-                  <Link href="/find-ca" onClick={() => { trackButtonClick("Find a CA", "Header More"); setMoreOpen(false); }} className={dropItem}>
-                    <UserCheck className="w-4 h-4 text-blue-500" />
-                    Find a CA
-                  </Link>
-                  <div className="border-t border-slate-100 my-1" />
                   <Link href="/accounting" onClick={() => { trackButtonClick("Accounting", "Header More"); setMoreOpen(false); }} className={dropItem}>
                     Accounting
                   </Link>

@@ -221,6 +221,15 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                     </Button>
                     <Button
                       variant="outline"
+                      onClick={() => window.location.href = "/find-ca"}
+                      className="border border-blue-200 text-blue-700 hover:border-blue-400 hover:bg-blue-50 px-6 py-4 rounded-lg font-semibold transition-colors"
+                      data-testid="button-find-ca-hero"
+                    >
+                      <UserCheck className="mr-2 h-4 w-4" />
+                      Find a CA
+                    </Button>
+                    <Button
+                      variant="outline"
                       onClick={() => window.location.href = "/blog"}
                       className="border border-slate-300 text-slate-700 hover:border-slate-400 px-6 py-4 rounded-lg font-semibold transition-colors"
                     >
