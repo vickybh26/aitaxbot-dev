@@ -29,6 +29,7 @@ import {
   BarChart2,
   Users,
   ChevronDown,
+  UserCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import logoImage from "@assets/aitaxbot-logo-lovable.png";
@@ -622,6 +623,28 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                   </Button>
                 </div>
 
+                {/* Find a CA Card */}
+                <a
+                  href="/find-ca"
+                  className="block bg-white rounded-2xl p-5 border border-blue-100 hover:border-blue-300 hover:shadow-md transition-all group"
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-9 h-9 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-600 transition-colors">
+                      <UserCheck className="w-5 h-5 text-blue-600 group-hover:text-white transition-colors" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-slate-800 text-sm leading-tight">Need a CA for ITR filing?</p>
+                      <p className="text-xs text-slate-500">Free introduction — no fees</p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-500 leading-relaxed">
+                    Connect with a verified, practicing Chartered Accountant near you. Deadline: <span className="font-semibold text-orange-600">July 31, 2026</span>.
+                  </p>
+                  <div className="mt-3 text-xs font-semibold text-blue-600 flex items-center gap-1 group-hover:gap-2 transition-all">
+                    Find a CA near you <ArrowRight className="w-3.5 h-3.5" />
+                  </div>
+                </a>
+
               </div>
             </aside>
 
@@ -639,7 +662,8 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                   <div className="text-slate-400 text-xs">Smart Tax Calculator for India</div>
                 </div>
               </div>
-              <div className="flex space-x-6 text-sm text-slate-400">
+              <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-400 justify-center md:justify-end">
+                <a href="/find-ca" className="hover:text-white transition-colors font-medium text-blue-400 hover:text-blue-300">Find a CA</a>
                 <a href="/privacy-policy" className="hover:text-white transition-colors">Privacy</a>
                 <a href="/terms-of-service" className="hover:text-white transition-colors">Terms</a>
                 <a href="/contact" className="hover:text-white transition-colors">Contact</a>

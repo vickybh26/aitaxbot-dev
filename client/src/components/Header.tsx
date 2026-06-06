@@ -7,7 +7,7 @@ import { logout } from "@/lib/firebase";
 import logoImage from "@assets/aitaxbot-logo-lovable.png";
 import {
   Menu, X, Calculator, LogOut, User, LayoutDashboard,
-  Globe, Shield, ChevronDown,
+  Globe, Shield, ChevronDown, UserCheck,
 } from "lucide-react";
 import { useTranslation, type Lang } from "@/lib/i18n";
 
@@ -116,7 +116,12 @@ export default function Header({ showModal }: HeaderProps = {}) {
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform ${moreOpen ? "rotate-180" : ""}`} />
               </button>
               {moreOpen && (
-                <div className="absolute top-full left-0 mt-2 w-44 bg-white border border-slate-200 rounded-xl shadow-lg py-1.5 z-50">
+                <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-slate-200 rounded-xl shadow-lg py-1.5 z-50">
+                  <Link href="/find-ca" onClick={() => { trackButtonClick("Find a CA", "Header More"); setMoreOpen(false); }} className={dropItem}>
+                    <UserCheck className="w-4 h-4 text-blue-500" />
+                    Find a CA
+                  </Link>
+                  <div className="border-t border-slate-100 my-1" />
                   <Link href="/accounting" onClick={() => { trackButtonClick("Accounting", "Header More"); setMoreOpen(false); }} className={dropItem}>
                     Accounting
                   </Link>
@@ -244,6 +249,9 @@ export default function Header({ showModal }: HeaderProps = {}) {
             </Link>
             <Link href="/accounting" onClick={() => setMobileMenuOpen(false)} className="py-2.5 text-sm font-medium text-slate-700 block">Accounting</Link>
             <Link href="/blog" onClick={() => setMobileMenuOpen(false)} className="py-2.5 text-sm font-medium text-slate-700 block">Blog</Link>
+            <Link href="/find-ca" onClick={() => { trackButtonClick("Find a CA", "Mobile Header"); setMobileMenuOpen(false); }} className="flex items-center gap-2 py-2.5 text-sm font-medium text-blue-600">
+              <UserCheck className="w-4 h-4" />Find a CA
+            </Link>
             <Link href="/about" onClick={() => setMobileMenuOpen(false)} className="py-2.5 text-sm font-medium text-slate-700 block">About</Link>
             <Link href="/contact" onClick={() => setMobileMenuOpen(false)} className="py-2.5 text-sm font-medium text-slate-700 block">Contact</Link>
 
