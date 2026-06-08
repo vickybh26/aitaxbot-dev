@@ -54,6 +54,11 @@ export default function About() {
                   <h3 className="text-xl font-semibold text-orange-900 mb-3">📰 Latest Tax Updates</h3>
                   <p className="text-gray-700">Stay informed with simplified tax news, law changes, and financial alerts.</p>
                 </div>
+
+                <div className="bg-teal-50 rounded-lg p-6">
+                  <h3 className="text-xl font-semibold text-teal-900 mb-3">🔍 Find a CA Directory</h3>
+                  <p className="text-gray-700">Browse verified Chartered Accountants and send your tax enquiry directly — free, with no platform fee.</p>
+                </div>
               </div>
             </section>
 
@@ -108,6 +113,44 @@ export default function About() {
                     <p className="text-gray-700">Designed with the expertise of a CA who understands the challenges of tax filing and compliance.</p>
                   </div>
                 </div>
+              </div>
+            </section>
+
+            {/* Find a CA section */}
+            <section className="mb-10">
+              <h2 className="text-2xl font-semibold text-gray-900 mb-6">Find a CA — Free Directory Service</h2>
+              <div className="bg-gradient-to-r from-teal-50 to-blue-50 border border-teal-100 rounded-lg p-8">
+                <p className="text-gray-800 leading-relaxed mb-4">
+                  We understand that calculators answer "how much" — but sometimes you need a qualified
+                  professional to answer "what next." That's why AiTaxBot maintains a free directory of
+                  Chartered Accountants (CAs) across India.
+                </p>
+                <p className="text-gray-800 leading-relaxed mb-4">
+                  CAs list their own profiles voluntarily. Users can browse by city and service area, and
+                  send an enquiry directly to any CA. <strong>AiTaxBot charges no fee</strong> — to users
+                  or to CAs — for this service.
+                </p>
+                <p className="text-gray-700 text-sm leading-relaxed mb-4">
+                  <strong>Important:</strong> AiTaxBot is an informational platform only. We do not recommend,
+                  refer, rank, or endorse any CA. Profiles are shown in alphabetical order. We advise all users
+                  to verify a CA's ICAI membership number at{" "}
+                  <a
+                    href="https://www.icai.org/post.html?post_id=11967"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 underline"
+                  >
+                    icai.org
+                  </a>{" "}
+                  before engaging their services. Full terms are available in our{" "}
+                  <a href="/find-ca#disclaimer" className="text-blue-600 underline">Find a CA Disclaimer</a>.
+                </p>
+                <a
+                  href="/find-ca"
+                  className="inline-block bg-teal-600 text-white px-6 py-3 rounded-lg hover:bg-teal-700 transition-colors font-medium"
+                >
+                  Browse CA Directory →
+                </a>
               </div>
             </section>
 

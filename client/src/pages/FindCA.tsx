@@ -124,12 +124,12 @@ export default function FindCA() {
           <div className="max-w-3xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 bg-white/20 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
               <Shield className="w-4 h-4" />
-              Free Introduction · ICAI Verified
+              Free · No Platform Fee · ICAI Verified
             </div>
             <h1 className="text-3xl sm:text-4xl font-bold mb-3">Find a Chartered Accountant</h1>
             <p className="text-blue-100 max-w-xl mx-auto mb-8">
-              Connect with practicing CAs for ITR filing, tax planning, NRI taxation, and more.
-              Free introduction service — no platform fee.
+              Browse CA profiles and send your enquiry directly. CAs respond at their own discretion.
+              No fees charged to users or CAs.
             </p>
 
             {/* Search bar */}
@@ -161,20 +161,23 @@ export default function FindCA() {
         </div>
 
         {/* Compliance banner */}
-        <div className="bg-amber-50 border-b border-amber-100 py-2 px-4">
+        <div className="bg-amber-50 border-b border-amber-100 py-2.5 px-4">
           <div className="max-w-5xl mx-auto flex items-center gap-2 text-xs text-amber-700">
             <BookOpen className="w-3.5 h-3.5 flex-shrink-0" />
-            AiTaxBot is a technology platform and does not recommend or endorse any CA. Profiles
-            are listed in alphabetical order only. Please verify credentials at{" "}
-            <a
-              href="https://www.icai.org/post.html?post_id=11967"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline font-medium"
-            >
-              ICAI Member Search
-            </a>{" "}
-            before engaging professional services.
+            <span>
+              <strong>Informational directory only.</strong> AiTaxBot does not recommend, endorse, or refer any CA.
+              Profiles are listed alphabetically. CAs are solely responsible for their professional conduct.
+              Verify membership at{" "}
+              <a
+                href="https://www.icai.org/post.html?post_id=11967"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline font-medium"
+              >
+                ICAI Member Search
+              </a>{" "}
+              before engaging any professional. <a href="#disclaimer" className="underline font-medium">Full disclaimer ↓</a>
+            </span>
           </div>
         </div>
 
@@ -275,7 +278,7 @@ export default function FindCA() {
                     onClick={() => { setContactCA(ca); setSent(false); }}
                   >
                     <Mail className="w-3.5 h-3.5 mr-1" />
-                    Get Intro
+                    Send Enquiry
                   </Button>
                   {ca.whatsappNumber && (
                     <a
@@ -298,16 +301,97 @@ export default function FindCA() {
             <div className="mt-12 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-2xl p-6 text-center">
               <h3 className="font-semibold text-slate-800 mb-1">Are you a Chartered Accountant?</h3>
               <p className="text-sm text-slate-500 mb-4">
-                List your practice for free. Connect with taxpayers actively looking for CA help
-                during ITR filing season.
+                List your profile for free. Users looking for CA help during ITR filing season will
+                be able to send you enquiries directly.
               </p>
               <a href="/ca/register">
                 <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                  List Your Practice — It's Free
+                  List Your Profile — It's Free
                 </Button>
               </a>
             </div>
           )}
+
+          {/* ── Full Disclaimer ── */}
+          <div id="disclaimer" className="mt-10 bg-white border border-slate-200 rounded-2xl p-6 text-xs text-slate-500 leading-relaxed space-y-3">
+            <h2 className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+              <BookOpen className="w-4 h-4" />
+              Disclaimer — CA Directory &amp; Enquiry Service
+            </h2>
+
+            <p>
+              <strong className="text-slate-600">Nature of service.</strong> AiTaxBot ("Platform") operates as an
+              informational directory that displays publicly available details of Chartered Accountants (CAs) who
+              have voluntarily chosen to list their profiles. The Platform also provides a facility for users to
+              submit unsolicited enquiries that are forwarded to the selected CA. This is a passive technology
+              service only.
+            </p>
+
+            <p>
+              <strong className="text-slate-600">No referral, recommendation, or endorsement.</strong> AiTaxBot
+              does not recommend, refer, guarantee, rate, rank, or endorse any CA listed on this directory.
+              Profiles are displayed in alphabetical order only. No paid placement or premium ranking exists.
+              The display of a CA profile does not constitute a representation as to the quality, competence,
+              or suitability of that CA for any particular matter.
+            </p>
+
+            <p>
+              <strong className="text-slate-600">No fees charged.</strong> AiTaxBot does not charge any fee to
+              users for submitting enquiries, nor does it charge CAs for being listed on this directory. This
+              service is provided free of charge as a public convenience.
+            </p>
+
+            <p>
+              <strong className="text-slate-600">CA responds at their own discretion.</strong> Submission of an
+              enquiry does not create any obligation on the part of the CA to respond. The CA decides
+              independently whether to accept or decline any matter. No professional relationship is created
+              between the user and any CA by reason of using this Platform.
+            </p>
+
+            <p>
+              <strong className="text-slate-600">Verify before engaging.</strong> Users are strongly advised to
+              independently verify the ICAI membership number and Certificate of Practice status of any CA
+              before engaging their services or making any payment. Verification can be done at{" "}
+              <a
+                href="https://www.icai.org/post.html?post_id=11967"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline text-blue-600"
+              >
+                ICAI Member Search
+              </a>.
+            </p>
+
+            <p>
+              <strong className="text-slate-600">ICAI guidelines.</strong> CAs listed on this Platform are
+              individually responsible for ensuring their profile content and conduct comply with the
+              Chartered Accountants Act, 1949, the Code of Ethics issued by ICAI, and all applicable
+              regulations. AiTaxBot does not verify compliance with ICAI advertising guidelines and accepts
+              no liability for any professional misconduct by any listed CA.
+            </p>
+
+            <p>
+              <strong className="text-slate-600">Limitation of liability.</strong> AiTaxBot is not a party to
+              any professional engagement between the user and any CA. AiTaxBot shall not be liable for
+              any professional advice given or omitted, any fees charged, or any outcome of the user's
+              engagement with any CA. Users engage professional services entirely at their own risk.
+            </p>
+
+            <p>
+              <strong className="text-slate-600">Data.</strong> Contact details submitted through the enquiry
+              form are shared only with the specific CA selected by the user, for the sole purpose of
+              enabling the user to seek professional services. Details are not sold, shared with third parties,
+              or used for any other purpose. See our{" "}
+              <a href="/privacy" className="underline text-blue-600">Privacy Policy</a> for full details.
+            </p>
+
+            <p className="pt-1 border-t border-slate-100">
+              For questions about this disclaimer, contact us at{" "}
+              <a href="mailto:support@aitaxbot.co.in" className="underline text-blue-600">
+                support@aitaxbot.co.in
+              </a>.
+            </p>
+          </div>
         </div>
       </div>
 
@@ -317,7 +401,7 @@ export default function FindCA() {
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="flex items-start justify-between p-6 pb-0">
               <div>
-                <h2 className="text-lg font-bold text-slate-800">Request Introduction</h2>
+                <h2 className="text-lg font-bold text-slate-800">Send an Enquiry</h2>
                 <p className="text-sm text-slate-500 mt-0.5">
                   to <strong>{contactCA.fullName}</strong>
                   {contactCA.firmName ? `, ${contactCA.firmName}` : ""}
@@ -333,30 +417,33 @@ export default function FindCA() {
                 <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
                   <CheckCircle2 className="w-7 h-7 text-green-600" />
                 </div>
-                <h3 className="font-semibold text-slate-800 mb-1">Introduction Sent!</h3>
+                <h3 className="font-semibold text-slate-800 mb-1">Enquiry Sent!</h3>
                 <p className="text-sm text-slate-500 mb-4">
-                  {contactCA.fullName} will reach out to you directly. We've also sent you a
-                  confirmation email.
+                  Your enquiry has been forwarded to {contactCA.fullName}. The CA will contact you
+                  directly at their discretion. Response times vary by individual CA.
                 </p>
                 <Button onClick={closeModal} variant="outline" className="w-full">Close</Button>
                 <p className="text-xs text-slate-400 mt-3">
-                  Reminder: Please verify ICAI credentials before engaging professional services.
+                  Please verify ICAI membership number at icai.org before engaging or paying any fees.
                 </p>
               </div>
             ) : (
               <form onSubmit={sendContact} className="p-6 space-y-4">
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-700">
-                  AiTaxBot is a technology introduction service. We do not recommend or endorse any
-                  CA. Please verify credentials at{" "}
-                  <a
-                    href="https://www.icai.org/post.html?post_id=11967"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline"
-                  >
-                    ICAI Member Search
-                  </a>{" "}
-                  before engaging.
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-700 space-y-1">
+                  <p><strong>You are sending an enquiry directly to this CA.</strong> AiTaxBot only
+                  forwards your message — it does not recommend, guarantee, or vouch for any CA.</p>
+                  <p>The CA will respond at their own discretion. AiTaxBot charges no fee to you or the CA for this.</p>
+                  <p>Verify ICAI membership at{" "}
+                    <a
+                      href="https://www.icai.org/post.html?post_id=11967"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline font-medium"
+                    >
+                      icai.org
+                    </a>{" "}
+                    before making any payment or sharing financial documents.
+                  </p>
                 </div>
 
                 <div>
@@ -419,13 +506,14 @@ export default function FindCA() {
                   {sending ? (
                     <><Loader2 className="w-4 h-4 animate-spin mr-2" />Sending…</>
                   ) : (
-                    "Send Introduction Request"
+                    "Send My Enquiry"
                   )}
                 </Button>
 
                 <p className="text-xs text-slate-400 text-center">
-                  By submitting, you agree that AiTaxBot may share your contact details with the
-                  selected CA for the purpose of this introduction only.
+                  By submitting, you consent to AiTaxBot forwarding your contact details and enquiry
+                  to the selected CA for the sole purpose of enabling you to seek their professional
+                  services. No fees are charged for this service.
                 </p>
               </form>
             )}
