@@ -90,7 +90,7 @@ router.post("/register", async (req: Request, res: Response) => {
             <tr><td style="padding:8px;border:1px solid #ddd"><b>Bio</b></td><td style="padding:8px;border:1px solid #ddd">${profileData.bio || "—"}</td></tr>
           </table>
           <p style="margin-top:16px">
-            <a href="https://aitaxbot.co.in/admin" style="background:#2563eb;color:white;padding:10px 20px;border-radius:6px;text-decoration:none">
+            <a href="https://aitaxbot.co.in/admin/cas" style="background:#2563eb;color:white;padding:10px 20px;border-radius:6px;text-decoration:none">
               Approve in Admin Panel
             </a>
           </p>
