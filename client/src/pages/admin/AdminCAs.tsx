@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/contexts/AuthContext";
-import { CheckCircle, XCircle, Eye, RefreshCw, Users } from "lucide-react";
+import { CheckCircle, XCircle, Eye, RefreshCw, Users, Trash2, AlertTriangle } from "lucide-react";
 
 type CAStatus = "all" | "pending" | "approved" | "rejected";
 
@@ -65,6 +65,15 @@ async function rejectCA(token: string, id: string, reason: string) {
   return r.json();
 }
 
+async function deleteCA(token: string, id: string) {
+  const r = await fetch(`/api/admin/ca/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!r.ok) throw new Error("Failed to delete");
+  return r.json();
+}
+
 const STATUS_COLOURS: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
   approved: "bg-green-100 text-green-800 border-green-200",
@@ -86,6 +95,7 @@ export default function AdminCAs() {
   const [rejectOpen, setRejectOpen] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
   const [viewOpen, setViewOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["admin-cas", activeTab],
@@ -112,6 +122,19 @@ export default function AdminCAs() {
       qc.invalidateQueries({ queryKey: ["admin-cas"] });
       setRejectOpen(false);
       setRejectReason("");
+      setSelected(null);
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const token = await getIdToken();
+      return deleteCA(token!, id);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin-cas"] });
+      setDeleteOpen(false);
+      setViewOpen(false);
       setSelected(null);
     },
   });
@@ -230,6 +253,15 @@ export default function AdminCAs() {
                             </button>
                           </>
                         )}
+                        {(adminLevel ?? 0) <= 1 && (
+                          <button
+                            title="Delete permanently"
+                            onClick={() => { setSelected(ca); setDeleteOpen(true); }}
+                            className="p-1 text-slate-400 hover:text-red-700 transition-colors"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -267,7 +299,16 @@ export default function AdminCAs() {
               />
             </div>
           )}
-          <DialogFooter>
+          <DialogFooter className="flex-wrap gap-2">
+            {(adminLevel ?? 0) <= 1 && (
+              <Button
+                variant="outline"
+                className="text-red-700 border-red-300 hover:bg-red-50 mr-auto"
+                onClick={() => { setViewOpen(false); setDeleteOpen(true); }}
+              >
+                <Trash2 className="h-4 w-4 mr-1" /> Delete
+              </Button>
+            )}
             {(adminLevel ?? 0) <= 2 && selected?.status === "pending" && (
               <>
                 <Button
@@ -285,6 +326,40 @@ export default function AdminCAs() {
                 </Button>
               </>
             )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Modal */}
+      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-700">
+              <AlertTriangle className="h-5 w-5" />
+              Delete CA Profile
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <p className="text-sm text-slate-700">
+              You are about to <strong>permanently delete</strong> the profile for:
+            </p>
+            <div className="bg-slate-50 rounded-lg p-3 text-sm">
+              <p className="font-semibold">{selected?.fullName}</p>
+              <p className="text-slate-500">ICAI: {selected?.icaiMembershipNumber} · {selected?.email}</p>
+            </div>
+            <p className="text-sm text-red-600 font-medium">
+              This action cannot be undone. The CA will need to re-register if deleted by mistake.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteOpen(false)}>Cancel</Button>
+            <Button
+              className="bg-red-700 hover:bg-red-800 text-white"
+              disabled={deleteMutation.isPending}
+              onClick={() => deleteMutation.mutate(selected!.id)}
+            >
+              {deleteMutation.isPending ? "Deleting…" : "Yes, Delete Permanently"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

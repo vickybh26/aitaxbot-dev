@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import AdminLayout from "@/components/AdminLayout";
@@ -17,10 +17,18 @@ import {
   CheckCircle2,
   Circle,
   Filter,
+  AlertTriangle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -418,6 +426,24 @@ function CRMDrawer({
             </>
           ) : null}
         </div>
+
+        {/* Super Admin: delete user */}
+        {adminLevel === 1 && (
+          <div className="p-4 border-t border-slate-200 bg-red-50">
+            <p className="text-xs text-red-600 font-medium mb-2 flex items-center gap-1">
+              <AlertTriangle className="w-3.5 h-3.5" /> Danger Zone
+            </p>
+            <button
+              onClick={() => {
+                // Dispatch a custom event so the parent page can open the confirm dialog
+                window.dispatchEvent(new CustomEvent("admin:delete-user-request", { detail: userId }));
+              }}
+              className="text-xs text-red-700 border border-red-300 rounded px-3 py-1.5 hover:bg-red-100 transition-colors w-full font-medium"
+            >
+              Delete this user account permanently
+            </button>
+          </div>
+        )}
       </aside>
     </div>
   );
@@ -436,6 +462,45 @@ export default function AdminUsers() {
   const [stateFilter, setStateFilter] = useState("");
   const [tagFilter, setTagFilter] = useState("");
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
+  const [deleteUserOpen, setDeleteUserOpen] = useState(false);
+  const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
+
+  const qc = useQueryClient();
+
+  const deleteUserMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const token = await getIdToken();
+      const r = await fetch(`/api/admin/users/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!r.ok) throw new Error("Failed to delete user");
+      return r.json();
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      setDeleteUserOpen(false);
+      setDeletingUserId(null);
+      setSelectedUser(null);
+      toast({ title: "User deleted", description: "The user account has been removed." });
+    },
+    onError: () => {
+      toast({ title: "Delete failed", variant: "destructive" });
+    },
+  });
+
+  // Listen for delete-user events from the CRM drawer (child component)
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const userId = (e as CustomEvent).detail;
+      if (userId) {
+        setDeletingUserId(userId);
+        setDeleteUserOpen(true);
+      }
+    };
+    window.addEventListener("admin:delete-user-request", handler);
+    return () => window.removeEventListener("admin:delete-user-request", handler);
+  }, []);
 
   const handleSearch = (v: string) => {
     setSearch(v);
@@ -629,6 +694,36 @@ export default function AdminUsers() {
       {selectedUser && (
         <CRMDrawer userId={selectedUser.id} onClose={() => setSelectedUser(null)} />
       )}
+
+      {/* Delete User Confirmation */}
+      <Dialog open={deleteUserOpen} onOpenChange={setDeleteUserOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-700">
+              <AlertTriangle className="h-5 w-5" />
+              Delete User Account
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <p className="text-sm text-slate-700">
+              You are about to <strong>permanently delete</strong> this user account and all associated data.
+            </p>
+            <p className="text-sm text-red-600 font-medium">
+              This action cannot be undone. The user will be signed out immediately.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setDeleteUserOpen(false); setDeletingUserId(null); }}>Cancel</Button>
+            <Button
+              className="bg-red-700 hover:bg-red-800 text-white"
+              disabled={deleteUserMutation.isPending}
+              onClick={() => deletingUserId && deleteUserMutation.mutate(deletingUserId)}
+            >
+              {deleteUserMutation.isPending ? "Deleting…" : "Yes, Delete Account"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 }

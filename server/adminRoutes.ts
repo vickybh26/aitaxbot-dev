@@ -587,6 +587,55 @@ router.post("/ca/:id/reject", adminL2, async (req: any, res) => {
   }
 });
 
+// DELETE /api/admin/ca/:id — permanently remove a CA profile (Super Admin only)
+router.delete("/ca/:id", adminL1, async (req: any, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) return res.status(400).json({ error: "id required" });
+
+    const db = getFirestore();
+    const ref = db.collection(COLLECTIONS.CA_PROFILES).doc(id);
+    const snap = await ref.get();
+    if (!snap.exists) return res.status(404).json({ error: "CA profile not found" });
+
+    const caData: any = snap.data();
+    await ref.delete();
+
+    console.log(`[Admin] CA profile deleted: ${id} (${caData?.fullName || "unknown"}) by admin ${req.userId}`);
+    res.json({ success: true, deleted: id });
+  } catch (err) {
+    console.error("[Admin] CA delete error:", err);
+    res.status(500).json({ error: "Failed to delete CA profile" });
+  }
+});
+
+// DELETE /api/admin/users/:id — permanently delete a user account (Super Admin only)
+router.delete("/users/:id", adminL1, async (req: any, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) return res.status(400).json({ error: "id required" });
+
+    // Prevent accidental self-deletion
+    if (id === req.userId) {
+      return res.status(400).json({ error: "You cannot delete your own account" });
+    }
+
+    const db = getFirestore();
+    const ref = db.collection("users").doc(id);
+    const snap = await ref.get();
+    if (!snap.exists) return res.status(404).json({ error: "User not found" });
+
+    const userData: any = snap.data();
+    await ref.delete();
+
+    console.log(`[Admin] User deleted: ${id} (${userData?.email || "unknown"}) by admin ${req.userId}`);
+    res.json({ success: true, deleted: id });
+  } catch (err) {
+    console.error("[Admin] User delete error:", err);
+    res.status(500).json({ error: "Failed to delete user" });
+  }
+});
+
 // ─────────────────────────────────────────────────────────────────────────────
 // LEADS
 // ─────────────────────────────────────────────────────────────────────────────
