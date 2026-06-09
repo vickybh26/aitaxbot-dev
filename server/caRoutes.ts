@@ -56,6 +56,39 @@ router.post("/register", async (req: Request, res: Response) => {
     const { agreeToEthics, ...profileData } = parsed.data;
 
     const db = getFirestore();
+
+    // ── Duplicate checks (run in parallel for speed) ────────────────────────
+    // Each uses a single-field equality query — no composite index required.
+    const [icaiSnap, emailSnap] = await Promise.all([
+      db.collection(COLLECTIONS.CA_PROFILES)
+        .where("icaiMembershipNumber", "==", profileData.icaiMembershipNumber)
+        .limit(1).get(),
+      db.collection(COLLECTIONS.CA_PROFILES)
+        .where("email", "==", profileData.email)
+        .limit(1).get(),
+    ]);
+
+    if (!icaiSnap.empty) {
+      const ex = icaiSnap.docs[0].data();
+      const statusLabel =
+        ex.status === "approved"  ? "is already live in our directory" :
+        ex.status === "pending"   ? "is already under review" :
+                                    "was previously submitted";
+      return res.status(409).json({
+        error: `ICAI membership number ${profileData.icaiMembershipNumber} ${statusLabel}. To update your profile or resolve an issue, email support@aitaxbot.co.in`,
+      });
+    }
+
+    if (!emailSnap.empty) {
+      const ex = emailSnap.docs[0].data();
+      const statusLabel =
+        ex.status === "approved" ? "is already active" : "is already under review";
+      return res.status(409).json({
+        error: `A CA profile with this email address ${statusLabel}. To update your details, email support@aitaxbot.co.in`,
+      });
+    }
+    // ── End duplicate checks ─────────────────────────────────────────────────
+
     const id = randomUUID();
     const now = new Date().toISOString();
 

@@ -49,23 +49,52 @@ router.post("/capture", async (req: Request, res: Response) => {
     const id = randomUUID();
     const now = new Date().toISOString();
 
-    // Check for duplicate email (same source within 24h) to avoid spam
-    const existing = await db
+    const WINDOW_24H = 24 * 60 * 60 * 1000;
+    const WINDOW_7D  =  7 * 24 * 60 * 60 * 1000;
+
+    // ── Duplicate check 1: email (same source, 24 h) ────────────────────────
+    // NOTE: two-field .where() chain — Firestore may use a merge-join on the
+    // auto single-field indexes; works for small collections without a
+    // composite index. If this throws in future, move to single-field + memory filter.
+    const emailSnap = await db
       .collection(COLLECTIONS.LEADS)
       .where("email", "==", data.email)
       .where("source", "==", data.source)
       .limit(1)
       .get();
 
-    if (!existing.empty) {
-      const existingLead = existing.docs[0].data() as Lead;
-      const createdAt = new Date(existingLead.createdAt as string).getTime();
-      const age = Date.now() - createdAt;
-      if (age < 24 * 60 * 60 * 1000) {
-        // Already captured within 24h from same source — still return success (don't expose duplicates)
+    if (!emailSnap.empty) {
+      const age = Date.now() - new Date((emailSnap.docs[0].data() as Lead).createdAt as string).getTime();
+      if (age < WINDOW_24H) {
         return res.status(200).json({ success: true, duplicate: true });
       }
     }
+
+    // ── Duplicate check 2: WhatsApp number (same source, 7 days) ────────────
+    // Single-field equality — auto-indexed, no composite index required.
+    // Filter by source + window in memory after fetch.
+    if (data.whatsapp) {
+      const waSnap = await db
+        .collection(COLLECTIONS.LEADS)
+        .where("whatsapp", "==", data.whatsapp)
+        .limit(20)
+        .get();
+
+      if (!waSnap.empty) {
+        const sevenDaysAgo = Date.now() - WINDOW_7D;
+        const sameSourceRecent = waSnap.docs.some((doc) => {
+          const d = doc.data() as Lead;
+          return (
+            d.source === data.source &&
+            new Date(d.createdAt as string).getTime() > sevenDaysAgo
+          );
+        });
+        if (sameSourceRecent) {
+          return res.status(200).json({ success: true, duplicate: true });
+        }
+      }
+    }
+    // ── End duplicate checks ─────────────────────────────────────────────────
 
     const lead: Lead = { id, ...data, createdAt: now };
     await db.collection(COLLECTIONS.LEADS).doc(id).set(lead);
