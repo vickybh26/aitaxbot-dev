@@ -697,7 +697,7 @@ export default function AdminUsers() {
 
       {/* Delete User Confirmation */}
       <Dialog open={deleteUserOpen} onOpenChange={setDeleteUserOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md bg-white">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-red-700">
               <AlertTriangle className="h-5 w-5" />

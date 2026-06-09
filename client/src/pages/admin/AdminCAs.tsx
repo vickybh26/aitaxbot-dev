@@ -274,7 +274,7 @@ export default function AdminCAs() {
 
       {/* View Profile Modal */}
       <Dialog open={viewOpen} onOpenChange={setViewOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg bg-white">
           <DialogHeader>
             <DialogTitle>CA Profile — {selected?.fullName}</DialogTitle>
           </DialogHeader>
@@ -332,7 +332,7 @@ export default function AdminCAs() {
 
       {/* Delete Confirmation Modal */}
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md bg-white">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-red-700">
               <AlertTriangle className="h-5 w-5" />
@@ -366,7 +366,7 @@ export default function AdminCAs() {
 
       {/* Reject Modal */}
       <Dialog open={rejectOpen} onOpenChange={setRejectOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md bg-white">
           <DialogHeader>
             <DialogTitle>Reject CA — {selected?.fullName}</DialogTitle>
           </DialogHeader>
