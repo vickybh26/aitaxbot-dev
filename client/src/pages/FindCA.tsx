@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import {
-  Search, MapPin, Mail, MessageCircle, Phone, Shield, ChevronDown,
-  BookOpen, ExternalLink, Loader2, AlertCircle, CheckCircle2, X
+  Search, MapPin, Mail, Shield, ChevronDown,
+  BookOpen, Loader2, AlertCircle, CheckCircle2, X, CheckCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -225,9 +225,6 @@ export default function FindCA() {
                   </div>
                   <div className="min-w-0">
                     <h3 className="font-semibold text-slate-800 text-sm leading-tight truncate">{ca.fullName}</h3>
-                    {ca.firmName && (
-                      <p className="text-xs text-slate-500 truncate">{ca.firmName}</p>
-                    )}
                     <div className="flex items-center gap-1 mt-0.5">
                       <Shield className="w-3 h-3 text-green-500" />
                       <span className="text-xs text-green-600 font-medium">ICAI {ca.icaiMembershipNumber}</span>
@@ -280,17 +277,6 @@ export default function FindCA() {
                     <Mail className="w-3.5 h-3.5 mr-1" />
                     Send Enquiry
                   </Button>
-                  {ca.whatsappNumber && (
-                    <a
-                      href={`https://wa.me/${ca.whatsappNumber.replace(/\D/g, "")}?text=Hi%20${encodeURIComponent(ca.fullName)}%2C%20I%20found%20your%20profile%20on%20AiTaxBot%20and%20need%20help%20with%20my%20taxes.`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <Button size="sm" variant="outline" className="h-8 px-2.5 border-green-200 text-green-600 hover:bg-green-50">
-                        <MessageCircle className="w-3.5 h-3.5" />
-                      </Button>
-                    </a>
-                  )}
                 </div>
               </div>
             ))}
@@ -323,8 +309,8 @@ export default function FindCA() {
               <strong className="text-slate-600">Nature of service.</strong> AiTaxBot ("Platform") operates as an
               informational directory that displays publicly available details of Chartered Accountants (CAs) who
               have voluntarily chosen to list their profiles. The Platform also provides a facility for users to
-              submit unsolicited enquiries that are forwarded to the selected CA. This is a passive technology
-              service only.
+              submit enquiries that are forwarded to the selected CA. This is a passive technology service only.
+              AiTaxBot does not render professional services and is not a party to any professional engagement.
             </p>
 
             <p>
@@ -363,25 +349,25 @@ export default function FindCA() {
             </p>
 
             <p>
-              <strong className="text-slate-600">ICAI guidelines.</strong> CAs listed on this Platform are
-              individually responsible for ensuring their profile content and conduct comply with the
-              Chartered Accountants Act, 1949, the Code of Ethics issued by ICAI, and all applicable
-              regulations. AiTaxBot does not verify compliance with ICAI advertising guidelines and accepts
-              no liability for any professional misconduct by any listed CA.
+              <strong className="text-slate-600">CA responsibility for ICAI compliance.</strong> CAs listed on
+              this Platform are individually responsible for ensuring their profile content and professional
+              conduct comply with the Chartered Accountants Act, 1949, the ICAI Code of Ethics 2026, and all
+              applicable regulations. AiTaxBot does not verify compliance with ICAI advertising guidelines and
+              accepts no liability for any professional misconduct by any listed CA.
             </p>
 
             <p>
               <strong className="text-slate-600">Limitation of liability.</strong> AiTaxBot is not a party to
-              any professional engagement between the user and any CA. AiTaxBot shall not be liable for
-              any professional advice given or omitted, any fees charged, or any outcome of the user's
-              engagement with any CA. Users engage professional services entirely at their own risk.
+              any professional engagement between the user and any CA. AiTaxBot shall not be liable for any
+              professional advice given or omitted, any fees charged, or any outcome of the user's engagement
+              with any CA. Users engage professional services entirely at their own risk.
             </p>
 
             <p>
               <strong className="text-slate-600">Data.</strong> Contact details submitted through the enquiry
-              form are shared only with the specific CA selected by the user, for the sole purpose of
-              enabling the user to seek professional services. Details are not sold, shared with third parties,
-              or used for any other purpose. See our{" "}
+              form are shared only with the specific CA selected by the user, for the sole purpose of enabling
+              the user to seek professional services. Details are not sold, shared with third parties, or used
+              for any other purpose. See our{" "}
               <a href="/privacy" className="underline text-blue-600">Privacy Policy</a> for full details.
             </p>
 
@@ -390,6 +376,141 @@ export default function FindCA() {
               <a href="mailto:support@aitaxbot.co.in" className="underline text-blue-600">
                 support@aitaxbot.co.in
               </a>.
+            </p>
+          </div>
+
+          {/* ── ICAI Code of Ethics Compliance ── */}
+          <div className="mt-6 bg-green-50 border border-green-100 rounded-2xl p-6 text-xs text-slate-600 leading-relaxed">
+            <h2 className="text-sm font-semibold text-slate-700 mb-1 flex items-center gap-2">
+              <Shield className="w-4 h-4 text-green-600" />
+              How This Directory Complies with the ICAI Code of Ethics 2026
+            </h2>
+            <p className="text-slate-500 mb-4">
+              AiTaxBot has designed this directory in accordance with the Chartered Accountants Act, 1949
+              (First Schedule, Part I) and the ICAI Code of Ethics 2026 (13th Edition, effective 1 April 2026),
+              including the Council Guidelines for Advertisement, 2008 (updated December 2025). The following
+              provisions of the Code are directly addressed by our design choices.
+            </p>
+
+            <div className="space-y-3">
+
+              <div className="flex items-start gap-2.5">
+                <CheckCircle className="w-3.5 h-3.5 text-green-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <strong className="text-slate-700">Clause 5, First Schedule Part I — No payment for securing professional business.</strong>{" "}
+                  AiTaxBot charges no fee to CAs for listing and no commission on any engagement. No CA pays
+                  AiTaxBot to obtain clients. This eliminates the core risk under Clause 5 (securing
+                  professional business through a third party for payment).
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <CheckCircle className="w-3.5 h-3.5 text-green-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <strong className="text-slate-700">Clause 6 Proviso (ii), First Schedule Part I — Response to organisation-issued enquiry.</strong>{" "}
+                  Every contact on this platform is a user-initiated enquiry forwarded by the Platform to the CA.
+                  This fits the express safe harbour in Clause 6 Proviso (ii): a CA responding to an enquiry
+                  issued by an organisation is not in violation of the prohibition on solicitation. The CA does
+                  not initiate contact with users.
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <CheckCircle className="w-3.5 h-3.5 text-green-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <strong className="text-slate-700">Clause 6 Item K — No roving circulars or cold outreach.</strong>{" "}
+                  CAs listed here do not send circulars or cold messages to users. The enquiry flow is strictly
+                  one-directional: user → Platform → CA. The Platform does not provide a mechanism for CAs to
+                  mass-contact users or to push their profiles to users who have not searched for them.
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <CheckCircle className="w-3.5 h-3.5 text-green-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <strong className="text-slate-700">§3.1.2(iii), Council Guidelines for Advertisement, 2008 — Directories are a permitted medium.</strong>{" "}
+                  The Council's definition of "write-up" expressly includes writing or display of CA particulars
+                  published "by way of print or electronic mode or otherwise including in… Directories… and
+                  websites." This directory is a permitted medium for CA profile particulars under the
+                  Advertisement Guidelines.
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <CheckCircle className="w-3.5 h-3.5 text-green-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <strong className="text-slate-700">§3.1.3(E) — No testimonials or endorsements.</strong>{" "}
+                  This directory does not display user reviews, star ratings, satisfaction scores, or any
+                  testimonial or endorsement concerning any CA or the fees they charge. Profile content is
+                  limited to factual particulars only.
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <CheckCircle className="w-3.5 h-3.5 text-green-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <strong className="text-slate-700">§3.1.3(F) — No awards, achievements, or positions.</strong>{" "}
+                  CA profiles on this Platform do not display awards, rankings, "Top CA" badges, accreditations,
+                  or positions held (other than ICAI designation and membership number). No comparative claims
+                  about a CA's superiority to other CAs are made or permitted.
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <CheckCircle className="w-3.5 h-3.5 text-green-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <strong className="text-slate-700">§3.4 — Online Third Party Platforms — contact details not displayed.</strong>{" "}
+                  In accordance with §3.4 of the Advertisement Guidelines (which governs non-CA websites
+                  facilitating CA advisory services), the CA's direct contact details — phone number, email
+                  address, and professional address — are not displayed on the public-facing profile. Enquiries
+                  are routed to the CA via the Platform's backend only. Users contact the CA through the
+                  Platform's enquiry form, not through a publicly exposed address.
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <CheckCircle className="w-3.5 h-3.5 text-green-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <strong className="text-slate-700">§3.5 — Application-based Aggregators — non-exclusive services only.</strong>{" "}
+                  §3.5 of the Advertisement Guidelines states: "there is no restriction on listing [with
+                  online aggregators] for non-exclusive Services." All services listed on this Platform —
+                  ITR filing, tax advisory, GST, NRI tax, financial planning — are non-exclusive professional
+                  services. Services exclusively reserved for Chartered Accountants (statutory audit, tax audit
+                  under §44AB) are not offered as selectable categories on this Platform.
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <CheckCircle className="w-3.5 h-3.5 text-green-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <strong className="text-slate-700">§3.6 — Specialised Directories — alphabetical listing.</strong>{" "}
+                  §3.6 expressly permits a CA's name, description and address to appear in "any directory or
+                  list of members of a particular body in which the names are listed alphabetically." Profiles
+                  on this Platform are listed alphabetically. No paid placement, ranking by revenue, or
+                  non-alphabetical ordering is used.
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <CheckCircle className="w-3.5 h-3.5 text-green-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <strong className="text-slate-700">§3.3.14 — Website design must not amount to solicitation.</strong>{" "}
+                  The Platform is designed so that no element of the user interface constitutes solicitation
+                  of professional work on behalf of any CA. There are no "Book Now," "Hire This CA," or
+                  urgency-driven calls to action. The Platform uses neutral language ("Send Enquiry,"
+                  "Informational directory only") throughout.
+                </div>
+              </div>
+
+            </div>
+
+            <p className="mt-4 pt-3 border-t border-green-200 text-slate-500">
+              This compliance framework applies to CAs in practice (Certificate of Practice holders) who are
+              subject to First Schedule Part I of the Chartered Accountants Act, 1949. Non-practising CAs
+              are not subject to these restrictions and may list freely. Nothing in this compliance statement
+              constitutes legal advice. CAs are individually responsible for their own compliance with ICAI
+              rules. Last reviewed against ICAI Code of Ethics 2026 (13th Edition, effective 1 April 2026)
+              and Council Guidelines for Advertisement, 2008 (updated December 2025).
             </p>
           </div>
         </div>
@@ -404,7 +525,6 @@ export default function FindCA() {
                 <h2 className="text-lg font-bold text-slate-800">Send an Enquiry</h2>
                 <p className="text-sm text-slate-500 mt-0.5">
                   to <strong>{contactCA.fullName}</strong>
-                  {contactCA.firmName ? `, ${contactCA.firmName}` : ""}
                 </p>
               </div>
               <button onClick={closeModal} className="text-slate-400 hover:text-slate-600 p-1">
