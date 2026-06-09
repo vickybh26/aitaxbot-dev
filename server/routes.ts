@@ -14,6 +14,7 @@ import caRoutes from "./caRoutes";
 import leadRoutes from "./leadRoutes";
 import toolUsageRoutes from "./toolUsageRoutes";
 import { getFirestore, verifyFirebaseToken, admin } from "./firebase";
+import { COLLECTIONS } from "./firestoreHelper";
 import { TransactionalEmailsApi, TransactionalEmailsApiApiKeys } from '@getbrevo/brevo';
 import { seedTaxRates, getTaxSlabsForCalculation } from "./seedTaxRates";
 import { generateTaxComputationPDF, savePDFToStorage, generateRentReceiptPDF, type TaxComputationData, type RentReceiptData } from "./pdfGenerator";
@@ -359,6 +360,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error getting dashboard insights:", error);
       res.status(500).json({ error: "Failed to generate insights" });
+    }
+  });
+
+  // ==========================================
+  // PUBLIC AUTH HELPERS
+  // ==========================================
+
+  // GET /api/auth/check-email?email=xxx
+  // Returns { exists: boolean } — no auth required (used by lead-capture modal)
+  app.get("/api/auth/check-email", async (req, res) => {
+    try {
+      const email = (req.query.email as string || "").trim().toLowerCase();
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return res.status(400).json({ error: "Invalid email" });
+      }
+      const db = getFirestore();
+      const snap = await db
+        .collection(COLLECTIONS.USERS)
+        .where("email", "==", email)
+        .limit(1)
+        .get();
+      return res.json({ exists: !snap.empty });
+    } catch (err) {
+      console.error("[check-email]", err);
+      return res.status(500).json({ error: "Server error" });
     }
   });
 

@@ -79,6 +79,13 @@
   }
 }
 
+/* Block browser print — computation PDFs are only available via Download button */
+@media print {
+  body {
+    display: none !important;
+  }
+}
+
 /* Modern Design System Classes */
 .bg-primary { background-color: hsl(var(--primary-blue)); }
 .bg-primary-light { background-color: hsl(var(--primary-blue-light)); }

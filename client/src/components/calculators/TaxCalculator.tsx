@@ -80,6 +80,8 @@ interface BothRegimesResult {
 interface TaxCalculatorProps {
   onClose?: () => void;
   onCalculated?: (summaryText: string) => void;
+  /** Called when Download PDF is clicked and user is NOT logged in */
+  onGuestDownload?: () => void;
 }
 
 // ── Regime comparison bar chart ───────────────────────────────────────────────
@@ -140,7 +142,7 @@ function RegimeChart({
   );
 }
 
-export default function TaxCalculator({ onClose, onCalculated }: TaxCalculatorProps = {}) {
+export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }: TaxCalculatorProps = {}) {
   const [activeTab, setActiveTab] = useState('calculator');
   const [isCalculating, setIsCalculating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -1324,8 +1326,14 @@ export default function TaxCalculator({ onClose, onCalculated }: TaxCalculatorPr
                     <Badge variant={result.recommendedRegime === 'old' ? 'default' : 'secondary'} className="text-lg px-4 py-2 text-center">
                       Save ₹{result.savings.toLocaleString('en-IN')}
                     </Badge>
-                    <Button 
-                      onClick={generatePDF}
+                    <Button
+                      onClick={() => {
+                        if (user) {
+                          generatePDF();
+                        } else {
+                          onGuestDownload?.();
+                        }
+                      }}
                       disabled={isGeneratingPDF}
                       variant="outline"
                       className="bg-white hover:bg-primary hover:text-white border-primary text-primary"

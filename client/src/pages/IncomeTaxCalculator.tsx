@@ -2,6 +2,7 @@ import { Helmet } from 'react-helmet-async';
 import { Link } from 'wouter';
 import { useEffect, useState } from 'react';
 import { trackPageView } from '@/lib/analytics';
+import { useAuth } from '@/contexts/AuthContext';
 import FindCABanner from '@/components/FindCABanner';
 import TaxDownloadModal from '@/components/TaxDownloadModal';
 import {
@@ -43,17 +44,37 @@ const incomeTaxFAQs = [
 ];
 
 export default function IncomeTaxCalculatorPage() {
+  const { user } = useAuth();
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [computationSummary, setComputationSummary] = useState("");
 
   useEffect(() => {
     trackPageView('/calculators/income-tax', 'Income Tax Calculator India FY 2026-27 — New vs Old Regime | AiTaxBot');
+
+    // Disable browser print (Ctrl+P / Cmd+P)
+    const blockPrint = (e: KeyboardEvent) => {
+      if (e.key === 'p' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+      }
+    };
+    document.addEventListener('keydown', blockPrint);
+    // Override window.print so programmatic calls also do nothing
+    const origPrint = window.print;
+    window.print = () => {};
+    return () => {
+      document.removeEventListener('keydown', blockPrint);
+      window.print = origPrint;
+    };
   }, []);
 
   function handleCalculated(summaryText: string) {
+    // Only update the summary — no auto-popup
     setComputationSummary(summaryText);
-    // Small delay so user sees the results first
-    setTimeout(() => setShowDownloadModal(true), 1200);
+  }
+
+  // Called by TaxCalculator when Download PDF is clicked and user is NOT logged in
+  function handleGuestDownloadRequest() {
+    setShowDownloadModal(true);
   }
 
   const calculatorSchema = generateCalculatorSchema({
@@ -104,7 +125,10 @@ export default function IncomeTaxCalculatorPage() {
         {/* Calculator */}
         <section className="py-12 px-6">
           <div className="max-w-6xl mx-auto">
-            <TaxCalculator onCalculated={handleCalculated} />
+            <TaxCalculator
+              onCalculated={handleCalculated}
+              onGuestDownload={handleGuestDownloadRequest}
+            />
           </div>
         </section>
 
