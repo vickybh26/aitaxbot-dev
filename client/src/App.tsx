@@ -41,6 +41,8 @@ import Profile from "@/pages/Profile";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminUsers from "@/pages/admin/AdminUsers";
 import AdminAnalytics from "@/pages/admin/AdminAnalytics";
+import AdminCAs from "@/pages/admin/AdminCAs";
+import AdminLeads from "@/pages/admin/AdminLeads";
 import NotFound from "@/pages/not-found";
 
 function ProtectedRoute({ component: Component }: { component: any }) {
@@ -125,6 +127,12 @@ function Router() {
         </Route>
         <Route path="/admin/analytics">
           {() => <AdminRoute component={AdminAnalytics} minLevel={3} />}
+        </Route>
+        <Route path="/admin/cas">
+          {() => <AdminRoute component={AdminCAs} minLevel={3} />}
+        </Route>
+        <Route path="/admin/leads">
+          {() => <AdminRoute component={AdminLeads} minLevel={3} />}
         </Route>
       </Switch>
     );

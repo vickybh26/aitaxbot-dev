@@ -78,6 +78,7 @@ interface BothRegimesResult {
 
 interface TaxCalculatorProps {
   onClose?: () => void;
+  onCalculated?: (summaryText: string) => void;
 }
 
 // ── Regime comparison bar chart ───────────────────────────────────────────────
@@ -138,7 +139,7 @@ function RegimeChart({
   );
 }
 
-export default function TaxCalculator({ onClose }: TaxCalculatorProps = {}) {
+export default function TaxCalculator({ onClose, onCalculated }: TaxCalculatorProps = {}) {
   const [activeTab, setActiveTab] = useState('calculator');
   const [isCalculating, setIsCalculating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -436,6 +437,16 @@ export default function TaxCalculator({ onClose }: TaxCalculatorProps = {}) {
     setResult(bothRegimesResult);
     setActiveTab('results');
     setIsCalculating(false);
+
+    // Fire onCalculated callback for lead-capture modal
+    if (onCalculated) {
+      const fmt = (n: number) =>
+        '₹' + new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(n);
+      const rec = recommendedRegime === 'new' ? 'New Regime' : 'Old Regime';
+      const recTax = recommendedRegime === 'new' ? newRegimeResult.totalTax : oldRegimeResult.totalTax;
+      const summaryText = `${rec}: ${fmt(recTax)} tax | Income: ${fmt(oldRegimeResult.grossIncome)} | Saves ${fmt(savings)} vs ${recommendedRegime === 'new' ? 'Old' : 'New'} Regime`;
+      onCalculated(summaryText);
+    }
 
     // Track calculation count (fire-and-forget)
     fetch('/api/stats/track-calculation', { method: 'POST' }).catch(() => {});

@@ -441,7 +441,7 @@ export interface CAProfile {
   yearsOfPractice: number;
   email: string;                   // Shown publicly for contact
   whatsappNumber?: string | null;  // Shown as wa.me link if provided
-  bio?: string | null;             // Max 200 chars, factual only
+  bio?: string | null;
   status: "pending" | "approved" | "rejected";
   rejectedReason?: string | null;
   createdAt?: Date | string;
@@ -461,7 +461,7 @@ export const insertCAProfileSchema = z.object({
   yearsOfPractice: z.number().min(0).max(60),
   email: z.string().email("Valid email required"),
   whatsappNumber: optStr,
-  bio: z.string().max(200, "Bio must be under 200 characters").optional().nullable(),
+  bio: z.string().max(2000, "Bio must be under 2000 characters").optional().nullable(),
   agreeToEthics: z.literal(true, { errorMap: () => ({ message: "You must confirm compliance with ICAI Code of Ethics" }) }),
 });
 

@@ -10,6 +10,8 @@ import {
   X,
   Shield,
   ChevronRight,
+  UserCheck,
+  Inbox,
 } from "lucide-react";
 import { logout } from "@/lib/firebase";
 import { cn } from "@/lib/utils";
@@ -19,6 +21,8 @@ const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, minLevel: 3 },
   { href: "/admin/users", label: "Users & CRM", icon: Users, minLevel: 3 },
   { href: "/admin/analytics", label: "Analytics", icon: BarChart3, minLevel: 3 },
+  { href: "/admin/cas", label: "CA Directory", icon: UserCheck, minLevel: 3 },
+  { href: "/admin/leads", label: "Leads", icon: Inbox, minLevel: 3 },
 ];
 
 const LEVEL_LABELS: Record<number, { label: string; color: string }> = {

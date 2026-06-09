@@ -1,9 +1,9 @@
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'wouter';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { trackPageView } from '@/lib/analytics';
 import FindCABanner from '@/components/FindCABanner';
-import LeadCaptureForm from '@/components/LeadCaptureForm';
+import TaxDownloadModal from '@/components/TaxDownloadModal';
 import {
   generateCalculatorSchema,
   generateBreadcrumbSchema,
@@ -43,9 +43,18 @@ const incomeTaxFAQs = [
 ];
 
 export default function IncomeTaxCalculatorPage() {
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
+  const [computationSummary, setComputationSummary] = useState("");
+
   useEffect(() => {
     trackPageView('/calculators/income-tax', 'Income Tax Calculator India FY 2026-27 — New vs Old Regime | AiTaxBot');
   }, []);
+
+  function handleCalculated(summaryText: string) {
+    setComputationSummary(summaryText);
+    // Small delay so user sees the results first
+    setTimeout(() => setShowDownloadModal(true), 1200);
+  }
 
   const calculatorSchema = generateCalculatorSchema({
     name: "Income Tax Calculator FY 2026-27 (AY 2027-28)",
@@ -95,7 +104,7 @@ export default function IncomeTaxCalculatorPage() {
         {/* Calculator */}
         <section className="py-12 px-6">
           <div className="max-w-6xl mx-auto">
-            <TaxCalculator />
+            <TaxCalculator onCalculated={handleCalculated} />
           </div>
         </section>
 
@@ -461,11 +470,18 @@ export default function IncomeTaxCalculatorPage() {
           </div>
         </footer>
 
-        {/* Lead Capture + CA Banner */}
+        {/* CA Banner */}
         <div className="max-w-3xl mx-auto px-4 pb-10">
-          <LeadCaptureForm source="Income Tax Calculator" />
           <FindCABanner context="filing your ITR" />
         </div>
+
+        {/* Tax Download Lead Capture Modal */}
+        <TaxDownloadModal
+          open={showDownloadModal}
+          onClose={() => setShowDownloadModal(false)}
+          summaryText={computationSummary}
+          source="Income Tax Calculator"
+        />
 
       </div>
     </>

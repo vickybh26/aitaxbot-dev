@@ -15,6 +15,8 @@
 
 import { Router } from "express";
 import { getFirestore, verifyFirebaseToken, admin } from "./firebase";
+import { COLLECTIONS } from "./firestoreHelper";
+import { TransactionalEmailsApi, TransactionalEmailsApiApiKeys } from "@getbrevo/brevo";
 
 const router = Router();
 
@@ -451,6 +453,141 @@ router.get("/tags", adminL3, async (_req: any, res) => {
   // Custom tags added to users are surfaced in the users list directly.
   const defaults = ["High Value", "Lead", "CA Client", "Follow Up", "VIP", "Inactive", "Referred"];
   res.json({ tags: defaults.sort() });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CA DIRECTORY MANAGEMENT
+// ─────────────────────────────────────────────────────────────────────────────
+
+async function sendBrevoEmail(params: {
+  to: { email: string; name: string }[];
+  subject: string;
+  htmlContent: string;
+}) {
+  const apiInstance = new TransactionalEmailsApi();
+  apiInstance.setApiKey(TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY!);
+  await apiInstance.sendTransacEmail({
+    sender: { email: process.env.BREVO_SENDER_EMAIL || "noreply@aitaxbot.co.in", name: "AiTaxBot" },
+    to: params.to,
+    subject: params.subject,
+    htmlContent: params.htmlContent,
+  });
+}
+
+// GET /api/admin/ca/list — list all CA profiles, filterable by status
+router.get("/ca/list", adminL3, async (req: any, res) => {
+  try {
+    const db = getFirestore();
+    const { status, page = "1", limit = "50" } = req.query as any;
+    const pageNum = Math.max(1, parseInt(page));
+    const limitNum = Math.min(100, Math.max(1, parseInt(limit)));
+
+    let query: any = db.collection(COLLECTIONS.CA_PROFILES).orderBy("createdAt", "desc");
+    if (status && ["pending", "approved", "rejected"].includes(status)) {
+      query = query.where("status", "==", status);
+    }
+
+    const snap = await query.limit(limitNum).get();
+    const cas = snap.docs.map((d: any) => ({ id: d.id, ...d.data() }));
+    res.json({ cas, count: cas.length });
+  } catch (err) {
+    console.error("[Admin] CA list error:", err);
+    res.status(500).json({ error: "Failed to fetch CA list" });
+  }
+});
+
+// POST /api/admin/ca/:id/approve — approve a CA profile
+router.post("/ca/:id/approve", adminL2, async (req: any, res) => {
+  try {
+    const db = getFirestore();
+    const ref = db.collection(COLLECTIONS.CA_PROFILES).doc(req.params.id);
+    const snap = await ref.get();
+    if (!snap.exists) return res.status(404).json({ error: "CA profile not found" });
+
+    const ca = snap.data() as any;
+    const now = new Date().toISOString();
+    await ref.update({ status: "approved", approvedAt: now, rejectedReason: null });
+
+    // Email the CA
+    try {
+      await sendBrevoEmail({
+        to: [{ email: ca.email, name: ca.fullName }],
+        subject: "🎉 Your AiTaxBot CA Profile is Approved!",
+        htmlContent: `
+          <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;">
+            <h2 style="color:#0f172a;">Congratulations, ${ca.fullName}!</h2>
+            <p>Your CA profile on <strong>AiTaxBot</strong> has been reviewed and <strong>approved</strong>. It is now live in our CA Directory.</p>
+            <p>Potential clients can now discover you via our <a href="https://aitaxbot.co.in/find-ca" style="color:#3b82f6;">Find a CA</a> directory.</p>
+            <hr style="border:none;border-top:1px solid #e2e8f0;margin:20px 0;"/>
+            <p style="color:#64748b;font-size:13px;">AiTaxBot · Free Tax Tools for India · <a href="https://aitaxbot.co.in">aitaxbot.co.in</a></p>
+          </div>`,
+      });
+    } catch (emailErr) {
+      console.error("[Admin] CA approval email failed:", emailErr);
+    }
+
+    res.json({ success: true, status: "approved" });
+  } catch (err) {
+    console.error("[Admin] CA approve error:", err);
+    res.status(500).json({ error: "Failed to approve CA" });
+  }
+});
+
+// POST /api/admin/ca/:id/reject — reject a CA profile
+router.post("/ca/:id/reject", adminL2, async (req: any, res) => {
+  try {
+    const db = getFirestore();
+    const ref = db.collection(COLLECTIONS.CA_PROFILES).doc(req.params.id);
+    const snap = await ref.get();
+    if (!snap.exists) return res.status(404).json({ error: "CA profile not found" });
+
+    const ca = snap.data() as any;
+    const { reason = "Your profile did not meet our listing requirements." } = req.body;
+    await ref.update({ status: "rejected", rejectedReason: reason });
+
+    try {
+      await sendBrevoEmail({
+        to: [{ email: ca.email, name: ca.fullName }],
+        subject: "AiTaxBot CA Profile — Action Required",
+        htmlContent: `
+          <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;">
+            <h2 style="color:#0f172a;">Hi ${ca.fullName},</h2>
+            <p>After reviewing your CA profile submission, we were unable to approve it at this time.</p>
+            <p><strong>Reason:</strong> ${reason}</p>
+            <p>You are welcome to re-register at <a href="https://aitaxbot.co.in/ca/register" style="color:#3b82f6;">aitaxbot.co.in/ca/register</a> after addressing the above.</p>
+            <hr style="border:none;border-top:1px solid #e2e8f0;margin:20px 0;"/>
+            <p style="color:#64748b;font-size:13px;">AiTaxBot · Free Tax Tools for India · <a href="https://aitaxbot.co.in">aitaxbot.co.in</a></p>
+          </div>`,
+      });
+    } catch (emailErr) {
+      console.error("[Admin] CA rejection email failed:", emailErr);
+    }
+
+    res.json({ success: true, status: "rejected" });
+  } catch (err) {
+    console.error("[Admin] CA reject error:", err);
+    res.status(500).json({ error: "Failed to reject CA" });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LEADS
+// ─────────────────────────────────────────────────────────────────────────────
+
+// GET /api/admin/leads — list last 500 leads (also in leadRoutes, here for admin panel)
+router.get("/leads", adminL3, async (_req: any, res) => {
+  try {
+    const db = getFirestore();
+    const snap = await db.collection(COLLECTIONS.LEADS)
+      .orderBy("createdAt", "desc")
+      .limit(500)
+      .get();
+    const leads = snap.docs.map((d: any) => ({ id: d.id, ...d.data() }));
+    res.json({ leads, count: leads.length });
+  } catch (err) {
+    console.error("[Admin] Leads list error:", err);
+    res.status(500).json({ error: "Failed to fetch leads" });
+  }
 });
 
 export default router;
