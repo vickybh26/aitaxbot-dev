@@ -223,7 +223,10 @@ router.get("/users", adminL3, async (req: any, res) => {
     const tagFilter = (req.query.tag as string) ?? "";
     const completeFilter = req.query.complete as string;
 
-    let query: any = db.collection("users").orderBy("createdAt", "desc");
+    // Build filters first — then sort in memory to avoid composite index requirements.
+    // Chaining .orderBy(fieldA) + .where(fieldB) on DIFFERENT fields requires a
+    // Firestore composite index; we avoid that by doing the sort client-side.
+    let query: any = db.collection("users");
 
     if (occupationFilter) query = query.where("occupation", "==", occupationFilter);
     if (stateFilter) query = query.where("state", "==", stateFilter);
@@ -232,7 +235,9 @@ router.get("/users", adminL3, async (req: any, res) => {
     }
 
     const snap = await query.get();
-    let docs = snap.docs.map((d: any) => ({ id: d.id, ...d.data() }));
+    let docs = snap.docs
+      .map((d: any) => ({ id: d.id, ...d.data() }))
+      .sort((a: any, b: any) => (b.createdAt || "").localeCompare(a.createdAt || ""));
 
     // Client-side filtering for search and tags (Firestore doesn't support full-text)
     if (search) {
@@ -478,17 +483,29 @@ async function sendBrevoEmail(params: {
 router.get("/ca/list", adminL3, async (req: any, res) => {
   try {
     const db = getFirestore();
-    const { status, page = "1", limit = "50" } = req.query as any;
-    const pageNum = Math.max(1, parseInt(page));
+    const { status, limit = "50" } = req.query as any;
     const limitNum = Math.min(100, Math.max(1, parseInt(limit)));
 
-    let query: any = db.collection(COLLECTIONS.CA_PROFILES).orderBy("createdAt", "desc");
+    // IMPORTANT: combining .where(fieldA) + .orderBy(fieldB) on DIFFERENT fields
+    // requires a Firestore composite index. To avoid that, we either:
+    //   a) use only .orderBy() when no status filter (relies on single-field index)
+    //   b) use only .where() when filtering by status, then sort in memory
+    let ref: any = db.collection(COLLECTIONS.CA_PROFILES);
     if (status && ["pending", "approved", "rejected"].includes(status)) {
-      query = query.where("status", "==", status);
+      // Single-field equality — auto-indexed, no composite index needed
+      ref = ref.where("status", "==", status);
+    } else {
+      // No filter: fetch all ordered by date (single-field index, always exists)
+      ref = ref.orderBy("createdAt", "desc");
     }
 
-    const snap = await query.limit(limitNum).get();
-    const cas = snap.docs.map((d: any) => ({ id: d.id, ...d.data() }));
+    // Fetch up to 2× limit so in-memory sort still gives correct top-N results
+    const snap = await ref.limit(limitNum * 2).get();
+    const cas = snap.docs
+      .map((d: any) => ({ id: d.id, ...d.data() }))
+      .sort((a: any, b: any) => (b.createdAt || "").localeCompare(a.createdAt || ""))
+      .slice(0, limitNum);
+
     res.json({ cas, count: cas.length });
   } catch (err) {
     console.error("[Admin] CA list error:", err);
