@@ -47,6 +47,14 @@ interface DashboardActivity {
   color: string;
 }
 
+interface ToolUsageEvent {
+  id: string;
+  tool: string;
+  route: string | null;
+  summary: string | null;
+  createdAt: string;
+}
+
 interface TaxCalculationHistory {
   id: string;
   financialYear: string;
@@ -93,6 +101,22 @@ export default function Dashboard() {
   // Fetch recent activities
   const { data: activities = [], isLoading: activitiesLoading } = useQuery<DashboardActivity[]>({
     queryKey: ['/api/accounting/dashboard/activities'],
+  });
+
+  // Fetch recent calculator activity
+  const { data: toolUsageEvents = [], isLoading: toolUsageLoading } = useQuery<ToolUsageEvent[]>({
+    queryKey: ['/api/tool-usage'],
+    queryFn: async () => {
+      const token = await getIdToken();
+      if (!token) return [];
+      const response = await fetch('/api/tool-usage', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!response.ok) return [];
+      return response.json();
+    },
+    enabled: !!user,
+    staleTime: 60_000,
   });
 
   // Fetch tax calculation history
@@ -559,44 +583,42 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Recent Activity */}
+        {/* Recent Calculator Activity */}
         <div>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Recent Activity</h2>
+            <h2 className="text-2xl font-bold text-gray-900">Recent Calculator Activity</h2>
           </div>
           <Card>
             <CardContent className="p-6">
-              {activitiesLoading ? (
+              {toolUsageLoading ? (
                 <div className="flex items-center justify-center py-12">
                   <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
                 </div>
-              ) : activities.length === 0 ? (
+              ) : toolUsageEvents.length === 0 ? (
                 <div className="text-center py-12">
                   <Activity className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 mb-2">No recent activity</p>
-                  <p className="text-sm text-gray-500">Start using AiTaxBot to see your activities here</p>
+                  <p className="text-gray-600 mb-2">No calculator activity yet</p>
+                  <p className="text-sm text-gray-500">Use any calculator while logged in and your activity will appear here.</p>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {activities.map((activity, index) => {
-                    const IconComponent = getIconComponent(activity.icon);
-                    return (
-                      <div
-                        key={index}
-                        className="flex items-start gap-4 pb-4 border-b last:border-b-0 last:pb-0"
-                        data-testid={`activity-${index}`}
-                      >
-                        <div className={`p-2 rounded-lg bg-gray-50`}>
-                          <IconComponent className={`h-5 w-5 ${activity.color}`} />
-                        </div>
-                        <div className="flex-1">
-                          <p className="font-semibold text-gray-900">{activity.title}</p>
-                          <p className="text-sm text-gray-600 mt-1">{activity.description}</p>
-                          <p className="text-xs text-gray-500 mt-1">{getTimeAgo(activity.time)}</p>
-                        </div>
+                <div className="space-y-3">
+                  {toolUsageEvents.map((event) => (
+                    <div
+                      key={event.id}
+                      className="flex items-start gap-4 pb-3 border-b last:border-b-0 last:pb-0"
+                    >
+                      <div className="p-2 rounded-lg bg-blue-50 shrink-0">
+                        <Calculator className="h-5 w-5 text-blue-600" />
                       </div>
-                    );
-                  })}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-gray-900 truncate">{event.tool}</p>
+                        {event.summary && (
+                          <p className="text-sm text-gray-600 mt-0.5 truncate">{event.summary}</p>
+                        )}
+                        <p className="text-xs text-gray-500 mt-0.5">{getTimeAgo(event.createdAt)}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
             </CardContent>

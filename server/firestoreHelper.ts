@@ -212,5 +212,6 @@ export const COLLECTIONS = {
   IPO_DATA: 'ipoData',
   CA_PROFILES: 'caProfiles',
   CA_CONTACT_REQUESTS: 'caContactRequests',
-  LEADS: 'leads'
+  LEADS: 'leads',
+  TOOL_USAGE: 'toolUsage',
 } as const;

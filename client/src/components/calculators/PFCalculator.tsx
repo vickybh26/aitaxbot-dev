@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useTrackToolUse } from '@/hooks/useTrackToolUse';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -40,6 +41,7 @@ interface YearlyBreakdown {
 }
 
 export default function PFCalculator() {
+  const trackTool = useTrackToolUse();
   const [monthlyBasicDA, setMonthlyBasicDA] = useState<number>(50000);
   const [annualIncrement, setAnnualIncrement] = useState<number>(5);
   const [interestRate, setInterestRate] = useState<number>(8.25);
@@ -156,6 +158,8 @@ export default function PFCalculator() {
       totalVPF
     });
     fetch('/api/stats/track-calculation', { method: 'POST' }).catch(() => {});
+    const pfCorpus = yearlyGrowth[yearlyGrowth.length - 1]?.closingBalance || 0;
+    trackTool("PF Calculator", `Corpus: ₹${Math.round(pfCorpus).toLocaleString('en-IN')}`);
 
     setActiveTab("results");
     updateChart(yearlyGrowth);

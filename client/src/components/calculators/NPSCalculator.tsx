@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useTrackToolUse } from '@/hooks/useTrackToolUse';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,6 +19,7 @@ interface NPSResult {
 }
 
 export default function NPSCalculator() {
+  const trackTool = useTrackToolUse();
   const [currentAge, setCurrentAge] = useState<number>(30);
   const [retirementAge, setRetirementAge] = useState<number>(60);
   const [monthlyContribution, setMonthlyContribution] = useState<number>(5000);
@@ -84,6 +86,7 @@ export default function NPSCalculator() {
       totalTaxSaving: tax80CCD1 + tax80CCD1B + tax80CCD2
     });
     fetch('/api/stats/track-calculation', { method: 'POST' }).catch(() => {});
+    trackTool("NPS Calculator", `Corpus: ₹${Math.round(totalCorpus).toLocaleString('en-IN')}`);
   };
 
   useEffect(() => {

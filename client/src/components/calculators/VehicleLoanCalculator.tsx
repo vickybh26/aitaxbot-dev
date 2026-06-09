@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTrackToolUse } from '@/hooks/useTrackToolUse';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -75,6 +76,7 @@ function computeFlat(principal: number, annualRate: number, tenureYears: number)
 }
 
 export default function VehicleLoanCalculator() {
+  const trackTool = useTrackToolUse();
   const [vehicleType, setVehicleType] = useState<VehicleType>("four-wheeler");
   const [onRoadPrice, setOnRoadPrice] = useState<number>(DEFAULTS["four-wheeler"].onRoadPrice);
   const [downPayment, setDownPayment] = useState<number>(DEFAULTS["four-wheeler"].downPayment);
@@ -118,6 +120,7 @@ export default function VehicleLoanCalculator() {
       flatInterest: flat.interest,
       flatTotal: flat.total,
     });
+    trackTool("Vehicle Loan Calculator", `EMI: ₹${Math.round(active.emi).toLocaleString('en-IN')}`);
   };
 
   const d = DEFAULTS[vehicleType];

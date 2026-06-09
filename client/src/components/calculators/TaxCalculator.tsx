@@ -29,6 +29,7 @@ import { Download, Save, Loader2, Sparkles, TrendingDown, AlertTriangle, Info, S
 import jsPDF from 'jspdf';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { useTrackToolUse } from '@/hooks/useTrackToolUse';
 
 interface AiTip {
   title: string;
@@ -151,6 +152,7 @@ export default function TaxCalculator({ onClose, onCalculated }: TaxCalculatorPr
 
   const { user, userProfile, getIdToken } = useAuth();
   const { toast } = useToast();
+  const trackTool = useTrackToolUse();
   
   // Form state
   const [formData, setFormData] = useState({
@@ -450,6 +452,9 @@ export default function TaxCalculator({ onClose, onCalculated }: TaxCalculatorPr
 
     // Track calculation count (fire-and-forget)
     fetch('/api/stats/track-calculation', { method: 'POST' }).catch(() => {});
+    const recLabel = recommendedRegime === 'new' ? 'New Regime' : 'Old Regime';
+    const recTaxAmt = recommendedRegime === 'new' ? newRegimeResult.totalTax : oldRegimeResult.totalTax;
+    trackTool("Income Tax Calculator", `${recLabel}: ₹${Math.round(recTaxAmt).toLocaleString('en-IN')} tax`);
 
     // Get AI advice via Firebase AI Logic (client-side Gemini) with server fallback
     setAiAdvice(null);

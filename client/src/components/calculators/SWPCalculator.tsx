@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTrackToolUse } from '@/hooks/useTrackToolUse';
 import Modal from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +30,7 @@ interface SWPResult {
 }
 
 export default function SWPCalculator({ onClose }: SWPCalculatorProps = {}) {
+  const trackTool = useTrackToolUse();
   const [initialCorpus, setInitialCorpus] = useState<number>(5000000);
   const [monthlyWithdrawal, setMonthlyWithdrawal] = useState<number>(50000);
   const [annualReturn, setAnnualReturn] = useState<number>(8);
@@ -82,6 +84,7 @@ export default function SWPCalculator({ onClose }: SWPCalculatorProps = {}) {
       yearlySnapshots: yearlySnapshots.slice(0, 10), // Show first 10 years
     });
     fetch('/api/stats/track-calculation', { method: 'POST' }).catch(() => {});
+    trackTool("SWP Calculator", `Monthly withdrawal: ₹${monthlyWithdrawal.toLocaleString('en-IN')}`);
   };
 
   useEffect(() => {

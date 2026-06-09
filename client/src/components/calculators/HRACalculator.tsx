@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTrackToolUse } from '@/hooks/useTrackToolUse';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -43,6 +44,7 @@ interface AIRecommendation {
 
 export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProps = {}) {
   const { user, getIdToken } = useAuth();
+  const trackTool = useTrackToolUse();
   const { toast } = useToast();
   const [basicSalary, setBasicSalary] = useState<number>(600000);
   const [hraReceived, setHraReceived] = useState<number>(240000);
@@ -138,6 +140,7 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
     setActiveTab("results");
     setIsCalculating(false);
     fetch('/api/stats/track-calculation', { method: 'POST' }).catch(() => {});
+    trackTool("HRA Calculator", `HRA exempt: ₹${hraResult.hraExemption.toLocaleString('en-IN')}`);
   };
 
   const generateRecommendations = (hraResult: HRAResult) => {

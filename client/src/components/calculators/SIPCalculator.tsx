@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useTrackToolUse } from '@/hooks/useTrackToolUse';
 import Modal from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +18,7 @@ interface SIPResult {
 }
 
 export default function SIPCalculator({ onClose }: SIPCalculatorProps = {}) {
+  const trackTool = useTrackToolUse();
   const [monthlyInvestment, setMonthlyInvestment] = useState<number>(5000);
   const [annualReturn, setAnnualReturn] = useState<number>(12);
   const [years, setYears] = useState<number>(10);
@@ -59,6 +61,7 @@ export default function SIPCalculator({ onClose }: SIPCalculatorProps = {}) {
       wealthGain
     });
     fetch('/api/stats/track-calculation', { method: 'POST' }).catch(() => {});
+    trackTool("SIP Calculator", `Maturity: ₹${Math.round(maturityValue).toLocaleString('en-IN')}`);
 
     // Update chart
     updateChart(totalInvestment, maturityValue);

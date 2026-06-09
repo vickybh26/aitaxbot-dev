@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { useTrackToolUse } from '@/hooks/useTrackToolUse';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -1056,6 +1057,7 @@ function computeGrandTotal(
 }
 
 export default function TradingTaxCalculator() {
+  const trackTool = useTrackToolUse();
   const [activeTab, setActiveTab] = useState<Tab>("us-stocks");
   const [annualIncome, setAnnualIncome] = useState<number>(2500000);
 
@@ -1119,7 +1121,7 @@ export default function TradingTaxCalculator() {
       {hasAnyData && (
         <div
           className="border-b border-slate-200 px-5 py-3 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors"
-          onClick={() => setActiveTab("summary")}
+          onClick={() => { setActiveTab("summary"); trackTool("Trading Tax Calculator", `Tax: ₹${Math.round(grandTotal).toLocaleString('en-IN')}`); }}
         >
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />

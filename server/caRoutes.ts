@@ -366,4 +366,139 @@ router.get("/pending", async (req: Request, res: Response) => {
   }
 });
 
+// ─── POST /api/ca/my-profile/verify ───────────────────────────────────────
+// CA self-update: step 1 — verify identity via ICAI no. + registered email.
+// Returns the public profile fields for pre-filling the edit form.
+// No Firebase auth — CAs are not registered as Firebase users.
+
+router.post("/my-profile/verify", async (req: Request, res: Response) => {
+  try {
+    const { icaiMembershipNumber, email } = req.body;
+    if (!icaiMembershipNumber || !email) {
+      return res.status(400).json({ error: "ICAI membership number and email are required." });
+    }
+
+    const db = getFirestore();
+    const snap = await db
+      .collection(COLLECTIONS.CA_PROFILES)
+      .where("icaiMembershipNumber", "==", String(icaiMembershipNumber).trim())
+      .limit(1)
+      .get();
+
+    if (snap.empty) {
+      return res.status(404).json({ error: "No CA profile found with this ICAI membership number." });
+    }
+
+    const profile = snap.docs[0].data() as CAProfile;
+    if (profile.email.toLowerCase() !== String(email).trim().toLowerCase()) {
+      // Deliberate 404 — don't confirm the ICAI number is valid to a wrong email.
+      return res.status(404).json({ error: "No CA profile found with this ICAI membership number." });
+    }
+
+    // Return the profile (minus internal admin fields)
+    return res.json({
+      id: profile.id,
+      fullName: profile.fullName,
+      firmName: profile.firmName,
+      icaiMembershipNumber: profile.icaiMembershipNumber,
+      city: profile.city,
+      state: profile.state,
+      email: profile.email,
+      whatsappNumber: profile.whatsappNumber,
+      practiceAreas: profile.practiceAreas,
+      languages: profile.languages,
+      yearsOfPractice: profile.yearsOfPractice,
+      bio: profile.bio,
+      status: profile.status,
+    });
+  } catch (err) {
+    console.error("CA verify error:", err);
+    return res.status(500).json({ error: "Verification failed. Please try again." });
+  }
+});
+
+// ─── PUT /api/ca/my-profile ───────────────────────────────────────────────
+// CA self-update: step 2 — submit updated profile.
+// Identity re-verified via icaiMembershipNumber + email in body.
+// Updates allowed fields; sets status back to "pending" for admin review.
+
+router.put("/my-profile", async (req: Request, res: Response) => {
+  try {
+    const { icaiMembershipNumber, email, ...updates } = req.body;
+    if (!icaiMembershipNumber || !email) {
+      return res.status(400).json({ error: "ICAI membership number and email are required." });
+    }
+
+    const db = getFirestore();
+    const snap = await db
+      .collection(COLLECTIONS.CA_PROFILES)
+      .where("icaiMembershipNumber", "==", String(icaiMembershipNumber).trim())
+      .limit(1)
+      .get();
+
+    if (snap.empty) {
+      return res.status(404).json({ error: "Profile not found." });
+    }
+
+    const existing = snap.docs[0].data() as CAProfile;
+    if (existing.email.toLowerCase() !== String(email).trim().toLowerCase()) {
+      return res.status(404).json({ error: "Profile not found." });
+    }
+
+    // Whitelist of fields a CA may update themselves
+    const ALLOWED = [
+      "fullName", "firmName", "city", "state", "whatsappNumber",
+      "practiceAreas", "languages", "yearsOfPractice", "bio",
+    ] as const;
+
+    const patch: Record<string, any> = { status: "pending", updatedAt: new Date().toISOString() };
+    for (const field of ALLOWED) {
+      if (field in updates && updates[field] !== undefined) {
+        patch[field] = updates[field];
+      }
+    }
+
+    await snap.docs[0].ref.update(patch);
+
+    // Notify admin
+    try {
+      await sendBrevoEmail({
+        to: [{ email: "vickybh26@gmail.com", name: "AiTaxBot Admin" }],
+        subject: `CA Profile Updated — ${existing.fullName} (${existing.icaiMembershipNumber})`,
+        htmlContent: `
+          <h2>CA Profile Updated — Pending Re-Approval</h2>
+          <p><strong>${existing.fullName}</strong> (ICAI: ${existing.icaiMembershipNumber}) has updated their profile and it is now pending review.</p>
+          <p>
+            <a href="https://aitaxbot.co.in/admin/cas" style="background:#2563eb;color:white;padding:10px 20px;border-radius:6px;text-decoration:none">
+              Review in Admin Panel
+            </a>
+          </p>
+        `,
+      });
+    } catch (e) {
+      console.error("CA update admin notification failed:", e);
+    }
+
+    // Confirm to CA
+    try {
+      await sendBrevoEmail({
+        to: [{ email: existing.email, name: existing.fullName }],
+        subject: "Your AiTaxBot CA profile update is under review",
+        htmlContent: `
+          <h2>Profile update received, ${existing.fullName}!</h2>
+          <p>Your updated profile has been submitted and is now under review. We typically complete re-approvals within 1–2 business days.</p>
+          <p style="color:#888;font-size:12px">If you have questions, contact support@aitaxbot.co.in</p>
+        `,
+      });
+    } catch (e) {
+      console.error("CA update confirmation email failed:", e);
+    }
+
+    return res.json({ success: true });
+  } catch (err) {
+    console.error("CA update error:", err);
+    return res.status(500).json({ error: "Update failed. Please try again." });
+  }
+});
+
 export default router;

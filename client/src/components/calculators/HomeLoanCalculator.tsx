@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTrackToolUse } from '@/hooks/useTrackToolUse';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,6 +26,7 @@ function formatINR(n: number): string {
 }
 
 export default function HomeLoanCalculator() {
+  const trackTool = useTrackToolUse();
   const [monthlyIncome, setMonthlyIncome] = useState<number>(100000);
   const [existingEMI, setExistingEMI] = useState<number>(0);
   const [propertyPrice, setPropertyPrice] = useState<number>(7500000);
@@ -80,6 +82,7 @@ export default function HomeLoanCalculator() {
       annualTaxSaving30,
       annualTaxSaving20,
     });
+    trackTool("Home Loan Calculator", `EMI: ₹${Math.round(emi).toLocaleString('en-IN')}`);
   };
 
   const loanAmount = Math.max(0, propertyPrice - downPayment);
