@@ -20,7 +20,7 @@ export default function CalcPageHeader({
           {/* Left column: breadcrumb, title, subtitle */}
           <div className="flex-1">
             {/* Breadcrumb */}
-            <nav className="flex items-center gap-2 text-xs text-slate-400 mb-4">
+            <nav className="flex items-center gap-2 text-xs text-slate-500 mb-4" aria-label="Breadcrumb">
               {breadcrumbs.map((crumb, idx) => (
                 <div key={idx} className="flex items-center gap-2">
                   {idx > 0 && <span>/</span>}

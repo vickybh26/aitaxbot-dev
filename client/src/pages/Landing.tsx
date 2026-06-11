@@ -259,7 +259,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                     {calcCountDisplay && (
                       <div className="flex items-center gap-1.5 text-sm text-slate-600">
                         <BarChart2 className="h-4 w-4 text-orange-500 flex-shrink-0" />
-                        <span><strong className="text-orange-600">{calcCountDisplay} calculations done</strong></span>
+                        <span><strong className="text-orange-700">{calcCountDisplay} calculations done</strong></span>
                       </div>
                     )}
                   </div>
@@ -278,7 +278,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                     { step: "03", icon: <BarChart2 className="h-6 w-6 text-orange-500" />, title: "See Your Result", desc: "Instantly compare Old vs New Regime. Know exactly which saves you more tax." },
                   ].map(({ step, icon, title, desc }) => (
                     <div key={step} className="relative p-5 rounded-2xl bg-slate-50 border border-slate-100">
-                      <div className="text-4xl font-black text-slate-100 absolute top-4 right-4 leading-none select-none">{step}</div>
+                      <div className="text-4xl font-black text-slate-200 absolute top-4 right-4 leading-none select-none" aria-hidden="true">{step}</div>
                       <div className="w-11 h-11 bg-white rounded-xl flex items-center justify-center shadow-soft mb-3 border border-slate-100">
                         {icon}
                       </div>
@@ -389,7 +389,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
 
               {/* Disclaimer — condensed */}
               <section className="py-3">
-                <p className="text-xs text-slate-400 leading-relaxed">
+                <p className="text-xs text-slate-500 leading-relaxed">
                   Calculations are indicative only — not professional tax advice. AiTaxBot is not affiliated with the Income Tax Department or CBDT.{" "}
                   <a href="/privacy-policy" className="underline hover:text-slate-600">Privacy Policy</a>
                   {" · "}
@@ -456,7 +456,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                         <Mail className="h-4 w-4 text-persian-blue-600" />
                       </div>
                       <div>
-                        <p className="text-xs text-slate-400 mb-0.5">Email</p>
+                        <p className="text-xs text-slate-500 mb-0.5">Email</p>
                         <p className="text-sm font-semibold text-slate-800 group-hover:text-persian-blue-600 transition-colors">info@aitaxbot.in</p>
                       </div>
                     </a>
@@ -465,7 +465,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                         <Phone className="h-4 w-4 text-green-600" />
                       </div>
                       <div>
-                        <p className="text-xs text-slate-400 mb-0.5">Phone</p>
+                        <p className="text-xs text-slate-500 mb-0.5">Phone</p>
                         <p className="text-sm font-semibold text-slate-800 group-hover:text-persian-blue-600 transition-colors">+91 78998 69036</p>
                       </div>
                     </a>
@@ -474,7 +474,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                         <MapPin className="h-4 w-4 text-orange-500" />
                       </div>
                       <div>
-                        <p className="text-xs text-slate-400 mb-0.5">Location</p>
+                        <p className="text-xs text-slate-500 mb-0.5">Location</p>
                         <p className="text-sm font-semibold text-slate-800">Bengaluru, India</p>
                       </div>
                     </div>
@@ -482,10 +482,10 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
                       <p className="text-sm text-slate-500">Follow us:</p>
-                      <a href="https://www.linkedin.com/company/aitaxbot/" target="_blank" rel="noopener noreferrer" className="bg-persian-blue-100 hover:bg-persian-blue-200 text-persian-blue-700 rounded-full p-2 transition-colors">
+                      <a href="https://www.linkedin.com/company/aitaxbot/" target="_blank" rel="noopener noreferrer" aria-label="AiTaxBot on LinkedIn" className="bg-persian-blue-100 hover:bg-persian-blue-200 text-persian-blue-700 rounded-full p-2 transition-colors">
                         <Linkedin className="h-4 w-4" />
                       </a>
-                      <a href="https://www.instagram.com/aitaxbot/" target="_blank" rel="noopener noreferrer" className="bg-pink-100 hover:bg-pink-200 text-pink-600 rounded-full p-2 transition-colors">
+                      <a href="https://www.instagram.com/aitaxbot/" target="_blank" rel="noopener noreferrer" aria-label="AiTaxBot on Instagram" className="bg-pink-100 hover:bg-pink-200 text-pink-600 rounded-full p-2 transition-colors">
                         <Instagram className="h-4 w-4" />
                       </a>
                     </div>
@@ -647,7 +647,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                     </div>
                   </div>
                   <p className="text-xs text-slate-500 leading-relaxed">
-                    Connect with a verified, practicing Chartered Accountant near you. Deadline: <span className="font-semibold text-orange-600">July 31, 2026</span>.
+                    Connect with a verified, practicing Chartered Accountant near you. Deadline: <span className="font-semibold text-orange-700">July 31, 2026</span>.
                   </p>
                   <div className="mt-3 text-xs font-semibold text-blue-600 flex items-center gap-1 group-hover:gap-2 transition-all">
                     Find a CA near you <ArrowRight className="w-3.5 h-3.5" />

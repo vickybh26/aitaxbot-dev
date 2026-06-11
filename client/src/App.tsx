@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -9,42 +9,59 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import CookieConsent from "@/components/CookieConsent";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import Layout from "@/components/Layout";
+
+// Landing and Login are eagerly loaded — they're needed on first paint
 import Landing from "@/pages/Landing";
 import Login from "@/pages/Login";
-import Dashboard from "@/pages/Dashboard";
-import Blog from "@/pages/Blog";
-import BlogPost from "@/pages/BlogPost";
-import AccountingDashboard from "@/pages/accounting/AccountingDashboard";
-import About from "@/pages/About";
-import Contact from "@/pages/Contact";
-import PrivacyPolicy from "@/pages/privacy-policy";
-import TermsOfService from "@/pages/terms-of-service";
-import Calculators from "@/pages/Calculators";
-import IncomeTaxCalculator from "@/pages/IncomeTaxCalculator";
-import HRACalculator from "@/pages/HRACalculator";
-import SIPCalculator from "@/pages/SIPCalculator";
-import SWPCalculator from "@/pages/SWPCalculator";
-import PFCalculator from "@/pages/PFCalculator";
-import NPSCalculator from "@/pages/NPSCalculator";
-import HomeLoanCalculator from "@/pages/HomeLoanCalculator";
-import VehicleLoanCalculator from "@/pages/VehicleLoanCalculator";
-import TradingTaxCalculatorPage from "@/pages/TradingTaxCalculator";
-import NRICorner from "@/pages/NRICorner";
-import DTAACalculator from "@/pages/nri/DTAACalculator";
-import NRONREComparison from "@/pages/nri/NRONREComparison";
-import NRIIncomeTaxCalculator from "@/pages/nri/NRIIncomeTaxCalculator";
-import RepatriationPlanner from "@/pages/nri/RepatriationPlanner";
-import RentReceiptGenerator from "@/pages/RentReceiptGenerator";
-import FindCA from "@/pages/FindCA";
-import CARegister from "@/pages/CARegister";
-import CAMyProfile from "@/pages/CAMyProfile";
-import Profile from "@/pages/Profile";
-import AdminDashboard from "@/pages/admin/AdminDashboard";
-import AdminUsers from "@/pages/admin/AdminUsers";
-import AdminAnalytics from "@/pages/admin/AdminAnalytics";
-import AdminCAs from "@/pages/admin/AdminCAs";
-import AdminLeads from "@/pages/admin/AdminLeads";
-import NotFound from "@/pages/not-found";
+
+// All other pages are lazy-loaded — loaded only when the user navigates to them.
+// This reduces the initial bundle by ~600-800 KiB, dramatically improving LCP/TBT.
+const Dashboard = lazy(() => import("@/pages/Dashboard"));
+const Blog = lazy(() => import("@/pages/Blog"));
+const BlogPost = lazy(() => import("@/pages/BlogPost"));
+const AccountingDashboard = lazy(() => import("@/pages/accounting/AccountingDashboard"));
+const About = lazy(() => import("@/pages/About"));
+const Contact = lazy(() => import("@/pages/Contact"));
+const PrivacyPolicy = lazy(() => import("@/pages/privacy-policy"));
+const TermsOfService = lazy(() => import("@/pages/terms-of-service"));
+const Calculators = lazy(() => import("@/pages/Calculators"));
+const IncomeTaxCalculator = lazy(() => import("@/pages/IncomeTaxCalculator"));
+const HRACalculator = lazy(() => import("@/pages/HRACalculator"));
+const SIPCalculator = lazy(() => import("@/pages/SIPCalculator"));
+const SWPCalculator = lazy(() => import("@/pages/SWPCalculator"));
+const PFCalculator = lazy(() => import("@/pages/PFCalculator"));
+const NPSCalculator = lazy(() => import("@/pages/NPSCalculator"));
+const HomeLoanCalculator = lazy(() => import("@/pages/HomeLoanCalculator"));
+const VehicleLoanCalculator = lazy(() => import("@/pages/VehicleLoanCalculator"));
+const TradingTaxCalculatorPage = lazy(() => import("@/pages/TradingTaxCalculator"));
+const NRICorner = lazy(() => import("@/pages/NRICorner"));
+const DTAACalculator = lazy(() => import("@/pages/nri/DTAACalculator"));
+const NRONREComparison = lazy(() => import("@/pages/nri/NRONREComparison"));
+const NRIIncomeTaxCalculator = lazy(() => import("@/pages/nri/NRIIncomeTaxCalculator"));
+const RepatriationPlanner = lazy(() => import("@/pages/nri/RepatriationPlanner"));
+const RentReceiptGenerator = lazy(() => import("@/pages/RentReceiptGenerator"));
+const FindCA = lazy(() => import("@/pages/FindCA"));
+const CARegister = lazy(() => import("@/pages/CARegister"));
+const CAMyProfile = lazy(() => import("@/pages/CAMyProfile"));
+const Profile = lazy(() => import("@/pages/Profile"));
+const AdminDashboard = lazy(() => import("@/pages/admin/AdminDashboard"));
+const AdminUsers = lazy(() => import("@/pages/admin/AdminUsers"));
+const AdminAnalytics = lazy(() => import("@/pages/admin/AdminAnalytics"));
+const AdminCAs = lazy(() => import("@/pages/admin/AdminCAs"));
+const AdminLeads = lazy(() => import("@/pages/admin/AdminLeads"));
+const NotFound = lazy(() => import("@/pages/not-found"));
+
+// Minimal full-screen spinner shown while a lazy chunk loads
+function PageLoader() {
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-white">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-persian-blue-600 mx-auto" />
+        <p className="mt-3 text-sm text-slate-500">Loading…</p>
+      </div>
+    </div>
+  );
+}
 
 function ProtectedRoute({ component: Component }: { component: any }) {
   const { isAuthenticated, loading } = useAuth();
@@ -119,65 +136,69 @@ function Router() {
   const isAdminRoute = location.startsWith("/admin");
   if (isAdminRoute) {
     return (
-      <Switch>
-        <Route path="/admin">
-          {() => <AdminRoute component={AdminDashboard} minLevel={3} />}
-        </Route>
-        <Route path="/admin/users">
-          {() => <AdminRoute component={AdminUsers} minLevel={3} />}
-        </Route>
-        <Route path="/admin/analytics">
-          {() => <AdminRoute component={AdminAnalytics} minLevel={3} />}
-        </Route>
-        <Route path="/admin/cas">
-          {() => <AdminRoute component={AdminCAs} minLevel={3} />}
-        </Route>
-        <Route path="/admin/leads">
-          {() => <AdminRoute component={AdminLeads} minLevel={3} />}
-        </Route>
-      </Switch>
+      <Suspense fallback={<PageLoader />}>
+        <Switch>
+          <Route path="/admin">
+            {() => <AdminRoute component={AdminDashboard} minLevel={3} />}
+          </Route>
+          <Route path="/admin/users">
+            {() => <AdminRoute component={AdminUsers} minLevel={3} />}
+          </Route>
+          <Route path="/admin/analytics">
+            {() => <AdminRoute component={AdminAnalytics} minLevel={3} />}
+          </Route>
+          <Route path="/admin/cas">
+            {() => <AdminRoute component={AdminCAs} minLevel={3} />}
+          </Route>
+          <Route path="/admin/leads">
+            {() => <AdminRoute component={AdminLeads} minLevel={3} />}
+          </Route>
+        </Switch>
+      </Suspense>
     );
   }
 
   return (
     <Layout showModal={showModal}>
-      <Switch>
-        <Route path="/" component={(props) => <Landing {...props} activeModal={activeModal} setActiveModal={setActiveModal} />} />
-        <Route path="/login" component={Login} />
-        <Route path="/dashboard">
-          {() => <ProtectedRoute component={Dashboard} />}
-        </Route>
-        <Route path="/blog" component={Blog} />
-        <Route path="/blog/:slug" component={BlogPost} />
-        <Route path="/profile">
-          {() => <ProtectedRoute component={Profile} />}
-        </Route>
-        <Route path="/accounting" component={AccountingDashboard} />
-        <Route path="/calculators" component={Calculators} />
-        <Route path="/calculators/income-tax" component={IncomeTaxCalculator} />
-        <Route path="/calculators/hra" component={HRACalculator} />
-        <Route path="/calculators/sip" component={SIPCalculator} />
-        <Route path="/calculators/swp" component={SWPCalculator} />
-        <Route path="/calculators/pf" component={PFCalculator} />
-        <Route path="/calculators/nps" component={NPSCalculator} />
-        <Route path="/calculators/home-loan" component={HomeLoanCalculator} />
-        <Route path="/calculators/vehicle-loan" component={VehicleLoanCalculator} />
-        <Route path="/calculators/trading-tax" component={TradingTaxCalculatorPage} />
-        <Route path="/nri" component={NRICorner} />
-        <Route path="/nri/dtaa-calculator" component={DTAACalculator} />
-        <Route path="/nri/nro-nre-comparison" component={NRONREComparison} />
-        <Route path="/nri/income-tax-calculator" component={NRIIncomeTaxCalculator} />
-        <Route path="/nri/repatriation-planner" component={RepatriationPlanner} />
-        <Route path="/tools/rent-receipt" component={RentReceiptGenerator} />
-        <Route path="/find-ca" component={FindCA} />
-        <Route path="/ca/register" component={CARegister} />
-        <Route path="/ca/my-profile" component={CAMyProfile} />
-        <Route path="/about" component={About} />
-        <Route path="/contact" component={Contact} />
-        <Route path="/privacy-policy" component={PrivacyPolicy} />
-        <Route path="/terms-of-service" component={TermsOfService} />
-        <Route component={NotFound} />
-      </Switch>
+      <Suspense fallback={<PageLoader />}>
+        <Switch>
+          <Route path="/" component={(props) => <Landing {...props} activeModal={activeModal} setActiveModal={setActiveModal} />} />
+          <Route path="/login" component={Login} />
+          <Route path="/dashboard">
+            {() => <ProtectedRoute component={Dashboard} />}
+          </Route>
+          <Route path="/blog" component={Blog} />
+          <Route path="/blog/:slug" component={BlogPost} />
+          <Route path="/profile">
+            {() => <ProtectedRoute component={Profile} />}
+          </Route>
+          <Route path="/accounting" component={AccountingDashboard} />
+          <Route path="/calculators" component={Calculators} />
+          <Route path="/calculators/income-tax" component={IncomeTaxCalculator} />
+          <Route path="/calculators/hra" component={HRACalculator} />
+          <Route path="/calculators/sip" component={SIPCalculator} />
+          <Route path="/calculators/swp" component={SWPCalculator} />
+          <Route path="/calculators/pf" component={PFCalculator} />
+          <Route path="/calculators/nps" component={NPSCalculator} />
+          <Route path="/calculators/home-loan" component={HomeLoanCalculator} />
+          <Route path="/calculators/vehicle-loan" component={VehicleLoanCalculator} />
+          <Route path="/calculators/trading-tax" component={TradingTaxCalculatorPage} />
+          <Route path="/nri" component={NRICorner} />
+          <Route path="/nri/dtaa-calculator" component={DTAACalculator} />
+          <Route path="/nri/nro-nre-comparison" component={NRONREComparison} />
+          <Route path="/nri/income-tax-calculator" component={NRIIncomeTaxCalculator} />
+          <Route path="/nri/repatriation-planner" component={RepatriationPlanner} />
+          <Route path="/tools/rent-receipt" component={RentReceiptGenerator} />
+          <Route path="/find-ca" component={FindCA} />
+          <Route path="/ca/register" component={CARegister} />
+          <Route path="/ca/my-profile" component={CAMyProfile} />
+          <Route path="/about" component={About} />
+          <Route path="/contact" component={Contact} />
+          <Route path="/privacy-policy" component={PrivacyPolicy} />
+          <Route path="/terms-of-service" component={TermsOfService} />
+          <Route component={NotFound} />
+        </Switch>
+      </Suspense>
     </Layout>
   );
 }

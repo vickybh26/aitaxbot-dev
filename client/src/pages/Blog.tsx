@@ -280,7 +280,7 @@ export default function Blog() {
                   <div className="p-8 md:w-3/5 flex flex-col justify-center">
                     <div className="flex items-center gap-2 mb-3">
                       <span className="text-xs font-bold bg-orange-100 text-orange-700 px-2.5 py-0.5 rounded-full">New</span>
-                      <span className="text-xs text-slate-400">{featuredPost.date}</span>
+                      <span className="text-xs text-slate-500">{featuredPost.date}</span>
                     </div>
                     <h2 className="text-2xl md:text-3xl font-bold text-slate-900 group-hover:text-persian-blue-600 transition-colors leading-snug mb-4">
                       {featuredPost.title}
@@ -328,7 +328,7 @@ export default function Blog() {
                             {post.category}
                           </span>
                           {post.isNew && (
-                            <span className="text-xs font-bold bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full">New</span>
+                            <span className="text-xs font-bold bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full">New</span>
                           )}
                         </div>
 
@@ -343,7 +343,7 @@ export default function Blog() {
                         </p>
 
                         {/* Footer */}
-                        <div className="flex items-center justify-between text-xs text-slate-400 pt-4 border-t border-slate-50">
+                        <div className="flex items-center justify-between text-xs text-slate-500 pt-4 border-t border-slate-50">
                           <div className="flex items-center gap-3">
                             <span className="flex items-center gap-1">
                               <Calendar className="h-3.5 w-3.5" />{post.date}

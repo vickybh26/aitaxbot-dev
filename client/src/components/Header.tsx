@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { trackButtonClick } from "@/lib/analytics";
 import { useAuth } from "@/contexts/AuthContext";
 import { logout } from "@/lib/firebase";
-import logoImage from "@assets/aitaxbot-logo-lovable.png";
+import logoImageWebP from "@assets/aitaxbot-logo-lovable.webp";
+import logoImagePng from "@assets/aitaxbot-logo-lovable.png";
 import {
   Menu, X, Calculator, LogOut, User, LayoutDashboard,
   Globe, Shield, ChevronDown, UserCheck,
@@ -70,11 +71,16 @@ export default function Header({ showModal }: HeaderProps = {}) {
             onClick={() => trackButtonClick("Logo Home", "Header")}
             data-testid="link-home-logo"
           >
-            <img
-              src={logoImage}
-              alt="AiTaxBot Logo"
-              className="h-14 w-auto"
-            />
+            <picture>
+              <source srcSet={logoImageWebP} type="image/webp" />
+              <img
+                src={logoImagePng}
+                alt="AiTaxBot Logo"
+                className="h-14 w-auto"
+                width={56}
+                height={56}
+              />
+            </picture>
           </Link>
 
           {/* ── Desktop Nav ── */}
