@@ -324,8 +324,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // POST /api/stats/track-calculation — fire-and-forget hit from any calculator on the site
-  // App Check keeps a bot from inflating the "X calculations done" counter.
-  app.post("/api/stats/track-calculation", appCheckGuard, async (req, res) => {
+  // No App Check guard — this is a vanity counter, not sensitive data. Enforcement was blocking all clients.
+  app.post("/api/stats/track-calculation", async (req, res) => {
     res.json({ ok: true }); // respond immediately — don't make the client wait
     try {
       const db = getFirestore();
