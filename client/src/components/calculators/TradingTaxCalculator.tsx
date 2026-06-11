@@ -1121,7 +1121,7 @@ export default function TradingTaxCalculator() {
       {hasAnyData && (
         <div
           className="border-b border-slate-200 px-5 py-3 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors"
-          onClick={() => { setActiveTab("summary"); trackTool("Trading Tax Calculator", `Tax: ₹${Math.round(grandTotal).toLocaleString('en-IN')}`); }}
+          onClick={() => { setActiveTab("summary"); trackTool("Trading Tax Calculator", `Tax: ₹${Math.round(grandTotal).toLocaleString('en-IN')}`); fetch('/api/stats/track-calculation', { method: 'POST' }).catch(() => {}); }}
         >
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
