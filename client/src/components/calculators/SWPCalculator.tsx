@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { PiggyBank, Info } from "lucide-react";
 import { useTrackToolUse } from '@/hooks/useTrackToolUse';
 import Modal from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
@@ -184,7 +185,7 @@ export default function SWPCalculator({ onClose }: SWPCalculatorProps = {}) {
           className="w-full h-12 bg-persian-blue-600 hover:bg-persian-blue-700 text-white font-medium"
           data-testid="button-calculate-swp"
         >
-          <i className="fas fa-piggy-bank mr-2"></i>Calculate SWP
+          <PiggyBank className="mr-2 h-4 w-4" />Calculate SWP
         </Button>
       </div>
 
@@ -284,7 +285,7 @@ export default function SWPCalculator({ onClose }: SWPCalculatorProps = {}) {
 
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
           <div className="flex items-start gap-2">
-            <i className="fas fa-info-circle text-yellow-600 mt-0.5"></i>
+            <Info className="h-4 w-4 text-yellow-600 mt-0.5 shrink-0" />
             <span className="text-sm text-yellow-800">
               {result?.inflationAdjusted
                 ? `Withdrawals increase by ${inflationRate}% annually to account for inflation.`

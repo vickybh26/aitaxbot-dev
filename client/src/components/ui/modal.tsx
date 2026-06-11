@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { X } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -36,7 +37,7 @@ export default function Modal({ isOpen, onClose, title, children, size = "4xl" }
               className="text-gray-500 hover:text-gray-700"
               data-testid="button-close-modal"
             >
-              <i className="fas fa-times text-xl"></i>
+              <X className="h-5 w-5" />
             </Button>
           </div>
           {children}

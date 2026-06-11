@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { TrendingUp } from "lucide-react";
 import { useTrackToolUse } from '@/hooks/useTrackToolUse';
 import Modal from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
@@ -205,7 +206,7 @@ export default function SIPCalculator({ onClose }: SIPCalculatorProps = {}) {
             className="w-full h-12 bg-persian-blue-600 hover:bg-persian-blue-700 text-white font-medium"
             data-testid="button-calculate-sip"
           >
-            <i className="fas fa-chart-line mr-2"></i>Calculate SIP
+            <TrendingUp className="mr-2 h-4 w-4" />Calculate SIP
           </Button>
         </div>
         

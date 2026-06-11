@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Calculator, PieChart, ClipboardList, User, Coins, Percent, Loader2, RotateCcw } from 'lucide-react';
 import {
   BarChart,
   Bar,
@@ -906,15 +907,15 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
         </div>
         <TabsList className="grid w-full grid-cols-3 mb-6">
           <TabsTrigger value="calculator" className="flex items-center space-x-2">
-            <i className="fas fa-calculator"></i>
+            <Calculator className="h-4 w-4" />
             <span>Calculator</span>
           </TabsTrigger>
           <TabsTrigger value="results" className="flex items-center space-x-2">
-            <i className="fas fa-chart-pie"></i>
+            <PieChart className="h-4 w-4" />
             <span>Results</span>
           </TabsTrigger>
           <TabsTrigger value="breakdown" className="flex items-center space-x-2">
-            <i className="fas fa-list-alt"></i>
+            <ClipboardList className="h-4 w-4" />
             <span>Tax Breakdown</span>
           </TabsTrigger>
         </TabsList>
@@ -926,7 +927,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
               <Card className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-readable flex items-center">
-                    <i className="fas fa-user mr-2 text-primary"></i>
+                    <User className="mr-2 h-4 w-4 text-primary" />
                     Basic Information
                   </h3>
                   <LastUpdated
@@ -1021,7 +1022,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
 
               <Card className="p-6">
                 <h3 className="text-lg font-semibold text-readable mb-4 flex items-center">
-                  <i className="fas fa-coins mr-2 text-success"></i>
+                  <Coins className="mr-2 h-4 w-4 text-success" />
                   Income Sources
                 </h3>
                 
@@ -1093,7 +1094,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
             <div className="space-y-6">
               <Card className="p-6">
                 <h3 className="text-lg font-semibold text-readable mb-4 flex items-center">
-                  <i className="fas fa-percentage mr-2 text-accent"></i>
+                  <Percent className="mr-2 h-4 w-4 text-accent" />
                   Deductions (Old Regime Only)
                 </h3>
                 
@@ -1276,12 +1277,12 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                 >
                   {isCalculating ? (
                     <>
-                      <i className="fas fa-spinner fa-spin mr-2"></i>
+                      <Loader2 className="animate-spin mr-2 h-4 w-4" />
                       Calculating...
                     </>
                   ) : (
                     <>
-                      <i className="fas fa-calculator mr-2"></i>
+                      <Calculator className="mr-2 h-4 w-4" />
                       Calculate Tax
                     </>
                   )}
@@ -1292,7 +1293,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                   onClick={resetCalculator}
                   data-testid="button-reset"
                 >
-                  <i className="fas fa-redo mr-2"></i>
+                  <RotateCcw className="mr-2 h-4 w-4" />
                   Reset
                 </Button>
               </div>
@@ -1520,7 +1521,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
             </div>
           ) : (
             <div className="text-center py-12">
-              <i className="fas fa-chart-pie text-4xl text-neutral-300 mb-4"></i>
+              <PieChart className="h-10 w-10 text-neutral-300 mb-4" />
               <p className="text-readable-light">Complete the calculation to see detailed results</p>
             </div>
           )}
@@ -1669,7 +1670,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
             </div>
           ) : (
             <div className="text-center py-12">
-              <i className="fas fa-list-alt text-4xl text-neutral-300 mb-4"></i>
+              <ClipboardList className="h-10 w-10 text-neutral-300 mb-4" />
               <p className="text-readable-light">Complete the calculation to see tax breakdown</p>
             </div>
           )}
