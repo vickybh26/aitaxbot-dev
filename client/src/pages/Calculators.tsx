@@ -172,6 +172,19 @@ const documentTools = [
       'Email delivery with dashboard link',
       '100% free — no registration needed'
     ]
+  },
+  {
+    title: 'AIS vs 26AS vs Form 16 Reconciliation',
+    description: 'Upload your AIS, Form 26AS, and Form 16 PDFs and instantly detect mismatches before filing ITR. AI-powered engine flags salary discrepancies, TDS gaps, unreported income, and more.',
+    icon: Award,
+    link: '/tools/ais-26as-form16',
+    color: 'blue',
+    features: [
+      'AI extracts & compares all 3 documents',
+      'Severity-rated mismatch cards (HIGH/MEDIUM/LOW)',
+      'Downloadable PDF reconciliation report',
+      'ITR filing action plan — login required'
+    ]
   }
 ];
 

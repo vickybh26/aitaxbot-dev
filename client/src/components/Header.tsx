@@ -8,7 +8,7 @@ import logoImageWebP from "@assets/aitaxbot-logo-lovable.webp";
 import logoImagePng from "@assets/aitaxbot-logo-lovable.png";
 import {
   Menu, X, Calculator, LogOut, User, LayoutDashboard,
-  Globe, Shield, ChevronDown, UserCheck,
+  Globe, Shield, ChevronDown, UserCheck, FileText,
 } from "lucide-react";
 import { useTranslation, type Lang } from "@/lib/i18n";
 
@@ -133,7 +133,13 @@ export default function Header({ showModal }: HeaderProps = {}) {
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform ${moreOpen ? "rotate-180" : ""}`} />
               </button>
               {moreOpen && (
-                <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-slate-200 rounded-xl shadow-lg py-1.5 z-50">
+                <div className="absolute top-full left-0 mt-2 w-56 bg-white border border-slate-200 rounded-xl shadow-lg py-1.5 z-50">
+                  <Link href="/tools/ais-26as-form16" onClick={() => { trackButtonClick("AIS Reconciliation", "Header More"); setMoreOpen(false); }} className={dropItem}>
+                    AIS Reconciliation
+                  </Link>
+                  <Link href="/tools/rent-receipt" onClick={() => { trackButtonClick("Rent Receipt", "Header More"); setMoreOpen(false); }} className={dropItem}>
+                    Rent Receipt
+                  </Link>
                   <Link href="/accounting" onClick={() => { trackButtonClick("Accounting", "Header More"); setMoreOpen(false); }} className={dropItem}>
                     Accounting
                   </Link>
@@ -258,6 +264,9 @@ export default function Header({ showModal }: HeaderProps = {}) {
             </Link>
             <Link href="/nri" onClick={() => { trackButtonClick("NRI", "Mobile Header"); setMobileMenuOpen(false); }} className="flex items-center gap-2 py-2.5 text-sm font-medium text-slate-700">
               <Globe className="w-4 h-4" />NRI
+            </Link>
+            <Link href="/tools/ais-26as-form16" onClick={() => { trackButtonClick("AIS Reconciliation", "Mobile Header"); setMobileMenuOpen(false); }} className="flex items-center gap-2 py-2.5 text-sm font-medium text-slate-700">
+              <FileText className="w-4 h-4" />AIS Reconciliation
             </Link>
             <Link href="/accounting" onClick={() => setMobileMenuOpen(false)} className="py-2.5 text-sm font-medium text-slate-700 block">Accounting</Link>
             <Link href="/blog" onClick={() => setMobileMenuOpen(false)} className="py-2.5 text-sm font-medium text-slate-700 block">Blog</Link>

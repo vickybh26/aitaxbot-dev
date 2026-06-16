@@ -7,7 +7,7 @@ import { trackPageView } from "@/lib/analytics";
 import {
   FileText, Upload, AlertCircle, CheckCircle2, AlertTriangle,
   Download, Loader2, ChevronDown, ChevronUp, Info, Shield,
-  ArrowRight, RefreshCw, LogIn,
+  ArrowRight, RefreshCw, LogIn, Lock, Eye, EyeOff,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -124,11 +124,15 @@ interface FileCardProps {
   file: File | null;
   onSelect: (f: File | null) => void;
   tip: string;
+  passwordHint?: string;
+  password: string;
+  onPasswordChange: (p: string) => void;
 }
 
-function FileCard({ label, description, color, file, onSelect, tip }: FileCardProps) {
+function FileCard({ label, description, color, file, onSelect, tip, passwordHint, password, onPasswordChange }: FileCardProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
+  const [showPwd, setShowPwd] = useState(false);
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
@@ -141,50 +145,83 @@ function FileCard({ label, description, color, file, onSelect, tip }: FileCardPr
   );
 
   return (
-    <div
-      className={`border-2 rounded-xl p-5 cursor-pointer transition-all ${
-        dragging ? "border-blue-500 bg-blue-50" : file ? "border-green-400 bg-green-50" : "border-dashed border-gray-300 bg-gray-50 hover:border-gray-400"
-      }`}
-      onClick={() => inputRef.current?.click()}
-      onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
-      onDragLeave={() => setDragging(false)}
-      onDrop={handleDrop}
-    >
-      <input
-        ref={inputRef}
-        type="file"
-        accept="application/pdf,.pdf"
-        className="hidden"
-        onChange={(e) => onSelect(e.target.files?.[0] ?? null)}
-      />
-      <div className="flex items-start gap-3">
-        <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${color}`}>
-          <FileText className="w-5 h-5 text-white" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="font-semibold text-gray-900 text-sm">{label}</div>
-          <div className="text-xs text-gray-500 mt-0.5">{description}</div>
-          {file ? (
-            <div className="flex items-center gap-1.5 mt-2 text-green-700 text-xs font-medium">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              {file.name} ({(file.size / 1024).toFixed(0)} KB)
-            </div>
-          ) : (
-            <div className="flex items-center gap-1 mt-2 text-gray-400 text-xs">
-              <Upload className="w-3 h-3" /> Click or drag & drop PDF
-            </div>
+    <div className={`border-2 rounded-xl transition-all ${
+      dragging ? "border-blue-500 bg-blue-50" : file ? "border-green-400 bg-green-50" : "border-dashed border-gray-300 bg-gray-50"
+    }`}>
+      {/* Upload zone */}
+      <div
+        className="p-5 cursor-pointer hover:bg-gray-100/50 rounded-t-xl transition-colors"
+        onClick={() => inputRef.current?.click()}
+        onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={handleDrop}
+      >
+        <input
+          ref={inputRef}
+          type="file"
+          accept="application/pdf,.pdf"
+          className="hidden"
+          onChange={(e) => onSelect(e.target.files?.[0] ?? null)}
+        />
+        <div className="flex items-start gap-3">
+          <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${color}`}>
+            <FileText className="w-5 h-5 text-white" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="font-semibold text-gray-900 text-sm">{label}</div>
+            <div className="text-xs text-gray-500 mt-0.5">{description}</div>
+            {file ? (
+              <div className="flex items-center gap-1.5 mt-2 text-green-700 text-xs font-medium">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                {file.name} ({(file.size / 1024).toFixed(0)} KB)
+              </div>
+            ) : (
+              <div className="flex items-center gap-1 mt-2 text-gray-400 text-xs">
+                <Upload className="w-3 h-3" /> Click or drag & drop PDF
+              </div>
+            )}
+          </div>
+          {file && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onSelect(null); }}
+              className="text-gray-400 hover:text-red-500 text-lg leading-none"
+            >×</button>
           )}
         </div>
-        {file && (
-          <button
-            onClick={(e) => { e.stopPropagation(); onSelect(null); }}
-            className="text-gray-400 hover:text-red-500 text-lg leading-none"
-          >×</button>
-        )}
+        <div className="mt-3 flex items-start gap-1.5 text-xs text-gray-400">
+          <Info className="w-3 h-3 flex-shrink-0 mt-0.5" />
+          <span>{tip}</span>
+        </div>
       </div>
-      <div className="mt-3 flex items-start gap-1.5 text-xs text-gray-400">
-        <Info className="w-3 h-3 flex-shrink-0 mt-0.5" />
-        <span>{tip}</span>
+
+      {/* Password field — always shown */}
+      <div className="border-t border-gray-200 px-5 pb-4 pt-3 bg-white/70 rounded-b-xl" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center gap-2">
+          <Lock className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+          <span className="text-xs text-gray-500 font-medium">PDF Password</span>
+          <span className="text-xs text-gray-400">(optional — leave blank if not password-protected)</span>
+        </div>
+        <div className="relative mt-1.5">
+          <input
+            type={showPwd ? "text" : "password"}
+            value={password}
+            onChange={(e) => onPasswordChange(e.target.value)}
+            placeholder={passwordHint || "Enter PDF password if locked"}
+            className="w-full text-xs border border-gray-200 rounded-lg px-3 py-2 pr-8 focus:outline-none focus:border-blue-400 bg-white placeholder-gray-300"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPwd((s) => !s)}
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+          >
+            {showPwd ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+          </button>
+        </div>
+        {passwordHint && !password && (
+          <div className="text-xs text-amber-600 mt-1 flex items-center gap-1">
+            <Lock className="w-3 h-3" /> {passwordHint}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -200,6 +237,9 @@ export default function AIS26ASForm16Tool() {
   const [aisFile, setAisFile] = useState<File | null>(null);
   const [form26asFile, setForm26asFile] = useState<File | null>(null);
   const [form16File, setForm16File] = useState<File | null>(null);
+  const [aisPassword, setAisPassword] = useState("");
+  const [form26asPassword, setForm26asPassword] = useState("");
+  const [form16Password, setForm16Password] = useState("");
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [report, setReport] = useState<ReconciliationReport | null>(null);
@@ -231,6 +271,9 @@ export default function AIS26ASForm16Tool() {
       formData.append("ais", aisFile);
       formData.append("form26as", form26asFile);
       formData.append("form16", form16File);
+      if (aisPassword) formData.append("aisPassword", aisPassword);
+      if (form26asPassword) formData.append("form26asPassword", form26asPassword);
+      if (form16Password) formData.append("form16Password", form16Password);
 
       setProgress(30);
       const resp = await fetch("/api/tools/tax-reconcile", {
@@ -363,6 +406,9 @@ export default function AIS26ASForm16Tool() {
                 file={aisFile}
                 onSelect={setAisFile}
                 tip="AIS shows all income reported to IT dept — salary, interest, dividends, MF/stock transactions"
+                passwordHint="AIS is usually not password-protected. Leave blank."
+                password={aisPassword}
+                onPasswordChange={setAisPassword}
               />
               <FileCard
                 label="Form 26AS / Annual Tax Statement"
@@ -371,6 +417,9 @@ export default function AIS26ASForm16Tool() {
                 file={form26asFile}
                 onSelect={setForm26asFile}
                 tip="26AS shows TDS credits — salary TDS (Part A), bank TDS (Part B), advance tax (Part C)"
+                passwordHint="If locked, the password is usually your PAN number (e.g. ABCDE1234F)"
+                password={form26asPassword}
+                onPasswordChange={setForm26asPassword}
               />
               <FileCard
                 label="Form 16"
@@ -379,6 +428,9 @@ export default function AIS26ASForm16Tool() {
                 file={form16File}
                 onSelect={setForm16File}
                 tip="Form 16 Part A: TDS deposited by employer. Part B: Salary breakup and Chapter VI-A deductions"
+                passwordHint="Common passwords: PAN number, PAN+DOB (ABCDE1234F01011990), or employer-set"
+                password={form16Password}
+                onPasswordChange={setForm16Password}
               />
             </div>
 
@@ -591,7 +643,7 @@ export default function AIS26ASForm16Tool() {
 
               {/* Restart */}
               <Button
-                onClick={() => { setReport(null); setAisFile(null); setForm26asFile(null); setForm16File(null); }}
+                onClick={() => { setReport(null); setAisFile(null); setForm26asFile(null); setForm16File(null); setAisPassword(""); setForm26asPassword(""); setForm16Password(""); }}
                 variant="outline"
                 className="w-full"
               >

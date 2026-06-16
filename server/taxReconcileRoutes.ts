@@ -247,7 +247,14 @@ export function registerTaxReconcileRoutes(app: Express): void {
           }
         }
 
-        const report = await reconcileTaxDocuments(aisBuf, form26asBuf, form16Buf);
+        // Optional per-document passwords (for password-protected PDFs)
+        const passwords = {
+          ais: req.body?.aisPassword as string | undefined,
+          form26as: req.body?.form26asPassword as string | undefined,
+          form16: req.body?.form16Password as string | undefined,
+        };
+
+        const report = await reconcileTaxDocuments(aisBuf, form26asBuf, form16Buf, passwords);
         return res.json({ success: true, report });
       } catch (err) {
         console.error("[tax-reconcile] Error:", err);

@@ -170,7 +170,8 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
     { title: "SIP Calculator", description: "Wealth Builder", icon: TrendingUp, href: "/calculators/sip", color: "from-green-500 to-emerald-600" },
     { title: "SWP Calculator", description: "Retirement Plan", icon: PiggyBank, href: "/calculators/swp", color: "from-purple-500 to-pink-600" },
     { title: "PF Calculator", description: "EPF / VPF / PPF", icon: Shield, href: "/calculators/pf", color: "from-indigo-500 to-indigo-600" },
-    { title: "Rent Receipt", description: "HRA Proof PDF", icon: FileText, href: "/tools/rent-receipt", color: "from-orange-500 to-amber-600", badge: "New" },
+    { title: "Rent Receipt", description: "HRA Proof PDF", icon: FileText, href: "/tools/rent-receipt", color: "from-orange-500 to-amber-600" },
+    { title: "AIS Reconciliation", description: "AIS vs 26AS vs Form 16", icon: FileText, href: "/tools/ais-26as-form16", color: "from-blue-600 to-indigo-700", badge: "New" },
   ];
 
   return (

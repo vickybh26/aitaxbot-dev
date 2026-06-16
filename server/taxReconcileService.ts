@@ -8,7 +8,7 @@ import { createRequire } from "module";
 const _require = createRequire(import.meta.url);
 // pdf-parse is CJS-only; use createRequire so esbuild (ESM output) doesn't shim it
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const pdfParse: (buffer: Buffer) => Promise<{ text: string }> = _require("pdf-parse");
+const pdfParse: (buffer: Buffer, options?: { password?: string }) => Promise<{ text: string }> = _require("pdf-parse");
 
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY || "" });
 
@@ -103,13 +103,27 @@ export interface ReconciliationReport {
 // PDF text extraction
 // ─────────────────────────────────────────────────────────────────────────────
 
-async function extractPdfText(buffer: Buffer): Promise<string> {
-  try {
-    const data = await pdfParse(buffer);
-    return data.text || "";
-  } catch {
-    return "";
+async function extractPdfText(buffer: Buffer, password?: string): Promise<string> {
+  // Try with password first (if provided), then without as fallback
+  const attempts = password ? [password, undefined] : [undefined];
+  for (const pwd of attempts) {
+    try {
+      const data = await pdfParse(buffer, pwd ? { password: pwd } : undefined);
+      if (data.text && data.text.trim().length > 10) return data.text;
+    } catch {
+      // continue to next attempt
+    }
   }
+  return "";
+}
+
+/**
+ * Exposed for the route layer to call independently —
+ * validates that a given password can unlock a PDF.
+ */
+export async function tryExtractPdfText(buffer: Buffer, password?: string): Promise<{ success: boolean; text: string }> {
+  const text = await extractPdfText(buffer, password);
+  return { success: text.trim().length > 10, text };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -558,13 +572,14 @@ function generateSummary(
 export async function reconcileTaxDocuments(
   aisPdfBuffer: Buffer,
   form26asPdfBuffer: Buffer,
-  form16PdfBuffer: Buffer
+  form16PdfBuffer: Buffer,
+  passwords?: { ais?: string; form26as?: string; form16?: string }
 ): Promise<ReconciliationReport> {
-  // 1. Extract text from all PDFs in parallel
+  // 1. Extract text from all PDFs in parallel (with optional per-document passwords)
   const [aisText, form26asText, form16Text] = await Promise.all([
-    extractPdfText(aisPdfBuffer),
-    extractPdfText(form26asPdfBuffer),
-    extractPdfText(form16PdfBuffer),
+    extractPdfText(aisPdfBuffer, passwords?.ais),
+    extractPdfText(form26asPdfBuffer, passwords?.form26as),
+    extractPdfText(form16PdfBuffer, passwords?.form16),
   ]);
 
   // 2. Parse structured data with Gemini in parallel
