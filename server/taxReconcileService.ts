@@ -1,14 +1,11 @@
 /**
  * Tax Reconciliation Service
  * Compares AIS vs 26AS vs Form 16 and generates a reconciliation report.
- * Uses pdf-parse for text extraction and Gemini for AI explanations.
+ * Uses Gemini's native PDF reading (inline base64) — no pdf-parse needed.
+ * Indian IT-portal PDFs often have complex encoding that text extractors can't handle;
+ * Gemini's vision model reads them directly as images/documents.
  */
 import { GoogleGenAI } from "@google/genai";
-import { createRequire } from "module";
-const _require = createRequire(import.meta.url);
-// pdf-parse is CJS-only; use createRequire so esbuild (ESM output) doesn't shim it
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const pdfParse: (buffer: Buffer, options?: { password?: string }) => Promise<{ text: string }> = _require("pdf-parse");
 
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY || "" });
 
@@ -100,112 +97,91 @@ export interface ReconciliationReport {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PDF text extraction
+// Core helper: send a PDF buffer directly to Gemini as inline base64 data.
+// This bypasses text extraction entirely — Gemini's vision reads the PDF
+// natively, handling scanned pages, complex fonts, and Indian govt PDF layouts.
 // ─────────────────────────────────────────────────────────────────────────────
 
-async function extractPdfText(buffer: Buffer, password?: string): Promise<string> {
-  // Try with password first (if provided), then without as fallback
-  const attempts = password ? [password, undefined] : [undefined];
-  for (const pwd of attempts) {
-    try {
-      const data = await pdfParse(buffer, pwd ? { password: pwd } : undefined);
-      if (data.text && data.text.trim().length > 10) return data.text;
-    } catch {
-      // continue to next attempt
-    }
+async function geminiReadPdf<T>(
+  pdfBuffer: Buffer,
+  prompt: string,
+  fallback: T
+): Promise<T> {
+  if (!process.env.GOOGLE_API_KEY) return fallback;
+  try {
+    const result = await ai.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: [{
+        role: "user",
+        parts: [
+          {
+            inlineData: {
+              mimeType: "application/pdf",
+              data: pdfBuffer.toString("base64"),
+            },
+          },
+          { text: prompt },
+        ],
+      }],
+    });
+    const raw = result.candidates?.[0]?.content?.parts?.[0]?.text ?? "{}";
+    const cleaned = raw.replace(/```json\s*/g, "").replace(/```/g, "").trim();
+    // find the JSON object
+    const match = cleaned.match(/\{[\s\S]*\}/);
+    if (!match) return fallback;
+    return { ...fallback, ...JSON.parse(match[0]) };
+  } catch (err) {
+    console.error("[geminiReadPdf] error:", err);
+    return fallback;
   }
-  return "";
-}
-
-/**
- * Exposed for the route layer to call independently —
- * validates that a given password can unlock a PDF.
- */
-export async function tryExtractPdfText(buffer: Buffer, password?: string): Promise<{ success: boolean; text: string }> {
-  const text = await extractPdfText(buffer, password);
-  return { success: text.trim().length > 10, text };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Gemini: parse structured data from raw PDF text
+// Gemini: extract structured data from each document (PDF sent directly)
 // ─────────────────────────────────────────────────────────────────────────────
 
-async function parseAISWithGemini(text: string): Promise<ExtractedAIS> {
+async function parseAISWithGemini(pdfBuffer: Buffer): Promise<ExtractedAIS> {
   const fallback: ExtractedAIS = {
     salaryIncome: null, interestFromSavings: null, interestFromFD: null,
     dividendIncome: null, securitiesTransactions: null,
     mutualFundTransactions: null, otherIncome: null,
   };
-  if (!process.env.GOOGLE_API_KEY) return fallback;
+  return geminiReadPdf(pdfBuffer, `This is an Annual Information Statement (AIS) from the Indian Income Tax Department.
+Read every page carefully and extract the financial figures.
 
-  const prompt = `You are a tax document parser. Extract financial figures from this Annual Information Statement (AIS) text.
-Return ONLY valid JSON (no markdown, no explanation).
-
-Text:
-${text.slice(0, 8000)}
-
-Return this exact JSON structure (use null for fields not found, numbers without commas or symbols):
+Return ONLY this JSON (no markdown, no extra text). Use null for fields not found. All numbers must be plain integers/decimals — no commas, no ₹ symbol:
 {
-  "salaryIncome": <number or null>,
-  "interestFromSavings": <number or null>,
-  "interestFromFD": <number or null>,
-  "dividendIncome": <number or null>,
-  "securitiesTransactions": <number or null>,
-  "mutualFundTransactions": <number or null>,
-  "otherIncome": <number or null>
-}`;
-
-  try {
-    const result = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-    });
-    const raw = result.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
-    const cleaned = raw.replace(/```json|```/g, "").trim();
-    return { ...fallback, ...JSON.parse(cleaned) };
-  } catch {
-    return fallback;
-  }
+  "salaryIncome": <total salary/wages income reported in AIS, number or null>,
+  "interestFromSavings": <interest from savings account, number or null>,
+  "interestFromFD": <interest from fixed deposits or term deposits, number or null>,
+  "dividendIncome": <dividend income, number or null>,
+  "securitiesTransactions": <total value of listed securities transactions, number or null>,
+  "mutualFundTransactions": <total value of mutual fund transactions, number or null>,
+  "otherIncome": <any other income reported, number or null>
+}`, fallback);
 }
 
-async function parse26ASWithGemini(text: string): Promise<Extracted26AS> {
+async function parse26ASWithGemini(pdfBuffer: Buffer): Promise<Extracted26AS> {
   const fallback: Extracted26AS = {
     tdsSalary: null, tdsNonSalary: null, advanceTaxPaid: null,
     selfAssessmentTax: null, totalTdsCredits: null,
   };
-  if (!process.env.GOOGLE_API_KEY) return fallback;
+  return geminiReadPdf(pdfBuffer, `This is a Form 26AS (Annual Tax Statement) or Annual Tax Statement from India's TRACES portal.
+Read every part carefully. Part A = TDS on salary. Part B = TDS on non-salary. Part C = Advance Tax. Part D = Self Assessment Tax.
 
-  const prompt = `You are a tax document parser. Extract financial figures from this Form 26AS / Annual Tax Statement text.
-Return ONLY valid JSON (no markdown, no explanation).
-
-Text:
-${text.slice(0, 8000)}
-
-Return this exact JSON structure (numbers without commas or symbols, null if not found):
+Return ONLY this JSON (no markdown). Use null for fields not found. Numbers must be plain integers/decimals:
 {
-  "tdsSalary": <TDS deducted on salary from Part A, number or null>,
-  "tdsNonSalary": <TDS deducted on non-salary payments like interest from Part B, number or null>,
-  "advanceTaxPaid": <advance tax paid from Part C, number or null>,
-  "selfAssessmentTax": <self-assessment tax from Part D, number or null>,
-  "totalTdsCredits": <total TDS credits, number or null>,
-  "employerName": <employer name from Part A if found, string or null>,
-  "employerTAN": <employer TAN number if found, string or null>
-}`;
-
-  try {
-    const result = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-    });
-    const raw = result.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
-    const cleaned = raw.replace(/```json|```/g, "").trim();
-    return { ...fallback, ...JSON.parse(cleaned) };
-  } catch {
-    return fallback;
-  }
+  "tdsSalary": <total TDS amount deducted on salary (Part A), number or null>,
+  "tdsNonSalary": <total TDS on interest/dividends/other non-salary (Part B), number or null>,
+  "advanceTaxPaid": <advance tax deposited (Part C), number or null>,
+  "selfAssessmentTax": <self-assessment tax paid (Part D), number or null>,
+  "totalTdsCredits": <total of all TDS credits, number or null>,
+  "employerName": <name of employer from Part A if visible, string or null>,
+  "employerTAN": <TAN of employer from Part A if visible, string or null>
+}`, fallback);
 }
 
-async function parseForm16WithGemini(text: string): Promise<ExtractedForm16> {
+async function parseForm16WithGemini(pdfBuffer: Buffer): Promise<ExtractedForm16> {
   const fallback: ExtractedForm16 = {
     employerName: null, employerTAN: null, employeePAN: null,
     tdsDeposited: null, grossSalary: null, hraReceived: null,
@@ -214,45 +190,28 @@ async function parseForm16WithGemini(text: string): Promise<ExtractedForm16> {
     otherDeductions: null, taxableIncome: null, taxPayable: null,
     rebate87A: null, totalTaxDeducted: null,
   };
-  if (!process.env.GOOGLE_API_KEY) return fallback;
+  return geminiReadPdf(pdfBuffer, `This is a Form 16 TDS certificate issued by an Indian employer. It has Part A (TDS deposited quarterly) and Part B (salary breakup and deductions).
+Read all pages carefully.
 
-  const prompt = `You are a tax document parser. Extract financial figures from this Form 16 (TDS certificate) text.
-Return ONLY valid JSON (no markdown, no explanation).
-
-Text:
-${text.slice(0, 8000)}
-
-Return this exact JSON (numbers without commas or symbols, null if not found):
+Return ONLY this JSON (no markdown). Use null for fields not found. All numbers must be plain integers/decimals — no commas, no ₹:
 {
-  "employerName": <string or null>,
-  "employerTAN": <TAN number string or null>,
-  "employeePAN": <PAN number string or null>,
-  "tdsDeposited": <total TDS deposited from Part A, number or null>,
-  "grossSalary": <gross salary from Part B, number or null>,
-  "hraReceived": <HRA received, number or null>,
-  "standardDeduction": <standard deduction amount (usually 50000 or 75000), number or null>,
-  "professionalTax": <professional tax deducted, number or null>,
-  "netSalary": <net taxable salary after exemptions, number or null>,
-  "totalDeductions80C": <total deductions under section 80C, number or null>,
-  "totalDeductions80D": <deductions under section 80D, number or null>,
-  "otherDeductions": <other deductions total, number or null>,
-  "taxableIncome": <total taxable income, number or null>,
-  "taxPayable": <income tax computed, number or null>,
+  "employerName": <employer/company name, string or null>,
+  "employerTAN": <employer TAN number, string or null>,
+  "employeePAN": <employee PAN number, string or null>,
+  "tdsDeposited": <total TDS deposited as per Part A, number or null>,
+  "grossSalary": <gross salary before any deductions from Part B, number or null>,
+  "hraReceived": <HRA received or HRA exemption amount, number or null>,
+  "standardDeduction": <standard deduction (typically 50000 or 75000), number or null>,
+  "professionalTax": <professional tax paid, number or null>,
+  "netSalary": <net salary after allowance exemptions (income from salary), number or null>,
+  "totalDeductions80C": <total Chapter VI-A deductions under 80C, number or null>,
+  "totalDeductions80D": <deductions under 80D (medical insurance), number or null>,
+  "otherDeductions": <any other Chapter VI-A deductions, number or null>,
+  "taxableIncome": <total taxable income / gross total income after deductions, number or null>,
+  "taxPayable": <income tax before cess and rebate, number or null>,
   "rebate87A": <rebate under section 87A, number or null>,
-  "totalTaxDeducted": <total tax deducted at source, number or null>
-}`;
-
-  try {
-    const result = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-    });
-    const raw = result.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
-    const cleaned = raw.replace(/```json|```/g, "").trim();
-    return { ...fallback, ...JSON.parse(cleaned) };
-  } catch {
-    return fallback;
-  }
+  "totalTaxDeducted": <total tax deducted at source for the year, number or null>
+}`, fallback);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -573,20 +532,15 @@ export async function reconcileTaxDocuments(
   aisPdfBuffer: Buffer,
   form26asPdfBuffer: Buffer,
   form16PdfBuffer: Buffer,
-  passwords?: { ais?: string; form26as?: string; form16?: string }
+  _passwords?: { ais?: string; form26as?: string; form16?: string }
 ): Promise<ReconciliationReport> {
-  // 1. Extract text from all PDFs in parallel (with optional per-document passwords)
-  const [aisText, form26asText, form16Text] = await Promise.all([
-    extractPdfText(aisPdfBuffer, passwords?.ais),
-    extractPdfText(form26asPdfBuffer, passwords?.form26as),
-    extractPdfText(form16PdfBuffer, passwords?.form16),
-  ]);
-
-  // 2. Parse structured data with Gemini in parallel
+  // 1. Send each PDF directly to Gemini as inline base64 data.
+  //    Gemini's vision model reads the PDF natively — no text extraction needed.
+  //    This handles Indian IT-portal PDFs, scanned pages, and complex layouts.
   const [ais, form26as, form16] = await Promise.all([
-    parseAISWithGemini(aisText),
-    parse26ASWithGemini(form26asText),
-    parseForm16WithGemini(form16Text),
+    parseAISWithGemini(aisPdfBuffer),
+    parse26ASWithGemini(form26asPdfBuffer),
+    parseForm16WithGemini(form16PdfBuffer),
   ]);
 
   // 3. Run rule-based reconciliation
