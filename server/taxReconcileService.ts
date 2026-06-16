@@ -4,8 +4,11 @@
  * Uses pdf-parse for text extraction and Gemini for AI explanations.
  */
 import { GoogleGenAI } from "@google/genai";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const pdfParse = require("pdf-parse");
+import { createRequire } from "module";
+const _require = createRequire(import.meta.url);
+// pdf-parse is CJS-only; use createRequire so esbuild (ESM output) doesn't shim it
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const pdfParse: (buffer: Buffer) => Promise<{ text: string }> = _require("pdf-parse");
 
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY || "" });
 
