@@ -40,6 +40,7 @@ const NRONREComparison = lazy(() => import("@/pages/nri/NRONREComparison"));
 const NRIIncomeTaxCalculator = lazy(() => import("@/pages/nri/NRIIncomeTaxCalculator"));
 const RepatriationPlanner = lazy(() => import("@/pages/nri/RepatriationPlanner"));
 const RentReceiptGenerator = lazy(() => import("@/pages/RentReceiptGenerator"));
+const AIS26ASForm16Tool = lazy(() => import("@/pages/AIS26ASForm16Tool"));
 const FindCA = lazy(() => import("@/pages/FindCA"));
 const CARegister = lazy(() => import("@/pages/CARegister"));
 const CAMyProfile = lazy(() => import("@/pages/CAMyProfile"));
@@ -189,6 +190,7 @@ function Router() {
           <Route path="/nri/income-tax-calculator" component={NRIIncomeTaxCalculator} />
           <Route path="/nri/repatriation-planner" component={RepatriationPlanner} />
           <Route path="/tools/rent-receipt" component={RentReceiptGenerator} />
+          <Route path="/tools/ais-26as-form16" component={AIS26ASForm16Tool} />
           <Route path="/find-ca" component={FindCA} />
           <Route path="/ca/register" component={CARegister} />
           <Route path="/ca/my-profile" component={CAMyProfile} />

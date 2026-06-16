@@ -13,6 +13,7 @@ import whatsappRoutes from "./whatsapp/whatsappRoutes";
 import caRoutes from "./caRoutes";
 import leadRoutes from "./leadRoutes";
 import toolUsageRoutes from "./toolUsageRoutes";
+import { registerTaxReconcileRoutes } from "./taxReconcileRoutes.js";
 import { getFirestore, verifyFirebaseToken, admin } from "./firebase";
 import { COLLECTIONS } from "./firestoreHelper";
 import { TransactionalEmailsApi, TransactionalEmailsApiApiKeys } from '@getbrevo/brevo';
@@ -214,6 +215,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api/ca", caRoutes);
   app.use("/api/leads", leadRoutes);
   app.use("/api/tool-usage", toolUsageRoutes);
+  registerTaxReconcileRoutes(app);
   
   
   // Seed tax rates on startup (only runs once if empty)
