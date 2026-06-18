@@ -538,7 +538,7 @@ Extract these values. Use null if not found. Return ONLY this JSON (no markdown,
   try {
     console.log("[parseAISWithGemini] Sending AIS PDF to Gemini...");
     const result = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
+      model: "gemini-2.5-flash",
       contents: [{
         role: "user",
         parts: [
@@ -899,7 +899,7 @@ Respond ONLY in this JSON (no markdown, no leading/trailing text):
 
   try {
     const result = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
+      model: "gemini-2.5-flash",
       contents: [{ role: "user", parts: [{ text: prompt }] }],
     });
     const raw = result.text ?? "{}";
