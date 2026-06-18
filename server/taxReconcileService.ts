@@ -1,15 +1,14 @@
 /**
- * Tax Reconciliation Service — v2
+ * Tax Reconciliation Service — v3
  *
- * Strategy:
- *  • Form 16 + 26AS  → pdf-parse text extraction + TRACES-specific regex
- *    (Both are plain-text PDFs from TRACES; no Gemini key required)
- *  • AIS             → Gemini 2.0 Flash inline PDF (image-heavy IT-portal PDF)
- *    (Requires GOOGLE_API_KEY; gracefully degrades if absent)
+ * Strategy: All three PDFs are parsed via Gemini 2.5 Flash inline PDF.
+ *  • AIS     → Gemini inline (image-heavy IT-portal PDF — no text layer)
+ *  • 26AS    → Gemini inline (TRACES PDF — text encoding is unreliable for regex)
+ *  • Form 16 → Gemini inline (TRACES PDF — same reason)
  *
- * This means the tool shows real salary / TDS data immediately.
- * AIS data (dividends, interest, MF, capital gains) is additive once
- * the API key is configured.
+ * All three calls run in parallel (Promise.all).
+ * If GOOGLE_API_KEY is absent, all three gracefully return empty objects.
+ * Text regex (parse26ASFromText, parseForm16FromText) kept as dead code for reference.
  */
 
 import { createRequire } from "module";
@@ -572,6 +571,214 @@ Extract these values. Use null if not found. Return ONLY this JSON (no markdown,
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Parse Form 26AS via Gemini inline PDF
+// ─────────────────────────────────────────────────────────────────────────────
+
+async function parse26ASWithGemini(pdfBuffer: Buffer): Promise<Extracted26AS> {
+  const empty: Extracted26AS = {
+    tdsSalary: null, tdsNonSalary: null, advanceTaxPaid: null,
+    selfAssessmentTax: null, totalTdsCredits: null, tcsPaid: null,
+  };
+  if (!ai) {
+    console.warn("[parse26ASWithGemini] No API key — skipping");
+    return empty;
+  }
+
+  const prompt = `This is an Annual Tax Statement / Annual Information Statement (Form 26AS or ATS) downloaded from TRACES for FY 2025-26 / AY 2026-27.
+
+The document has sections like:
+- PART-I or PART A: TDS details — each row shows Deductor Name, TAN, Section code, Amount Paid, Tax Deducted, Tax Deposited
+  * Section 192 = salary TDS
+  * Section 194A = interest TDS
+  * Section 194S = crypto/VDA TDS
+  * Section 194Q = purchase TDS
+- PART-III or PART C: Advance Tax / Self-Assessment Tax payments
+- PART-VI or PART D: TCS collected
+
+Find ALL deductors and their TDS. Section 192 entries are salary TDS.
+Sum up:
+- tdsSalary = total Tax Deposited for all section 192 (salary) rows across all deductors
+- tdsNonSalary = total Tax Deposited for all non-192 section rows (194A, 194S, etc.)
+- advanceTaxPaid = total advance tax from Part C/III (BSR code entries, not TDS)
+- selfAssessmentTax = self-assessment tax paid (if any)
+- tcsPaid = total TCS collected (Part VI/D, section 206CQ etc.)
+- employerName = name of the deductor with section 192 (salary) TDS
+- employerTAN = TAN of that salary deductor
+
+Return ONLY this JSON (no markdown, no text before/after the JSON):
+{
+  "tdsSalary": <number or null>,
+  "tdsNonSalary": <number or null>,
+  "advanceTaxPaid": <number or null>,
+  "selfAssessmentTax": <number or null>,
+  "tcsPaid": <number or null>,
+  "employerName": "<string or null>",
+  "employerTAN": "<string or null>"
+}`;
+
+  try {
+    console.log("[parse26ASWithGemini] Sending 26AS PDF to Gemini...");
+    const result = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: [{
+        role: "user",
+        parts: [
+          { inlineData: { mimeType: "application/pdf", data: pdfBuffer.toString("base64") } },
+          { text: prompt },
+        ],
+      }],
+    });
+
+    const raw = result.text ?? result.candidates?.[0]?.content?.parts?.[0]?.text ?? "{}";
+    console.log("[parse26ASWithGemini] Raw response:", raw.slice(0, 400));
+
+    const cleaned = raw.replace(/```json\s*/g, "").replace(/```/g, "").trim();
+    const match = cleaned.match(/\{[\s\S]*\}/);
+    if (!match) { console.warn("[parse26ASWithGemini] No JSON found"); return empty; }
+    const parsed = JSON.parse(match[0]);
+    console.log("[parse26ASWithGemini] Parsed:", JSON.stringify(parsed));
+    return {
+      tdsSalary: parsed.tdsSalary ?? null,
+      tdsNonSalary: parsed.tdsNonSalary ?? null,
+      advanceTaxPaid: parsed.advanceTaxPaid ?? null,
+      selfAssessmentTax: parsed.selfAssessmentTax ?? null,
+      totalTdsCredits: (parsed.tdsSalary ?? 0) + (parsed.tdsNonSalary ?? 0) || null,
+      tcsPaid: parsed.tcsPaid ?? null,
+      employerName: parsed.employerName ?? undefined,
+      employerTAN: parsed.employerTAN ?? undefined,
+    };
+  } catch (err) {
+    console.error("[parse26ASWithGemini] Error:", err);
+    return empty;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Parse Form 16 via Gemini inline PDF
+// ─────────────────────────────────────────────────────────────────────────────
+
+async function parseForm16WithGemini(pdfBuffer: Buffer): Promise<ExtractedForm16> {
+  const empty: ExtractedForm16 = {
+    employerName: null, employerTAN: null, employeePAN: null, tdsDeposited: null,
+    grossSalary: null, salaryU17_1: null, perquisites: null, hraExempt: null,
+    standardDeduction: null, professionalTax: null, netSalary: null,
+    deduction80C: null, deduction80D: null, totalDeductionsVI_A: null,
+    taxableIncome: null, taxOnIncome: null, rebate87A: null, cess: null,
+    totalTaxPayable: null, totalTaxDeducted: null, newRegime: null,
+  };
+  if (!ai) {
+    console.warn("[parseForm16WithGemini] No API key — skipping");
+    return empty;
+  }
+
+  const prompt = `This is Form 16 (TDS Certificate) issued by an employer for FY 2025-26 / AY 2026-27.
+
+PART A contains:
+- Employer name, TAN, Employee PAN
+- Quarterly TDS breakdown table with a "Total" row showing: Amount Paid/Credited, Tax Deducted, Tax Deposited
+
+PART B contains the salary computation:
+1(a) Salary as per section 17(1)
+1(b) Value of perquisites u/s 17(2)
+1(c) Profits in lieu of salary u/s 17(3)
+1(d) Total = gross salary
+2. Less: Allowances exempt under section 10 (HRA u/s 10(13A), LTA u/s 10(5))
+3. Balance (1-2)
+4. Less: Deductions u/s 16 — (a) Standard deduction Rs.75,000, (b) Entertainment allowance, (c) Professional tax
+5. Not present in new format
+6. Income chargeable under Salaries
+7. Other income reported by employee
+8. Gross total income
+9. Deductions under Chapter VI-A (80C, 80D, etc.)
+10. Aggregate of deductible amount
+11. Total income / Taxable income (line 8 minus 9 or 10)
+12. Tax on total income (as per slab)
+13. Rebate u/s 87A (if income <= 7 lakh in old, <= 12 lakh in new)
+14. Surcharge (if any)
+15. Health and education cess @ 4%
+16. Tax payable
+17. Less: Relief u/s 89
+18. Net tax payable
+AND: Whether opting out of sub-section (1A) of section 115BAC: YES or NO
+  - If NO = New Tax Regime (115BAC applies = newRegime true)
+  - If YES = Old Tax Regime (opting out = newRegime false)
+
+Extract all values and return ONLY this JSON (no markdown):
+{
+  "employerName": "<full name>",
+  "employerTAN": "<TAN>",
+  "employeePAN": "<PAN>",
+  "tdsDeposited": <total from Part A Total row - Tax Deposited column, number>,
+  "grossSalary": <line 1(d), number>,
+  "salaryU17_1": <line 1(a), number>,
+  "perquisites": <line 1(b), number or 0>,
+  "hraExempt": <HRA exempt under 10(13A), number or 0>,
+  "standardDeduction": <standard deduction u/s 16(ia), number>,
+  "professionalTax": <professional tax u/s 16(iii), number or 0>,
+  "netSalary": <income chargeable under Salaries, number>,
+  "deduction80C": <80C deduction, number or 0>,
+  "deduction80D": <80D deduction, number or 0>,
+  "totalDeductionsVI_A": <total Chapter VI-A, number or 0>,
+  "taxableIncome": <total taxable income, number>,
+  "taxOnIncome": <tax on total income before rebate/cess, number>,
+  "rebate87A": <rebate u/s 87A, number or 0>,
+  "cess": <health and education cess, number>,
+  "totalTaxPayable": <net tax payable, number>,
+  "totalTaxDeducted": <same as tdsDeposited from Part A total, number>,
+  "newRegime": <true if 115BAC opted (opting out = NO), false if old regime (opting out = YES), null if not found>
+}`;
+
+  try {
+    console.log("[parseForm16WithGemini] Sending Form 16 PDF to Gemini...");
+    const result = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: [{
+        role: "user",
+        parts: [
+          { inlineData: { mimeType: "application/pdf", data: pdfBuffer.toString("base64") } },
+          { text: prompt },
+        ],
+      }],
+    });
+
+    const raw = result.text ?? result.candidates?.[0]?.content?.parts?.[0]?.text ?? "{}";
+    console.log("[parseForm16WithGemini] Raw response:", raw.slice(0, 400));
+
+    const cleaned = raw.replace(/```json\s*/g, "").replace(/```/g, "").trim();
+    const match = cleaned.match(/\{[\s\S]*\}/);
+    if (!match) { console.warn("[parseForm16WithGemini] No JSON found"); return empty; }
+    const parsed = JSON.parse(match[0]);
+    console.log("[parseForm16WithGemini] Parsed:", JSON.stringify(parsed));
+    return {
+      employerName: parsed.employerName ?? null,
+      employerTAN: parsed.employerTAN ?? null,
+      employeePAN: parsed.employeePAN ?? null,
+      tdsDeposited: parsed.tdsDeposited ?? null,
+      grossSalary: parsed.grossSalary ?? null,
+      salaryU17_1: parsed.salaryU17_1 ?? null,
+      perquisites: parsed.perquisites ?? null,
+      hraExempt: parsed.hraExempt ?? null,
+      standardDeduction: parsed.standardDeduction ?? null,
+      professionalTax: parsed.professionalTax ?? null,
+      netSalary: parsed.netSalary ?? null,
+      deduction80C: parsed.deduction80C ?? null,
+      deduction80D: parsed.deduction80D ?? null,
+      totalDeductionsVI_A: parsed.totalDeductionsVI_A ?? null,
+      taxableIncome: parsed.taxableIncome ?? null,
+      taxOnIncome: parsed.taxOnIncome ?? null,
+      rebate87A: parsed.rebate87A ?? null,
+      cess: parsed.cess ?? null,
+      totalTaxPayable: parsed.totalTaxPayable ?? null,
+      totalTaxDeducted: parsed.totalTaxDeducted ?? parsed.tdsDeposited ?? null,
+      newRegime: parsed.newRegime ?? null,
+    };
+  } catch (err) {
+    console.error("[parseForm16WithGemini] Error:", err);
+    return empty;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Rule-based reconciliation engine
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -928,45 +1135,38 @@ export async function reconcileTaxDocuments(
 ): Promise<ReconciliationReport> {
   console.log("[reconcileTaxDocuments] Starting reconciliation...");
 
-  // ── Step 1: Extract text from Form 16 and 26AS (text-based TRACES PDFs) ──
-  const [aisText, form26asText, form16Text] = await Promise.all([
-    extractText(aisPdfBuffer, "AIS"),
-    extractText(form26asPdfBuffer, "26AS"),
-    extractText(form16PdfBuffer, "Form16"),
+  // ── Step 1: Extract text (for logging/debugging only) ─────────────────────
+  const aisText = await extractText(aisPdfBuffer, "AIS");
+
+  // ── Step 2: Parse all three documents with Gemini inline PDF ──────────────
+  //    AIS is an image PDF (IT portal) — always needs Gemini
+  //    26AS and Form 16 are TRACES PDFs — Gemini is more reliable than regex
+  //    All three run in parallel for speed
+  console.log("[reconcileTaxDocuments] Parsing all 3 PDFs with Gemini...");
+  const [aisPartial, form26as, form16] = await Promise.all([
+    parseAISWithGemini(aisPdfBuffer),
+    parse26ASWithGemini(form26asPdfBuffer),
+    parseForm16WithGemini(form16PdfBuffer),
   ]);
 
-  // ── Step 2: Parse Form 16 and 26AS via regex (reliable for TRACES PDFs) ──
-  const form26as = parse26ASFromText(form26asText);
-  const form16 = parseForm16FromText(form16Text);
-
-  // ── Step 3: Parse AIS ─────────────────────────────────────────────────────
-  //    Strategy: try text regex first, then Gemini inline if key is available
-  let aisPartial: Partial<ExtractedAIS> = {};
-
-  // Try text extraction first (works if AIS has a text layer)
-  if (aisText.length > 200) {
-    aisPartial = parseAISFromText(aisText);
-    console.log("[reconcileTaxDocuments] AIS text parse result:", JSON.stringify(aisPartial));
-  }
-
-  // If text extraction gave nothing useful, use Gemini
-  const aisHasData = Object.values(aisPartial).some(v => v != null);
-  if (!aisHasData) {
-    console.log("[reconcileTaxDocuments] AIS text extraction insufficient — trying Gemini inline");
-    const geminiResult = await parseAISWithGemini(aisPdfBuffer);
-    aisPartial = { ...aisPartial, ...geminiResult };
+  // ── Step 3: Fallback — try text regex for AIS if Gemini returned nothing ──
+  let aisFinal = aisPartial;
+  const aisHasData = Object.values(aisFinal).some(v => v != null);
+  if (!aisHasData && aisText.length > 200) {
+    console.log("[reconcileTaxDocuments] AIS Gemini returned empty — trying text regex");
+    aisFinal = parseAISFromText(aisText);
   }
 
   const ais: ExtractedAIS = {
-    salaryIncome: aisPartial.salaryIncome ?? null,
-    interestFromSavings: aisPartial.interestFromSavings ?? null,
-    interestFromFD: aisPartial.interestFromFD ?? null,
-    dividendIncome: aisPartial.dividendIncome ?? null,
-    securitiesTransactions: aisPartial.securitiesTransactions ?? null,
-    mutualFundTransactions: aisPartial.mutualFundTransactions ?? null,
-    cryptoIncome: aisPartial.cryptoIncome ?? null,
-    lrsRemittance: aisPartial.lrsRemittance ?? null,
-    taxPaidSelfAssessment: aisPartial.taxPaidSelfAssessment ?? null,
+    salaryIncome: aisFinal.salaryIncome ?? null,
+    interestFromSavings: aisFinal.interestFromSavings ?? null,
+    interestFromFD: aisFinal.interestFromFD ?? null,
+    dividendIncome: aisFinal.dividendIncome ?? null,
+    securitiesTransactions: aisFinal.securitiesTransactions ?? null,
+    mutualFundTransactions: aisFinal.mutualFundTransactions ?? null,
+    cryptoIncome: aisFinal.cryptoIncome ?? null,
+    lrsRemittance: aisFinal.lrsRemittance ?? null,
+    taxPaidSelfAssessment: aisFinal.taxPaidSelfAssessment ?? null,
     rawText: aisText.slice(0, 300),
   };
 

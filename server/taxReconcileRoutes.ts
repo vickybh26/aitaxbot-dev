@@ -43,178 +43,244 @@ function fmt(n: number | null | undefined): string {
 }
 
 // ─── PDF report generator using PDFKit ───────────────────────────────────────
-function generatePDFReport(report: ReconciliationReport): Buffer {
+function generatePDFReport(report: ReconciliationReport): Promise<Buffer> {
   return new Promise<Buffer>((resolve) => {
-    const doc = new PDFDocument({ margin: 50, size: "A4" });
+    const doc = new PDFDocument({ margin: 50, size: "A4", autoFirstPage: true });
     const chunks: Buffer[] = [];
     doc.on("data", (c: Buffer) => chunks.push(c));
     doc.on("end", () => resolve(Buffer.concat(chunks)));
 
-    const BLUE = "#1B4FD8";
+    const PAGE_W = doc.page.width;   // 595
+    const M = 50;                    // margin
+    const CW = PAGE_W - 2 * M;      // content width = 495
+
+    const BLUE  = "#1B4FD8";
     const GREEN = "#16A34A";
-    const RED = "#DC2626";
+    const RED   = "#DC2626";
     const ORANGE = "#EA580C";
-    const GRAY = "#6B7280";
-    const LIGHT = "#F3F4F6";
+    const GRAY  = "#6B7280";
+    const LGRAY = "#F3F4F6";
+    const BLACK = "#111827";
 
-    const statusColor =
-      report.overallStatus === "CLEAN"
-        ? GREEN
-        : report.overallStatus === "CRITICAL"
-        ? RED
-        : ORANGE;
+    // PDFKit's built-in Helvetica uses WinAnsi encoding — the Rs symbol
+    // (U+20B9) is not supported and renders as the superscript-1 glyph.
+    // Replace with "Rs." throughout the PDF.
+    const pdfSafe = (s: string): string =>
+      s.replace(/₹/g, "Rs.").replace(/✓/g, "(OK)").replace(/✗/g, "(X)")
+       .replace(/✅/g, "(done)").replace(/⚠️?/g, "(!)").replace(/❌/g, "(X)");
 
-    // ── Header ────────────────────────────────────────────────────────────────
-    doc.rect(0, 0, doc.page.width, 80).fill(BLUE);
-    doc.fillColor("white").fontSize(20).font("Helvetica-Bold")
-       .text("AiTaxBot — Tax Document Reconciliation Report", 50, 22);
-    doc.fontSize(10).font("Helvetica")
-       .text(`FY 2025-26 | AY 2026-27 | Generated: ${new Date().toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}`, 50, 50);
-    doc.fillColor("black");
-    doc.y = 100;
+    const fmtRs = (n: number | null | undefined): string =>
+      n == null ? "N/A" : "Rs." + n.toLocaleString("en-IN", { maximumFractionDigits: 0 });
 
-    // ── Overall Status ────────────────────────────────────────────────────────
-    doc.rect(50, doc.y, doc.page.width - 100, 50).fill(LIGHT);
-    doc.fillColor(statusColor).fontSize(16).font("Helvetica-Bold")
-       .text(`Status: ${report.overallStatus.replace("_", " ")}`, 65, doc.y - 38);
-    doc.fillColor(GRAY).fontSize(10).font("Helvetica")
-       .text(report.summary, 65, doc.y - 20, { width: doc.page.width - 130 });
-    doc.fillColor("black");
-    doc.moveDown(1);
+    const statusColor = report.overallStatus === "CLEAN" ? GREEN
+      : report.overallStatus === "CRITICAL" ? RED : ORANGE;
+    const statusLabel = report.overallStatus === "CLEAN"
+      ? "CLEAN - Ready to File ITR"
+      : report.overallStatus === "CRITICAL"
+      ? "CRITICAL - Resolve Issues Before Filing"
+      : "NEEDS ATTENTION - Review Items Below";
 
-    // ── Extracted Data Summary ────────────────────────────────────────────────
-    doc.fontSize(13).font("Helvetica-Bold").fillColor(BLUE).text("Extracted Data Summary");
-    doc.moveDown(0.3);
-    doc.fontSize(9).font("Helvetica").fillColor("black");
+    // ── ensure space or add page ─────────────────────────────────────────────
+    const ensureSpace = (needed: number) => {
+      if (doc.y + needed > doc.page.height - 60) doc.addPage();
+    };
 
-    const tableX = 50;
-    const colW = (doc.page.width - 100) / 4;
-    const headers = ["Metric", "AIS", "Form 16", "26AS"];
-    const rows = [
-      ["Gross Salary / Salary Income",
-        fmt(report.extractedData.ais.salaryIncome),
-        fmt(report.extractedData.form16.grossSalary),
-        "—"],
-      ["TDS (Salary)",
-        "—",
-        fmt(report.extractedData.form16.totalTaxDeducted),
-        fmt(report.extractedData.form26as.tdsSalary)],
-      ["FD Interest",
-        fmt(report.extractedData.ais.interestFromFD),
-        "—",
-        "—"],
-      ["Savings Interest",
-        fmt(report.extractedData.ais.interestFromSavings),
-        "—",
-        "—"],
-      ["Dividend Income",
-        fmt(report.extractedData.ais.dividendIncome),
-        "—",
-        "—"],
-      ["Advance Tax Paid",
-        "—",
-        "—",
-        fmt(report.extractedData.form26as.advanceTaxPaid)],
-      ["Taxable Income (Form 16)",
-        "—",
-        fmt(report.extractedData.form16.taxableIncome),
-        "—"],
+    // ── section header ───────────────────────────────────────────────────────
+    const sectionHeader = (title: string) => {
+      ensureSpace(30);
+      doc.moveDown(0.5);
+      const y = doc.y;
+      doc.rect(M, y, CW, 20).fill(BLUE);
+      doc.fillColor("white").font("Helvetica-Bold").fontSize(11)
+         .text(title, M + 8, y + 5, { width: CW - 16, lineBreak: false });
+      doc.y = y + 24;
+    };
+
+    // ────────────────────────────────────────────────────────────────────────
+    // HEADER
+    // ────────────────────────────────────────────────────────────────────────
+    doc.rect(0, 0, PAGE_W, 65).fill(BLUE);
+    doc.fillColor("white").font("Helvetica-Bold").fontSize(16)
+       .text("AiTaxBot - Tax Document Reconciliation Report", M, 14, { width: CW });
+    doc.fillColor("white").font("Helvetica").fontSize(9)
+       .text(
+         "AIS + Form 26AS + Form 16  |  FY 2025-26 / AY 2026-27  |  Generated: " +
+         new Date().toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }),
+         M, 40, { width: CW }
+       );
+    doc.y = 75;
+
+    // ────────────────────────────────────────────────────────────────────────
+    // STATUS BOX
+    // ────────────────────────────────────────────────────────────────────────
+    const sy = doc.y;
+    doc.rect(M, sy, CW, 50).fill(LGRAY);
+    doc.fillColor(statusColor).font("Helvetica-Bold").fontSize(13)
+       .text("Status: " + statusLabel, M + 10, sy + 8, { width: CW - 20, lineBreak: false });
+    const summaryLine = pdfSafe((report.summary || "").replace(/\n/g, " "));
+    doc.fillColor(BLACK).font("Helvetica").fontSize(8)
+       .text(summaryLine, M + 10, sy + 28, { width: CW - 20, lineBreak: false });
+    doc.y = sy + 58;
+
+    // ────────────────────────────────────────────────────────────────────────
+    // EXTRACTED DATA SUMMARY TABLE
+    // ────────────────────────────────────────────────────────────────────────
+    sectionHeader("Extracted Data Summary");
+
+    const W0 = CW * 0.43, W1 = CW * 0.19, W2 = CW * 0.19, W3 = CW - W0 - W1 - W2;
+    const C0 = M, C1 = M + W0, C2 = M + W0 + W1, C3 = M + W0 + W1 + W2;
+    const ROW_H = 17;
+
+    // header row
+    {
+      const y = doc.y;
+      doc.rect(M, y, CW, ROW_H).fill(BLUE);
+      const hdr = ["Metric", "AIS", "Form 16", "26AS"];
+      const xs  = [C0, C1, C2, C3];
+      const ws  = [W0, W1, W2, W3];
+      hdr.forEach((h, i) => {
+        doc.fillColor("white").font("Helvetica-Bold").fontSize(8.5)
+           .text(h, xs[i] + 4, y + 5, { width: ws[i] - 8, lineBreak: false });
+      });
+      doc.y = y + ROW_H + 2;
+    }
+
+    const tableRows: [string, string, string, string][] = [
+      ["Gross Salary / Salary Income",  fmtRs(report.extractedData.ais.salaryIncome),          fmtRs(report.extractedData.form16.grossSalary),       "—"],
+      ["TDS on Salary",                 "—",                                                    fmtRs(report.extractedData.form16.totalTaxDeducted),   fmtRs(report.extractedData.form26as.tdsSalary)],
+      ["Taxable Income",                "—",                                                    fmtRs(report.extractedData.form16.taxableIncome),      "—"],
+      ["Standard Deduction",            "—",                                                    fmtRs(report.extractedData.form16.standardDeduction),  "—"],
+      ["Savings Interest (AIS)",        fmtRs(report.extractedData.ais.interestFromSavings),   "—",                                                   "—"],
+      ["FD Interest (AIS)",             fmtRs(report.extractedData.ais.interestFromFD),        "—",                                                   "—"],
+      ["Dividend Income (AIS)",         fmtRs(report.extractedData.ais.dividendIncome),        "—",                                                   "—"],
+      ["TDS Non-Salary (26AS)",         "—",                                                    "—",                                                   fmtRs(report.extractedData.form26as.tdsNonSalary)],
+      ["Advance Tax Paid (26AS)",       "—",                                                    "—",                                                   fmtRs(report.extractedData.form26as.advanceTaxPaid)],
     ];
 
-    // Header row
-    doc.rect(tableX, doc.y, doc.page.width - 100, 18).fill(BLUE);
-    headers.forEach((h, i) =>
-      doc.fillColor("white").font("Helvetica-Bold").fontSize(9)
-         .text(h, tableX + i * colW + 4, doc.y - 15, { width: colW - 8 })
-    );
-    doc.fillColor("black");
-    doc.moveDown(0.1);
-
-    rows.forEach((row, ri) => {
-      if (ri % 2 === 0) doc.rect(tableX, doc.y, doc.page.width - 100, 16).fill(LIGHT);
-      row.forEach((cell, ci) =>
-        doc.fillColor("black").font("Helvetica").fontSize(8)
-           .text(cell, tableX + ci * colW + 4, doc.y - 13, { width: colW - 8 })
-      );
-      doc.moveDown(0.05);
+    tableRows.forEach((row, ri) => {
+      const y = doc.y;
+      if (ri % 2 === 0) doc.rect(M, y, CW, ROW_H).fill(LGRAY);
+      const xs = [C0, C1, C2, C3];
+      const ws = [W0, W1, W2, W3];
+      row.forEach((cell, ci) => {
+        doc.fillColor(BLACK).font("Helvetica").fontSize(8.5)
+           .text(cell, xs[ci] + 4, y + 5, { width: ws[ci] - 8, lineBreak: false });
+      });
+      doc.y = y + ROW_H + 1;
     });
-    doc.moveDown(1);
 
-    // ── Reconciliation Checks ─────────────────────────────────────────────────
-    doc.fontSize(13).font("Helvetica-Bold").fillColor(BLUE).text("Reconciliation Checks");
-    doc.moveDown(0.3);
+    // employer info line
+    const empParts = [
+      report.extractedData.form16.employerName ? `Employer: ${report.extractedData.form16.employerName}` : "",
+      report.extractedData.form16.employerTAN  ? `TAN: ${report.extractedData.form16.employerTAN}` : "",
+      report.extractedData.form16.newRegime != null
+        ? `Regime: ${report.extractedData.form16.newRegime ? "New Tax Regime (115BAC)" : "Old Tax Regime"}`
+        : "",
+    ].filter(Boolean);
+    if (empParts.length) {
+      doc.moveDown(0.3);
+      doc.fillColor(GRAY).font("Helvetica").fontSize(7.5)
+         .text(empParts.join("   |   "), M, doc.y, { width: CW });
+    }
 
+    // ────────────────────────────────────────────────────────────────────────
+    // RECONCILIATION CHECKS
+    // ────────────────────────────────────────────────────────────────────────
+    sectionHeader("Reconciliation Checks");
     report.checks.forEach((check) => {
-      const colour =
-        check.status === "MATCH" || check.status === "OK" ? GREEN
-        : check.status === "MISMATCH" ? RED
-        : ORANGE;
-      const icon = check.status === "MATCH" || check.status === "OK" ? "✓" : check.status === "MISMATCH" ? "✗" : "?";
-      doc.fillColor(colour).font("Helvetica-Bold").fontSize(10).text(`${icon} ${check.name}`, { continued: true });
-      doc.fillColor(GRAY).font("Helvetica").fontSize(9).text(`  ${check.note}`);
+      ensureSpace(18);
+      const checkColor = (check.status === "MATCH" || check.status === "OK") ? GREEN
+        : check.status === "MISMATCH" ? RED : GRAY;
+      const icon = (check.status === "MATCH" || check.status === "OK") ? "[OK]"
+        : check.status === "MISMATCH" ? "[!!]" : "[?]";
+      const label = `${icon} ${check.name}: `;
+      doc.fillColor(checkColor).font("Helvetica-Bold").fontSize(8.5)
+         .text(label, M, doc.y, { continued: true, width: CW });
+      doc.fillColor(BLACK).font("Helvetica").fontSize(8.5)
+         .text(pdfSafe(check.note), { width: CW - doc.widthOfString(label) });
       doc.moveDown(0.2);
     });
-    doc.moveDown(0.5);
 
-    // ── Mismatches ────────────────────────────────────────────────────────────
+    // ────────────────────────────────────────────────────────────────────────
+    // ISSUES FOUND
+    // ────────────────────────────────────────────────────────────────────────
     if (report.mismatches.length > 0) {
-      doc.fontSize(13).font("Helvetica-Bold").fillColor(BLUE).text("Issues Found");
-      doc.moveDown(0.3);
-
+      sectionHeader(`Issues Found (${report.mismatches.length})`);
       report.mismatches.forEach((m, i) => {
+        ensureSpace(80);
         const mColor = m.severity === "HIGH" ? RED : m.severity === "MEDIUM" ? ORANGE : GRAY;
-        doc.fillColor(mColor).font("Helvetica-Bold").fontSize(10)
-           .text(`${i + 1}. [${m.severity}] ${m.title}`);
-        doc.fillColor("black").font("Helvetica").fontSize(9)
-           .text(m.description, { indent: 12 });
-        doc.fillColor(GRAY).fontSize(8)
-           .text(`Why: ${m.ruleExplanation}`, { indent: 12 });
-        doc.fillColor(BLUE).fontSize(8)
-           .text(`Action: ${m.suggestedAction}`, { indent: 12 });
+        doc.fillColor(mColor).font("Helvetica-Bold").fontSize(9)
+           .text(`${i + 1}. [${m.severity}] ${pdfSafe(m.title)}`, M, doc.y, { width: CW });
+        doc.moveDown(0.15);
+        doc.fillColor(BLACK).font("Helvetica").fontSize(8.5)
+           .text(pdfSafe(m.description), M + 12, doc.y, { width: CW - 12 });
+        doc.moveDown(0.1);
+        doc.fillColor(GRAY).font("Helvetica").fontSize(8)
+           .text("Rule: " + pdfSafe(m.ruleExplanation), M + 12, doc.y, { width: CW - 12 });
+        doc.moveDown(0.1);
+        doc.fillColor(BLUE).font("Helvetica").fontSize(8)
+           .text("Action: " + pdfSafe(m.suggestedAction), M + 12, doc.y, { width: CW - 12 });
         doc.moveDown(0.5);
       });
     } else {
-      doc.fontSize(10).fillColor(GREEN).font("Helvetica")
-         .text("✓ No significant mismatches found.");
+      doc.moveDown(0.3);
+      doc.fillColor(GREEN).font("Helvetica").fontSize(9)
+         .text("(OK) No significant mismatches found. Documents appear consistent.", M, doc.y, { width: CW });
       doc.moveDown(0.5);
     }
 
-    // ── AI Insights ───────────────────────────────────────────────────────────
+    // ────────────────────────────────────────────────────────────────────────
+    // AI ANALYSIS
+    // ────────────────────────────────────────────────────────────────────────
     if (report.aiInsights) {
-      doc.fontSize(13).font("Helvetica-Bold").fillColor(BLUE).text("AI Analysis");
-      doc.moveDown(0.3);
-      doc.fontSize(9).font("Helvetica").fillColor("black").text(report.aiInsights, { width: doc.page.width - 100 });
+      sectionHeader("AI Analysis");
+      doc.fillColor(BLACK).font("Helvetica").fontSize(8.5)
+         .text(pdfSafe(report.aiInsights), M, doc.y, { width: CW });
       doc.moveDown(0.5);
     }
 
-    // ── Action Items ──────────────────────────────────────────────────────────
-    if (report.actionItems.length > 0) {
-      doc.fontSize(13).font("Helvetica-Bold").fillColor(BLUE).text("Action Items Before Filing ITR");
-      doc.moveDown(0.3);
+    // ────────────────────────────────────────────────────────────────────────
+    // ACTION ITEMS
+    // ────────────────────────────────────────────────────────────────────────
+    if (report.actionItems && report.actionItems.length > 0) {
+      sectionHeader("Action Items Before Filing ITR");
       report.actionItems.forEach((item, i) => {
-        doc.fillColor("black").font("Helvetica").fontSize(9).text(`${i + 1}. ${item}`, { indent: 8 });
-        doc.moveDown(0.15);
+        ensureSpace(20);
+        doc.fillColor(BLACK).font("Helvetica").fontSize(8.5)
+           .text(`${i + 1}. ${pdfSafe(item)}`, M + 6, doc.y, { width: CW - 6 });
+        doc.moveDown(0.2);
       });
+    }
+
+    // ────────────────────────────────────────────────────────────────────────
+    // ITR FILING IMPACT
+    // ────────────────────────────────────────────────────────────────────────
+    if (report.itrImpact) {
+      sectionHeader("ITR Filing Impact");
+      doc.fillColor(BLACK).font("Helvetica").fontSize(8.5)
+         .text(pdfSafe(report.itrImpact), M, doc.y, { width: CW });
       doc.moveDown(0.5);
     }
 
-    // ── ITR Impact ────────────────────────────────────────────────────────────
-    if (report.itrImpact) {
-      doc.fontSize(13).font("Helvetica-Bold").fillColor(BLUE).text("ITR Filing Impact");
-      doc.moveDown(0.3);
-      doc.fontSize(9).font("Helvetica").fillColor("black").text(report.itrImpact, { width: doc.page.width - 100 });
-      doc.moveDown(1);
-    }
-
-    // ── Footer ────────────────────────────────────────────────────────────────
-    doc.rect(50, doc.y, doc.page.width - 100, 1).fill(GRAY);
+    // ────────────────────────────────────────────────────────────────────────
+    // FOOTER
+    // ────────────────────────────────────────────────────────────────────────
+    ensureSpace(45);
+    doc.moveDown(1);
+    doc.moveTo(M, doc.y).lineTo(PAGE_W - M, doc.y).strokeColor(GRAY).lineWidth(0.5).stroke();
+    doc.moveDown(0.4);
+    doc.fillColor(GRAY).font("Helvetica").fontSize(7.5)
+       .text(
+         "Disclaimer: This report is for informational purposes only. Not a substitute for professional CA advice. " +
+         "Always consult a qualified Chartered Accountant before filing your ITR.",
+         M, doc.y, { width: CW, align: "center" }
+       );
     doc.moveDown(0.3);
-    doc.fillColor(GRAY).fontSize(8).font("Helvetica")
-       .text("Disclaimer: This report is generated by AiTaxBot for informational purposes only. It is not a substitute for professional CA advice. Always verify with a qualified tax professional before filing your ITR.", { width: doc.page.width - 100, align: "center" });
-    doc.fontSize(8).text("www.aitaxbot.co.in | ITR Filing Deadline: July 31, 2026", { align: "center" });
+    doc.fillColor(GRAY).fontSize(7.5)
+       .text("www.aitaxbot.co.in  |  ITR Filing Deadline: July 31, 2026", { align: "center" });
 
     doc.end();
-  }) as unknown as Buffer;
+  });
 }
 
 // ─── Register routes ──────────────────────────────────────────────────────────
