@@ -86,6 +86,7 @@ interface ReconciliationReport {
   aiInsights: string;
   itrImpact: string;
   generatedAt: string;
+  aisNote?: string;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -483,6 +484,14 @@ export default function AIS26ASForm16Tool() {
                   PDF Report
                 </Button>
               </div>
+
+              {/* AIS note — shown when API key is absent or AIS is image-only */}
+              {report.aisNote && (
+                <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-900">
+                  <Info className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
+                  <span>{report.aisNote}</span>
+                </div>
+              )}
 
               {/* Extracted Data Table */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
