@@ -3,8 +3,7 @@ import { Helmet } from "react-helmet-async";
 import { Link } from "wouter";
 import { Globe, ChevronRight, AlertCircle, Calculator, TrendingUp } from "lucide-react";
 import AuthorBox from "@/components/AuthorBox";
-import AdBanner, { ResponsiveAd, RectangleAd } from "@/components/AdBanner";
-import Footer from "@/components/Footer";
+import { AdBanner, ResponsiveAd, RectangleAd } from "@/components/AdBanner";
 
 export default function NRIIncomeTaxCalculator() {
   // State for calculator inputs
@@ -905,8 +904,7 @@ export default function NRIIncomeTaxCalculator() {
         <AuthorBox />
       </div>
 
-      {/* Footer */}
-      <Footer />
+
     </>
   );
 }

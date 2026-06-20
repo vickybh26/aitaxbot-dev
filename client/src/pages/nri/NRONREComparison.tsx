@@ -3,8 +3,7 @@ import { Helmet } from "react-helmet-async";
 import { Link } from "wouter";
 import { Globe, ChevronRight, AlertCircle, CreditCard, TrendingUp, BookOpen } from "lucide-react";
 import AuthorBox from "@/components/AuthorBox";
-import AdBanner, { ResponsiveAd, RectangleAd } from "@/components/AdBanner";
-import Footer from "@/components/Footer";
+import { AdBanner, ResponsiveAd, RectangleAd } from "@/components/AdBanner";
 
 export default function NRONREComparison() {
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
@@ -493,8 +492,7 @@ export default function NRONREComparison() {
         </div>
       </section>
 
-      {/* Footer */}
-      <Footer />
+
     </>
   );
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import Footer from "@/components/Footer";
+import PageHeader from "@/components/PageHeader";
 import { trackPageView } from "@/lib/analytics";
 import { Mail, Phone, MapPin, Linkedin, Instagram } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
@@ -67,10 +67,17 @@ export default function Contact() {
         <meta property="og:image" content="https://aitaxbot.co.in/images/aitaxbot-logo.png" />
       </Helmet>
       
+      <PageHeader
+        title="Contact Us"
+        subtitle="Have questions, feedback, or need help with a tool? We're here for you."
+        breadcrumbs={[
+          { label: "Home", href: "/" },
+          { label: "Contact" }
+        ]}
+      />
+
       <div>
-        <div className="max-w-4xl mx-auto px-4 py-12">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">Contact Us</h1>
-          
+        <div className="max-w-4xl mx-auto px-4 py-8">
           <div className="grid md:grid-cols-2 gap-12">
             {/* Contact Information */}
             <div>
@@ -265,7 +272,6 @@ export default function Contact() {
           </div>
         </div>
       </div>
-      <Footer />
     </>
   );
 }

@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { Helmet } from "react-helmet-async";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import PageHeader from "@/components/PageHeader";
 import { trackPageView } from "@/lib/analytics";
 
 export default function PrivacyPolicy() {
@@ -12,299 +11,410 @@ export default function PrivacyPolicy() {
   return (
     <>
       <Helmet>
-        <title>Privacy Policy - AiTaxBot</title>
-        <meta name="description" content="AiTaxBot Privacy Policy - Learn how we collect, use, and protect your information, including cookie usage and Google AdSense data practices." />
-        <link rel="canonical" href="https://aitaxbot.co.in/privacy-policy" />
-        <meta property="og:image" content="https://aitaxbot.co.in/images/aitaxbot-logo.png" />
+        <title>Privacy Policy - AiTaxBot | How We Protect Your Data</title>
+        <meta name="description" content="AiTaxBot Privacy Policy — learn how we collect, use, store, and protect your personal information in compliance with India's Digital Personal Data Protection Act 2023." />
+        <link rel="canonical" href="https://www.aitaxbot.co.in/privacy-policy" />
+        <meta property="og:image" content="https://www.aitaxbot.co.in/apple-touch-icon.png" />
         <meta property="og:type" content="website" />
       </Helmet>
-      <Header />
+      <PageHeader
+        title="Privacy Policy"
+        subtitle="Applies to aitaxbot.co.in and www.aitaxbot.co.in · Governed by India's Digital Personal Data Protection Act, 2023 (DPDPA)"
+        breadcrumbs={[
+          { label: "Home", href: "/" },
+          { label: "Privacy Policy" }
+        ]}
+        badge="Last Updated: June 20, 2026"
+      />
       <div>
-        <div className="max-w-4xl mx-auto px-4 py-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4" data-testid="heading-privacy">Privacy Policy</h1>
-          <p className="text-gray-600 mb-8">
-            <strong>Last Updated:</strong> March 4, 2026
-          </p>
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          <div className="prose prose-lg max-w-none" data-testid="heading-privacy">
 
-          <div className="prose prose-lg max-w-none">
+            {/* Intro */}
             <p className="text-lg text-gray-800 mb-8">
-              At AiTaxBot, your privacy is our top priority. We are committed to maintaining transparency and ensuring that your personal and financial information remains secure. This privacy policy explains how we collect, use, disclose, and safeguard your information when you visit our website.
+              AiTaxBot ("we", "us", "our") is committed to protecting your privacy. This policy explains
+              what personal data we collect, why we collect it, how we use and store it, and your rights
+              as a Data Principal under the Digital Personal Data Protection Act, 2023 (DPDPA). Please
+              read this policy carefully before using our platform.
             </p>
 
+            {/* 1. What Data We Collect */}
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Information Collection</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. What Data We Collect</h2>
+
+              <h3 className="text-xl font-semibold text-gray-900 mb-3 mt-6">1a. Calculator Inputs (No Storage)</h3>
               <div className="bg-green-50 border-l-4 border-green-400 p-6 mb-6">
-                <p className="text-green-800 font-medium mb-3">
-                  <strong>AiTaxBot does not collect, store, or share any personal or financial data</strong> you provide while using our calculators and tools.
+                <p className="text-green-800 font-medium mb-2">
+                  Financial data you enter into our calculators — income, investments, HRA, loans — is
+                  processed entirely in your browser session.
                 </p>
-                <p className="text-green-700">
-                  All calculations happen instantly in your browser session and are purged once you leave or refresh the page.
-                </p>
-              </div>
-              
-              <p className="text-gray-700 mb-4">However, we do collect certain non-personal information automatically:</p>
-              <ul className="list-disc pl-6 mb-4 text-gray-700 space-y-2">
-                <li><strong>Browser Information:</strong> Browser type, operating system, device type</li>
-                <li><strong>Usage Data:</strong> Pages visited, time spent on pages, navigation patterns</li>
-                <li><strong>Location Data:</strong> General geographic location (country/city level)</li>
-                <li><strong>IP Address:</strong> For analytics and security purposes</li>
-              </ul>
-            </section>
-
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">2. How We Use Your Information</h2>
-              <ul className="list-disc pl-6 mb-4 text-gray-700 space-y-2">
-                <li>Any financial data entered (such as income details, investments, or expenses) is used only for showing you real-time calculations</li>
-                <li><strong>No financial information is stored on our servers, databases, or logs</strong></li>
-                <li>Non-personal information is used to improve our website, understand user behavior, and serve relevant advertisements</li>
-                <li>Analytics data helps us identify popular features and optimize user experience</li>
-              </ul>
-            </section>
-
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">3. Cookies & Tracking Technologies</h2>
-              
-              <div className="bg-blue-50 border-l-4 border-blue-400 p-6 mb-6">
-                <p className="text-blue-800 font-medium">
-                  We use cookies and similar tracking technologies to enhance your browsing experience and deliver personalized advertisements.
+                <p className="text-green-700 text-sm">
+                  This data is never sent to our servers, never stored in any database, and is permanently
+                  cleared when you close or refresh the page. No exceptions.
                 </p>
               </div>
 
-              <h3 className="text-xl font-semibold text-gray-900 mb-3 mt-6">What Are Cookies?</h3>
-              <p className="text-gray-700 mb-4">
-                Cookies are small text files placed on your device by websites you visit. They are widely used to make websites work efficiently and provide information to website owners.
+              <h3 className="text-xl font-semibold text-gray-900 mb-3 mt-6">1b. Account Registration (Optional)</h3>
+              <p className="text-gray-700 mb-3">
+                If you choose to create an account, we collect and store in Firebase:
+              </p>
+              <ul className="list-disc pl-6 mb-4 text-gray-700 space-y-1">
+                <li>Full name</li>
+                <li>Email address</li>
+                <li>Mobile number (optional, if provided)</li>
+                <li>Saved calculation history (linked to your account)</li>
+                <li>Account creation timestamp</li>
+              </ul>
+              <p className="text-gray-600 text-sm">
+                Account creation is entirely optional. All calculators work without an account.
               </p>
 
-              <h3 className="text-xl font-semibold text-gray-900 mb-3 mt-6">Types of Cookies We Use:</h3>
-              
+              <h3 className="text-xl font-semibold text-gray-900 mb-3 mt-6">1c. Download Gate (Lead Capture)</h3>
+              <p className="text-gray-700 mb-3">
+                When you download a PDF summary of your tax calculation, we collect:
+              </p>
+              <ul className="list-disc pl-6 mb-4 text-gray-700 space-y-1">
+                <li>Name</li>
+                <li>Email address</li>
+                <li>WhatsApp / mobile number (optional)</li>
+                <li>A brief text summary of the calculation type (e.g., "Income Tax — New Regime")</li>
+              </ul>
+              <p className="text-gray-600 text-sm">
+                This information is stored in our Firestore database and used to email you the PDF and
+                provide occasional tax updates. You may unsubscribe at any time.
+              </p>
+
+              <h3 className="text-xl font-semibold text-gray-900 mb-3 mt-6">1d. CA Directory Profiles</h3>
+              <p className="text-gray-700 mb-3">
+                Chartered Accountants who voluntarily register on our platform provide:
+              </p>
+              <ul className="list-disc pl-6 mb-4 text-gray-700 space-y-1">
+                <li>Name and ICAI membership number</li>
+                <li>City and state</li>
+                <li>Specialisation and services offered</li>
+                <li>Contact email and phone (voluntarily disclosed)</li>
+              </ul>
+              <p className="text-gray-600 text-sm">
+                This data is publicly displayed in the CA directory. CAs can request removal at any time
+                by emailing us.
+              </p>
+
+              <h3 className="text-xl font-semibold text-gray-900 mb-3 mt-6">1e. WhatsApp Bot</h3>
+              <p className="text-gray-700 mb-3">
+                If you interact with our WhatsApp assistant, we collect:
+              </p>
+              <ul className="list-disc pl-6 mb-4 text-gray-700 space-y-1">
+                <li>Your WhatsApp phone number (E.164 format)</li>
+                <li>Your first name (if you share it)</li>
+                <li>Message count and query type (for service improvement)</li>
+              </ul>
+              <p className="text-gray-600 text-sm">
+                We do not read or store the full text of your WhatsApp messages beyond the first 100
+                characters of unrecognised queries. No financial data sent over WhatsApp is stored.
+              </p>
+
+              <h3 className="text-xl font-semibold text-gray-900 mb-3 mt-6">1f. Automatic Technical Data</h3>
+              <p className="text-gray-700 mb-2">We automatically collect non-personal technical data:</p>
+              <ul className="list-disc pl-6 mb-4 text-gray-700 space-y-1">
+                <li>Browser type, operating system, device type</li>
+                <li>Pages visited and navigation patterns</li>
+                <li>General geographic location (country/city level — not precise)</li>
+                <li>IP address (for security and analytics; not linked to your account)</li>
+                <li>Referring URL</li>
+              </ul>
+            </section>
+
+            {/* 2. How We Use Your Data */}
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">2. How We Use Your Data</h2>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm border-collapse border border-gray-200 rounded-lg">
+                  <thead>
+                    <tr className="bg-gray-50">
+                      <th className="border border-gray-200 px-4 py-3 text-left font-semibold text-gray-900">Data</th>
+                      <th className="border border-gray-200 px-4 py-3 text-left font-semibold text-gray-900">Purpose</th>
+                      <th className="border border-gray-200 px-4 py-3 text-left font-semibold text-gray-900">Legal Basis (DPDPA)</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-gray-700">
+                    <tr>
+                      <td className="border border-gray-200 px-4 py-3">Account data (name, email)</td>
+                      <td className="border border-gray-200 px-4 py-3">Login, saved calculations, account management</td>
+                      <td className="border border-gray-200 px-4 py-3">Consent (at sign-up)</td>
+                    </tr>
+                    <tr className="bg-gray-50">
+                      <td className="border border-gray-200 px-4 py-3">Download lead data</td>
+                      <td className="border border-gray-200 px-4 py-3">Email PDF, tax update notifications</td>
+                      <td className="border border-gray-200 px-4 py-3">Consent (at download)</td>
+                    </tr>
+                    <tr>
+                      <td className="border border-gray-200 px-4 py-3">CA profile data</td>
+                      <td className="border border-gray-200 px-4 py-3">Public directory display</td>
+                      <td className="border border-gray-200 px-4 py-3">Consent (at registration)</td>
+                    </tr>
+                    <tr className="bg-gray-50">
+                      <td className="border border-gray-200 px-4 py-3">WhatsApp data</td>
+                      <td className="border border-gray-200 px-4 py-3">Bot responses, query routing</td>
+                      <td className="border border-gray-200 px-4 py-3">Legitimate use</td>
+                    </tr>
+                    <tr>
+                      <td className="border border-gray-200 px-4 py-3">Technical / analytics data</td>
+                      <td className="border border-gray-200 px-4 py-3">Website performance, security, ad serving</td>
+                      <td className="border border-gray-200 px-4 py-3">Legitimate use</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p className="text-gray-600 text-sm mt-4">
+                We never sell your personal data to third parties. We never use your data for automated
+                decision-making that produces legal or similarly significant effects.
+              </p>
+            </section>
+
+            {/* 3. Data Retention */}
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">3. Data Retention</h2>
+              <ul className="list-disc pl-6 mb-4 text-gray-700 space-y-2">
+                <li><strong>Calculator inputs:</strong> Never stored — cleared immediately on session end</li>
+                <li><strong>User accounts:</strong> Retained until you delete your account</li>
+                <li><strong>Download leads:</strong> Retained for 90 days, then archived or deleted</li>
+                <li><strong>CA profiles:</strong> Retained while active; deleted within 7 days of removal request</li>
+                <li><strong>WhatsApp records:</strong> Retained for 90 days</li>
+                <li><strong>Tax computation PDFs:</strong> Auto-deleted from our servers within 60 seconds of generation</li>
+                <li><strong>Server access logs:</strong> Retained for 30 days for security monitoring</li>
+              </ul>
+            </section>
+
+            {/* 4. Cookies */}
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">4. Cookies &amp; Tracking Technologies</h2>
+
+              <div className="bg-blue-50 border-l-4 border-blue-400 p-6 mb-6">
+                <p className="text-blue-800 font-medium">
+                  We use cookies and similar technologies to enhance your experience and serve relevant
+                  advertisements. You can manage your cookie preferences through our cookie consent banner.
+                </p>
+              </div>
+
               <div className="space-y-4 mb-6">
                 <div className="border-l-4 border-gray-300 pl-4">
-                  <h4 className="font-semibold text-gray-900 mb-2">Essential Cookies</h4>
-                  <p className="text-gray-700">Required for the website to function properly. These cannot be disabled.</p>
+                  <h4 className="font-semibold text-gray-900 mb-1">Essential Cookies</h4>
+                  <p className="text-gray-700 text-sm">Required for login sessions and site functionality. Cannot be disabled.</p>
                 </div>
-                
                 <div className="border-l-4 border-gray-300 pl-4">
-                  <h4 className="font-semibold text-gray-900 mb-2">Analytics Cookies</h4>
-                  <p className="text-gray-700">Help us understand how visitors interact with our website through Google Analytics and Microsoft Clarity.</p>
+                  <h4 className="font-semibold text-gray-900 mb-1">Analytics Cookies</h4>
+                  <p className="text-gray-700 text-sm">Google Analytics (GA4) and Microsoft Clarity — help us understand how visitors use the site. Session recordings (Clarity) are anonymised.</p>
                 </div>
-                
                 <div className="border-l-4 border-gray-300 pl-4">
-                  <h4 className="font-semibold text-gray-900 mb-2">Advertising Cookies</h4>
-                  <p className="text-gray-700">Used by Google AdSense and other ad networks to display relevant advertisements based on your browsing history.</p>
+                  <h4 className="font-semibold text-gray-900 mb-1">Advertising Cookies</h4>
+                  <p className="text-gray-700 text-sm">Google AdSense and Google Ads — serve personalised advertisements based on your browsing history. You can opt out using the links in Section 5.</p>
                 </div>
-                
                 <div className="border-l-4 border-gray-300 pl-4">
-                  <h4 className="font-semibold text-gray-900 mb-2">Preference Cookies</h4>
-                  <p className="text-gray-700">Remember your settings and preferences (like cookie consent choices).</p>
+                  <h4 className="font-semibold text-gray-900 mb-1">Preference Cookies</h4>
+                  <p className="text-gray-700 text-sm">Remember your cookie consent choice and display preferences.</p>
                 </div>
               </div>
             </section>
 
+            {/* 5. Third-Party Services */}
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">4. Google AdSense & Third-Party Advertising</h2>
-              
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">5. Third-Party Services &amp; Advertising</h2>
+
               <div className="bg-yellow-50 border-l-4 border-yellow-400 p-6 mb-6">
-                <p className="text-yellow-800 font-medium mb-3">
-                  <strong>Important Disclosure:</strong> Third-party vendors, including Google, use cookies to serve ads on our site based on your prior visits to our website or other websites.
+                <p className="text-yellow-800 font-medium">
+                  <strong>Disclosure:</strong> Third-party vendors, including Google, use cookies to serve
+                  ads on our site based on your prior visits to our website or other websites on the internet.
                 </p>
               </div>
 
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Google AdSense Cookie Usage:</h3>
-              <ul className="list-disc pl-6 mb-4 text-gray-700 space-y-2">
-                <li><strong>Google uses cookies to serve ads</strong> based on a user's prior visits to our website or other websites on the internet</li>
-                <li>Google's use of advertising cookies enables it and its partners to serve ads based on your visit to our site and/or other sites on the internet</li>
-                <li>These cookies collect information such as:
-                  <ul className="list-circle pl-6 mt-2 space-y-1">
-                    <li>Your IP address</li>
-                    <li>Browser type and version</li>
-                    <li>Pages you visit on our website</li>
-                    <li>Time and date of your visit</li>
-                    <li>Time spent on pages</li>
-                    <li>Previous websites you visited</li>
-                  </ul>
-                </li>
-                <li>This information is used to display personalized advertisements that may be of interest to you</li>
-              </ul>
+              <div className="space-y-3 mb-6">
+                <div className="border-l-4 border-gray-300 pl-4">
+                  <h4 className="font-semibold text-gray-900 mb-1">Google Analytics 4</h4>
+                  <p className="text-gray-700 text-sm">Traffic, user behaviour, conversion tracking. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Privacy Policy</a></p>
+                </div>
+                <div className="border-l-4 border-gray-300 pl-4">
+                  <h4 className="font-semibold text-gray-900 mb-1">Google AdSense</h4>
+                  <p className="text-gray-700 text-sm">Serves display ads. Uses advertising cookies linked to your Google account or browser history. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Privacy Policy</a></p>
+                </div>
+                <div className="border-l-4 border-gray-300 pl-4">
+                  <h4 className="font-semibold text-gray-900 mb-1">Google Ads (Performance Max)</h4>
+                  <p className="text-gray-700 text-sm">Conversion tracking for paid campaigns. Tag: AW-17983211580.</p>
+                </div>
+                <div className="border-l-4 border-gray-300 pl-4">
+                  <h4 className="font-semibold text-gray-900 mb-1">Microsoft Clarity</h4>
+                  <p className="text-gray-700 text-sm">Heatmaps and anonymised session recordings to improve UX. <a href="https://privacy.microsoft.com/privacystatement" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Privacy Policy</a></p>
+                </div>
+                <div className="border-l-4 border-gray-300 pl-4">
+                  <h4 className="font-semibold text-gray-900 mb-1">Firebase (Google)</h4>
+                  <p className="text-gray-700 text-sm">Authentication, Firestore database, App Check. All data stored on Google Cloud servers. <a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Privacy Policy</a></p>
+                </div>
+                <div className="border-l-4 border-gray-300 pl-4">
+                  <h4 className="font-semibold text-gray-900 mb-1">Brevo (Sendinblue)</h4>
+                  <p className="text-gray-700 text-sm">Transactional email service — used to send you PDF calculations and account notifications. <a href="https://www.brevo.com/legal/privacypolicy/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Privacy Policy</a></p>
+                </div>
+                <div className="border-l-4 border-gray-300 pl-4">
+                  <h4 className="font-semibold text-gray-900 mb-1">Meta (WhatsApp Cloud API)</h4>
+                  <p className="text-gray-700 text-sm">Powers our WhatsApp assistant. Messages are processed via Meta's Cloud API. <a href="https://www.whatsapp.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Privacy Policy</a></p>
+                </div>
+              </div>
 
-              <h3 className="text-xl font-semibold text-gray-900 mb-3 mt-6">How to Opt Out of Personalized Advertising:</h3>
-              <div className="bg-gray-50 rounded-lg p-6 mb-4">
-                <p className="text-gray-800 mb-4">You may opt out of personalized advertising by visiting the following pages:</p>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">Opt Out of Personalised Advertising</h3>
+              <div className="bg-gray-50 rounded-lg p-6">
                 <ul className="space-y-2">
                   <li>
-                    <a 
-                      href="https://www.google.com/settings/ads" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-persian-blue-600 hover:text-persian-blue-700 transition-colors font-medium"
-                      data-testid="link-google-ads-settings"
-                    >
+                    <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-700 font-medium" data-testid="link-google-ads-settings">
                       → Google Ads Settings
                     </a>
                   </li>
                   <li>
-                    <a 
-                      href="http://www.aboutads.info/choices/" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-persian-blue-600 hover:text-persian-blue-700 transition-colors font-medium"
-                      data-testid="link-aboutads"
-                    >
-                      → Network Advertising Initiative (NAI) Opt-Out Page
+                    <a href="http://www.aboutads.info/choices/" target="_blank" rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-700 font-medium" data-testid="link-aboutads">
+                      → Network Advertising Initiative Opt-Out
                     </a>
                   </li>
                   <li>
-                    <a 
-                      href="http://www.youronlinechoices.eu/" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-persian-blue-600 hover:text-persian-blue-700 transition-colors font-medium"
-                      data-testid="link-youronlinechoices"
-                    >
-                      → Your Online Choices (for EU users)
+                    <a href="http://www.youronlinechoices.eu/" target="_blank" rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-700 font-medium" data-testid="link-youronlinechoices">
+                      → Your Online Choices (EU users)
                     </a>
                   </li>
                 </ul>
-                <p className="text-gray-600 text-sm mt-4">
-                  Note: Opting out does not mean you will no longer see ads. It means the ads you see will not be personalized based on your browsing history.
+                <p className="text-gray-500 text-sm mt-4">
+                  Opting out means ads won't be personalised — you will still see ads.
                 </p>
               </div>
             </section>
 
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">5. Other Third-Party Services</h2>
-              <p className="text-gray-700 mb-4">We also use the following third-party services that may collect information:</p>
-              
-              <div className="space-y-3">
-                <div className="border-l-4 border-gray-300 pl-4">
-                  <h4 className="font-semibold text-gray-900 mb-1">Google Analytics</h4>
-                  <p className="text-gray-700 text-sm">Tracks website traffic and user behavior. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-persian-blue-600 hover:underline">Privacy Policy</a></p>
-                </div>
-                
-                <div className="border-l-4 border-gray-300 pl-4">
-                  <h4 className="font-semibold text-gray-900 mb-1">Microsoft Clarity</h4>
-                  <p className="text-gray-700 text-sm">Provides heatmaps and session recordings. <a href="https://privacy.microsoft.com/privacystatement" target="_blank" rel="noopener noreferrer" className="text-persian-blue-600 hover:underline">Privacy Policy</a></p>
-                </div>
-                
-                <div className="border-l-4 border-gray-300 pl-4">
-                  <h4 className="font-semibold text-gray-900 mb-1">Firebase (Google)</h4>
-                  <p className="text-gray-700 text-sm">Authentication and data storage services. <a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener noreferrer" className="text-persian-blue-600 hover:underline">Privacy Policy</a></p>
-                </div>
-              </div>
-            </section>
-
+            {/* 6. Data Security */}
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">6. Data Security</h2>
               <ul className="list-disc pl-6 mb-4 text-gray-700 space-y-2">
-                <li>Since no financial data is stored on our servers, there is no risk of unauthorized access to your tax or investment information</li>
-                <li>All financial processing is session-based and temporary</li>
-                <li>We use industry-standard security measures including HTTPS encryption for all data transmission</li>
-                <li>Firebase Authentication provides secure user authentication with automatic logout after 30 minutes of inactivity</li>
-                <li>All uploaded documents are automatically deleted from our servers after processing</li>
+                <li>All data transmission uses HTTPS / TLS encryption</li>
+                <li>Calculator inputs are never transmitted to our servers</li>
+                <li>User accounts are protected by Firebase Authentication with secure session management</li>
+                <li>Firebase App Check validates all requests to prevent unauthorised database access</li>
+                <li>Firestore Security Rules restrict each user to their own data only</li>
+                <li>Tax computation PDFs are auto-deleted from our servers within 60 seconds of generation</li>
+                <li>API endpoints are rate-limited to prevent abuse and denial-of-service attacks</li>
+                <li>All dependencies are regularly audited for known vulnerabilities (npm audit)</li>
               </ul>
-            </section>
-
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">7. Your Privacy Rights</h2>
-              <p className="text-gray-700 mb-4">Depending on your location, you may have the following rights:</p>
-              <ul className="list-disc pl-6 mb-4 text-gray-700 space-y-2">
-                <li><strong>Right to Access:</strong> Request access to the personal information we hold about you</li>
-                <li><strong>Right to Deletion:</strong> Request deletion of your personal information</li>
-                <li><strong>Right to Correction:</strong> Request correction of inaccurate information</li>
-                <li><strong>Right to Object:</strong> Object to certain types of data processing</li>
-                <li><strong>Right to Data Portability:</strong> Request a copy of your data in a machine-readable format</li>
-                <li><strong>Right to Withdraw Consent:</strong> Withdraw consent for cookie usage at any time</li>
-              </ul>
-              <p className="text-gray-700 mt-4">
-                To exercise these rights, please contact us at <a href="mailto:info@aitaxbot.in" className="text-persian-blue-600 hover:underline">info@aitaxbot.in</a>.
+              <p className="text-gray-600 text-sm">
+                While we take reasonable security measures, no internet transmission is 100% secure. In the
+                event of a data breach affecting your personal data, we will notify you and the Data Protection
+                Board of India within 72 hours as required under DPDPA 2023.
               </p>
             </section>
 
+            {/* 7. DPDPA Rights */}
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">7. Your Rights Under DPDPA 2023</h2>
+              <p className="text-gray-700 mb-4">
+                As a Data Principal under India's Digital Personal Data Protection Act, 2023, you have the
+                following rights with respect to your personal data held by AiTaxBot:
+              </p>
+              <div className="space-y-3">
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h4 className="font-semibold text-gray-900 mb-1">Right to Access</h4>
+                  <p className="text-gray-700 text-sm">Request a summary of the personal data we hold about you and how it is being processed.</p>
+                </div>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h4 className="font-semibold text-gray-900 mb-1">Right to Correction &amp; Erasure</h4>
+                  <p className="text-gray-700 text-sm">Request correction of inaccurate data or deletion of your personal data. Account users can delete their account from the Profile page. Others may email us.</p>
+                </div>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h4 className="font-semibold text-gray-900 mb-1">Right to Withdraw Consent</h4>
+                  <p className="text-gray-700 text-sm">Withdraw consent for data processing at any time by deleting your account or emailing us. Withdrawal does not affect the lawfulness of processing before withdrawal.</p>
+                </div>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h4 className="font-semibold text-gray-900 mb-1">Right to Grievance Redressal</h4>
+                  <p className="text-gray-700 text-sm">Raise a grievance with our Grievance Officer (contact details below). We will respond within 48 hours and resolve within 30 days.</p>
+                </div>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h4 className="font-semibold text-gray-900 mb-1">Right to Nominate</h4>
+                  <p className="text-gray-700 text-sm">Nominate another person to exercise your rights in the event of your death or incapacity, as provided under DPDPA 2023.</p>
+                </div>
+              </div>
+            </section>
+
+            {/* 8. Children's Privacy */}
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">8. Children's Privacy</h2>
               <p className="text-gray-700">
-                Our services are not directed to individuals under the age of 18. We do not knowingly collect personal information from children. If you are a parent or guardian and believe your child has provided us with personal information, please contact us.
+                Our services are not directed at individuals under 18 years of age. We do not knowingly
+                collect personal data from minors. If you believe a child has provided us with personal data,
+                please contact us immediately and we will delete it within 7 days.
               </p>
             </section>
 
+            {/* 9. International Transfers */}
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">9. International Data Transfers</h2>
               <p className="text-gray-700">
-                Your information may be transferred to and processed in countries other than your own. These countries may have different data protection laws. By using our website, you consent to such transfers.
+                Your data is stored on Google Firebase infrastructure, which may process data outside India.
+                Google Cloud and Firebase comply with applicable data protection standards. By creating an
+                account or submitting a download request, you consent to such transfer. We will comply with
+                any future DPDPA rules on cross-border data transfers once notified.
               </p>
             </section>
 
+            {/* 10. Third-Party Links */}
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">10. Third-Party Links</h2>
               <p className="text-gray-700">
-                Our website may contain links to third-party sites (e.g., tax authority portals, news sources, Google Ads Settings). We are not responsible for the privacy practices of those websites. We encourage you to read their privacy policies.
+                Our website links to third-party sites (tax authority portals, ICAI, news sources). We are
+                not responsible for the privacy practices of those websites. Please read their privacy
+                policies before sharing any information with them.
               </p>
             </section>
 
+            {/* 11. Updates */}
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">11. User Control</h2>
-              <div className="bg-blue-50 border-l-4 border-blue-400 p-6 mb-6">
-                <p className="text-blue-800 font-medium mb-3">
-                  You are in full control of the financial information you enter.
-                </p>
-                <p className="text-blue-700">
-                  Once you exit the page, refresh it, or close your browser, all entered financial data is automatically cleared from your session.
-                </p>
-              </div>
-              
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Managing Cookies:</h3>
-              <p className="text-gray-700 mb-4">You can control cookies through:</p>
-              <ul className="list-disc pl-6 mb-4 text-gray-700 space-y-2">
-                <li><strong>Browser Settings:</strong> Most browsers allow you to refuse cookies or delete existing cookies</li>
-                <li><strong>Cookie Consent Banner:</strong> Manage your preferences through our cookie consent tool</li>
-                <li><strong>Opt-Out Tools:</strong> Use the links provided in Section 4 to opt out of personalized advertising</li>
-              </ul>
-              <p className="text-gray-600 text-sm">
-                Note: Disabling cookies may affect the functionality of certain features on our website.
-              </p>
-            </section>
-
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">12. Updates to This Policy</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">11. Updates to This Policy</h2>
               <p className="text-gray-700">
-                We may update this Privacy Policy periodically to reflect changes in our practices, technology, legal requirements, or other factors. Any changes will be posted on this page with an updated "Last Updated" date. We encourage you to review this policy regularly.
+                We may update this Privacy Policy periodically to reflect changes in our services, legal
+                requirements, or data practices. Material changes will be communicated via a notice on our
+                website at least 7 days before they take effect. The "Last Updated" date at the top of this
+                page will always reflect the most recent version.
               </p>
             </section>
 
+            {/* 12. Contact / Grievance Officer */}
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">13. Contact Us</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">12. Contact &amp; Grievance Officer</h2>
               <p className="text-gray-700 mb-4">
-                If you have any questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact us:
+                For privacy queries, data requests, or grievances under DPDPA 2023, contact our Grievance Officer:
               </p>
               <div className="bg-gray-50 rounded-lg p-6">
-                <p className="text-gray-800 font-medium mb-2">📧 Email:</p>
-                <p className="mb-4">
-                  <a href="mailto:info@aitaxbot.in" className="text-persian-blue-600 hover:text-persian-blue-700 transition-colors text-lg" data-testid="link-contact-email">
+                <p className="text-gray-800 font-semibold mb-1">AiTaxBot — Data Grievance Officer</p>
+                <p className="text-gray-700 mb-1">
+                  📧 Email:{" "}
+                  <a href="mailto:info@aitaxbot.in" className="text-blue-600 hover:underline" data-testid="link-contact-email">
                     info@aitaxbot.in
                   </a>
                 </p>
-                
-                <p className="text-gray-800 font-medium mb-2">🌐 Website:</p>
-                <p className="mb-4">
-                  <a href="https://aitaxbot.co.in" className="text-persian-blue-600 hover:text-persian-blue-700 transition-colors" data-testid="link-website">
-                    aitaxbot.co.in
+                <p className="text-gray-700 mb-1">
+                  🌐 Website:{" "}
+                  <a href="https://www.aitaxbot.co.in" className="text-blue-600 hover:underline" data-testid="link-website">
+                    www.aitaxbot.co.in
                   </a>
                 </p>
-                
                 <p className="text-gray-600 text-sm mt-4">
-                  We will respond to your inquiry within 48 hours.
+                  We acknowledge grievances within 48 hours and resolve them within 30 days. If unsatisfied,
+                  you may approach the Data Protection Board of India once it is constituted under DPDPA 2023.
                 </p>
               </div>
             </section>
 
             <div className="border-t border-gray-200 pt-8 mt-12">
               <p className="text-sm text-gray-600 italic">
-                By using AiTaxBot, you acknowledge that you have read and understood this Privacy Policy and agree to its terms.
+                By using AiTaxBot, you acknowledge that you have read and understood this Privacy Policy
+                and agree to our data practices as described herein. This policy is governed by the laws of India.
               </p>
             </div>
           </div>
         </div>
       </div>
-      <Footer />
     </>
   );
 }

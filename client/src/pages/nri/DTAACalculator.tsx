@@ -3,8 +3,7 @@ import { Helmet } from "react-helmet-async";
 import { Link } from "wouter";
 import { Globe, ChevronRight, AlertCircle, Calculator, TrendingUp, BookOpen, Users } from "lucide-react";
 import AuthorBox from "@/components/AuthorBox";
-import AdBanner, { ResponsiveAd, RectangleAd } from "@/components/AdBanner";
-import Footer from "@/components/Footer";
+import { AdBanner, ResponsiveAd, RectangleAd } from "@/components/AdBanner";
 
 // TDS rate mapping by income type
 const tdsPratesByType = {
@@ -45,12 +44,12 @@ export default function DTAACalculator() {
   const totalTax = tdsDeducted + netForeignTax;
   const taxSavedViaDTAA = foreignTaxLiability - netForeignTax;
 
-  const handleIncomeTypeChange = (type) => {
+  const handleIncomeTypeChange = (type: string) => {
     setIncomeType(type);
-    setTdsPercentage(tdsPratesByType[type] || 10);
+    setTdsPercentage(tdsPratesByType[type as keyof typeof tdsPratesByType] || 10);
   };
 
-  const countryInfo = countryData[country];
+  const countryInfo = countryData[country as keyof typeof countryData];
   const isUAE = country === "uae";
 
   return (
@@ -230,7 +229,7 @@ export default function DTAACalculator() {
                     max="100"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Default: {tdsPratesByType[incomeType]}% for {incomeType.replace("-", " ")}</p>
+                  <p className="text-xs text-gray-500 mt-1">Default: {tdsPratesByType[incomeType as keyof typeof tdsPratesByType]}% for {incomeType.replace("-", " ")}</p>
                 </div>
 
                 {/* Foreign Tax Rate */}
@@ -749,8 +748,7 @@ export default function DTAACalculator() {
         </div>
       </section>
 
-      {/* Footer */}
-      <Footer />
+
     </div>
   );
 }

@@ -3,8 +3,7 @@ import { Helmet } from "react-helmet-async";
 import { Link } from "wouter";
 import { Globe, ChevronRight, AlertCircle, Send, TrendingUp, BookOpen, CheckCircle } from "lucide-react";
 import AuthorBox from "@/components/AuthorBox";
-import AdBanner, { ResponsiveAd, RectangleAd } from "@/components/AdBanner";
-import Footer from "@/components/Footer";
+import { AdBanner, ResponsiveAd, RectangleAd } from "@/components/AdBanner";
 
 interface CalculatorState {
   sourceAccount: "nro" | "nre" | "fcnr";
@@ -707,8 +706,6 @@ export default function RepatriationPlanner() {
       {/* Author Box */}
       <AuthorBox />
 
-      {/* Footer */}
-      <Footer />
 
       {/* FAQ Schema */}
       <script type="application/ld+json">

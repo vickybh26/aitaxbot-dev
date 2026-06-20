@@ -1,7 +1,6 @@
 import { Helmet } from "react-helmet-async";
 import { Link } from "wouter";
 import { Globe, Calculator, ArrowRight, BookOpen, TrendingUp, Send, CreditCard, ChevronRight } from "lucide-react";
-import Footer from "@/components/Footer";
 
 const nriTools = [
   {
@@ -246,7 +245,6 @@ export default function NRICorner() {
         </div>
       </section>
 
-      <Footer />
     </>
   );
 }
