@@ -79,7 +79,7 @@ export default function HomeLoanCalculatorPage() {
         <script type="application/ld+json">{JSON.stringify(organizationSchema)}</script>
       </Helmet>
 
-      <div className="min-h-screen bg-slate-50">
+      <div className="bg-white">
 
         <CalcPageHeader
           title="Home Loan EMI & Affordability Calculator"
@@ -283,14 +283,6 @@ export default function HomeLoanCalculatorPage() {
             </div>
           </div>
         </section>
-
-        <footer className="bg-slate-900 text-white py-8 px-6">
-          <div className="max-w-6xl mx-auto text-center">
-            <p className="text-sm text-slate-400">
-              © 2026 AiTaxBot. All rights reserved. | Home Loan Affordability Calculator India
-            </p>
-          </div>
-        </footer>
 
         {/* Lead Capture + CA Banner */}
         <div className="max-w-3xl mx-auto px-4 pb-10">

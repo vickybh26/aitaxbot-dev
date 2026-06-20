@@ -79,7 +79,7 @@ export default function SWPCalculatorPage() {
         <script type="application/ld+json">{JSON.stringify(organizationSchema)}</script>
       </Helmet>
 
-      <div className="min-h-screen bg-slate-50">
+      <div className="bg-white">
 
         <CalcPageHeader
           title="SWP Calculator — Systematic Withdrawal Planning"
@@ -531,15 +531,6 @@ export default function SWPCalculatorPage() {
             </div>
           </div>
         </section>
-
-        {/* Footer */}
-        <footer className="bg-slate-900 text-white py-8 px-6">
-          <div className="max-w-6xl mx-auto text-center">
-            <p className="text-sm text-slate-400">
-              © 2026 AiTaxBot. All rights reserved. | SWP Calculator — Retirement Income Planning
-            </p>
-          </div>
-        </footer>
 
         {/* Lead Capture + CA Banner */}
         <div className="max-w-3xl mx-auto px-4 pb-10">

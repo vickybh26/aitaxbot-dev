@@ -109,7 +109,7 @@ export default function IncomeTaxCalculatorPage() {
         <script type="application/ld+json">{JSON.stringify(organizationSchema)}</script>
       </Helmet>
 
-      <div className="min-h-screen bg-slate-50">
+      <div className="bg-white">
 
         <CalcPageHeader
           title="Income Tax Calculator — New vs Old Regime FY 2026-27"
@@ -484,15 +484,6 @@ export default function IncomeTaxCalculatorPage() {
             </div>
           </div>
         </section>
-
-        {/* Footer */}
-        <footer className="bg-slate-900 text-white py-8 px-6">
-          <div className="max-w-6xl mx-auto text-center">
-            <p className="text-sm text-slate-400">
-              © 2026 AiTaxBot. All rights reserved. | Income Tax Calculator FY 2026-27
-            </p>
-          </div>
-        </footer>
 
         {/* CA Banner */}
         <div className="max-w-3xl mx-auto px-4 pb-10">
