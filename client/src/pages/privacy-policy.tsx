@@ -19,7 +19,7 @@ export default function PrivacyPolicy() {
         <meta property="og:type" content="website" />
       </Helmet>
       <Header />
-      <div className="min-h-screen bg-white">
+      <div>
         <div className="max-w-4xl mx-auto px-4 py-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4" data-testid="heading-privacy">Privacy Policy</h1>
           <p className="text-gray-600 mb-8">

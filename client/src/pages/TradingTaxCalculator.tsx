@@ -87,7 +87,7 @@ export default function TradingTaxCalculatorPage() {
         <script type="application/ld+json">{JSON.stringify(organizationSchema)}</script>
       </Helmet>
 
-      <div className="min-h-screen bg-slate-50">
+      <div className="bg-white">
 
         <CalcPageHeader
           breadcrumbs={[

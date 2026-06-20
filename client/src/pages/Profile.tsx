@@ -89,7 +89,7 @@ export default function Profile() {
   };
 
   if (loading) return (
-    <div className="flex items-center justify-center min-h-screen">
+    <div className="flex items-center justify-center py-20">
       <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600" />
     </div>
   );
@@ -104,7 +104,7 @@ export default function Profile() {
         <meta name="robots" content="noindex" />
       </Helmet>
 
-      <div className="min-h-screen bg-gray-50 py-8 px-4">
+      <div className="bg-slate-50 py-8 px-4">
         <div className="max-w-2xl mx-auto space-y-6">
 
           {/* Header card */}

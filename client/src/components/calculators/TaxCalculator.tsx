@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Calculator, PieChart, ClipboardList, User, Coins, Percent, Loader2, RotateCcw } from 'lucide-react';
+import { SegmentedToggle } from '@/components/ui/segmented-toggle';
+import { Callout } from '@/components/ui/callout';
 import {
   BarChart,
   Bar,
@@ -1005,17 +1007,17 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                   </div>
 
                   <div>
-                    <Label htmlFor="age-group">Age Group</Label>
-                    <Select value={formData.ageGroup} onValueChange={(value) => updateFormData('ageGroup', value)}>
-                      <SelectTrigger data-testid="select-age-group">
-                        <SelectValue placeholder="Select Age Group" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="below60">Below 60 years</SelectItem>
-                        <SelectItem value="60to80">60-80 years (Senior Citizen)</SelectItem>
-                        <SelectItem value="above80">Above 80 years (Super Senior)</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Label className="mb-2 block">Age Group</Label>
+                    <SegmentedToggle
+                      fullWidth
+                      options={[
+                        { value: "below60",  label: "Below 60" },
+                        { value: "60to80",   label: "60–80 (Senior)" },
+                        { value: "above80",  label: "80+ (Super Senior)" },
+                      ]}
+                      value={formData.ageGroup}
+                      onChange={(v) => updateFormData("ageGroup", v)}
+                    />
                   </div>
                 </div>
               </Card>
@@ -1312,70 +1314,53 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
             </div>
           ) : result ? (
             <div className="space-y-6">
-              {/* Recommendation Banner */}
-              <Card className="p-6 bg-gradient-to-r from-primary/10 to-accent/10 border-primary/20">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              {/* Recommendation Banner — DS Callout style */}
+              <div className="rounded-2xl border overflow-hidden bg-white shadow-sm">
+                <div className={`px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
+                  result.recommendedRegime === 'new'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-green-600 text-white'
+                }`}>
                   <div>
-                    <h3 className="text-xl font-bold text-readable mb-2">
-                      {result.recommendedRegime === 'old' ? 'Old Regime' : 'New Regime'} is Better for You
+                    <p className="text-xs font-semibold uppercase tracking-wide opacity-80 mb-0.5">Recommended Regime</p>
+                    <h3 className="text-xl font-bold">
+                      {result.recommendedRegime === 'old' ? 'Old Regime' : 'New Regime'} saves you more
                     </h3>
-                    <p className="text-readable-light">
-                      You can save ₹{result.savings.toLocaleString('en-IN')} by choosing the {result.recommendedRegime} regime
+                    <p className="text-sm opacity-90 mt-0.5">
+                      You save ₹{result.savings.toLocaleString('en-IN')} vs the other regime
                     </p>
                   </div>
-                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                    <Badge variant={result.recommendedRegime === 'old' ? 'default' : 'secondary'} className="text-lg px-4 py-2 text-center">
-                      Save ₹{result.savings.toLocaleString('en-IN')}
-                    </Badge>
+                  <div className="flex flex-wrap gap-2">
                     <Button
-                      onClick={() => {
-                        if (user) {
-                          generatePDF();
-                        } else {
-                          onGuestDownload?.();
-                        }
-                      }}
+                      onClick={() => { if (user) { generatePDF(); } else { onGuestDownload?.(); } }}
                       disabled={isGeneratingPDF}
+                      className="bg-white/20 hover:bg-white/30 text-white border-white/30 border"
                       variant="outline"
-                      className="bg-white hover:bg-primary hover:text-white border-primary text-primary"
                       data-testid="button-download-pdf"
                     >
-                      {isGeneratingPDF ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Generating...
-                        </>
-                      ) : (
-                        <>
-                          <Download className="mr-2 h-4 w-4" />
-                          Download PDF
-                        </>
-                      )}
+                      {isGeneratingPDF ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Generating…</> : <><Download className="mr-2 h-4 w-4" />Download PDF</>}
                     </Button>
                     {user && (
-                      <Button 
+                      <Button
                         onClick={saveCalculation}
                         disabled={isSaving}
+                        className="bg-white/20 hover:bg-white/30 text-white border-white/30 border"
                         variant="outline"
-                        className="bg-white hover:bg-success hover:text-white border-success text-success"
                         data-testid="button-save-calculation"
                       >
-                        {isSaving ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Saving...
-                          </>
-                        ) : (
-                          <>
-                            <Save className="mr-2 h-4 w-4" />
-                            Save Calculation
-                          </>
-                        )}
+                        {isSaving ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving…</> : <><Save className="mr-2 h-4 w-4" />Save</>}
                       </Button>
                     )}
                   </div>
                 </div>
-              </Card>
+                {result.savings > 0 && (
+                  <div className="px-5 py-3 border-t border-slate-100">
+                    <Callout tone="info">
+                      Switch to the <strong>{result.recommendedRegime === 'old' ? 'Old' : 'New'} Regime</strong> when your employer asks for your regime declaration this April — you cannot change it mid-year for TDS purposes.
+                    </Callout>
+                  </div>
+                )}
+              </div>
 
               {/* Regime Comparison Bar Chart */}
               <Card className="p-5">

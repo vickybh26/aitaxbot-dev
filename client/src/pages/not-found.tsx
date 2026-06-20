@@ -19,7 +19,7 @@ export default function NotFound() {
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
       
-      <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 px-4 py-12">
+      <div className="w-full flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-slate-50 px-4 py-12">
         <Card className="w-full max-w-2xl shadow-xl">
           <CardContent className="pt-8 pb-8">
             <div className="text-center mb-8">

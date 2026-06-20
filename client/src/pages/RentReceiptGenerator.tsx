@@ -6,6 +6,7 @@ import {
   FileText, Download, Mail, CheckCircle2, AlertCircle,
   ArrowRight, Home, Calculator, Info, Loader2, Plus, Trash2,
 } from "lucide-react";
+import CalcPageHeader from "@/components/CalcPageHeader";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface ReceiptForm {
@@ -212,28 +213,19 @@ export default function RentReceiptGenerator() {
         <link rel="canonical" href="https://aitaxbot.co.in/tools/rent-receipt" />
       </Helmet>
 
-      <div className="min-h-screen bg-slate-50 py-10 px-4">
-        <div className="max-w-4xl mx-auto">
+      <div>
+        <CalcPageHeader
+          title="Rent Receipt Generator"
+          subtitle="Generate HRA-compliant rent receipts in seconds. Download as PDF or send to your email — free, no account needed."
+          breadcrumbs={[
+            { label: "Home", href: "/" },
+            { label: "Tools", href: "/tools" },
+            { label: "Rent Receipt Generator" },
+          ]}
+          badge="HRA · FY 2026-27"
+        />
 
-          {/* Header */}
-          <div className="mb-8">
-            <div className="flex items-center gap-2 text-sm text-persian-blue-600 font-semibold mb-2">
-              <Home className="h-4 w-4" /> Tools
-              <span className="text-slate-400">/</span>
-              Rent Receipt Generator
-            </div>
-            <h1 className="text-3xl font-bold text-slate-900 mb-2">Rent Receipt Generator</h1>
-            <p className="text-slate-500 max-w-2xl">
-              Generate professional, HRA-compliant rent receipts in seconds. Download as PDF or send directly to your email — free, no account needed.
-            </p>
-            <div className="flex flex-wrap gap-3 mt-4">
-              {["100% Free", "No Signup Required", "HRA-Compliant Format", "Bulk — Full Year in 1 Click"].map(tag => (
-                <span key={tag} className="flex items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
-                  <CheckCircle2 className="h-3 w-3" /> {tag}
-                </span>
-              ))}
-            </div>
-          </div>
+        <div className="max-w-4xl mx-auto px-4 py-8">
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 

@@ -106,7 +106,7 @@ export default function Login() {
   // Show loading spinner while checking authentication
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center py-20">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading...</p>
@@ -123,7 +123,7 @@ export default function Login() {
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
       
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <div className="bg-gradient-to-br from-blue-50 via-white to-slate-50">
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
@@ -228,7 +228,7 @@ export default function Login() {
                       <span className="w-full border-t" />
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-white dark:bg-gray-800 px-2 text-gray-500">Or continue with</span>
+                      <span className="bg-white px-2 text-gray-500">Or continue with</span>
                     </div>
                   </div>
 
@@ -304,7 +304,7 @@ export default function Login() {
                       <span className="w-full border-t" />
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-white dark:bg-gray-800 px-2 text-gray-500">Or continue with</span>
+                      <span className="bg-white px-2 text-gray-500">Or continue with</span>
                     </div>
                   </div>
 

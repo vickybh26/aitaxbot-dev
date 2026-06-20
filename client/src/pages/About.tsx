@@ -23,7 +23,7 @@ export default function About() {
         <meta property="og:image" content="https://aitaxbot.co.in/images/aitaxbot-logo.png" />
       </Helmet>
       
-      <div className="min-h-screen bg-white">
+      <div>
         <div className="max-w-4xl mx-auto px-4 py-12">
           <h1 className="text-3xl font-bold text-gray-900 mb-8">About Ai Tax Bot</h1>
           <div className="prose prose-lg max-w-none">

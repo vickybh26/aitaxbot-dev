@@ -187,7 +187,7 @@ export default function Blog() {
         <meta property="og:image" content="https://aitaxbot.co.in/images/aitaxbot-logo.png" />
       </Helmet>
 
-      <div className="min-h-screen bg-slate-50">
+      <div className="bg-slate-50">
 
         {/* ── Hero / Page Header ─────────────────────────────────────────── */}
         <section className="bg-white border-b border-slate-100 py-12 px-6">

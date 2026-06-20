@@ -118,9 +118,9 @@ export default function FindCA() {
         />
       </Helmet>
 
-      <div className="min-h-screen bg-slate-50">
+      <div>
         {/* Hero */}
-        <div className="bg-gradient-to-br from-blue-600 to-indigo-700 text-white py-14 px-4">
+        <div className="bg-gradient-to-br from-blue-700 via-blue-800 to-[#3a6fc4] text-white py-14 px-4">
           <div className="max-w-3xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 bg-white/20 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
               <Shield className="w-4 h-4" />
@@ -216,11 +216,11 @@ export default function FindCA() {
             {filtered.map((ca) => (
               <div
                 key={ca.id}
-                className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow p-5 flex flex-col"
+                className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 p-5 flex flex-col"
               >
                 {/* Avatar + name */}
                 <div className="flex items-start gap-3 mb-3">
-                  <div className="w-11 h-11 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                  <div className="w-11 h-11 rounded-full bg-[#4685d8] flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
                     {ca.fullName.charAt(0)}
                   </div>
                   <div className="min-w-0">
@@ -271,7 +271,7 @@ export default function FindCA() {
                 <div className="mt-auto flex gap-2">
                   <Button
                     size="sm"
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs h-8"
+                    className="flex-1 bg-[#4685d8] hover:bg-blue-700 text-white text-xs h-8"
                     onClick={() => { setContactCA(ca); setSent(false); }}
                   >
                     <Mail className="w-3.5 h-3.5 mr-1" />

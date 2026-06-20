@@ -95,7 +95,7 @@ export default function CARegister() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-6">
+      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-6">
         <div className="bg-white rounded-2xl shadow-lg p-10 max-w-md w-full text-center">
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <CheckCircle2 className="w-8 h-8 text-green-600" />
@@ -123,7 +123,7 @@ export default function CARegister() {
         />
       </Helmet>
 
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 py-12 px-4">
+      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 py-12 px-4">
         <div className="max-w-2xl mx-auto">
 
           {/* Header */}

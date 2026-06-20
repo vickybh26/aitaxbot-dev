@@ -171,7 +171,7 @@ export default function CAMyProfile() {
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
 
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-12 px-4">
+      <div className="bg-gradient-to-br from-slate-50 to-blue-50 py-12 px-4">
         <div className="max-w-2xl mx-auto">
 
           {/* Header */}
