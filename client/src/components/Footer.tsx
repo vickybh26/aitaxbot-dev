@@ -1,95 +1,163 @@
-import { useTranslation } from "@/lib/i18n";
+import { Link } from "wouter";
+import { Linkedin, Instagram } from "lucide-react";
+import logoImagePng from "@assets/aitaxbot-logo-lovable.png";
+import logoImageWebP from "@assets/aitaxbot-logo-lovable.webp";
 
 export default function Footer() {
-  const { t } = useTranslation();
+  const calculators: [string, string][] = [
+    ["Income Tax", "/calculators/income-tax"],
+    ["HRA Calculator", "/calculators/hra"],
+    ["SIP Calculator", "/calculators/sip"],
+    ["SWP Calculator", "/calculators/swp"],
+    ["NPS Calculator", "/calculators/nps"],
+    ["PF Calculator", "/calculators/pf"],
+    ["Home Loan", "/calculators/home-loan"],
+    ["Trading Tax", "/calculators/trading-tax"],
+  ];
+
+  const tools: [string, string][] = [
+    ["Rent Receipt", "/tools/rent-receipt"],
+    ["AIS Reconciliation", "/tools/ais-26as-form16"],
+    ["Find a CA", "/find-ca"],
+    ["NRI Corner", "/nri"],
+    ["GST Invoicing", "/accounting"],
+    ["Tax Guides", "/blog"],
+  ];
+
+  const company: [string, string][] = [
+    ["About Us", "/about"],
+    ["Contact", "/contact"],
+    ["Privacy Policy", "/privacy-policy"],
+    ["Terms of Service", "/terms-of-service"],
+  ];
 
   return (
-    <footer className="bg-white border-t border-neutral-200 py-12 mt-16">
-      <div className="max-container container-padding">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-          <div>
-            <div className="flex items-center space-x-3 mb-4">
-              <img
-                src="/images/aitaxbot-logo.png"
-                alt="AiTaxBot Logo"
-                className="h-12 w-auto"
-                loading="lazy"
-              />
-            </div>
-            <p className="text-base text-readable-light font-medium">
-              {t("footer.tagline")}
-            </p>
-          </div>
-
-          <div>
-            <h4 className="font-semibold text-neutral-800 mb-4">{t("footer.calculators")}</h4>
-            <ul className="space-y-2">
-              <li><a href="/calculators/income-tax" className="text-sm text-readable hover:text-primary font-medium transition-colors">{t("footer.incomeTax")}</a></li>
-              <li><a href="/calculators/hra"         className="text-sm text-readable hover:text-primary font-medium transition-colors">{t("footer.hra")}</a></li>
-              <li><a href="/calculators/sip"         className="text-sm text-readable hover:text-primary font-medium transition-colors">{t("footer.sip")}</a></li>
-              <li><a href="/calculators/swp"         className="text-sm text-readable hover:text-primary font-medium transition-colors">{t("footer.swp")}</a></li>
-              <li><a href="/calculators/pf"          className="text-sm text-readable hover:text-primary font-medium transition-colors">{t("footer.pf")}</a></li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="font-semibold text-neutral-800 mb-4">{t("footer.marketTools")}</h4>
-            <ul className="space-y-2">
-              <li><a href="#mutual-funds"  className="text-sm text-readable hover:text-primary font-medium transition-colors">{t("footer.mutualFunds")}</a></li>
-              <li><a href="#stock-quotes"  className="text-sm text-readable hover:text-primary font-medium transition-colors">{t("footer.stockQuotes")}</a></li>
-              <li><a href="#market-news"   className="text-sm text-readable hover:text-primary font-medium transition-colors">{t("footer.marketNews")}</a></li>
-              <li><a href="#ipo-analyzer"  className="text-sm text-readable hover:text-primary font-medium transition-colors">{t("footer.ipoAnalyzer")}</a></li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="font-semibold text-neutral-800 mb-4">{t("footer.legalSupport")}</h4>
-            <ul className="space-y-2">
-              <li><a href="/privacy-policy"         className="text-sm text-readable hover:text-primary font-medium transition-colors">{t("footer.privacyPolicy")}</a></li>
-              <li><a href="/terms-of-service"       className="text-sm text-readable hover:text-primary font-medium transition-colors">{t("footer.termsOfService")}</a></li>
-              <li><a href="mailto:info@aitaxbot.in" className="text-sm text-readable hover:text-primary font-medium transition-colors">{t("footer.contactSupport")}</a></li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="border-t border-neutral-200 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center mb-6">
-            <div className="mb-4 md:mb-0">
-              <p className="text-sm text-readable font-semibold">
-                {t("footer.copyright")}
-              </p>
-              <p className="text-xs text-readable-light mt-1">
-                Website: <a href="https://aitaxbot.co.in" className="hover:text-primary transition-colors">aitaxbot.co.in</a> |
-                Email: <a href="mailto:info@aitaxbot.in" className="hover:text-primary transition-colors ml-1">info@aitaxbot.in</a>
-              </p>
-            </div>
-            <div className="flex items-center space-x-4">
-              <a
-                href="https://linkedin.com/company/aitaxbot"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-readable-light hover:text-primary transition-colors"
-                aria-label="LinkedIn"
-              >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                </svg>
-              </a>
-              <a
-                href="https://www.instagram.com/aitaxbot/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-readable-light hover:text-primary transition-colors"
-                aria-label="Instagram"
-              >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                </svg>
-              </a>
-            </div>
-          </div>
+    <>
+      {/* Disclaimer */}
+      <div className="py-4 border-t border-slate-100 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <p className="text-xs text-slate-400 leading-relaxed">
+            Calculations are indicative only — not professional tax advice. AiTaxBot is not affiliated with the Income Tax Department or CBDT.{" "}
+            <Link href="/privacy-policy" className="underline hover:text-slate-600">Privacy Policy</Link>
+            {" · "}
+            <Link href="/about" className="underline hover:text-slate-600">About Us</Link>
+          </p>
         </div>
       </div>
-    </footer>
+
+      {/* Footer */}
+      <footer className="bg-slate-900 text-white pt-12 pb-8 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-8 mb-10">
+
+            {/* Brand column */}
+            <div>
+              <Link href="/" aria-label="AiTaxBot home">
+                <picture>
+                  <source srcSet={logoImageWebP} type="image/webp" />
+                  <img
+                    src={logoImagePng}
+                    alt="AiTaxBot"
+                    className="h-14 w-auto mb-3 brightness-110"
+                    loading="lazy"
+                    data-testid="logo-footer"
+                  />
+                </picture>
+              </Link>
+              <p className="text-slate-400 text-sm leading-relaxed mb-4">
+                AI-powered tax tools for India. CA-reviewed, IT Act 2025 ready.
+              </p>
+              <div className="flex gap-2">
+                <a
+                  href="https://www.linkedin.com/company/aitaxbot/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="LinkedIn"
+                  className="bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg p-2 transition-colors"
+                >
+                  <Linkedin className="h-4 w-4" />
+                </a>
+                <a
+                  href="https://www.instagram.com/aitaxbot/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  className="bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg p-2 transition-colors"
+                >
+                  <Instagram className="h-4 w-4" />
+                </a>
+              </div>
+            </div>
+
+            {/* Calculators column */}
+            <div>
+              <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">
+                Calculators
+              </h4>
+              <ul className="space-y-2.5">
+                {calculators.map(([name, href]) => (
+                  <li key={href}>
+                    <Link href={href} className="text-sm text-slate-400 hover:text-white transition-colors">
+                      {name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Tools & Services column */}
+            <div>
+              <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">
+                Tools &amp; Services
+              </h4>
+              <ul className="space-y-2.5">
+                {tools.map(([name, href]) => (
+                  <li key={href}>
+                    <Link href={href} className="text-sm text-slate-400 hover:text-white transition-colors">
+                      {name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Company column */}
+            <div>
+              <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">
+                Company
+              </h4>
+              <ul className="space-y-2.5">
+                {company.map(([name, href]) => (
+                  <li key={href}>
+                    <Link href={href} className="text-sm text-slate-400 hover:text-white transition-colors">
+                      {name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-6 p-3 bg-slate-800 rounded-lg">
+                <p className="text-xs text-slate-400 mb-1">Email us</p>
+                <a
+                  href="mailto:info@aitaxbot.in"
+                  className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                >
+                  info@aitaxbot.in
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom bar */}
+          <div className="border-t border-slate-800 pt-6 flex flex-col md:flex-row items-center justify-between gap-3">
+            <p className="text-xs text-slate-500">
+              © {new Date().getFullYear()} AiTaxBot. Not affiliated with CBDT or the Income Tax Department of India.
+            </p>
+            <p className="text-xs text-slate-500">
+              FY 2026-27 / AY 2027-28 Compliant · IT Act 2025 Ready
+            </p>
+          </div>
+        </div>
+      </footer>
+    </>
   );
 }

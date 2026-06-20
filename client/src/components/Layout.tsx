@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import Header from "./Header";
+import Footer from "./Footer";
 
 interface LayoutProps {
   children: ReactNode;
@@ -8,11 +9,12 @@ interface LayoutProps {
 
 export default function Layout({ children, showModal }: LayoutProps) {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-white flex flex-col">
       <Header showModal={showModal} />
-      <main className="w-full">
+      <main className="w-full flex-1">
         {children}
       </main>
+      <Footer />
     </div>
   );
 }

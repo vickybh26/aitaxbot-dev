@@ -56,7 +56,7 @@ const latestBlogPosts = [...blogPosts]
   .slice(0, 3)
   .map(p => ({
     slug: p.slug,
-    title: p.metaTitle.replace(/\s*[|\u2014\u2013-]\s*AiTaxBot.*$/i, "").trim(),
+    title: p.metaTitle.replace(/\s*[|—–-]\s*AiTaxBot.*$/i, "").trim(),
     readTime: `${p.readingTimeMinutes} min`,
     tag: p.tags[0] || "General",
   }));
@@ -65,10 +65,10 @@ const TOOLS = [
   { icon: Calculator, name: "Income Tax Calculator",  desc: "Old vs New Regime, 87A rebate, cess — AY 2027-28 ready.",                href: "/calculators/income-tax",  color: "text-blue-600",         bg: "bg-blue-50",         badge: "Popular" },
   { icon: HomeIcon,   name: "HRA Calculator",         desc: "Section 10(13A) — 8 metro cities, actual rent, IT Act 2025.",            href: "/calculators/hra",         color: "text-violet-600",       bg: "bg-violet-50"        },
   { icon: TrendingUp, name: "SIP Calculator",         desc: "Project mutual fund corpus with annual step-ups.",                       href: "/calculators/sip",         color: "text-cyan-600",         bg: "bg-cyan-50"          },
-  { icon: PiggyBank,  name: "NPS Calculator",         desc: "Model retirement corpus + \u20b950K extra deduction under 80CCD(1B).", href: "/calculators/nps",         color: "text-emerald-600",      bg: "bg-emerald-50"       },
+  { icon: PiggyBank,  name: "NPS Calculator",         desc: "Model retirement corpus + ₹50K extra deduction under 80CCD(1B).", href: "/calculators/nps",         color: "text-emerald-600",      bg: "bg-emerald-50"       },
   { icon: BarChart2,  name: "Trading Tax Calculator", desc: "STCG, LTCG and F&O tax for equity, MF, and VDA under IT Act 2025.",     href: "/calculators/trading-tax", color: "text-red-500",          bg: "bg-red-50"           },
   { icon: FileText,   name: "Rent Receipt Generator", desc: "Generate stamped, AO-ready rent receipts as PDFs instantly.",           href: "/tools/rent-receipt",      color: "text-orange-500",       bg: "bg-orange-50"        },
-  { icon: Layers,     name: "AIS \u00b7 26AS \u00b7 Form 16", desc: "AI spots mismatches across all three documents before notices.", href: "/tools/ais-26as-form16", color: "text-persian-blue-600", bg: "bg-persian-blue-50", badge: "New" },
+  { icon: Layers,     name: "AIS · 26AS · Form 16", desc: "AI spots mismatches across all three documents before notices.", href: "/tools/ais-26as-form16", color: "text-persian-blue-600", bg: "bg-persian-blue-50", badge: "New" },
   { icon: UserCheck,  name: "Find a Verified CA",     desc: "Free introductions — capital gains, NRI filing, notice response.",      href: "/find-ca",                 color: "text-green-600",        bg: "bg-green-50"         },
   { icon: BookOpen,   name: "Tax Guides & Blog",      desc: "34 in-depth articles on ITR, HRA, capital gains, and IT Act 2025.",    href: "/blog",                    color: "text-indigo-600",       bg: "bg-indigo-50"        },
 ] as const;
@@ -96,7 +96,7 @@ function calcTax(gross: number) {
 }
 
 function inr(n: number): string {
-  return "\u20b9" + Math.round(n).toLocaleString("en-IN");
+  return "₹" + Math.round(n).toLocaleString("en-IN");
 }
 
 function useCountUp(target: number, duration = 900) {
@@ -174,7 +174,7 @@ function SavingsCard() {
             className="w-full h-1.5 rounded-full appearance-none cursor-pointer"
             style={{ background: `linear-gradient(90deg,#16a34a 0%,#16a34a ${pct}%,#e2e8f0 ${pct}%,#e2e8f0 100%)` }}
           />
-          <div className="flex justify-between text-xs text-slate-400 mt-1.5"><span>\u20b93L</span><span>\u20b950L</span></div>
+          <div className="flex justify-between text-xs text-slate-400 mt-1.5"><span>₹3L</span><span>₹50L</span></div>
         </div>
         <div className="rounded-xl border border-slate-200 overflow-hidden divide-y divide-slate-100">
           {([
@@ -193,7 +193,7 @@ function SavingsCard() {
         <div className="rounded-xl p-5 text-white" style={{ background: "linear-gradient(135deg,#16a34a 0%,#22c55e 100%)" }}>
           <div className="text-xs font-bold uppercase tracking-widest opacity-80 mb-1.5">You save vs the other regime</div>
           <div className="text-4xl font-black tabular-nums leading-none tracking-tight">{inr(animSaving)}</div>
-          <div className="text-xs mt-2 opacity-80">Assumes \u20b91.5L 80C claimed (Old Regime) \u00b7 FY 2026-27</div>
+          <div className="text-xs mt-2 opacity-80">Assumes ₹1.5L 80C claimed (Old Regime) · FY 2026-27</div>
         </div>
         <a href="/calculators/income-tax"
           className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-colors">
@@ -231,11 +231,11 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
     <>
       <Helmet>
         <title>AiTaxBot - Income Tax Calculator India FY 2026-27 | AY 2027-28</title>
-        <meta name="description" content="AI-powered tax calculator for India. Compare old vs new regime, \u20b912L tax-free under Section 87A. Free SIP, SWP, HRA, PF calculators. CA-reviewed. FY 2026-27 & AY 2027-28 ready." />
+        <meta name="description" content="AI-powered tax calculator for India. Compare old vs new regime, ₹12L tax-free under Section 87A. Free SIP, SWP, HRA, PF calculators. CA-reviewed. FY 2026-27 & AY 2027-28 ready." />
         <meta name="keywords" content="income tax calculator, tax calculator India, new tax regime, old tax regime, SIP calculator, HRA calculator, AY 2027-28, Income Tax Act 2025" />
         <link rel="canonical" href="https://aitaxbot.co.in/" />
         <meta property="og:title" content="AiTaxBot - Income Tax Calculator India FY 2026-27 | AY 2027-28" />
-        <meta property="og:description" content="AI-powered income tax calculator with \u20b912L tax-free limit. CA-reviewed calculators for salaried, freelancers & investors. Income Tax Act 2025 ready." />
+        <meta property="og:description" content="AI-powered income tax calculator with ₹12L tax-free limit. CA-reviewed calculators for salaried, freelancers & investors. Income Tax Act 2025 ready." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://aitaxbot.co.in/" />
         <meta property="og:image" content="https://aitaxbot.co.in/images/aitaxbot-logo.png" />
@@ -249,12 +249,12 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
         <div className="bg-slate-900 text-slate-300 text-xs py-2.5 overflow-x-auto">
           <div className="max-w-7xl mx-auto px-4 flex items-center justify-center gap-5 whitespace-nowrap min-w-max">
             <span className="flex items-center gap-1.5"><Shield className="h-3.5 w-3.5 text-green-400 flex-shrink-0" />CA-reviewed calculators</span>
-            <span className="text-slate-700">\u00b7</span>
+            <span className="text-slate-700">·</span>
             <span className="flex items-center gap-1.5"><Zap className="h-3.5 w-3.5 text-blue-400 flex-shrink-0" />IT Act 2025 &amp; IT Act 1961 ready</span>
-            <span className="text-slate-700">\u00b7</span>
+            <span className="text-slate-700">·</span>
             <span className="flex items-center gap-1.5 text-orange-300 font-semibold"><Clock className="h-3.5 w-3.5 text-orange-400 flex-shrink-0" />ITR Deadline: July 31, 2026</span>
-            <span className="text-slate-700">\u00b7</span>
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-green-400 flex-shrink-0" />Runs in browser \u2014 data never stored</span>
+            <span className="text-slate-700">·</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-green-400 flex-shrink-0" />Runs in browser — data never stored</span>
           </div>
         </div>
 
@@ -266,7 +266,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
               <div>
                 <div className="mb-5">
                   <span className="text-xs font-bold text-blue-600 uppercase tracking-widest bg-blue-50 border border-blue-100 px-3 py-1.5 rounded-full">
-                    FY 2026-27 \u00b7 AY 2027-28 \u00b7 IT Act 2025 Ready
+                    FY 2026-27 · AY 2027-28 · IT Act 2025 Ready
                   </span>
                 </div>
                 <h1 className="text-4xl md:text-5xl font-bold text-slate-900 leading-[1.1] tracking-tight mb-5">
@@ -312,8 +312,8 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
           <div className="max-w-7xl mx-auto px-4">
             <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-slate-200">
               {[
-                { val: "\u20b912L",  label: "Zero tax limit",     sub: "New Regime FY 2026-27",     ref: s1.ref },
-                { val: "\u20b975K",  label: "Standard deduction", sub: "For salaried employees",    ref: s2.ref },
+                { val: "₹12L",  label: "Zero tax limit",     sub: "New Regime FY 2026-27",     ref: s1.ref },
+                { val: "₹75K",  label: "Standard deduction", sub: "For salaried employees",    ref: s2.ref },
                 { val: "18+",         label: "Free tools",         sub: "Calculators & generators",  ref: s3.ref },
                 { val: "5 min",       label: "Time to clarity",    sub: "ITR complexity decoded",    ref: s4.ref },
               ].map(({ val, label, sub, ref }) => (
@@ -333,7 +333,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
             <div className="text-center mb-10">
               <p className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-3">All Tools</p>
               <h2 className="text-3xl font-bold text-slate-900 tracking-tight mb-3">Everything you need for taxes &amp; investments</h2>
-              <p className="text-slate-500 max-w-xl mx-auto text-sm">Calculators, document tools, CA directory \u2014 all free, all built for India.</p>
+              <p className="text-slate-500 max-w-xl mx-auto text-sm">Calculators, document tools, CA directory — all free, all built for India.</p>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {TOOLS.map(({ icon: Icon, name, desc, href, color, bg, badge }: any) => (
@@ -364,15 +364,15 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                   <Zap className="h-3 w-3" />AI-Powered Document Analysis
                 </span>
                 <h2 className="text-3xl lg:text-4xl font-bold text-white leading-tight tracking-tight mb-5">
-                  AIS \u00b7 26AS \u00b7 Form 16
+                  AIS · 26AS · Form 16
                   <span className="block text-blue-400">Reconciliation in minutes</span>
                 </h2>
                 <p className="text-slate-300 leading-relaxed mb-8 text-sm lg:text-base">
-                  Upload all three PDFs. Our AI parses them in parallel, spots every mismatch, and flags which ones could trigger a notice \u2014 before you file.
+                  Upload all three PDFs. Our AI parses them in parallel, spots every mismatch, and flags which ones could trigger a notice — before you file.
                 </p>
                 <div className="space-y-3 mb-8">
                   {[
-                    "Parses locked TRACES PDFs with AI \u2014 no manual entry",
+                    "Parses locked TRACES PDFs with AI — no manual entry",
                     "Flags income mismatches and TDS discrepancies",
                     "Classifies issues as Critical / Warning / Info",
                     "AI summary explains each gap in plain language",
@@ -401,23 +401,23 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                   </div>
                   <div className="p-5 space-y-2.5">
                     {[
-                      { label: "Gross Salary",    ais: "\u20b98,20,000", f16: "\u20b98,20,000", ok: true  },
-                      { label: "Interest (Bank)", ais: "\u20b912,400",   f16: "\u2014",          ok: false },
-                      { label: "TDS Deducted",    ais: "\u20b982,000",   f16: "\u20b982,000",   ok: true  },
-                      { label: "Dividend Income", ais: "\u20b93,800",    f16: "\u2014",          ok: false },
+                      { label: "Gross Salary",    ais: "₹8,20,000", f16: "₹8,20,000", ok: true  },
+                      { label: "Interest (Bank)", ais: "₹12,400",   f16: "—",          ok: false },
+                      { label: "TDS Deducted",    ais: "₹82,000",   f16: "₹82,000",   ok: true  },
+                      { label: "Dividend Income", ais: "₹3,800",    f16: "—",          ok: false },
                     ].map(({ label, ais, f16, ok }) => (
                       <div key={label} className={cn("flex items-center justify-between px-3 py-2.5 rounded-lg text-xs", ok ? "bg-green-900/30 border border-green-800/50" : "bg-red-900/30 border border-red-800/50")}>
                         <span className="text-slate-300 font-medium">{label}</span>
                         <div className="flex items-center gap-3">
                           <span className="text-slate-400 tabular-nums">{ais}</span>
                           <span className="text-slate-400 tabular-nums">{f16}</span>
-                          <span className={cn("font-bold text-base leading-none", ok ? "text-green-400" : "text-red-400")}>{ok ? "\u2713" : "\u26a0"}</span>
+                          <span className={cn("font-bold text-base leading-none", ok ? "text-green-400" : "text-red-400")}>{ok ? "✓" : "⚠"}</span>
                         </div>
                       </div>
                     ))}
                     <div className="pt-2 flex items-center justify-between text-xs border-t border-slate-700">
                       <span className="text-red-400 font-semibold">2 discrepancies found</span>
-                      <span className="text-slate-500">AIS \u00b7 26AS \u00b7 Form 16</span>
+                      <span className="text-slate-500">AIS · 26AS · Form 16</span>
                     </div>
                   </div>
                 </div>
@@ -494,14 +494,14 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                 <p className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-2">CA Directory</p>
                 <h2 className="text-2xl font-bold text-slate-900 tracking-tight mb-3">Need a CA for ITR filing?</h2>
                 <p className="text-slate-600 max-w-lg text-sm leading-relaxed">
-                  Connect with a verified, practicing Chartered Accountant near you \u2014 for complex ITR, capital gains, NRI filing, or notice responses. Free introduction.
+                  Connect with a verified, practicing Chartered Accountant near you — for complex ITR, capital gains, NRI filing, or notice responses. Free introduction.
                 </p>
               </div>
               <div className="flex-shrink-0">
                 <div className="space-y-2.5 mb-4">
                   <div className="flex items-center gap-2 text-sm text-slate-700"><CheckCircle2 className="h-4 w-4 text-green-500" />ICAI-verified Chartered Accountants</div>
-                  <div className="flex items-center gap-2 text-sm text-slate-700"><CheckCircle2 className="h-4 w-4 text-green-500" />Free introduction \u2014 no platform fees</div>
-                  <div className="flex items-center gap-2 text-sm text-orange-700"><Clock className="h-4 w-4 text-orange-500" />Deadline: July 31, 2026 \u2014 act now</div>
+                  <div className="flex items-center gap-2 text-sm text-slate-700"><CheckCircle2 className="h-4 w-4 text-green-500" />Free introduction — no platform fees</div>
+                  <div className="flex items-center gap-2 text-sm text-orange-700"><Clock className="h-4 w-4 text-orange-500" />Deadline: July 31, 2026 — act now</div>
                 </div>
                 <a href="/find-ca"
                   className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3.5 rounded-xl transition-colors text-sm">
@@ -516,7 +516,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
         <section className="py-14 lg:py-16" style={{ background: "linear-gradient(135deg,#4685d8 0%,#2563eb 100%)" }}>
           <div className="max-w-7xl mx-auto px-4 text-center">
             <h2 className="text-3xl font-bold text-white tracking-tight mb-3">Ready to file smarter?</h2>
-            <p className="text-white/80 mb-8 text-base max-w-xl mx-auto">Free calculators, CA-reviewed logic, AI document reconciliation \u2014 all in one place.</p>
+            <p className="text-white/80 mb-8 text-base max-w-xl mx-auto">Free calculators, CA-reviewed logic, AI document reconciliation — all in one place.</p>
             <div className="flex flex-wrap justify-center gap-4">
               <a href="/calculators/income-tax"
                 className="inline-flex items-center gap-2 bg-white text-blue-700 hover:bg-slate-50 font-bold px-7 py-3.5 rounded-xl transition-colors text-sm">
@@ -539,8 +539,8 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
             </div>
             <div className="grid md:grid-cols-3 gap-6">
               {[
-                { num: "01", icon: <Users className="h-6 w-6 text-blue-600" />,        bg: "bg-blue-50",    title: "Pick your profile",  desc: "Salaried, freelancer, or investor \u2014 choose what fits. Takes 10 seconds." },
-                { num: "02", icon: <Calculator className="h-6 w-6 text-emerald-600" />, bg: "bg-emerald-50", title: "Enter deductions",    desc: "Add 80C, HRA, home loan interest \u2014 only what applies to you." },
+                { num: "01", icon: <Users className="h-6 w-6 text-blue-600" />,        bg: "bg-blue-50",    title: "Pick your profile",  desc: "Salaried, freelancer, or investor — choose what fits. Takes 10 seconds." },
+                { num: "02", icon: <Calculator className="h-6 w-6 text-emerald-600" />, bg: "bg-emerald-50", title: "Enter deductions",    desc: "Add 80C, HRA, home loan interest — only what applies to you." },
                 { num: "03", icon: <BarChart2 className="h-6 w-6 text-orange-500" />,   bg: "bg-orange-50",  title: "See your result",     desc: "Old vs New Regime comparison. Know exactly which saves you more." },
               ].map(({ num, icon, bg, title, desc }) => (
                 <div key={num} className="relative p-6 bg-white rounded-2xl border border-slate-200">
@@ -563,12 +563,12 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
             </div>
             <div className="space-y-3">
               {[
-                { q: "Which regime \u2014 Old or New \u2014 is better for me?", a: "It depends on your deductions. If your total 80C + HRA + home loan deductions exceed \u20b93.75 lakh, the Old Regime usually saves more. Below that threshold, the New Regime is typically better. Use our calculator above to get your exact answer in seconds." },
-                { q: "Is income up to \u20b912 lakh really tax-free in FY 2026-27?", a: "Yes \u2014 under the New Regime for FY 2026-27, the rebate under Section 87A has been enhanced so that taxpayers with net taxable income up to \u20b912 lakh pay zero tax. The \u20b975,000 standard deduction means a salaried person earning up to \u20b912.75 lakh pays no tax." },
-                { q: "What is the 87A rebate and am I eligible?", a: "Section 87A gives a full rebate on tax if your net taxable income is within the specified limit (\u20b912 lakh under New Regime for FY 2026-27). Our calculator automatically applies this rebate and shows you whether you qualify." },
+                { q: "Which regime — Old or New — is better for me?", a: "It depends on your deductions. If your total 80C + HRA + home loan deductions exceed ₹3.75 lakh, the Old Regime usually saves more. Below that threshold, the New Regime is typically better. Use our calculator above to get your exact answer in seconds." },
+                { q: "Is income up to ₹12 lakh really tax-free in FY 2026-27?", a: "Yes — under the New Regime for FY 2026-27, the rebate under Section 87A has been enhanced so that taxpayers with net taxable income up to ₹12 lakh pay zero tax. The ₹75,000 standard deduction means a salaried person earning up to ₹12.75 lakh pays no tax." },
+                { q: "What is the 87A rebate and am I eligible?", a: "Section 87A gives a full rebate on tax if your net taxable income is within the specified limit (₹12 lakh under New Regime for FY 2026-27). Our calculator automatically applies this rebate and shows you whether you qualify." },
                 { q: "Can I switch between Old and New Regime every year?", a: "Salaried individuals with no business income can choose their regime every year at the time of filing. If you have business or professional income, you can switch only once. Our calculator shows you both options so you can decide each year." },
                 { q: "Is the data I enter in the calculator saved anywhere?", a: "No. AiTaxBot calculators run entirely in your browser. Your income and deduction details are never sent to our servers or stored in any database." },
-                { q: "How is AY (Assessment Year) different from FY (Financial Year)?", a: "Financial Year (FY) is when you earn the income \u2014 e.g., FY 2026-27 runs April 2026 to March 2027. Assessment Year (AY) is when you file and pay tax on that income \u2014 so AY 2027-28 corresponds to FY 2026-27." },
+                { q: "How is AY (Assessment Year) different from FY (Financial Year)?", a: "Financial Year (FY) is when you earn the income — e.g., FY 2026-27 runs April 2026 to March 2027. Assessment Year (AY) is when you file and pay tax on that income — so AY 2027-28 corresponds to FY 2026-27." },
               ].map(({ q, a }, i) => (
                 <details key={i} className="group rounded-xl border border-slate-200 bg-white open:border-blue-200 transition-all">
                   <summary className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold text-slate-800 list-none [&::-webkit-details-marker]:hidden">
@@ -614,65 +614,6 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
             </div>
           </div>
         </section>
-
-        {/* Disclaimer */}
-        <div className="py-4 border-t border-slate-100">
-          <div className="max-w-7xl mx-auto px-4">
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Calculations are indicative only \u2014 not professional tax advice. AiTaxBot is not affiliated with the Income Tax Department or CBDT.{" "}
-              <a href="/privacy-policy" className="underline hover:text-slate-600">Privacy Policy</a>{" \u00b7 "}
-              <a href="/about" className="underline hover:text-slate-600">About Us</a>
-            </p>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <footer className="bg-slate-900 text-white pt-12 pb-8 px-6">
-          <div className="max-w-7xl mx-auto">
-            <div className="grid md:grid-cols-4 gap-8 mb-10">
-              <div>
-                <img src={logoImage} alt="AiTaxBot" className="h-14 w-auto mb-3 brightness-110" loading="lazy" data-testid="logo-footer" />
-                <p className="text-slate-400 text-sm leading-relaxed mb-4">AI-powered tax tools for India. CA-reviewed, IT Act 2025 ready.</p>
-                <div className="flex gap-2">
-                  <a href="https://www.linkedin.com/company/aitaxbot/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg p-2 transition-colors"><Linkedin className="h-4 w-4" /></a>
-                  <a href="https://www.instagram.com/aitaxbot/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg p-2 transition-colors"><Instagram className="h-4 w-4" /></a>
-                </div>
-              </div>
-              <div>
-                <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">Calculators</h4>
-                <ul className="space-y-2.5">
-                  {[["Income Tax","/calculators/income-tax"],["HRA Calculator","/calculators/hra"],["SIP Calculator","/calculators/sip"],["SWP Calculator","/calculators/swp"],["NPS Calculator","/calculators/nps"],["PF Calculator","/calculators/pf"],["Home Loan","/calculators/home-loan"],["Trading Tax","/calculators/trading-tax"]].map(([n,h])=>(
-                    <li key={h}><a href={h} className="text-sm text-slate-400 hover:text-white transition-colors">{n}</a></li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">Tools &amp; Services</h4>
-                <ul className="space-y-2.5">
-                  {[["Rent Receipt","/tools/rent-receipt"],["AIS Reconciliation","/tools/ais-26as-form16"],["Find a CA","/find-ca"],["NRI Corner","/nri"],["GST Invoicing","/accounting"],["Tax Guides","/blog"]].map(([n,h])=>(
-                    <li key={h}><a href={h} className="text-sm text-slate-400 hover:text-white transition-colors">{n}</a></li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">Company</h4>
-                <ul className="space-y-2.5">
-                  {[["About Us","/about"],["Contact","/contact"],["Privacy Policy","/privacy-policy"],["Terms of Service","/terms-of-service"]].map(([n,h])=>(
-                    <li key={h}><a href={h} className="text-sm text-slate-400 hover:text-white transition-colors">{n}</a></li>
-                  ))}
-                </ul>
-                <div className="mt-6 p-3 bg-slate-800 rounded-lg">
-                  <p className="text-xs text-slate-400 mb-1">Email us</p>
-                  <a href="mailto:info@aitaxbot.in" className="text-xs text-blue-400 hover:text-blue-300 transition-colors">info@aitaxbot.in</a>
-                </div>
-              </div>
-            </div>
-            <div className="border-t border-slate-800 pt-6 flex flex-col md:flex-row items-center justify-between gap-3">
-              <p className="text-xs text-slate-500">\u00a9 {new Date().getFullYear()} AiTaxBot. Not affiliated with CBDT or the Income Tax Department of India.</p>
-              <p className="text-xs text-slate-500">FY 2026-27 / AY 2027-28 Compliant \u00b7 IT Act 2025 Ready</p>
-            </div>
-          </div>
-        </footer>
 
         {activeModal === "tax-calculator" && <TaxCalculator onClose={closeModal} />}
         {activeModal === "hra-calculator" && <HRACalculator onClose={closeModal} onApplyHRA={() => {}} />}
