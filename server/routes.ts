@@ -14,6 +14,7 @@ import caRoutes from "./caRoutes";
 import leadRoutes from "./leadRoutes";
 import toolUsageRoutes from "./toolUsageRoutes";
 import { registerTaxReconcileRoutes } from "./taxReconcileRoutes.js";
+import ragRoutes from "./ragRoutes";
 import { getFirestore, verifyFirebaseToken, admin } from "./firebase";
 import { COLLECTIONS } from "./firestoreHelper";
 import { TransactionalEmailsApi, TransactionalEmailsApiApiKeys } from '@getbrevo/brevo';
@@ -216,6 +217,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api/leads", leadRoutes);
   app.use("/api/tool-usage", toolUsageRoutes);
   registerTaxReconcileRoutes(app);
+
+  // RAG AI routes
+  app.use("/api/ai", ragRoutes);
   
   
   // Seed tax rates on startup (only runs once if empty)
@@ -844,7 +848,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
 
         // Process PDF in background
-        processDocumentAsync(taxDocument.id, localFilePath, documentType, null);
+        processDocumentAsync(taxDocument.id, localFilePath, documentType, undefined);
 
         res.json({
           success: true,
@@ -1340,7 +1344,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const indices = await stockMarket.getNSEIndices();
       
       if (indices && indices.data) {
-        const formattedIndices = indices.data.slice(0, 4).map(index => ({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const formattedIndices = indices.data.slice(0, 4).map((index: any) => ({
           symbol: index.index?.replace(/\s+/g, '').toUpperCase() || "NIFTY50",
           name: index.index || "Nifty 50",
           value: parseFloat(index.last) || 25013.15,
@@ -1435,7 +1440,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const topStocks = await stockMarket.getTopStocks();
       
       if (topStocks.success && topStocks.data) {
-        const formattedStocks = topStocks.data.map(stock => ({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const formattedStocks = topStocks.data.map((stock: any) => ({
           symbol: stock.symbol || 'UNKNOWN',
           companyName: stock.companyName || `${stock.symbol} Limited`,
           currentPrice: parseFloat(stock.lastPrice) || 1000.00,

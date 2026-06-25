@@ -1,0 +1,448 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "description": "AiTaxBot Tax Topic Graph — maps Indian tax concept dependencies for agentic RAG. When a concept is detected in a query, all triggered concepts are also fetched from the vector store.",
+    "law_basis": "Income Tax Act 2025 (as amended by FA 2026) + IT Rules 2026",
+    "updated": "2026-06-25"
+  },
+
+  "nodes": {
+    "salary_income": {
+      "label": "Salary Income",
+      "keywords": ["salary", "pay", "CTC", "gross salary", "take-home", "employment", "salaried", "payslip", "pay slip"],
+      "triggers": ["standard_deduction", "regime_choice", "tds_salary", "advance_tax", "form_16", "hra", "lta", "professional_tax"],
+      "sections_ita2025": ["Section 17", "Section 15", "Section 16"],
+      "sections_ita1961": ["Section 17", "Section 15", "Section 16"]
+    },
+
+    "standard_deduction": {
+      "label": "Standard Deduction",
+      "keywords": ["standard deduction", "flat deduction", "75000", "75,000", "50000", "50,000"],
+      "triggers": ["regime_choice"],
+      "sections_ita2025": ["Section 16(ia)"],
+      "sections_ita1961": ["Section 16(ia)"],
+      "key_facts": ["New Regime: Rs.75,000 FY 2025-26 onwards", "Old Regime: Rs.75,000 FY 2024-25 onwards"]
+    },
+
+    "hra": {
+      "label": "HRA Exemption",
+      "keywords": ["HRA", "house rent allowance", "rent", "rented", "paying rent", "metro", "non-metro"],
+      "triggers": ["metro_cities", "regime_choice", "form_16"],
+      "sections_ita2025": ["Section 10(13A)", "Rule 280"],
+      "sections_ita1961": ["Section 10(13A)", "Rule 2A"],
+      "key_facts": ["8 metro cities: Mumbai, Delhi, Kolkata, Chennai, Hyderabad, Bengaluru, Pune, Ahmedabad", "Metro: 50% of basic salary; Non-metro: 40%", "Minimum of three conditions"]
+    },
+
+    "lta": {
+      "label": "Leave Travel Allowance",
+      "keywords": ["LTA", "leave travel", "travel allowance", "travel exemption"],
+      "triggers": ["regime_choice"],
+      "sections_ita2025": ["Section 10(5)"],
+      "sections_ita1961": ["Section 10(5)"],
+      "key_facts": ["Exempt only in Old Regime", "2 journeys in 4-year block", "Only domestic travel", "Economy class air or AC-1 train"]
+    },
+
+    "tds_salary": {
+      "label": "TDS on Salary (Section 192)",
+      "keywords": ["TDS", "tax deducted", "TDS deducted", "employer TDS", "Form 16", "192"],
+      "triggers": ["form_16", "advance_tax", "ais_reconciliation"],
+      "sections_ita2025": ["Section 401 (TDS)"],
+      "sections_ita1961": ["Section 192"],
+      "key_facts": ["Employer deducts TDS monthly based on estimated annual income", "Employee declares investments to employer for TDS reduction", "TDS mismatch = notice risk"]
+    },
+
+    "form_16": {
+      "label": "Form 16 / Form 130",
+      "keywords": ["form 16", "form 130", "TDS certificate", "Part A", "Part B", "certificate of TDS"],
+      "triggers": ["tds_salary", "ais_reconciliation", "itr_form_selection"],
+      "sections_ita2025": ["Section 401"],
+      "sections_ita1961": ["Section 203"],
+      "key_facts": ["Under ITA 2025, Form 16 is renamed Form 130", "Part A: TDS summary from TRACES", "Part B: Salary breakup and deductions from employer"]
+    },
+
+    "regime_choice": {
+      "label": "Old vs New Tax Regime",
+      "keywords": ["old regime", "new regime", "which regime", "regime choice", "115BAC", "default regime"],
+      "triggers": ["standard_deduction", "section_80c", "section_80d", "hra", "lta", "nps_80ccd1b"],
+      "sections_ita2025": ["Section 171"],
+      "sections_ita1961": ["Section 115BAC"],
+      "key_facts": [
+        "New Regime is DEFAULT from FY 2023-24 onwards",
+        "Old Regime: opt-in required every year (except business income filers — once opted out, irrevocable until business income ends)",
+        "New Regime slabs FY 2025-26: 0-4L nil, 4-8L 5%, 8-12L 10%, 12-16L 15%, 16-20L 20%, 20-24L 25%, 24L+ 30%",
+        "New Regime rebate u/s 87A: Rs.60,000 if income ≤ Rs.12L (effectively zero tax up to Rs.12L)",
+        "Old Regime slabs: 0-2.5L nil, 2.5-5L 5%, 5-10L 20%, 10L+ 30%"
+      ]
+    },
+
+    "advance_tax": {
+      "label": "Advance Tax",
+      "keywords": ["advance tax", "self assessment", "quarterly tax", "advance tax payment", "under-payment"],
+      "triggers": ["interest_234b", "interest_234c"],
+      "sections_ita2025": ["Chapter XIV"],
+      "sections_ita1961": ["Section 207-219"],
+      "key_facts": [
+        "Advance tax applies when tax liability ≥ Rs.10,000 after TDS",
+        "Due dates: 15 Jun (15%), 15 Sep (45%), 15 Dec (75%), 15 Mar (100%)",
+        "Interest under Section 234B for short payment",
+        "Interest under Section 234C for deferred instalments",
+        "Senior citizens (60+) with no business income: exempt from advance tax"
+      ]
+    },
+
+    "section_80c": {
+      "label": "Section 80C Deductions",
+      "keywords": ["80C", "ELSS", "PPF", "LIC", "EPF", "NSC", "tax saving", "investment deduction", "1.5 lakh", "1,50,000"],
+      "triggers": ["regime_choice", "section_80ccd1b", "elss", "ppf"],
+      "sections_ita2025": ["Section 123"],
+      "sections_ita1961": ["Section 80C"],
+      "key_facts": [
+        "Maximum: Rs.1,50,000 per year",
+        "Available ONLY in Old Regime",
+        "Instruments: ELSS, PPF, LIC premium, EPF employee contribution, home loan principal, NSC, ULIP, children's tuition, Sukanya Samriddhi",
+        "ELSS lock-in: 3 years (shortest among 80C instruments)",
+        "PPF lock-in: 15 years"
+      ]
+    },
+
+    "section_80d": {
+      "label": "Section 80D Health Insurance",
+      "keywords": ["80D", "health insurance", "medical insurance", "premium", "Mediclaim", "preventive health checkup"],
+      "triggers": ["regime_choice"],
+      "sections_ita2025": ["Section 124"],
+      "sections_ita1961": ["Section 80D"],
+      "key_facts": [
+        "Available ONLY in Old Regime",
+        "Self + family (non-senior): Rs.25,000",
+        "Parents (non-senior): Rs.25,000 additional",
+        "Senior citizen parents: Rs.50,000 additional",
+        "Preventive health checkup: Rs.5,000 within above limits",
+        "Cash payment NOT allowed (except preventive checkup)"
+      ]
+    },
+
+    "nps_80ccd1b": {
+      "label": "NPS Section 80CCD(1B)",
+      "keywords": ["NPS", "National Pension System", "80CCD", "80CCD1B", "pension contribution", "tier 1"],
+      "triggers": ["regime_choice", "section_80c"],
+      "sections_ita2025": ["Section 123"],
+      "sections_ita1961": ["Section 80CCD"],
+      "key_facts": [
+        "Extra Rs.50,000 deduction beyond 80C limit — available ONLY in Old Regime",
+        "Only NPS Tier 1 contributions qualify",
+        "At maturity: 60% tax-free withdrawal, 40% mandatory annuity (taxable as pension)",
+        "Employer NPS contribution under 80CCD(2): available in BOTH regimes, up to 10% of salary (14% for Central Govt employees)"
+      ]
+    },
+
+    "capital_gains": {
+      "label": "Capital Gains",
+      "keywords": ["capital gain", "STCG", "LTCG", "sold shares", "sold property", "mutual fund redemption", "equity", "capital loss"],
+      "triggers": ["equity_stcg", "equity_ltcg", "debt_mf", "property_gains", "set_off_rules", "itr_form_selection"],
+      "sections_ita2025": ["Chapter X"],
+      "sections_ita1961": ["Section 45-55A, 111A, 112, 112A"],
+      "key_facts": ["Capital gains are taxed at SPECIAL rates — not regime-dependent", "Cannot be set off against salary or other income"]
+    },
+
+    "equity_stcg": {
+      "label": "STCG on Equity (Listed)",
+      "keywords": ["STCG", "short term capital gain", "listed shares", "equity fund", "held less than 12 months", "held less than 1 year"],
+      "triggers": ["stt", "schedule_112a"],
+      "sections_ita2025": ["Section 111A equivalent"],
+      "sections_ita1961": ["Section 111A"],
+      "key_facts": [
+        "Rate: 20% (increased from 15% in Budget 2024, effective 23 Jul 2024)",
+        "Applies to: listed equity shares, equity-oriented MF, units of business trust",
+        "Condition: STT paid at time of sale",
+        "Holding period: < 12 months",
+        "Rebate u/s 87A NOT available on STCG after FY 2024-25"
+      ]
+    },
+
+    "equity_ltcg": {
+      "label": "LTCG on Equity (Listed)",
+      "keywords": ["LTCG", "long term capital gain", "held more than 1 year", "112A", "Schedule 112A", "1 lakh exemption"],
+      "triggers": ["stt", "schedule_112a", "grandfathering"],
+      "sections_ita2025": ["Section 112A equivalent"],
+      "sections_ita1961": ["Section 112A"],
+      "key_facts": [
+        "Rate: 12.5% (increased from 10% in Budget 2024, effective 23 Jul 2024)",
+        "Exemption: LTCG up to Rs.1,25,000 per year exempt (increased from Rs.1,00,000)",
+        "Condition: STT paid on both buy and sell",
+        "Holding period: ≥ 12 months",
+        "No indexation benefit",
+        "Grandfathering: FMV as on 31 Jan 2018 is deemed cost for pre-2018 holdings"
+      ]
+    },
+
+    "debt_mf": {
+      "label": "Debt Mutual Fund Taxation",
+      "keywords": ["debt fund", "debt mutual fund", "bond fund", "liquid fund", "FMP", "fixed maturity"],
+      "triggers": ["regime_choice"],
+      "sections_ita2025": ["Section 50AA equivalent"],
+      "sections_ita1961": ["Section 50AA"],
+      "key_facts": [
+        "AFTER April 1 2023: All gains from debt MF taxed at SLAB RATE regardless of holding period (Section 50AA)",
+        "No LTCG benefit, no indexation for debt MF purchased after 31 Mar 2023",
+        "MFs with ≤35% equity treated as debt — taxed at slab rate"
+      ]
+    },
+
+    "property_gains": {
+      "label": "Property Capital Gains",
+      "keywords": ["property", "house sale", "land sale", "real estate", "immovable property", "flat sold"],
+      "triggers": ["section_54", "section_54ec", "indexation"],
+      "sections_ita2025": ["Section 45", "Section 48"],
+      "sections_ita1961": ["Section 45", "Section 48", "Section 54", "Section 54EC"],
+      "key_facts": [
+        "LTCG: Holding ≥ 24 months (2 years) — taxed at 12.5% WITHOUT indexation (Budget 2024 change)",
+        "STCG: Holding < 24 months — taxed at slab rate",
+        "Exemption 54: Reinvest in residential property within 2 years (purchase) or 3 years (construction)",
+        "Exemption 54EC: Invest in specified bonds (NHAI, REC) within 6 months, max Rs.50L"
+      ]
+    },
+
+    "set_off_rules": {
+      "label": "Capital Loss Set-Off Rules",
+      "keywords": ["capital loss", "set off loss", "carry forward loss", "loss adjustment", "loss utilization"],
+      "triggers": ["capital_gains"],
+      "sections_ita2025": ["Chapter VII"],
+      "sections_ita1961": ["Section 70-80"],
+      "key_facts": [
+        "STCL can be set off against STCG and LTCG",
+        "LTCL can ONLY be set off against LTCG",
+        "Cannot set off capital loss against salary or other income",
+        "Carry forward: 8 years (must file ITR on time, even if no income)",
+        "Intra-head set-off first, then inter-head"
+      ]
+    },
+
+    "crypto_vda": {
+      "label": "Crypto / VDA Taxation",
+      "keywords": ["crypto", "cryptocurrency", "Bitcoin", "Ethereum", "VDA", "virtual digital asset", "NFT", "token"],
+      "triggers": ["tds_194s"],
+      "sections_ita2025": ["Section 115BBH equivalent"],
+      "sections_ita1961": ["Section 115BBH"],
+      "key_facts": [
+        "Flat 30% tax on any gain — NO deductions allowed except cost of acquisition",
+        "Losses from VDA CANNOT be set off against any other income",
+        "VDA losses cannot be carried forward",
+        "TDS 1% on sale proceeds > Rs.10,000 (Section 194S)",
+        "Each transaction is a separate event"
+      ]
+    },
+
+    "itr_form_selection": {
+      "label": "ITR Form Selection",
+      "keywords": ["which ITR", "ITR-1", "ITR-2", "ITR-3", "ITR-4", "Sahaj", "Sugam", "which form"],
+      "triggers": ["salary_income", "capital_gains", "business_income", "regime_choice"],
+      "key_facts": [
+        "ITR-1 (Sahaj): Salary + 1 house property + other income, NO capital gains, income ≤ Rs.50L",
+        "ITR-2: Salary + capital gains + multiple house properties, no business income",
+        "ITR-3: Business/professional income (non-presumptive) + all other income",
+        "ITR-4 (Sugam): Presumptive income under 44AD/44ADA/44AE, income ≤ Rs.50L",
+        "From AY 2026-27: ITR-1 and ITR-4 allow 2 house properties"
+      ]
+    },
+
+    "ais_reconciliation": {
+      "label": "AIS / Form 26AS Reconciliation",
+      "keywords": ["AIS", "Annual Information Statement", "26AS", "Form 26AS", "mismatch", "TIS", "discrepancy", "reconcile"],
+      "triggers": ["tds_salary", "capital_gains", "form_16"],
+      "sections_ita2025": ["Section 285BB"],
+      "sections_ita1961": ["Section 285BB"],
+      "key_facts": [
+        "AIS replaced Form 26AS as the primary income statement",
+        "AIS shows: salary, interest, dividends, securities transactions, mutual fund purchases, foreign remittances",
+        "Mismatch between AIS and ITR → CBDT may send notice under Section 143(1)",
+        "Can file feedback on AIS portal to correct wrong entries",
+        "Always reconcile AIS before filing"
+      ]
+    },
+
+    "business_income": {
+      "label": "Business / Professional Income",
+      "keywords": ["business", "self-employed", "freelance", "professional", "consulting", "44AD", "44ADA", "presumptive", "profit"],
+      "triggers": ["advance_tax", "gst_compliance", "tds_194c", "tds_194j", "audit_44ab", "itr_form_selection"],
+      "sections_ita2025": ["Section 28-44"],
+      "sections_ita1961": ["Section 28-44"],
+      "key_facts": [
+        "44AD: Presumptive income for small business — 8% of turnover (6% for digital receipts), turnover ≤ Rs.2 crore",
+        "44ADA: Professionals (doctors, lawyers, CAs, etc.) — 50% of gross receipts, receipts ≤ Rs.75 lakh",
+        "44AB: Tax audit mandatory if turnover > Rs.1 crore (Rs.10 crore if cash transactions < 5%)"
+      ]
+    },
+
+    "gst_compliance": {
+      "label": "GST Compliance",
+      "keywords": ["GST", "goods and services tax", "GSTR", "input tax credit", "ITC", "GSTIN"],
+      "triggers": ["business_income"],
+      "key_facts": [
+        "GST registration mandatory if turnover > Rs.20 lakh (Rs.10 lakh in special category states)",
+        "Composition scheme: turnover ≤ Rs.1.5 crore, pay flat GST, no ITC",
+        "GSTR-1: Monthly/quarterly outward supplies filing",
+        "GSTR-3B: Monthly tax payment return"
+      ]
+    },
+
+    "home_loan": {
+      "label": "Home Loan Tax Benefits",
+      "keywords": ["home loan", "housing loan", "EMI", "principal repayment", "home loan interest", "Section 24", "Section 24b"],
+      "triggers": ["section_80c", "regime_choice", "property_gains"],
+      "sections_ita2025": ["Section 25 equivalent"],
+      "sections_ita1961": ["Section 24(b)", "Section 80C"],
+      "key_facts": [
+        "Interest on self-occupied property: max deduction Rs.2 lakh in Old Regime (Section 24b). NOT available in New Regime.",
+        "Principal repayment: Rs.1,50,000 under 80C in Old Regime",
+        "Let-out property: No cap on interest deduction (but set-off against other income capped at Rs.2 lakh/year)",
+        "Under-construction: Interest during construction period deductible in 5 equal instalments post-possession"
+      ]
+    },
+
+    "tds_other": {
+      "label": "TDS on Non-Salary Income",
+      "keywords": ["TDS on interest", "TDS on rent", "TDS on professional", "194A", "194I", "194J", "194C", "194S"],
+      "triggers": ["ais_reconciliation", "advance_tax"],
+      "key_facts": [
+        "194A: TDS on FD interest — threshold raised to Rs.50,000 (Rs.1,00,000 for senior citizens) from FY 2025-26",
+        "194I: TDS on rent — 2% (plant/machinery), 10% (land/building) if rent > Rs.50,000/month",
+        "194J: TDS on professional fees — 10% (professional), 2% (technical services)",
+        "194C: TDS on contractor payments — 1% (individual), 2% (company)",
+        "194S: TDS on VDA/crypto — 1% on amount > Rs.10,000"
+      ]
+    },
+
+    "section_87a": {
+      "label": "Section 87A Tax Rebate",
+      "keywords": ["87A", "rebate", "zero tax", "no tax", "12 lakh", "7 lakh", "tax rebate"],
+      "triggers": ["regime_choice"],
+      "sections_ita2025": ["Section 156"],
+      "sections_ita1961": ["Section 87A"],
+      "key_facts": [
+        "New Regime FY 2025-26: Rebate of Rs.60,000 if total income ≤ Rs.12,00,000 (effectively zero tax up to Rs.12L)",
+        "Old Regime: Rebate of Rs.12,500 if total income ≤ Rs.5,00,000",
+        "SPECIAL RATES (STCG 20%, LTCG 12.5%, crypto 30%) are NOT eligible for 87A rebate",
+        "Surcharge income is also NOT eligible for 87A rebate"
+      ]
+    },
+
+    "surcharge": {
+      "label": "Surcharge and Marginal Relief",
+      "keywords": ["surcharge", "marginal relief", "50 lakh", "1 crore", "2 crore", "5 crore"],
+      "triggers": ["regime_choice"],
+      "sections_ita2025": ["Schedule II"],
+      "sections_ita1961": ["Finance Act"],
+      "key_facts": [
+        "Surcharge slabs: 10% (50L-1Cr), 15% (1Cr-2Cr), 25% (2Cr-5Cr), 25% (>5Cr) — New Regime",
+        "Old Regime: 37% surcharge for income > 5 Cr (equity/STCG/LTCG capped at 15%)",
+        "Marginal relief available to prevent effective rate > 100% at the threshold",
+        "Health & Education Cess: 4% on (income tax + surcharge)"
+      ]
+    },
+
+    "itr_deadline": {
+      "label": "ITR Filing Deadlines",
+      "keywords": ["deadline", "due date", "last date", "July 31", "belated return", "penalty", "interest 234A", "belated"],
+      "triggers": ["advance_tax", "interest_234b"],
+      "sections_ita2025": ["Section 263"],
+      "sections_ita1961": ["Section 139"],
+      "key_facts": [
+        "Original return: July 31, 2026 (for FY 2025-26, AY 2026-27)",
+        "Belated return: December 31, 2026 — with penalty Rs.5,000 (Rs.1,000 if income < Rs.5L)",
+        "Interest under 234A: 1% per month on outstanding tax from due date",
+        "Revised return: December 31, 2026 (if original was filed on time)",
+        "Updated return (ITR-U): 24 months from assessment year end — with 25% or 50% additional tax"
+      ]
+    },
+
+    "nri_taxation": {
+      "label": "NRI Taxation",
+      "keywords": ["NRI", "non-resident", "DTAA", "foreign income", "NRO", "NRE", "FCNR", "repatriation", "overseas"],
+      "triggers": ["capital_gains", "tds_other"],
+      "sections_ita2025": ["Section 5", "Section 6"],
+      "sections_ita1961": ["Section 5", "Section 6", "Section 90"],
+      "key_facts": [
+        "NRI: Indian-sourced income taxable in India",
+        "DTAA relief: Tax paid abroad can be credited against Indian tax",
+        "NRO account: Taxable interest (TDS 30%)",
+        "NRE account: Tax-free interest",
+        "No 87A rebate for NRIs",
+        "Higher TDS rates apply to NRIs on capital gains"
+      ]
+    },
+
+    "gift_tax": {
+      "label": "Gift Taxation",
+      "keywords": ["gift", "received gift", "gift from family", "gift voucher", "bonus gift", "cash gift"],
+      "triggers": ["other_income"],
+      "sections_ita2025": ["Section 56(2)(x)"],
+      "sections_ita1961": ["Section 56(2)(x)"],
+      "key_facts": [
+        "Gifts from specified relatives (parents, siblings, spouse, etc.): EXEMPT — no limit",
+        "Gifts from non-relatives: Taxable as 'Other Sources' if total gifts > Rs.50,000/year",
+        "Gift vouchers from employer: Taxable as perquisite if value > Rs.15,000/year (Rule 3, IT Rules 2026 — increased from Rs.5,000 under old rules)",
+        "On marriage: All gifts exempt regardless of source or amount",
+        "Inherited property: Exempt (not a gift)"
+      ]
+    },
+
+    "fd_interest": {
+      "label": "Fixed Deposit Interest Taxation",
+      "keywords": ["FD", "fixed deposit", "FD interest", "bank interest", "RD", "recurring deposit", "TDS on FD"],
+      "triggers": ["tds_other", "ais_reconciliation"],
+      "key_facts": [
+        "FD interest: Fully taxable at slab rate as 'Income from Other Sources'",
+        "TDS 10% if annual interest > Rs.50,000 (raised from Rs.40,000 — Budget 2025)",
+        "Senior citizens: TDS threshold Rs.1,00,000 (raised from Rs.50,000)",
+        "Section 80TTA: Savings account interest exempt up to Rs.10,000 (NOT FD interest)",
+        "Section 80TTB: Senior citizens (60+) — Rs.50,000 exemption on ALL bank/post office interest including FDs",
+        "Accrual basis: FD interest is taxable yearly even if not yet paid"
+      ]
+    },
+
+    "professional_tax": {
+      "label": "Professional Tax",
+      "keywords": ["professional tax", "PT", "state tax", "employment tax"],
+      "triggers": ["salary_income"],
+      "key_facts": [
+        "State-level tax — varies by state",
+        "Deductible from salary income (below-the-line deduction)",
+        "Maximum Rs.2,500/year",
+        "Available in BOTH Old and New Regime as deduction from salary"
+      ]
+    },
+
+    "section_54": {
+      "label": "Section 54 Exemption (Property)",
+      "keywords": ["54", "section 54", "buy new house", "reinvest property gain", "LTCG property exemption"],
+      "triggers": ["property_gains"],
+      "sections_ita2025": ["Section 54 equivalent"],
+      "sections_ita1961": ["Section 54"],
+      "key_facts": [
+        "Exempt LTCG by buying 1 residential property: within 1 year before OR 2 years after sale",
+        "OR by constructing a house within 3 years",
+        "Capital Gains Account Scheme (CGAS): Deposit unused amount in bank before ITR due date",
+        "From AY 2024-25: Exemption capped at Rs.10 crore",
+        "Must hold new property for 3 years — else gain is taxable in year of sale"
+      ]
+    },
+
+    "other_income": {
+      "label": "Other Sources Income",
+      "keywords": ["dividend", "lottery", "winnings", "prize", "online gaming", "savings interest", "other income"],
+      "triggers": ["ais_reconciliation"],
+      "sections_ita2025": ["Chapter VII"],
+      "sections_ita1961": ["Section 56"],
+      "key_facts": [
+        "Dividends: Taxable at slab rate (post April 2020 — DDT abolished)",
+        "TDS 10% on dividends > Rs.5,000/year",
+        "Lottery/gambling/online gaming: Flat 30% + cess, no deductions allowed (Section 115BB/115BBJ)",
+        "Online gaming TDS: 30% on net winnings (Section 194BA)"
+      ]
+    }
+  },
+
+  "concept_keywords": {
+    "_description": "Flat keyword → concept mapping for fast entity extraction from user queries"
+  }
+}
