@@ -343,7 +343,7 @@ export default function BlogPost() {
                 sectionContent = (
                   <div key={index} className="mb-8">
                     <h2 className="text-3xl font-bold text-gray-900 mb-4 mt-12" data-testid={`heading-${index}`}>
-                      {section.title}
+                      {section.heading || section.title}
                     </h2>
                     {section.content_md && (
                       <div className="text-gray-700 leading-relaxed">
@@ -358,7 +358,7 @@ export default function BlogPost() {
                 sectionContent = (
                   <div key={index} className="mb-6">
                     <h3 className="text-2xl font-bold text-gray-900 mb-3 mt-8" data-testid={`subheading-${index}`}>
-                      {section.title}
+                      {section.heading || section.title}
                     </h3>
                     {section.content_md && (
                       <div className="text-gray-700 leading-relaxed">
@@ -374,7 +374,7 @@ export default function BlogPost() {
                   <Card key={index} className="p-6 mb-8 bg-blue-50 border-blue-200" data-testid="faq-section">
                     <h3 className="text-2xl font-bold text-gray-900 mb-6">Frequently Asked Questions</h3>
                     <div className="space-y-4">
-                      {section.items?.map((faq, faqIdx) => (
+                      {section.items?.map((faq: { q: string; a: string }, faqIdx: number) => (
                         <div key={faqIdx} className="border-b border-blue-200 last:border-b-0 pb-4 last:pb-0">
                           <p className="font-semibold text-gray-900 mb-2" data-testid={`faq-question-${faqIdx}`}>
                             Q: {faq.q}
@@ -397,7 +397,7 @@ export default function BlogPost() {
                     </div>
                     {section.internal_links && section.internal_links.length > 0 && (
                       <div className="flex flex-wrap gap-3">
-                        {section.internal_links.map((link, linkIdx) => (
+                        {section.internal_links.map((link: { href: string; label: string }, linkIdx: number) => (
                           <Link key={linkIdx} href={link.href}>
                             <Button
                               variant="secondary"
