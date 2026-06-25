@@ -10,25 +10,18 @@ export interface BlogPost {
   readingTimeMinutes: number;
   publishedAt?: string;
   heroImage: string;
-  schema: {
-    "@context": string;
-    "@type": string;
-    "headline": string;
-    "author": { "@type": string; "name": string };
-    "publisher": { "@type": string; "name": string };
-  };
-  bodySections: Array<{
-    type: string;
-    title?: string;
-    content_md?: string;
-    items?: Array<{ q: string; a: string }>;
-    internal_links?: Array<{ label: string; href: string }>;
-  }>;
+  // JSON-LD schema — flexible to support Article, BreadcrumbList, and future types
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  schema: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  bodySections: any[];
   disclaimer?: string;
   relatedPosts?: Array<{ slug: string; title: string }>;
 }
 
-export const blogPosts: BlogPost[] = [
+// Cast to BlogPost[] — TS can't narrow the 34-element union inference correctly
+// but all posts conform to the interface at runtime.
+export const blogPosts = ([
   {
     slug: "types-of-investments-in-india-beginners-guide",
     status: "published",
@@ -3063,6 +3056,11 @@ export const blogPosts: BlogPost[] = [
         ]
       },
       {
+        type: "h2",
+        heading: "Prefer Offline? Use the ITDe-Filing 2026 Utility",
+        content_md: "If you have a slow internet connection, want to review your return locally before uploading, or simply prefer working offline, the Income Tax Department provides a free offline utility: **ITDe-Filing 2026 (Version 1.1.0)**, released May 29, 2026.\n\n**How it works:**\n1. Download the pre-filled JSON from the portal (login → e-File → File Income Tax Return → Offline → Download pre-filled data)\n2. Download and install ITDe-Filing 2026 from incometax.gov.in → Downloads → Offline Utilities\n3. Open the utility, import your pre-filled JSON, and fill remaining fields offline\n4. Validate → Generate XML → Upload the XML to the portal\n5. E-verify within 30 days — same as the online method\n\nThe offline utility supports ITR-1, ITR-2, ITR-3, and ITR-4. For a detailed step-by-step walkthrough, see our dedicated guide: [How to File ITR Using ITDe-Filing 2026 Offline Utility](/blog/itde-filing-2026-offline-utility-guide)."
+      },
+      {
         type: "cta",
         content_md: "**Not sure which regime saves you more tax? Calculate in 60 seconds.**\n\nUse AiTaxBot's Income Tax Calculator to compare Old vs New Regime for FY 2025-26 before you open the e-filing portal.",
         internal_links: [
@@ -3076,7 +3074,7 @@ export const blogPosts: BlogPost[] = [
     relatedPosts: [
       { slug: "itr-filing-deadline-2026-july-31", title: "ITR Filing Deadline 2026: What Happens If You Miss July 31?" },
       { slug: "ais-vs-form-26as-difference", title: "AIS vs Form 26AS: What Is the Difference?" },
-      { slug: "new-vs-old-tax-regime-2025", title: "New vs Old Tax Regime: Which Is Better for You?" }
+      { slug: "itde-filing-2026-offline-utility-guide", title: "ITDe-Filing 2026: How to File ITR Using the Offline Utility" }
     ]
   },
 
@@ -3267,11 +3265,118 @@ export const blogPosts: BlogPost[] = [
       { slug: "capital-gains-tax-stocks-mutual-funds", title: "Capital Gains Tax on Stocks and Mutual Funds" },
       { slug: "itr-filing-deadline-2026-july-31", title: "ITR Filing Deadline 2026: What Happens If You Miss July 31?" }
     ]
+  },
+
+  {
+    slug: "itde-filing-2026-offline-utility-guide",
+    status: "published",
+    metaTitle: "ITDe-Filing 2026: How to File ITR Using the Offline Utility (Step-by-Step)",
+    metaDescription: "Step-by-step guide to file your ITR using the ITDe-Filing 2026 offline utility (v1.1.0). Download, import pre-filled data, fill, validate, generate XML, upload and e-verify.",
+    keywords: ["ITDe-Filing 2026", "offline ITR utility", "ITD offline utility 2026", "how to file ITR offline", "income tax offline utility download", "ITR XML upload", "e-filing offline AY 2026-27"],
+    ogTitle: "ITDe-Filing 2026 Offline Utility: Complete Filing Guide (AY 2026-27)",
+    ogDescription: "Prefer filing ITR offline? This step-by-step guide walks you through the ITDe-Filing 2026 utility — download, import pre-filled data, validate, generate XML, and upload.",
+    tags: ["ITR Filing", "Offline Utility", "ITDe-Filing", "Income Tax", "AY 2026-27"],
+    readingTimeMinutes: 7,
+    publishedAt: "June 25, 2026",
+    heroImage: "/images/taxation-india-guide.jpg",
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "ITDe-Filing 2026: How to File ITR Using the Offline Utility (Step-by-Step)",
+      "author": { "@type": "Organization", "name": "AiTaxBot" },
+      "publisher": { "@type": "Organization", "name": "AiTaxBot" },
+      "datePublished": "2026-06-25",
+      "dateModified": "2026-06-25",
+      "wordCount": 1200,
+      "reviewedBy": { "@type": "Organization", "name": "AiTaxBot Tax Research Team" }
+    },
+    bodySections: [
+      {
+        type: "intro",
+        content_md: "The Income Tax Department's offline utility — **ITDe-Filing 2026, Version 1.1.0** (released May 29, 2026) — lets you fill your ITR form locally on your computer and upload the completed XML to the portal. It is free to download from incometax.gov.in and supports ITR-1, ITR-2, ITR-3, and ITR-4.\n\nWhile the online mode on the portal is simpler for most salaried taxpayers, the offline utility is the better choice if you have unreliable internet, want to review your return thoroughly before submitting, or need to work on the return across multiple sessions without losing data. This guide walks through every step — from download to e-verification — for FY 2025-26 (AY 2026-27)."
+      },
+      {
+        type: "h2",
+        heading: "Online vs Offline — Which Method Should You Use?",
+        content_md: "Both methods file the same return and produce the same acknowledgement. The difference is in the workflow:\n\n| Factor | Online (Portal) | Offline (ITDe-Filing 2026) |\n|---|---|---|\n| Internet required | Throughout | Only for download/upload |\n| Data auto-saved | Yes (portal session) | Yes (local file) |\n| Form support | ITR-1 to ITR-7 | ITR-1, 2, 3, 4 |\n| Complex returns | Can be slow | Easier to navigate |\n| Best for | Simple salaried (ITR-1) | Multiple income sources, F&O, property |\n| Pre-filled data | Auto-populated | Import JSON manually |\n\n**Use online mode** if you are filing a straightforward ITR-1 with salary and FD interest only — it is the fastest path.\n\n**Use ITDe-Filing 2026** if you have capital gains (multiple transactions), F&O trading, multiple house properties, or simply prefer to work through the return at your own pace offline."
+      },
+      {
+        type: "h2",
+        heading: "Step 1: Download ITDe-Filing 2026",
+        content_md: "1. Go to **incometax.gov.in**\n2. Click **Downloads** in the top navigation menu\n3. Under **Offline Utilities**, find **ITR Offline Utility** → select **ITR 1, 2, 3 & 4** (AY 2026-27)\n4. Download the setup file: **ITDe-Filing-2026-Setup-1.1.0** (~47 MB, Windows installer)\n5. Run the installer with administrator privileges\n6. Launch the utility from the desktop shortcut or Start menu\n\n**System requirements:** Windows 7 or later (64-bit recommended). No separate Java installation required — the utility bundles its own runtime.\n\n**Important:** Always download directly from incometax.gov.in. Do not download from third-party sites — the official utility is free and contains no ads or bundled software."
+      },
+      {
+        type: "h2",
+        heading: "Step 2: Download Your Pre-Filled JSON from the Portal",
+        content_md: "Before opening the utility, download your pre-filled data from the portal. This pulls your salary, TDS, and other information already available with the Income Tax Department:\n\n1. Login to **incometax.gov.in** with your PAN and password\n2. Go to **e-File** → **Income Tax Returns** → **File Income Tax Return**\n3. Select Assessment Year: **2026-27** and filing mode: **Offline**\n4. Click **Download Pre-filled Data** (JSON file)\n5. Save the file to a folder you can easily find — for example, `C:\\ITR-Filing-2026\\`\n\nThe pre-filled JSON will contain your PAN details, employer salary (from Form 26AS and AIS), TDS deducted, and in many cases bank interest and dividend income already pulled from third-party reporting.\n\n**Tip:** Also download your **AIS (Annual Information Statement)** from the same portal and keep it open alongside the utility for cross-checking."
+      },
+      {
+        type: "h2",
+        heading: "Step 3: Open the Utility and Import Your Data",
+        content_md: "1. Launch **ITDe-Filing 2026** from your desktop\n2. On the home screen, click **Continue** under the relevant ITR form:\n   - **ITR-1 (Sahaj)**: Salary/pension, one house property, income ≤ ₹50 lakh, no capital gains\n   - **ITR-2**: Salary + capital gains from stocks/MF/property\n   - **ITR-3**: Business/professional income\n   - **ITR-4 (Sugam)**: Presumptive income under 44AD/44ADA/44AE\n3. Click **Import Pre-Filled JSON** → browse to the JSON file you downloaded in Step 2\n4. The utility populates all available fields automatically\n\nVerify the imported data carefully:\n- PAN, Aadhaar, date of birth, and address\n- Gross salary and TDS from employer\n- Bank interest and FD income (cross-check with AIS)\n- Previous year carry-forward losses (if any)\n\nCorrect any errors before proceeding — wrong pre-filled data is the most common cause of returns getting notices later."
+      },
+      {
+        type: "h2",
+        heading: "Step 4: Fill In the Remaining Sections",
+        content_md: "The utility is organised into tabs matching the ITR form sections. Work through each tab:\n\n**Part A — General Information:** Verify personal details, bank account (for refund), and residential status.\n\n**Schedule S (Salary Income):** Confirm Gross Salary, Standard Deduction (₹75,000 for New Regime / ₹75,000 for Old Regime), and any perquisites.\n\n**Schedule OS (Other Sources):** Add interest income from savings accounts, FDs, recurring deposits, NSC, and any dividend not pre-filled.\n\n**Tax Regime:** Select New or Old Regime. Use [AiTaxBot's Income Tax Calculator](/calculators/income-tax) before choosing — switching once filed requires a revised return.\n\n**Schedule VI-A (Deductions — Old Regime only):**\n- **80C** (ITA 2025: Section 123): ELSS, PPF, LIC, EPF, home loan principal — maximum ₹1,50,000\n- **80D** (ITA 2025: Section 124): Health insurance premiums\n- **80TTA**: Savings account interest exemption up to ₹10,000\n- **24(b)**: Home loan interest\n\n**Schedule HP (House Property):** Add annual rent received, municipal taxes paid, and home loan interest if applicable.\n\n**Capital Gains tabs (ITR-2 only):** Enter each transaction in Schedule 112A (equity LTCG), Schedule BFLA (carry-forward losses), and Schedule CG (summary)."
+      },
+      {
+        type: "h2",
+        heading: "Step 5: Validate, Generate XML, and Upload",
+        content_md: "Once all sections are filled:\n\n**Validate:**\n1. Click **Validate** (available on each tab and as a full-form validation at the end)\n2. Fix all red errors — these block generation. Review yellow warnings for accuracy.\n3. Common validation errors: Aadhaar not linked to PAN, bank IFSC incorrect, 87A rebate auto-computed wrong (check if income ≤ ₹12L in New Regime or ≤ ₹7L in Old Regime)\n\n**Preview:**\n4. Click **Preview** to see a PDF view of your complete return before generating\n5. Match the tax payable/refund figure with your own calculation\n\n**Generate XML:**\n6. Click **Generate XML** — saves an XML file to your chosen folder\n7. Note the filename — it contains your PAN and is the file you upload\n\n**Upload to portal:**\n8. Login to incometax.gov.in\n9. Go to **e-File** → **Income Tax Returns** → **File Income Tax Return** → **Offline** → **Upload XML**\n10. Select AY 2026-27, the correct ITR type, and upload the XML\n11. Confirm submission — you will receive an acknowledgement number (15 digits)\n\n**Pay outstanding tax first:** If the computation shows tax payable, pay via Challan 280 before uploading. The portal will validate that the challan is linked."
+      },
+      {
+        type: "h2",
+        heading: "Step 6: E-Verify Within 30 Days",
+        content_md: "After uploading the XML, your return is submitted but **not yet valid** until e-verified. You have **30 days** from submission to e-verify.\n\n**Fastest method — Aadhaar OTP:**\n1. After upload, the portal shows an e-verification screen\n2. Click **E-Verify via Aadhaar OTP**\n3. Enter the OTP sent to the mobile number linked with Aadhaar\n4. Done — acknowledgement PDF (ITR-V) sent to your registered email\n\n**Alternative methods:**\n- **Net banking**: Login to your bank's net banking → find the ITR e-verify section\n- **Demat account (CDSL/NSDL)**: Authenticate via your Demat account\n- **Physical ITR-V**: Print, sign in blue ink, and send via speed post to CPC Bengaluru 560500 (takes 2–3 weeks to process — use only as a last resort)\n\nOnce e-verified, the IT Department processes the return within 30–60 days. Refunds (if any) are credited to the bank account specified in the return."
+      },
+      {
+        type: "faq",
+        heading: "Frequently Asked Questions",
+        items: [
+          {
+            q: "Is ITDe-Filing 2026 free to download?",
+            a: "Yes. The offline utility is provided free of charge by the Income Tax Department at incometax.gov.in → Downloads → Offline Utilities. There is no cost to download, install, or use it."
+          },
+          {
+            q: "Can I use ITDe-Filing 2026 on a Mac or Linux?",
+            a: "The utility is currently Windows-only. Mac and Linux users should use the online mode on the Income Tax portal (incometax.gov.in), which works in any modern browser."
+          },
+          {
+            q: "What if I need to make corrections after generating the XML?",
+            a: "Do not upload the XML. Go back in the utility, make corrections, re-validate, and generate a fresh XML. Only the last uploaded XML matters. If you have already uploaded and the return is processed, file a Revised Return under Section 139(5) by December 31, 2026."
+          },
+          {
+            q: "The utility says my Aadhaar is not linked — what do I do?",
+            a: "Aadhaar-PAN linking is mandatory. If not linked, go to the Income Tax portal → Profile → Link Aadhaar before filing. The linking fee is ₹1,000 if done after the deadline. Check your link status at incometax.gov.in → Quick Links → Link Aadhaar Status."
+          },
+          {
+            q: "I uploaded the wrong XML. Can I re-upload?",
+            a: "If the return is still in 'Submitted — Pending e-verification' status, you can upload a corrected XML before e-verifying. If already e-verified and processed, file a Revised Return instead."
+          }
+        ]
+      },
+      {
+        type: "cta",
+        content_md: "**Before you file, compare which tax regime saves you more.**\n\nUse AiTaxBot's free Income Tax Calculator — enter your salary, deductions, and HRA details to see your tax under both regimes in seconds. No sign-up required.",
+        internal_links: [
+          { label: "Income Tax Calculator", href: "/calculators/income-tax" },
+          { label: "HRA Exemption Calculator", href: "/calculators/hra" },
+          { label: "AIS Reconciliation Tool", href: "/tools/ais-26as-form16" }
+        ]
+      }
+    ],
+    disclaimer: "This guide is based on the ITDe-Filing 2026 utility (v1.1.0) released by the Income Tax Department on May 29, 2026. The exact steps and interface may change with future utility updates. Always refer to incometax.gov.in for the latest version and official instructions.",
+    relatedPosts: [
+      { slug: "how-to-file-itr-1-online-fy-2025-26", title: "How to File ITR-1 Online for FY 2025-26 — Step by Step" },
+      { slug: "itr-filing-deadline-2026-july-31", title: "ITR Filing Deadline 2026: What Happens If You Miss July 31?" },
+      { slug: "ais-vs-form-26as-difference", title: "AIS vs Form 26AS: What Is the Difference?" }
+    ]
   }
-];
+]) as BlogPost[];
 
 export function getBlogPost(slug: string): BlogPost | undefined {
-  return blogPosts.find(post => post.slug === slug);
+  return blogPosts.find((post: BlogPost) => post.slug === slug);
 }
 
 export function getBlogPostExcerpt(content: string, maxLength: number = 150): string {

@@ -3,8 +3,8 @@
 
   <!-- ═══════════════════════════════════════════════════════════════
        AiTaxBot Sitemap — www.aitaxbot.co.in
-       Last updated: 2026-06-20
-       Total URLs: 62
+       Last updated: 2026-06-25
+       Total URLs: 63
   ═══════════════════════════════════════════════════════════════ -->
 
   <!-- ── CORE PAGES ─────────────────────────────────────────────── -->
@@ -228,6 +228,7 @@
   <!-- Capital Gains & Investments -->
   <url><loc>https://www.aitaxbot.co.in/blog/capital-gains-tax-stocks-mutual-funds</loc><lastmod>2026-06-01</lastmod><changefreq>monthly</changefreq><priority>0.85</priority></url>
   <url><loc>https://www.aitaxbot.co.in/blog/us-stock-trading-tax-india</loc><lastmod>2026-06-01</lastmod><changefreq>monthly</changefreq><priority>0.90</priority></url>
+  <url><loc>https://www.aitaxbot.co.in/blog/itde-filing-2026-offline-utility-guide</loc><lastmod>2026-06-25</lastmod><changefreq>monthly</changefreq><priority>0.90</priority></url>
   <url><loc>https://www.aitaxbot.co.in/blog/cryptocurrency-investments-india-2025</loc><lastmod>2026-04-20</lastmod><changefreq>monthly</changefreq><priority>0.80</priority></url>
   <url><loc>https://www.aitaxbot.co.in/blog/elss-vs-ppf-vs-nps-tax-saving-comparison</loc><lastmod>2026-04-20</lastmod><changefreq>monthly</changefreq><priority>0.82</priority></url>
   <url><loc>https://www.aitaxbot.co.in/blog/tax-saving-investments-80c-and-beyond</loc><lastmod>2026-04-20</lastmod><changefreq>monthly</changefreq><priority>0.80</priority></url>
