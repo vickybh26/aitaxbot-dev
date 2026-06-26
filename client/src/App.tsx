@@ -96,21 +96,26 @@ function ProtectedRoute({ component: Component }: { component: any }) {
 
 // Admin-only route — requires adminLevel to be set (1, 2, or 3)
 function AdminRoute({ component: Component, minLevel = 3 }: { component: any; minLevel?: number }) {
-  const { isAuthenticated, adminLevel, loading } = useAuth();
+  const { isAuthenticated, adminLevel, adminLoading, loading } = useAuth();
   const [, setLocation] = useLocation();
 
   useEffect(() => {
-    if (!loading) {
+    // Wait for BOTH firebase auth AND the admin-level check to resolve before redirecting.
+    // Previously we redirected as soon as loading=false, but adminLoading could still be true
+    // (the /api/admin/me fetch runs in parallel and was not awaited), causing a race condition
+    // that kicked every admin back to "/" on page load.
+    if (!loading && !adminLoading) {
       if (!isAuthenticated) {
         setLocation("/login");
       } else if (adminLevel === null) {
-        // Logged in but not an admin — redirect home
+        // Logged in but confirmed not an admin — redirect home
         setLocation("/");
       }
     }
-  }, [isAuthenticated, adminLevel, loading, setLocation]);
+  }, [isAuthenticated, adminLevel, adminLoading, loading, setLocation]);
 
-  if (loading) {
+  // Show spinner while Firebase auth OR admin check is still in-flight
+  if (loading || adminLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-slate-900">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-persian-blue-400" />

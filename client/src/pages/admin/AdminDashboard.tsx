@@ -8,6 +8,7 @@ import {
   UserCheck,
   UserPlus,
   Activity,
+  AlertTriangle,
 } from "lucide-react";
 import {
   AreaChart,
@@ -61,14 +62,17 @@ function StatCard({
 export default function AdminDashboard() {
   const { getIdToken, adminLevel } = useAuth();
 
-  const { data: stats, isLoading } = useQuery<AdminStats>({
+  const { data: stats, isLoading, isError } = useQuery<AdminStats>({
     queryKey: ["/api/admin/stats"],
     queryFn: async () => {
       const token = await getIdToken();
       const res = await fetch("/api/admin/stats", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error("Failed to load stats");
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body?.error || `HTTP ${res.status}`);
+      }
       return res.json();
     },
     staleTime: 2 * 60 * 1000,
@@ -86,6 +90,18 @@ export default function AdminDashboard() {
       <AdminLayout>
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-persian-blue-600" />
+        </div>
+      </AdminLayout>
+    );
+  }
+
+  if (isError) {
+    return (
+      <AdminLayout>
+        <div className="flex flex-col items-center justify-center h-64 gap-3 text-center">
+          <AlertTriangle className="w-8 h-8 text-red-400" />
+          <p className="text-sm font-medium text-slate-700">Failed to load dashboard stats</p>
+          <p className="text-xs text-slate-500">Check Railway logs for Firestore errors, or verify FIREBASE_SERVICE_ACCOUNT is set.</p>
         </div>
       </AdminLayout>
     );
@@ -213,7 +229,7 @@ export default function AdminDashboard() {
               </li>
               <li>
                 In Firestore, create a document:{" "}
-                <span className="font-mono text-amber-300">admins / {"<uid>"}</span> with fields:{" "}
+                <span className="font-mono text-amber-300">admin / {"<uid>"}</span> with fields:{" "}
                 <span className="font-mono text-amber-300">
                   {"{ level: 1|2|3, name: '...', email: '...' }"}
                 </span>

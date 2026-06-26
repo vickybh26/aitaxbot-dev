@@ -59,14 +59,17 @@ const PieCustomLabel = ({ cx, cy, midAngle, outerRadius, percent, name }: any) =
 export default function AdminAnalytics() {
   const { getIdToken } = useAuth();
 
-  const { data, isLoading } = useQuery<AnalyticsData>({
+  const { data, isLoading, isError, error } = useQuery<AnalyticsData>({
     queryKey: ["/api/admin/analytics"],
     queryFn: async () => {
       const token = await getIdToken();
       const res = await fetch("/api/admin/analytics", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error("Failed");
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body?.error || `HTTP ${res.status}`);
+      }
       return res.json();
     },
     staleTime: 5 * 60 * 1000,
@@ -77,6 +80,18 @@ export default function AdminAnalytics() {
       <AdminLayout>
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-persian-blue-600" />
+        </div>
+      </AdminLayout>
+    );
+  }
+
+  if (isError) {
+    return (
+      <AdminLayout>
+        <div className="flex flex-col items-center justify-center h-64 gap-3 text-center">
+          <svg className="w-8 h-8 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /></svg>
+          <p className="text-sm font-medium text-slate-700">Failed to load analytics</p>
+          <p className="text-xs text-red-500">{(error as Error)?.message}</p>
         </div>
       </AdminLayout>
     );

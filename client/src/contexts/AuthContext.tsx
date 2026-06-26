@@ -24,6 +24,7 @@ interface AuthContextType {
   user: User | null;
   userProfile: UserProfile | null;
   loading: boolean;
+  adminLoading: boolean; // true while /api/admin/me is in-flight
   isAuthenticated: boolean;
   isProfileComplete: boolean;
   adminLevel: number | null; // null = not admin; 1/2/3 = admin level
@@ -35,6 +36,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   userProfile: null,
   loading: true,
+  adminLoading: false,
   isAuthenticated: false,
   isProfileComplete: false,
   adminLevel: null,
@@ -49,6 +51,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [adminLevel, setAdminLevel] = useState<number | null>(null);
+  const [adminLoading, setAdminLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
   const lastActivityRef = useRef<number>(Date.now());
@@ -58,11 +61,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const token = await firebaseUser.getIdToken();
 
-      // Check admin status — runs in parallel with profile sync, doesn't block it
+      // Check admin status — runs in parallel with profile sync, doesn't block it.
+      // adminLoading stays true until this resolves so AdminRoute doesn't race-redirect.
+      setAdminLoading(true);
       fetch('/api/admin/me', { headers: { 'Authorization': `Bearer ${token}` } })
         .then(r => r.ok ? r.json() : null)
         .then(data => setAdminLevel(data ? data.level : null))
-        .catch(() => setAdminLevel(null));
+        .catch(() => setAdminLevel(null))
+        .finally(() => setAdminLoading(false));
 
       // Always sync user profile (admins are also users — they have a profile too)
       await fetch('/api/user/sync', {
@@ -172,7 +178,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [user]);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: User | null) => {
       console.log('[AuthContext] Auth state changed:', firebaseUser ? `User: ${firebaseUser.email}` : 'No user');
       setUser(firebaseUser);
 
@@ -182,6 +188,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         setUserProfile(null);
         setAdminLevel(null);
+        setAdminLoading(false);
         if (inactivityTimerRef.current) {
           clearTimeout(inactivityTimerRef.current);
         }
@@ -207,6 +214,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     user,
     userProfile,
     loading,
+    adminLoading,
     isAuthenticated: !!user,
     isProfileComplete: userProfile?.isProfileComplete ?? false,
     adminLevel,

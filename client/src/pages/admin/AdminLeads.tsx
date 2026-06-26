@@ -6,7 +6,7 @@
 import { useQuery } from "@tanstack/react-query";
 import AdminLayout from "@/components/AdminLayout";
 import { useAuth } from "@/contexts/AuthContext";
-import { RefreshCw, Users, Download } from "lucide-react";
+import { RefreshCw, Users, Download, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface Lead {
@@ -25,14 +25,17 @@ interface Lead {
 export default function AdminLeads() {
   const { getIdToken } = useAuth();
 
-  const { data, isLoading, refetch } = useQuery({
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["admin-leads"],
     queryFn: async () => {
       const token = await getIdToken();
       const r = await fetch("/api/admin/leads", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!r.ok) throw new Error("Failed to fetch leads");
+      if (!r.ok) {
+        const body = await r.json().catch(() => ({}));
+        throw new Error(body?.error || `HTTP ${r.status}`);
+      }
       return r.json();
     },
   });
@@ -93,6 +96,13 @@ export default function AdminLeads() {
         {isLoading ? (
           <div className="flex items-center justify-center py-20 text-slate-400">
             <RefreshCw className="h-5 w-5 animate-spin mr-2" /> Loading…
+          </div>
+        ) : isError ? (
+          <div className="flex flex-col items-center justify-center py-20 gap-3 text-center">
+            <AlertTriangle className="h-8 w-8 text-red-400" />
+            <p className="text-sm font-medium text-slate-700">Failed to load leads</p>
+            <p className="text-xs text-red-500">{(error as Error)?.message}</p>
+            <button onClick={() => refetch()} className="text-xs text-persian-blue-600 hover:underline">Retry</button>
           </div>
         ) : leads.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-slate-400 gap-2">
