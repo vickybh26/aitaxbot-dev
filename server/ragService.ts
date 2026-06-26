@@ -15,6 +15,8 @@ import taxTopicGraph from "./taxTopicGraph.json";
 
 // ─── Clients ────────────────────────────────────────────────────────────────
 
+// Generation only — do NOT use ai.models.embedContent (SDK targets v1beta path
+// inconsistently across versions). Embeddings use direct REST instead (see embedText).
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY || "" });
 
 const qdrant = new QdrantClient({
@@ -24,6 +26,7 @@ const qdrant = new QdrantClient({
 
 const COLLECTION = process.env.QDRANT_COLLECTION || "aitaxbot-knowledge";
 const EMBEDDING_MODEL = "text-embedding-004";   // 768 dims — free tier
+const EMBED_URL = `https://generativelanguage.googleapis.com/v1beta/models/${EMBEDDING_MODEL}:embedContent`;
 const GENERATION_MODEL = "gemini-2.5-flash";
 const TOP_K = 8;                                 // chunks returned per search
 const MAX_CONTEXT_CHARS = 12000;                 // keep prompt < 16K tokens
@@ -148,14 +151,28 @@ function buildExpandedQuery(original: string, concepts: Set<string>): string {
 }
 
 // ─── Embedding ───────────────────────────────────────────────────────────────
+// Uses direct REST (v1beta) — the @google/genai SDK resolves to v1 for embedContent
+// which returns 404 for text-embedding-004. Direct REST is version-stable.
 
 async function embedText(text: string): Promise<number[]> {
-  const result = await ai.models.embedContent({
-    model: EMBEDDING_MODEL,
-    contents: text,
+  const apiKey = process.env.GOOGLE_API_KEY || "";
+  const resp = await fetch(`${EMBED_URL}?key=${encodeURIComponent(apiKey)}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: `models/${EMBEDDING_MODEL}`,
+      content: { parts: [{ text }] },
+      taskType: "RETRIEVAL_QUERY",
+    }),
   });
 
-  const values = result.embeddings?.[0]?.values;
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(`Gemini embed HTTP ${resp.status}: ${JSON.stringify(err)}`);
+  }
+
+  const data = await resp.json();
+  const values: number[] | undefined = data?.embedding?.values;
   if (!values || values.length === 0) {
     throw new Error("Embedding returned empty vector");
   }
