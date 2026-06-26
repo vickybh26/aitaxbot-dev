@@ -50,7 +50,7 @@ GOOGLE_API_KEY   = os.getenv("GOOGLE_API_KEY", "")
 QDRANT_URL       = os.getenv("QDRANT_URL", "")
 QDRANT_API_KEY   = os.getenv("QDRANT_API_KEY", "")
 COLLECTION       = os.getenv("QDRANT_COLLECTION", "aitaxbot-knowledge")
-EMBEDDING_MODEL  = "models/text-embedding-004"  # 768-dim, free tier
+EMBEDDING_MODEL  = "text-embedding-004"  # 768-dim, free tier (no "models/" prefix in new SDK)
 VECTOR_SIZE      = 768
 
 CHUNK_SIZE       = 600    # tokens (~4 chars/token = ~2400 chars)
@@ -208,18 +208,24 @@ def embed_batch(texts: list[str]) -> list[list[float]]:
 # ─── Qdrant setup ────────────────────────────────────────────────────────────
 
 def ensure_collection(client: QdrantClient) -> None:
-    """Create Qdrant collection if it doesn't exist."""
+    """Create Qdrant collection if it doesn't exist. Recreate if it exists but is empty (failed previous run)."""
     existing = {c.name for c in client.get_collections().collections}
-    if COLLECTION not in existing:
-        print(f"Creating Qdrant collection '{COLLECTION}'...")
-        client.create_collection(
-            collection_name=COLLECTION,
-            vectors_config=VectorParams(size=VECTOR_SIZE, distance=Distance.COSINE),
-        )
-        print("  ✅ Collection created")
-    else:
+    if COLLECTION in existing:
         info = client.get_collection(COLLECTION)
-        print(f"  Collection '{COLLECTION}' already exists — {info.vectors_count or 0} vectors")
+        count = info.vectors_count or 0
+        if count > 0:
+            print(f"  Collection '{COLLECTION}' already has {count} vectors — skipping creation.")
+            return
+        else:
+            print(f"  Collection '{COLLECTION}' exists but is empty (previous failed run) — recreating...")
+            client.delete_collection(COLLECTION)
+
+    print(f"Creating Qdrant collection '{COLLECTION}'...")
+    client.create_collection(
+        collection_name=COLLECTION,
+        vectors_config=VectorParams(size=VECTOR_SIZE, distance=Distance.COSINE),
+    )
+    print("  ✅ Collection created")
 
 # ─── Main ingestion ───────────────────────────────────────────────────────────
 
@@ -235,6 +241,23 @@ def main():
     if not QDRANT_URL or not QDRANT_API_KEY:
         print("❌ QDRANT_URL or QDRANT_API_KEY not set in .env")
         print("   Create a free cluster at https://cloud.qdrant.io")
+        return
+
+    # Test embedding BEFORE extracting PDFs — fail fast if API key / model is wrong
+    print("\nTesting Gemini embedding API...")
+    try:
+        test_result = gemini.models.embed_content(
+            model=EMBEDDING_MODEL,
+            contents="test",
+            config=genai_types.EmbedContentConfig(task_type="RETRIEVAL_DOCUMENT"),
+        )
+        dim = len(test_result.embeddings[0].values)
+        print(f"  ✅ Embedding API working — {dim}-dim vector")
+        if dim != VECTOR_SIZE:
+            print(f"  ⚠️  WARNING: expected {VECTOR_SIZE} dims, got {dim}. Update VECTOR_SIZE in script.")
+    except Exception as e:
+        print(f"  ❌ Embedding test failed: {e}")
+        print("  Fix the API key / model name before re-running.")
         return
 
     # Connect to Qdrant
