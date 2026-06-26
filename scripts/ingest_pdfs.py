@@ -49,7 +49,7 @@ GOOGLE_API_KEY   = os.getenv("GOOGLE_API_KEY", "")
 QDRANT_URL       = os.getenv("QDRANT_URL", "")
 QDRANT_API_KEY   = os.getenv("QDRANT_API_KEY", "")
 COLLECTION       = os.getenv("QDRANT_COLLECTION", "aitaxbot-knowledge")
-EMBEDDING_MODEL  = "text-embedding-004"  # 768-dim, free tier (no "models/" prefix in new SDK)
+EMBEDDING_MODEL  = "gemini-embedding-001"  # 768-dim — renamed from text-embedding-004
 VECTOR_SIZE      = 768
 
 CHUNK_SIZE       = 600    # tokens (~4 chars/token = ~2400 chars)

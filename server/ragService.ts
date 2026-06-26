@@ -25,7 +25,7 @@ const qdrant = new QdrantClient({
 });
 
 const COLLECTION = process.env.QDRANT_COLLECTION || "aitaxbot-knowledge";
-const EMBEDDING_MODEL = "text-embedding-004";   // 768 dims — free tier
+const EMBEDDING_MODEL = "gemini-embedding-001";  // 768 dims — renamed from text-embedding-004
 const EMBED_URL = `https://generativelanguage.googleapis.com/v1beta/models/${EMBEDDING_MODEL}:embedContent`;
 const GENERATION_MODEL = "gemini-2.5-flash";
 const TOP_K = 8;                                 // chunks returned per search
