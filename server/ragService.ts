@@ -8,16 +8,14 @@
  *         → anonymous query logging to Firestore
  */
 
-import { GoogleGenAI } from "@google/genai";
 import { QdrantClient } from "@qdrant/js-client-rest";
 import { getFirestore } from "./firebase";
 import taxTopicGraph from "./taxTopicGraph.json";
 
 // ─── Clients ────────────────────────────────────────────────────────────────
 
-// Generation only — do NOT use ai.models.embedContent (SDK targets v1beta path
-// inconsistently across versions). Embeddings use direct REST instead (see embedText).
-const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY || "" });
+// Both embedding and generation use direct REST to avoid @google/genai SDK
+// version compatibility issues. The v1beta endpoint works for all current models.
 
 const qdrant = new QdrantClient({
   url: process.env.QDRANT_URL || "https://your-cluster.qdrant.io",
@@ -25,9 +23,11 @@ const qdrant = new QdrantClient({
 });
 
 const COLLECTION = process.env.QDRANT_COLLECTION || "aitaxbot-knowledge";
-const EMBEDDING_MODEL = "gemini-embedding-001";  // 3072 dims (default output dim for this model)
-const EMBED_URL = `https://generativelanguage.googleapis.com/v1beta/models/${EMBEDDING_MODEL}:embedContent`;
-const GENERATION_MODEL = "gemini-2.5-flash";
+const EMBEDDING_MODEL = "gemini-embedding-001";  // 3072 dims
+const GENERATION_MODEL = "gemini-2.5-flash";     // current stable (as of June 2026)
+const GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
+const EMBED_URL = `${GEMINI_BASE}/${EMBEDDING_MODEL}:embedContent`;
+const GENERATE_URL = `${GEMINI_BASE}/${GENERATION_MODEL}:generateContent`;
 const TOP_K = 8;                                 // chunks returned per search
 const MAX_CONTEXT_CHARS = 12000;                 // keep prompt < 16K tokens
 
@@ -269,13 +269,28 @@ async function generateAnswer(
   concepts: Set<string>
 ): Promise<{ answer: string; confidence: "high" | "medium" | "low" }> {
   const prompt = buildPrompt(question, chunks, concepts);
+  const apiKey = process.env.GOOGLE_API_KEY || "";
 
-  const response = await ai.models.generateContent({
-    model: GENERATION_MODEL,
-    contents: [{ role: "user", parts: [{ text: prompt }] }],
+  // Direct REST call — same pattern as embedText, avoids @google/genai SDK
+  // version compatibility issues. v1beta endpoint works for all current models.
+  const resp = await fetch(`${GENERATE_URL}?key=${encodeURIComponent(apiKey)}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+    }),
   });
 
-  const answer = response.text?.trim() || "I could not generate an answer. Please try rephrasing your question.";
+  if (!resp.ok) {
+    const errBody = await resp.json().catch(() => ({}));
+    throw new Error(`Gemini generate HTTP ${resp.status}: ${JSON.stringify(errBody)}`);
+  }
+
+  const data = await resp.json();
+  const answer = (
+    data?.candidates?.[0]?.content?.parts?.[0]?.text ||
+    "I could not generate an answer. Please try rephrasing your question."
+  ).trim();
 
   // Simple confidence heuristic based on chunk scores
   const avgScore = chunks.reduce((sum, c) => sum + c.score, 0) / (chunks.length || 1);
