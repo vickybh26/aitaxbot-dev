@@ -220,20 +220,35 @@ def embed_batch(texts: list[str]) -> list[list[float]]:
 # ─── Qdrant setup ────────────────────────────────────────────────────────────
 
 def ensure_collection(client: QdrantClient) -> None:
-    """Create Qdrant collection if it doesn't exist. Recreate if it exists but is empty (failed previous run)."""
+    """Create Qdrant collection if it doesn't exist.
+    Recreate if it exists but is empty OR has wrong vector dimensions."""
     existing = {c.name for c in client.get_collections().collections}
     if COLLECTION in existing:
         info = client.get_collection(COLLECTION)
-        # qdrant-client ≥1.9 uses points_count; fall back to vectors_count for older versions
         count = getattr(info, "points_count", None) or getattr(info, "vectors_count", None) or 0
-        if count > 0:
-            print(f"  Collection '{COLLECTION}' already has {count} vectors — skipping creation.")
+
+        # Check vector size — must match VECTOR_SIZE (e.g. old 768-dim vs new 3072-dim)
+        existing_dim = None
+        try:
+            cfg = info.config.params.vectors
+            if hasattr(cfg, "size"):
+                existing_dim = cfg.size
+            elif isinstance(cfg, dict) and "" in cfg:
+                existing_dim = cfg[""].size
+        except Exception:
+            pass
+
+        if existing_dim is not None and existing_dim != VECTOR_SIZE:
+            print(f"  ⚠️  Collection has wrong dimension ({existing_dim}-dim, need {VECTOR_SIZE}-dim) — recreating...")
+            client.delete_collection(COLLECTION)
+        elif count > 0:
+            print(f"  ✅ Collection '{COLLECTION}' already has {count} vectors with correct {VECTOR_SIZE}-dim — skipping ingestion.")
             return
         else:
-            print(f"  Collection '{COLLECTION}' exists but is empty (previous failed run) — recreating...")
+            print(f"  Collection '{COLLECTION}' exists but is empty — recreating...")
             client.delete_collection(COLLECTION)
 
-    print(f"Creating Qdrant collection '{COLLECTION}'...")
+    print(f"Creating Qdrant collection '{COLLECTION}' ({VECTOR_SIZE}-dim Cosine)...")
     client.create_collection(
         collection_name=COLLECTION,
         vectors_config=VectorParams(size=VECTOR_SIZE, distance=Distance.COSINE),
