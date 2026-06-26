@@ -49,8 +49,8 @@ GOOGLE_API_KEY   = os.getenv("GOOGLE_API_KEY", "")
 QDRANT_URL       = os.getenv("QDRANT_URL", "")
 QDRANT_API_KEY   = os.getenv("QDRANT_API_KEY", "")
 COLLECTION       = os.getenv("QDRANT_COLLECTION", "aitaxbot-knowledge")
-EMBEDDING_MODEL  = "gemini-embedding-001"  # 768-dim — renamed from text-embedding-004
-VECTOR_SIZE      = 768
+EMBEDDING_MODEL  = "gemini-embedding-001"  # 3072-dim (gemini-embedding-001 default)
+VECTOR_SIZE      = 3072
 
 CHUNK_SIZE       = 600    # tokens (~4 chars/token = ~2400 chars)
 CHUNK_OVERLAP    = 100    # overlap to preserve context across chunks
@@ -224,7 +224,8 @@ def ensure_collection(client: QdrantClient) -> None:
     existing = {c.name for c in client.get_collections().collections}
     if COLLECTION in existing:
         info = client.get_collection(COLLECTION)
-        count = info.vectors_count or 0
+        # qdrant-client ≥1.9 uses points_count; fall back to vectors_count for older versions
+        count = getattr(info, "points_count", None) or getattr(info, "vectors_count", None) or 0
         if count > 0:
             print(f"  Collection '{COLLECTION}' already has {count} vectors — skipping creation.")
             return
