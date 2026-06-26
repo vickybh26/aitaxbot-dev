@@ -11,7 +11,7 @@
 
 import { Router, Request, Response } from "express";
 import { runRAGQuery, checkRAGHealth } from "./ragService";
-import { db, verifyFirebaseToken, getFirestore } from "./firebase";
+import { verifyFirebaseToken, getFirestore } from "./firebase";
 
 const router = Router();
 
@@ -139,7 +139,7 @@ router.get("/admin/queries", requireAdminL1, async (req: Request, res: Response)
   try {
     const limit = Math.min(Number(req.query.limit) || 100, 500);
 
-    const snapshot = await db
+    const snapshot = await getFirestore()
       .collection("ai_queries")
       .orderBy("timestamp", "desc")
       .limit(limit)

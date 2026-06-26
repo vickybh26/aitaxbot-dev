@@ -10,7 +10,7 @@
 
 import { GoogleGenAI } from "@google/genai";
 import { QdrantClient } from "@qdrant/js-client-rest";
-import { db } from "./firebase";
+import { getFirestore } from "./firebase";
 import taxTopicGraph from "./taxTopicGraph.json";
 
 // ─── Clients ────────────────────────────────────────────────────────────────
@@ -277,7 +277,7 @@ async function logQuery(
   source?: string
 ): Promise<void> {
   try {
-    await db.collection("ai_queries").add({
+    await getFirestore().collection("ai_queries").add({
       question,                    // The query text (no user PII stored)
       concepts_triggered: concepts,
       session_id: sessionId || null,
