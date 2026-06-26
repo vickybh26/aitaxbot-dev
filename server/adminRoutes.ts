@@ -235,9 +235,16 @@ router.get("/users", adminL3, async (req: any, res) => {
     }
 
     const snap = await query.get();
+    // Sort newest first — createdAt can be a Firestore Timestamp or an ISO string
+    const toMs = (v: any): number => {
+      if (!v) return 0;
+      if (v._seconds) return v._seconds * 1000;
+      if (typeof v.toMillis === "function") return v.toMillis();
+      return new Date(v).getTime() || 0;
+    };
     let docs = snap.docs
       .map((d: any) => ({ id: d.id, ...d.data() }))
-      .sort((a: any, b: any) => (b.createdAt || "").localeCompare(a.createdAt || ""));
+      .sort((a: any, b: any) => toMs(b.createdAt) - toMs(a.createdAt));
 
     // Client-side filtering for search and tags (Firestore doesn't support full-text)
     if (search) {
@@ -501,9 +508,15 @@ router.get("/ca/list", adminL3, async (req: any, res) => {
 
     // Fetch up to 2× limit so in-memory sort still gives correct top-N results
     const snap = await ref.limit(limitNum * 2).get();
+    const toMs2 = (v: any): number => {
+      if (!v) return 0;
+      if (v._seconds) return v._seconds * 1000;
+      if (typeof v.toMillis === "function") return v.toMillis();
+      return new Date(v).getTime() || 0;
+    };
     const cas = snap.docs
       .map((d: any) => ({ id: d.id, ...d.data() }))
-      .sort((a: any, b: any) => (b.createdAt || "").localeCompare(a.createdAt || ""))
+      .sort((a: any, b: any) => toMs2(b.createdAt) - toMs2(a.createdAt))
       .slice(0, limitNum);
 
     res.json({ cas, count: cas.length });
@@ -601,7 +614,7 @@ router.delete("/ca/:id", adminL1, async (req: any, res) => {
     const caData: any = snap.data();
     await ref.delete();
 
-    console.log(`[Admin] CA profile deleted: ${id} (${caData?.fullName || "unknown"}) by admin ${req.userId}`);
+    console.log(`[Admin] CA profile deleted: ${id} (${caData?.fullName || "unknown"}) by admin ${req.adminUid}`);
     res.json({ success: true, deleted: id });
   } catch (err) {
     console.error("[Admin] CA delete error:", err);
@@ -616,7 +629,7 @@ router.delete("/users/:id", adminL1, async (req: any, res) => {
     if (!id) return res.status(400).json({ error: "id required" });
 
     // Prevent accidental self-deletion
-    if (id === req.userId) {
+    if (id === req.adminUid) {
       return res.status(400).json({ error: "You cannot delete your own account" });
     }
 
@@ -628,7 +641,7 @@ router.delete("/users/:id", adminL1, async (req: any, res) => {
     const userData: any = snap.data();
     await ref.delete();
 
-    console.log(`[Admin] User deleted: ${id} (${userData?.email || "unknown"}) by admin ${req.userId}`);
+    console.log(`[Admin] User deleted: ${id} (${userData?.email || "unknown"}) by admin ${req.adminUid}`);
     res.json({ success: true, deleted: id });
   } catch (err) {
     console.error("[Admin] User delete error:", err);

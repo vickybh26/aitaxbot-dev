@@ -521,17 +521,21 @@ export default function AdminUsers() {
     ...(tagFilter && { tag: tagFilter }),
   });
 
-  const { data, isLoading } = useQuery<UsersResponse>({
+  const { data, isLoading, isError, error, refetch } = useQuery<UsersResponse>({
     queryKey: ["/api/admin/users", page, debouncedSearch, occupationFilter, stateFilter, tagFilter],
     queryFn: async () => {
       const token = await getIdToken();
       const res = await fetch(`/api/admin/users?${queryParams}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error("Failed");
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body?.error || `HTTP ${res.status}`);
+      }
       return res.json();
     },
     staleTime: 30_000,
+    retry: 1,
   });
 
   const handleExport = async () => {
@@ -622,6 +626,20 @@ export default function AdminUsers() {
           {isLoading ? (
             <div className="flex items-center justify-center h-48">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-persian-blue-600" />
+            </div>
+          ) : isError ? (
+            <div className="flex flex-col items-center justify-center h-48 gap-3 text-center px-4">
+              <AlertTriangle className="w-8 h-8 text-red-400" />
+              <div>
+                <p className="text-sm font-medium text-slate-700">Failed to load users</p>
+                <p className="text-xs text-red-500 mt-1">{(error as Error)?.message}</p>
+              </div>
+              <button
+                onClick={() => refetch()}
+                className="text-xs text-persian-blue-600 hover:underline mt-1"
+              >
+                Retry
+              </button>
             </div>
           ) : (
             <>
