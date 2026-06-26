@@ -29,8 +29,7 @@ import pdfplumber
 from pathlib import Path
 from dotenv import load_dotenv
 
-from google import genai
-from google.genai import types as genai_types
+import requests
 from qdrant_client import QdrantClient
 from qdrant_client.models import (
     Distance, VectorParams, PointStruct
@@ -183,22 +182,35 @@ def extract_pdf_chunks(source_info: dict) -> list[dict]:
 
     return chunks
 
-# ─── Embedding ────────────────────────────────────────────────────────────────
+# ─── Embedding (direct REST — no SDK dependency) ─────────────────────────────
+# Calls the Gemini REST API directly to avoid SDK version issues.
+# Endpoint: POST /v1/models/{model}:embedContent?key={api_key}
 
-gemini = genai.Client(api_key=GOOGLE_API_KEY, http_options={"api_version": "v1"})
+EMBED_URL = f"https://generativelanguage.googleapis.com/v1/models/{EMBEDDING_MODEL}:embedContent"
+
+def _embed_one(text: str) -> list[float]:
+    """Embed a single text via Gemini REST API."""
+    resp = requests.post(
+        EMBED_URL,
+        params={"key": GOOGLE_API_KEY},
+        json={
+            "model": f"models/{EMBEDDING_MODEL}",
+            "content": {"parts": [{"text": text}]},
+            "taskType": "RETRIEVAL_DOCUMENT",
+        },
+        timeout=15,
+    )
+    data = resp.json()
+    if resp.status_code != 200:
+        raise RuntimeError(f"HTTP {resp.status_code}: {data.get('error', data)}")
+    return data["embedding"]["values"]
 
 def embed_batch(texts: list[str]) -> list[list[float]]:
-    """Embed a batch of texts using Gemini text-embedding-004."""
+    """Embed a batch of texts using Gemini REST API."""
     vectors = []
     for text in texts:
         try:
-            result = gemini.models.embed_content(
-                model=EMBEDDING_MODEL,
-                contents=text,
-                config=genai_types.EmbedContentConfig(task_type="RETRIEVAL_DOCUMENT"),
-            )
-            values = result.embeddings[0].values
-            vectors.append(list(values))
+            vectors.append(_embed_one(text))
         except Exception as e:
             print(f"  ⚠️  Embed error: {e} — using zero vector")
             vectors.append([0.0] * VECTOR_SIZE)
@@ -243,21 +255,20 @@ def main():
         print("   Create a free cluster at https://cloud.qdrant.io")
         return
 
-    # Test embedding BEFORE extracting PDFs — fail fast if API key / model is wrong
-    print("\nTesting Gemini embedding API...")
+    # Test embedding via REST before extracting PDFs — fail fast on bad key/model
+    print("\nTesting Gemini embedding API (REST)...")
     try:
-        test_result = gemini.models.embed_content(
-            model=EMBEDDING_MODEL,
-            contents="test",
-            config=genai_types.EmbedContentConfig(task_type="RETRIEVAL_DOCUMENT"),
-        )
-        dim = len(test_result.embeddings[0].values)
+        test_vec = _embed_one("test")
+        dim = len(test_vec)
         print(f"  ✅ Embedding API working — {dim}-dim vector")
-        if dim != VECTOR_SIZE:
-            print(f"  ⚠️  WARNING: expected {VECTOR_SIZE} dims, got {dim}. Update VECTOR_SIZE in script.")
+        global VECTOR_SIZE
+        VECTOR_SIZE = dim  # use actual dimension in case it differs
     except Exception as e:
         print(f"  ❌ Embedding test failed: {e}")
-        print("  Fix the API key / model name before re-running.")
+        print(f"\n  URL tried: {EMBED_URL}")
+        print(f"  Key (first 8 chars): {GOOGLE_API_KEY[:8]}...")
+        print("  → Verify GOOGLE_API_KEY in .env has no extra spaces")
+        print("  → Make sure 'Generative Language API' is enabled in Google Cloud Console")
         return
 
     # Connect to Qdrant
