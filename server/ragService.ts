@@ -27,7 +27,7 @@ const qdrant = new QdrantClient({
 const COLLECTION = process.env.QDRANT_COLLECTION || "aitaxbot-knowledge";
 const EMBEDDING_MODEL = "gemini-embedding-001";  // 3072 dims (default output dim for this model)
 const EMBED_URL = `https://generativelanguage.googleapis.com/v1beta/models/${EMBEDDING_MODEL}:embedContent`;
-const GENERATION_MODEL = "gemini-2.0-flash";
+const GENERATION_MODEL = "gemini-1.5-flash";
 const TOP_K = 8;                                 // chunks returned per search
 const MAX_CONTEXT_CHARS = 12000;                 // keep prompt < 16K tokens
 
@@ -272,7 +272,7 @@ async function generateAnswer(
 
   const response = await ai.models.generateContent({
     model: GENERATION_MODEL,
-    contents: prompt,
+    contents: [{ role: "user", parts: [{ text: prompt }] }],
   });
 
   const answer = response.text?.trim() || "I could not generate an answer. Please try rephrasing your question.";
