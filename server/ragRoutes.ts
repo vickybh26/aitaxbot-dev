@@ -8,7 +8,7 @@
 
 import { Router, Request, Response } from "express";
 import { runRAGQuery, checkRAGHealth } from "./ragService";
-import { db } from "./firebase";
+import { db, verifyFirebaseToken, getFirestore } from "./firebase";
 
 const router = Router();
 
@@ -63,12 +63,21 @@ router.post("/query", async (req: Request, res: Response) => {
       sessionId: sessionId || undefined,
       source: source || "api",
     });
+    // Note: runRAGQuery has per-step timeouts (10s embed + 8s search + 25s generate).
+    // The 35s hard ceiling in ragService catches any overhead outside those steps.
 
     return res.json(result);
   } catch (err: any) {
-    console.error("[RAG] /api/ai/query error:", err?.message);
+    const msg = err?.message || "";
+    console.error("[RAG] /api/ai/query error:", msg);
 
-    // Don't expose internal errors to client
+    // Distinguish timeout vs other failures — useful for client retry logic
+    if (msg.includes("timed out")) {
+      return res.status(504).json({
+        error: "The AI is taking too long to respond. Please try a shorter or simpler question.",
+      });
+    }
+
     return res.status(500).json({
       error: "The AI service is temporarily unavailable. Please try again shortly.",
     });
@@ -87,21 +96,57 @@ router.get("/health", async (_req: Request, res: Response) => {
   }
 });
 
-// ─── GET /api/admin/rag/queries ──────────────────────────────────────────────
-// Returns recent anonymous queries — useful for identifying gaps in the knowledge base
+// ─── Admin auth middleware ────────────────────────────────────────────────────
+// Mirrors the requireAdmin pattern in adminRoutes.ts:
+//   1. Verify Firebase ID token (not just "is there a Bearer header?")
+//   2. Check Firestore admin collection for adminLevel ≥ 1
+//   3. Fail-closed: any missing/invalid field → 401/403
 
-router.get("/admin/queries", async (req: Request, res: Response) => {
+async function requireAdminL1(req: Request, res: Response, next: any): Promise<any> {
   try {
-    // Basic admin check — reuse existing Firebase admin auth pattern
     const authHeader = req.headers.authorization;
     if (!authHeader?.startsWith("Bearer ")) {
-      return res.status(401).json({ error: "Unauthorized" });
+      return res.status(401).json({ error: "Unauthorized — no token" });
     }
+
+    const token = authHeader.split(" ")[1];
+    const decoded = await verifyFirebaseToken(token);
+    if (!decoded) {
+      return res.status(401).json({ error: "Unauthorized — invalid or expired token" });
+    }
+
+    const firestoreDb = getFirestore();
+    const adminDoc = await firestoreDb.collection("admin").doc(decoded.uid).get();
+    if (!adminDoc.exists) {
+      return res.status(403).json({ error: "Forbidden — not an admin account" });
+    }
+
+    const level = Number(adminDoc.data()!.level);
+    if (!Number.isInteger(level) || level < 1 || level > 3) {
+      return res.status(403).json({ error: "Forbidden — invalid admin level" });
+    }
+
+    (req as any).adminUid = decoded.uid;
+    (req as any).adminLevel = level;
+    next();
+  } catch (err) {
+    console.error("[RAG] Admin auth error:", err);
+    return res.status(500).json({ error: "Auth check failed" });
+  }
+}
+
+// ─── GET /api/ai/admin/queries ───────────────────────────────────────────────
+// Returns recent anonymous queries — useful for identifying gaps in the knowledge base
+// Requires: Firebase ID token with adminLevel ≥ 1 in Firestore
+
+router.get("/admin/queries", requireAdminL1, async (req: Request, res: Response) => {
+  try {
+    const limit = Math.min(Number(req.query.limit) || 100, 500);
 
     const snapshot = await db
       .collection("ai_queries")
       .orderBy("timestamp", "desc")
-      .limit(100)
+      .limit(limit)
       .get();
 
     const queries = snapshot.docs.map(doc => ({
@@ -111,6 +156,7 @@ router.get("/admin/queries", async (req: Request, res: Response) => {
 
     return res.json({ queries, total: queries.length });
   } catch (err) {
+    console.error("[RAG] /admin/queries error:", err);
     return res.status(500).json({ error: "Failed to fetch queries" });
   }
 });

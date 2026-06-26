@@ -28,6 +28,24 @@ const GENERATION_MODEL = "gemini-2.5-flash";
 const TOP_K = 8;                                 // chunks returned per search
 const MAX_CONTEXT_CHARS = 12000;                 // keep prompt < 16K tokens
 
+// ─── Timeout budgets ─────────────────────────────────────────────────────────
+const TIMEOUT_EMBED_MS      = 10_000;   // Gemini embedding  — 10s
+const TIMEOUT_SEARCH_MS     =  8_000;   // Qdrant search     —  8s
+const TIMEOUT_GENERATE_MS   = 25_000;   // Gemini generation — 25s
+const TIMEOUT_PIPELINE_MS   = 35_000;   // Total pipeline    — 35s (hard ceiling)
+
+/**
+ * Race a promise against a timeout.
+ * Throws a labelled error if the timeout fires first — avoids infinite hangs
+ * when Gemini or Qdrant is slow / unresponsive.
+ */
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  const timeout = new Promise<never>((_, reject) =>
+    setTimeout(() => reject(new Error(`[RAG] ${label} timed out after ${ms}ms`)), ms)
+  );
+  return Promise.race([promise, timeout]);
+}
+
 // ─── Types ──────────────────────────────────────────────────────────────────
 
 export interface RAGQuery {
@@ -291,11 +309,19 @@ export async function runRAGQuery(input: RAGQuery): Promise<RAGResult> {
   // Step 3: Build expanded query for better semantic search
   const expandedQuery = buildExpandedQuery(question, allConcepts);
 
-  // Step 4: Embed the expanded query
-  const queryVector = await embedText(expandedQuery);
+  // Step 4: Embed the expanded query (timeout: 10s)
+  const queryVector = await withTimeout(
+    embedText(expandedQuery),
+    TIMEOUT_EMBED_MS,
+    "Gemini embedding"
+  );
 
-  // Step 5: Search Qdrant
-  const chunks = await searchQdrant(queryVector, [...allConcepts]);
+  // Step 5: Search Qdrant (timeout: 8s)
+  const chunks = await withTimeout(
+    searchQdrant(queryVector, [...allConcepts]),
+    TIMEOUT_SEARCH_MS,
+    "Qdrant search"
+  );
 
   if (chunks.length === 0) {
     return {
@@ -309,8 +335,12 @@ export async function runRAGQuery(input: RAGQuery): Promise<RAGResult> {
     };
   }
 
-  // Step 6: Generate answer
-  const { answer, confidence } = await generateAnswer(question, chunks, allConcepts);
+  // Step 6: Generate answer (timeout: 25s)
+  const { answer, confidence } = await withTimeout(
+    generateAnswer(question, chunks, allConcepts),
+    TIMEOUT_GENERATE_MS,
+    "Gemini generation"
+  );
 
   // Step 7: Log anonymously (fire and forget)
   logQuery(question, [...allConcepts], sessionId, source);
