@@ -102,7 +102,36 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  
+
+  // ─── Request ID middleware ────────────────────────────────────────────────
+  // Stamps every request with a unique ID so errors can be traced in logs.
+  // • Reuses X-Request-ID if the client/proxy already set one (Cloudflare, etc.)
+  // • Echoes the ID back in the response header so clients can log it
+  // • Every console.error in route handlers should include req.requestId
+  app.use((req: any, res, next) => {
+    const existing = req.headers["x-request-id"];
+    const id = (typeof existing === "string" && existing.length <= 64)
+      ? existing
+      : crypto.randomUUID();
+    req.requestId = id;
+    res.setHeader("X-Request-ID", id);
+    next();
+  });
+
+  // ─── Global error-shape helper ─────────────────────────────────────────────
+  // Attach to res so any route can call res.apiError(status, code, message)
+  // Response shape: { error: { code, message, requestId } }
+  // This is the ONLY place we define the error contract — change once, applies everywhere.
+  app.use((req: any, res: any, next) => {
+    res.apiError = (status: number, code: string, message: string) => {
+      console.error(`[${code}] ${message} — requestId=${req.requestId} path=${req.path}`);
+      return res.status(status).json({
+        error: { code, message, requestId: req.requestId },
+      });
+    };
+    next();
+  });
+
   // 301 Redirects for old/deprecated URLs
   const redirects: Record<string, string> = {
     // Old calculator URLs - redirect to landing page with tax calculator

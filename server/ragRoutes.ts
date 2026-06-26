@@ -1,9 +1,12 @@
 /**
  * AiTaxBot RAG API Routes
  *
- * POST /api/ai/query     — Ask the AI a tax question
- * GET  /api/ai/health    — Check Qdrant + Gemini connectivity
- * GET  /api/admin/rag/queries — Admin: view recent anonymous queries (for training)
+ * POST /api/ai/query          — Ask the AI a tax question
+ * GET  /api/ai/health         — Check Qdrant + Gemini connectivity
+ * GET  /api/ai/admin/queries  — Admin: view recent anonymous queries (for training)
+ *
+ * Error shape (all routes): { error: { code, message, requestId } }
+ * Timeout errors return 504; auth errors 401/403; bad input 400; server 500.
  */
 
 import { Router, Request, Response } from "express";
@@ -16,13 +19,12 @@ const router = Router();
 // Simple in-memory map: IP → { count, resetAt }
 // For production replace with Redis-based rate limiting
 const ipHits = new Map<string, { count: number; resetAt: number }>();
-const RATE_LIMIT = 20;           // requests per window
-const RATE_WINDOW_MS = 60_000;   // 1 minute
+const RATE_LIMIT = 20;          // requests per window
+const RATE_WINDOW_MS = 60_000;  // 1 minute
 
 function isRateLimited(ip: string): boolean {
   const now = Date.now();
   const entry = ipHits.get(ip);
-
   if (!entry || now > entry.resetAt) {
     ipHits.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS });
     return false;
@@ -35,13 +37,12 @@ function isRateLimited(ip: string): boolean {
 // ─── POST /api/ai/query ──────────────────────────────────────────────────────
 
 router.post("/query", async (req: Request, res: Response) => {
+  const r = res as any;
   try {
     const ip = String(req.headers["x-forwarded-for"] || req.socket.remoteAddress || "unknown");
 
     if (isRateLimited(ip)) {
-      return res.status(429).json({
-        error: "Too many requests. Please wait a moment before asking again.",
-      });
+      return r.apiError(429, "RATE_LIMITED", "Too many requests. Please wait a moment before asking again.");
     }
 
     const { question, sessionId, source } = req.body as {
@@ -51,11 +52,11 @@ router.post("/query", async (req: Request, res: Response) => {
     };
 
     if (!question || question.trim().length < 5) {
-      return res.status(400).json({ error: "Please provide a question (minimum 5 characters)." });
+      return r.apiError(400, "QUESTION_TOO_SHORT", "Please provide a question (minimum 5 characters).");
     }
 
     if (question.length > 1000) {
-      return res.status(400).json({ error: "Question too long (maximum 1000 characters)." });
+      return r.apiError(400, "QUESTION_TOO_LONG", "Question too long (maximum 1000 characters).");
     }
 
     const result = await runRAGQuery({
@@ -63,24 +64,18 @@ router.post("/query", async (req: Request, res: Response) => {
       sessionId: sessionId || undefined,
       source: source || "api",
     });
-    // Note: runRAGQuery has per-step timeouts (10s embed + 8s search + 25s generate).
-    // The 35s hard ceiling in ragService catches any overhead outside those steps.
+    // Per-step timeouts: embed 10s + search 8s + generate 25s (in ragService.ts)
 
     return res.json(result);
   } catch (err: any) {
     const msg = err?.message || "";
-    console.error("[RAG] /api/ai/query error:", msg);
 
-    // Distinguish timeout vs other failures — useful for client retry logic
     if (msg.includes("timed out")) {
-      return res.status(504).json({
-        error: "The AI is taking too long to respond. Please try a shorter or simpler question.",
-      });
+      // 504 = upstream (Gemini/Qdrant) too slow — distinct from 500 (our bug)
+      return r.apiError(504, "AI_TIMEOUT", "The AI is taking too long to respond. Please try a shorter or simpler question.");
     }
 
-    return res.status(500).json({
-      error: "The AI service is temporarily unavailable. Please try again shortly.",
-    });
+    return r.apiError(500, "AI_UNAVAILABLE", "The AI service is temporarily unavailable. Please try again shortly.");
   }
 });
 
@@ -92,38 +87,39 @@ router.get("/health", async (_req: Request, res: Response) => {
     const statusCode = health.qdrant && health.gemini ? 200 : 503;
     return res.status(statusCode).json(health);
   } catch (err) {
-    return res.status(503).json({ error: "Health check failed" });
+    return (res as any).apiError(503, "HEALTH_CHECK_FAILED", "Health check failed");
   }
 });
 
 // ─── Admin auth middleware ────────────────────────────────────────────────────
-// Mirrors the requireAdmin pattern in adminRoutes.ts:
+// Mirrors requireAdmin in adminRoutes.ts:
 //   1. Verify Firebase ID token (not just "is there a Bearer header?")
 //   2. Check Firestore admin collection for adminLevel ≥ 1
 //   3. Fail-closed: any missing/invalid field → 401/403
 
 async function requireAdminL1(req: Request, res: Response, next: any): Promise<any> {
+  const r = res as any;
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader?.startsWith("Bearer ")) {
-      return res.status(401).json({ error: "Unauthorized — no token" });
+      return r.apiError(401, "UNAUTHORIZED", "No token provided.");
     }
 
     const token = authHeader.split(" ")[1];
     const decoded = await verifyFirebaseToken(token);
     if (!decoded) {
-      return res.status(401).json({ error: "Unauthorized — invalid or expired token" });
+      return r.apiError(401, "INVALID_TOKEN", "Token is invalid or expired.");
     }
 
     const firestoreDb = getFirestore();
     const adminDoc = await firestoreDb.collection("admin").doc(decoded.uid).get();
     if (!adminDoc.exists) {
-      return res.status(403).json({ error: "Forbidden — not an admin account" });
+      return r.apiError(403, "NOT_ADMIN", "This account does not have admin access.");
     }
 
     const level = Number(adminDoc.data()!.level);
     if (!Number.isInteger(level) || level < 1 || level > 3) {
-      return res.status(403).json({ error: "Forbidden — invalid admin level" });
+      return r.apiError(403, "INVALID_ADMIN_LEVEL", "Admin level is missing or invalid.");
     }
 
     (req as any).adminUid = decoded.uid;
@@ -131,7 +127,7 @@ async function requireAdminL1(req: Request, res: Response, next: any): Promise<a
     next();
   } catch (err) {
     console.error("[RAG] Admin auth error:", err);
-    return res.status(500).json({ error: "Auth check failed" });
+    return (res as any).apiError(500, "AUTH_CHECK_FAILED", "Auth check failed.");
   }
 }
 
@@ -156,8 +152,7 @@ router.get("/admin/queries", requireAdminL1, async (req: Request, res: Response)
 
     return res.json({ queries, total: queries.length });
   } catch (err) {
-    console.error("[RAG] /admin/queries error:", err);
-    return res.status(500).json({ error: "Failed to fetch queries" });
+    return (res as any).apiError(500, "QUERY_FETCH_FAILED", "Failed to fetch queries.");
   }
 });
 
