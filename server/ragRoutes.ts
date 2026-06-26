@@ -70,12 +70,16 @@ router.post("/query", async (req: Request, res: Response) => {
   } catch (err: any) {
     const msg = err?.message || "";
 
+    // Log the real error so Railway logs show exactly what failed
+    console.error("[RAG] Query pipeline error:", msg, err?.stack || "");
+
     if (msg.includes("timed out")) {
       // 504 = upstream (Gemini/Qdrant) too slow — distinct from 500 (our bug)
       return r.apiError(504, "AI_TIMEOUT", "The AI is taking too long to respond. Please try a shorter or simpler question.");
     }
 
-    return r.apiError(500, "AI_UNAVAILABLE", "The AI service is temporarily unavailable. Please try again shortly.");
+    // Return actual error message in requestId field so we can debug without Railway access
+    return r.apiError(500, "AI_UNAVAILABLE", `The AI service is temporarily unavailable. (${msg})`);
   }
 });
 
