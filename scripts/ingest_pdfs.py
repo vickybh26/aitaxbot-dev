@@ -185,7 +185,7 @@ def extract_pdf_chunks(source_info: dict) -> list[dict]:
 
 # ─── Embedding ────────────────────────────────────────────────────────────────
 
-gemini = genai.Client(api_key=GOOGLE_API_KEY)
+gemini = genai.Client(api_key=GOOGLE_API_KEY, http_options={"api_version": "v1"})
 
 def embed_batch(texts: list[str]) -> list[list[float]]:
     """Embed a batch of texts using Gemini text-embedding-004."""
