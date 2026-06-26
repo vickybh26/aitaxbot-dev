@@ -8,7 +8,7 @@ Run ONCE to populate the knowledge base.
 Re-run whenever new PDFs are added by admin.
 
 Requirements (install once):
-    pip install pdfplumber google-generativeai qdrant-client python-dotenv tqdm
+    pip install pdfplumber google-genai qdrant-client python-dotenv tqdm
 
 Usage:
     cd C:\\Users\\Vicky\\ATB\\aitaxbot-upload\\Ai-tax-Bot
@@ -23,17 +23,17 @@ Environment variables needed in .env (or set directly below):
 
 import os
 import re
-import json
 import uuid
 import time
 import pdfplumber
 from pathlib import Path
 from dotenv import load_dotenv
 
-import google.generativeai as genai
+from google import genai
+from google.genai import types as genai_types
 from qdrant_client import QdrantClient
 from qdrant_client.models import (
-    Distance, VectorParams, PointStruct, CreateCollection
+    Distance, VectorParams, PointStruct
 )
 
 try:
@@ -185,19 +185,20 @@ def extract_pdf_chunks(source_info: dict) -> list[dict]:
 
 # ─── Embedding ────────────────────────────────────────────────────────────────
 
-genai.configure(api_key=GOOGLE_API_KEY)
+gemini = genai.Client(api_key=GOOGLE_API_KEY)
 
 def embed_batch(texts: list[str]) -> list[list[float]]:
     """Embed a batch of texts using Gemini text-embedding-004."""
     vectors = []
     for text in texts:
         try:
-            result = genai.embed_content(
+            result = gemini.models.embed_content(
                 model=EMBEDDING_MODEL,
-                content=text,
-                task_type="RETRIEVAL_DOCUMENT",
+                contents=text,
+                config=genai_types.EmbedContentConfig(task_type="RETRIEVAL_DOCUMENT"),
             )
-            vectors.append(result["embedding"])
+            values = result.embeddings[0].values
+            vectors.append(list(values))
         except Exception as e:
             print(f"  ⚠️  Embed error: {e} — using zero vector")
             vectors.append([0.0] * VECTOR_SIZE)
