@@ -186,7 +186,7 @@ def extract_pdf_chunks(source_info: dict) -> list[dict]:
 # Calls the Gemini REST API directly to avoid SDK version issues.
 # Endpoint: POST /v1/models/{model}:embedContent?key={api_key}
 
-EMBED_URL = f"https://generativelanguage.googleapis.com/v1/models/{EMBEDDING_MODEL}:embedContent"
+EMBED_URL = f"https://generativelanguage.googleapis.com/v1beta/models/{EMBEDDING_MODEL}:embedContent"
 
 def _embed_one(text: str) -> list[float]:
     """Embed a single text via Gemini REST API."""
