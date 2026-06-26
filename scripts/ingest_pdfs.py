@@ -188,32 +188,41 @@ def extract_pdf_chunks(source_info: dict) -> list[dict]:
 
 EMBED_URL = f"https://generativelanguage.googleapis.com/v1beta/models/{EMBEDDING_MODEL}:embedContent"
 
-def _embed_one(text: str) -> list[float]:
-    """Embed a single text via Gemini REST API."""
-    resp = requests.post(
-        EMBED_URL,
-        params={"key": GOOGLE_API_KEY},
-        json={
-            "model": f"models/{EMBEDDING_MODEL}",
-            "content": {"parts": [{"text": text}]},
-            "taskType": "RETRIEVAL_DOCUMENT",
-        },
-        timeout=15,
-    )
-    data = resp.json()
-    if resp.status_code != 200:
+def _embed_one(text: str, retries: int = 5) -> list[float]:
+    """Embed a single text via Gemini REST API with exponential backoff on 503/429."""
+    delay = 5  # start with 5s, doubles each retry
+    for attempt in range(retries):
+        resp = requests.post(
+            EMBED_URL,
+            params={"key": GOOGLE_API_KEY},
+            json={
+                "model": f"models/{EMBEDDING_MODEL}",
+                "content": {"parts": [{"text": text}]},
+                "taskType": "RETRIEVAL_DOCUMENT",
+            },
+            timeout=20,
+        )
+        if resp.status_code == 200:
+            return resp.json()["embedding"]["values"]
+        if resp.status_code in (429, 503):
+            wait = delay * (2 ** attempt)
+            print(f"  ⏳ HTTP {resp.status_code} — retrying in {wait}s (attempt {attempt+1}/{retries})...")
+            time.sleep(wait)
+            continue
+        # Non-retryable error
+        data = resp.json()
         raise RuntimeError(f"HTTP {resp.status_code}: {data.get('error', data)}")
-    return data["embedding"]["values"]
+    raise RuntimeError(f"Gemini embedding failed after {retries} retries (persistent 503/429)")
 
 def embed_batch(texts: list[str]) -> list[list[float]]:
-    """Embed a batch of texts using Gemini REST API."""
+    """Embed a batch of texts using Gemini REST API. Retries on transient errors — never uses zero vectors."""
     vectors = []
     for text in texts:
         try:
             vectors.append(_embed_one(text))
         except Exception as e:
-            print(f"  ⚠️  Embed error: {e} — using zero vector")
-            vectors.append([0.0] * VECTOR_SIZE)
+            # Hard failure after all retries — abort the batch, don't silently store useless zero vectors
+            raise RuntimeError(f"Embedding failed permanently: {e}")
         time.sleep(EMBED_DELAY)
     return vectors
 
@@ -308,20 +317,27 @@ def main():
 
     print(f"\n✅ Total chunks extracted: {len(all_chunks)}")
 
-    # Embed and upload in batches
+    # Embed and upload in batches — resume from last successful batch if interrupted
+    already_uploaded = getattr(client.get_collection(COLLECTION), "points_count", None) \
+                    or getattr(client.get_collection(COLLECTION), "vectors_count", None) or 0
+    skip_batches = already_uploaded // BATCH_SIZE
+    if skip_batches > 0:
+        print(f"\n♻️  Resuming: {already_uploaded} vectors already in Qdrant — skipping first {skip_batches} batches.")
+
     print(f"\nEmbedding and uploading to Qdrant (batch size: {BATCH_SIZE})...")
     print("This may take 10–20 minutes depending on document size.\n")
 
-    uploaded = 0
-    batch_iter = range(0, len(all_chunks), BATCH_SIZE)
+    uploaded = already_uploaded
+    batches = list(range(0, len(all_chunks), BATCH_SIZE))
+    batch_iter = batches[skip_batches:]
     if HAS_TQDM:
-        batch_iter = tqdm(list(batch_iter), desc="Uploading batches")
+        batch_iter = tqdm(batch_iter, desc="Uploading batches", total=len(batches), initial=skip_batches)
 
     for i in batch_iter:
         batch = all_chunks[i : i + BATCH_SIZE]
         texts = [c["text"] for c in batch]
 
-        # Generate embeddings
+        # Generate embeddings (retries on 503/429 — never uses zero vectors)
         vectors = embed_batch(texts)
 
         # Build Qdrant points
