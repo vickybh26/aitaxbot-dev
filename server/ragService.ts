@@ -24,7 +24,7 @@ const qdrant = new QdrantClient({
 
 const COLLECTION = process.env.QDRANT_COLLECTION || "aitaxbot-knowledge";
 const EMBEDDING_MODEL = "gemini-embedding-001";  // 3072 dims
-const GENERATION_MODEL = "gemini-2.5-flash";     // current stable (as of June 2026)
+const GENERATION_MODEL = "gemini-3.5-flash";     // current stable flagship (June 2026)
 const GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
 const EMBED_URL = `${GEMINI_BASE}/${EMBEDDING_MODEL}:embedContent`;
 const GENERATE_URL = `${GEMINI_BASE}/${GENERATION_MODEL}:generateContent`;
