@@ -7,12 +7,42 @@
 
 import { Router, type Request, type Response } from "express";
 import { randomUUID } from "crypto";
-import { getFirestore } from "./firebase";
+import { getFirestore, verifyFirebaseToken } from "./firebase";
 import { COLLECTIONS } from "./firestoreHelper";
 import { TransactionalEmailsApi, TransactionalEmailsApiApiKeys } from "@getbrevo/brevo";
 import { insertLeadSchema, type Lead } from "@shared/schema";
 
 const router = Router();
+
+// ─── Admin middleware ──────────────────────────────────────────────────────
+
+async function requireAdmin(req: any, res: any, next: any): Promise<any> {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader?.startsWith("Bearer ")) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    const token = authHeader.split(" ")[1];
+    const decoded = await verifyFirebaseToken(token);
+    if (!decoded) return res.status(401).json({ error: "Invalid token" });
+
+    const db = getFirestore();
+    const adminDoc = await db.collection("admin").doc(decoded.uid).get();
+    if (!adminDoc.exists) {
+      return res.status(403).json({ error: "Not an admin account" });
+    }
+    const level = Number(adminDoc.data()!.level);
+    if (!Number.isInteger(level) || level < 1 || level > 3) {
+      return res.status(403).json({ error: "Invalid admin level" });
+    }
+    req.adminUid = decoded.uid;
+    req.adminLevel = level;
+    next();
+  } catch (err) {
+    console.error("[Leads Admin] Auth error:", err);
+    return res.status(500).json({ error: "Auth check failed" });
+  }
+}
 
 async function sendBrevoEmail(params: {
   to: { email: string; name: string }[];
@@ -191,7 +221,7 @@ router.post("/capture", async (req: Request, res: Response) => {
 
 // ─── GET /api/leads/list — Admin ───────────────────────────────────────────
 
-router.get("/list", async (req: Request, res: Response) => {
+router.get("/list", requireAdmin, async (req: Request, res: Response) => {
   try {
     const db = getFirestore();
     const snapshot = await db

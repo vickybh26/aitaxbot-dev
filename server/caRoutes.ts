@@ -8,7 +8,7 @@
 
 import { Router, type Request, type Response } from "express";
 import { randomUUID } from "crypto";
-import { getFirestore } from "./firebase";
+import { getFirestore, verifyFirebaseToken } from "./firebase";
 import { COLLECTIONS } from "./firestoreHelper";
 import { TransactionalEmailsApi, TransactionalEmailsApiApiKeys } from "@getbrevo/brevo";
 import {
@@ -19,6 +19,38 @@ import {
 } from "@shared/schema";
 
 const router = Router();
+
+// ─── Admin middleware ──────────────────────────────────────────────────────
+// Mirrors the requireAdmin() in adminRoutes.ts. Requires Firebase ID token
+// with a matching document in Firestore `admin/<uid>` with level 1–3.
+
+async function requireAdmin(req: any, res: any, next: any): Promise<any> {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader?.startsWith("Bearer ")) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    const token = authHeader.split(" ")[1];
+    const decoded = await verifyFirebaseToken(token);
+    if (!decoded) return res.status(401).json({ error: "Invalid token" });
+
+    const db = getFirestore();
+    const adminDoc = await db.collection("admin").doc(decoded.uid).get();
+    if (!adminDoc.exists) {
+      return res.status(403).json({ error: "Not an admin account" });
+    }
+    const level = Number(adminDoc.data()!.level);
+    if (!Number.isInteger(level) || level < 1 || level > 3) {
+      return res.status(403).json({ error: "Invalid admin level" });
+    }
+    req.adminUid = decoded.uid;
+    req.adminLevel = level;
+    next();
+  } catch (err) {
+    console.error("[CA Admin] Auth error:", err);
+    return res.status(500).json({ error: "Auth check failed" });
+  }
+}
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
 
@@ -300,7 +332,7 @@ router.post("/contact", async (req: Request, res: Response) => {
 
 // ─── Admin: PATCH /api/ca/:id/approve ─────────────────────────────────────
 
-router.patch("/:id/approve", async (req: Request, res: Response) => {
+router.patch("/:id/approve", requireAdmin, async (req: Request, res: Response) => {
   try {
     const db = getFirestore();
     const ref = db.collection(COLLECTIONS.CA_PROFILES).doc(req.params.id);
@@ -335,7 +367,7 @@ router.patch("/:id/approve", async (req: Request, res: Response) => {
 
 // ─── Admin: PATCH /api/ca/:id/reject ──────────────────────────────────────
 
-router.patch("/:id/reject", async (req: Request, res: Response) => {
+router.patch("/:id/reject", requireAdmin, async (req: Request, res: Response) => {
   try {
     const { reason } = req.body;
     const db = getFirestore();
@@ -352,7 +384,7 @@ router.patch("/:id/reject", async (req: Request, res: Response) => {
 
 // ─── Admin: GET /api/ca/pending ────────────────────────────────────────────
 
-router.get("/pending", async (req: Request, res: Response) => {
+router.get("/pending", requireAdmin, async (req: Request, res: Response) => {
   try {
     const db = getFirestore();
     const snapshot = await db
