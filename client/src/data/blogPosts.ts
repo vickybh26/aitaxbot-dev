@@ -2776,7 +2776,6 @@ export const blogPosts = ([
       { slug: "section-80c-deductions-list-fy-2026-27", title: "Section 80C Deductions: Complete List" }
     ]
   },
-,
 
   // ═══════════════════════════════════════════════════════════
   // ITR FILING SEASON 2025-26 (added April 2026)
