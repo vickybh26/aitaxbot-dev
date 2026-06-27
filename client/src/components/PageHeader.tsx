@@ -1,4 +1,5 @@
 import { Link } from 'wouter';
+import { cn } from '@/lib/utils';
 
 interface Crumb {
   label: string;
@@ -11,17 +12,18 @@ interface PageHeaderProps {
   breadcrumbs: Crumb[];
   /** Optional right-side badge, e.g. "Last Updated: June 20, 2026" */
   badge?: string;
+  maxWidth?: string;
 }
 
 /**
  * Consistent page header for informational pages (About, Contact, Privacy, Terms).
  * Mirrors the visual style of CalcPageHeader so all pages feel cohesive.
  */
-export default function PageHeader({ title, subtitle, breadcrumbs, badge }: PageHeaderProps) {
+export default function PageHeader({ title, subtitle, breadcrumbs, badge, maxWidth = "max-w-4xl" }: PageHeaderProps) {
   return (
     <header className="bg-white border-b border-slate-100">
       {/* Breadcrumb strip */}
-      <div className="max-w-4xl mx-auto px-6 pt-4">
+      <div className={cn(maxWidth, "mx-auto px-6 pt-4")}>
         <nav className="flex items-center gap-1.5 text-xs text-slate-400" aria-label="Breadcrumb">
           {breadcrumbs.map((crumb, idx) => (
             <span key={idx} className="flex items-center gap-1.5">
@@ -39,7 +41,7 @@ export default function PageHeader({ title, subtitle, breadcrumbs, badge }: Page
       </div>
 
       {/* Title area */}
-      <div className="max-w-4xl mx-auto px-6 pt-6 pb-8">
+      <div className={cn(maxWidth, "mx-auto px-6 pt-6 pb-8")}>
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
           <div className="flex-1">
             <div className="border-l-4 border-blue-600 pl-4">

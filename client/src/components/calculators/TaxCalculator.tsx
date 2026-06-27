@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calculator, PieChart, ClipboardList, User, Coins, Percent, Loader2, RotateCcw } from 'lucide-react';
+import { Calculator, PieChart, ClipboardList, User, Coins, Percent, RotateCcw } from 'lucide-react';
 import { SegmentedToggle } from '@/components/ui/segmented-toggle';
 import { Callout } from '@/components/ui/callout';
 import {
@@ -926,7 +926,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Input Form */}
             <div className="space-y-6">
-              <Card className="p-6">
+              <Card className="p-6 premium-glass-card premium-glass-card-hover transition-all duration-300">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-readable flex items-center">
                     <User className="mr-2 h-4 w-4 text-primary" />
@@ -1022,7 +1022,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                 </div>
               </Card>
 
-              <Card className="p-6">
+              <Card className="p-6 premium-glass-card premium-glass-card-hover transition-all duration-300">
                 <h3 className="text-lg font-semibold text-readable mb-4 flex items-center">
                   <Coins className="mr-2 h-4 w-4 text-success" />
                   Income Sources
@@ -1094,7 +1094,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
 
             {/* Deductions Form */}
             <div className="space-y-6">
-              <Card className="p-6">
+              <Card className="p-6 premium-glass-card premium-glass-card-hover transition-all duration-300">
                 <h3 className="text-lg font-semibold text-readable mb-4 flex items-center">
                   <Percent className="mr-2 h-4 w-4 text-accent" />
                   Deductions (Old Regime Only)
@@ -1363,7 +1363,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
               </div>
 
               {/* Regime Comparison Bar Chart */}
-              <Card className="p-5">
+              <Card className="p-5 premium-glass-card premium-glass-card-hover transition-all duration-300">
                 <h3 className="text-sm font-semibold text-slate-700 mb-4">Tax Comparison — Old vs New Regime</h3>
                 <RegimeChart
                   oldTax={result.oldRegime.totalTax}
@@ -1375,7 +1375,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
               {/* Side by Side Comparison */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Old Regime */}
-                <Card className={`p-6 ${result.recommendedRegime === 'old' ? 'ring-2 ring-primary border-primary' : ''}`}>
+                <Card className={`p-6 premium-glass-card transition-all duration-300 ${result.recommendedRegime === 'old' ? 'ring-2 ring-blue-600/50 border-blue-500/50 shadow-blue-500/5' : ''}`}>
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-readable">Old Tax Regime</h3>
                     {result.recommendedRegime === 'old' && (
@@ -1438,7 +1438,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                 </Card>
 
                 {/* New Regime */}
-                <Card className={`p-6 ${result.recommendedRegime === 'new' ? 'ring-2 ring-primary border-primary' : ''}`}>
+                <Card className={`p-6 premium-glass-card transition-all duration-300 ${result.recommendedRegime === 'new' ? 'ring-2 ring-blue-600/50 border-blue-500/50 shadow-blue-500/5' : ''}`}>
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-readable">New Tax Regime</h3>
                     {result.recommendedRegime === 'new' && (
@@ -1515,7 +1515,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
           {result && (
             <div className="mt-6">
               {aiLoading ? (
-                <Card className="p-5 border-2 border-purple-100 bg-gradient-to-r from-purple-50 to-indigo-50">
+                <Card className="p-5 border-2 border-purple-100 bg-gradient-to-r from-purple-50/70 to-indigo-50/70 backdrop-blur-md shadow-sm transition-all duration-300">
                   <div className="flex items-center gap-3 text-purple-700">
                     <Sparkles className="w-5 h-5 animate-pulse" />
                     <span className="font-semibold">AI Tax Advisor is analysing your profile…</span>
@@ -1523,7 +1523,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                   </div>
                 </Card>
               ) : aiAdvice && aiAdvice.tips?.length > 0 ? (
-                <Card className="p-5 border-2 border-purple-100 bg-gradient-to-br from-purple-50 to-indigo-50">
+                <Card className="p-5 border-2 border-purple-100 bg-gradient-to-br from-purple-50/70 to-indigo-50/70 backdrop-blur-md shadow-sm transition-all duration-300">
                   {/* Header */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-2">
@@ -1604,7 +1604,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
           {result ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Old Regime Breakdown */}
-              <Card className="p-6">
+              <Card className="p-6 premium-glass-card premium-glass-card-hover transition-all duration-300">
                 <h3 className="text-lg font-semibold text-readable mb-4">Old Regime - Tax Breakdown</h3>
                 <div className="overflow-x-auto">
                   <table className="w-full">
@@ -1629,7 +1629,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
               </Card>
 
               {/* New Regime Breakdown */}
-              <Card className="p-6">
+              <Card className="p-6 premium-glass-card premium-glass-card-hover transition-all duration-300">
                 <h3 className="text-lg font-semibold text-readable mb-4">New Regime - Tax Breakdown</h3>
                 <div className="overflow-x-auto">
                   <table className="w-full">

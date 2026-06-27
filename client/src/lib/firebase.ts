@@ -26,7 +26,16 @@ const firebaseConfig = {
 
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);
-export const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
+
+let analyticsInstance = null;
+if (typeof window !== 'undefined') {
+  try {
+    analyticsInstance = getAnalytics(app);
+  } catch (e) {
+    console.warn('[Firebase Analytics] Failed to initialize:', e);
+  }
+}
+export const analytics = analyticsInstance;
 export const auth = getAuth(app);
 
 // Firebase App Check — protects Gemini quota from abuse

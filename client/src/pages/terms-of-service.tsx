@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Helmet } from "react-helmet-async";
+import { Link } from "wouter";
 import PageHeader from "@/components/PageHeader";
 import { trackPageView } from "@/lib/analytics";
 
@@ -53,7 +54,7 @@ export default function TermsOfService() {
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Acceptance of Terms</h2>
               <p className="text-gray-700 mb-4">
                 By accessing or using AiTaxBot (aitaxbot.co.in / www.aitaxbot.co.in), you agree to be bound
-                by these Terms of Service and our <a href="/privacy-policy" className="text-blue-600 hover:underline">Privacy Policy</a>.
+                by these Terms of Service and our <Link href="/privacy-policy" className="text-blue-600 hover:underline">Privacy Policy</Link>.
                 If you do not agree, please do not use this platform.
               </p>
               <p className="text-gray-700">
@@ -199,7 +200,7 @@ export default function TermsOfService() {
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">7. Privacy &amp; Data Protection</h2>
               <p className="text-gray-700 mb-4">
                 Our data practices are governed by India's Digital Personal Data Protection Act, 2023.
-                Please read our full <a href="/privacy-policy" className="text-blue-600 hover:underline">Privacy Policy</a> for
+                Please read our full <Link href="/privacy-policy" className="text-blue-600 hover:underline">Privacy Policy</Link> for
                 details on what we collect, how we use it, and your rights as a Data Principal.
               </p>
               <p className="text-gray-700">

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
+import { Link } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -105,9 +106,9 @@ export default function CARegister() {
             Thank you. We'll verify your ICAI membership number and approve your profile within
             <strong> 1–2 business days</strong>. You'll receive a confirmation email once you're live.
           </p>
-          <a href="/find-ca" className="text-blue-600 hover:underline text-sm">
+          <Link href="/find-ca" className="text-blue-600 hover:underline text-sm">
             View CA Directory →
-          </a>
+          </Link>
         </div>
       </div>
     );

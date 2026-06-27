@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
+import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { trackPageView } from "@/lib/analytics";
 import {
@@ -403,9 +404,9 @@ export default function RentReceiptGenerator() {
                             : "We've included an invite to create your free AiTaxBot account to save receipts and access all calculators."}
                         </p>
                         {!emailResult.userExists && (
-                          <a href="/login" className="inline-flex items-center gap-1 text-xs font-semibold text-persian-blue-600 hover:underline mt-1">
+                          <Link href="/login" className="inline-flex items-center gap-1 text-xs font-semibold text-persian-blue-600 hover:underline mt-1">
                             Create free account <ArrowRight className="h-3 w-3" />
-                          </a>
+                          </Link>
                         )}
                       </div>
                     </div>
@@ -461,9 +462,9 @@ export default function RentReceiptGenerator() {
                 <p className="text-xs text-persian-blue-100 mb-4 leading-relaxed">
                   Use your rent receipts to claim HRA exemption under Section 10(13A). Our calculator shows exactly how much you can save.
                 </p>
-                <a href="/calculators/hra" className="flex items-center justify-center gap-1.5 bg-white text-persian-blue-700 font-bold text-sm py-2 rounded-xl hover:bg-persian-blue-50 transition">
+                <Link href="/calculators/hra" className="flex items-center justify-center gap-1.5 bg-white text-persian-blue-700 font-bold text-sm py-2 rounded-xl hover:bg-persian-blue-50 transition">
                   HRA Calculator <ArrowRight className="h-3.5 w-3.5" />
-                </a>
+                </Link>
               </div>
 
               {/* Tips */}

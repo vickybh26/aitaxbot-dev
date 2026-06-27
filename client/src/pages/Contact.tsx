@@ -94,13 +94,21 @@ export default function Contact() {
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">Email</h3>
-                    <a 
-                      href="mailto:info@aitaxbot.in" 
-                      className="text-persian-blue-600 hover:text-persian-blue-700 transition-colors"
-                      data-testid="link-email"
-                    >
-                      info@aitaxbot.in
-                    </a>
+                    <div className="flex flex-col space-y-1">
+                      <a
+                        href="mailto:info@aitaxbot.in"
+                        className="text-persian-blue-600 hover:text-persian-blue-700 transition-colors"
+                        data-testid="link-email"
+                      >
+                        info@aitaxbot.in
+                      </a>
+                      <a
+                        href="mailto:admin@aitaxbot.co.in"
+                        className="text-persian-blue-600 hover:text-persian-blue-700 transition-colors"
+                      >
+                        admin@aitaxbot.co.in
+                      </a>
+                    </div>
                   </div>
                 </div>
 

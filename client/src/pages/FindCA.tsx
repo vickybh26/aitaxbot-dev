@@ -206,9 +206,9 @@ export default function FindCA() {
                   ? "The directory is being built. Check back soon!"
                   : "Try a different city or service filter."}
               </p>
-              <a href="/ca/register" className="inline-block mt-4 text-blue-600 hover:underline text-sm">
+              <Link href="/ca/register" className="inline-block mt-4 text-blue-600 hover:underline text-sm">
                 Are you a CA? List yourself for free →
-              </a>
+              </Link>
             </div>
           )}
 
@@ -290,11 +290,11 @@ export default function FindCA() {
                 List your profile for free. Users looking for CA help during ITR filing season will
                 be able to send you enquiries directly.
               </p>
-              <a href="/ca/register">
+              <Link href="/ca/register">
                 <Button className="bg-blue-600 hover:bg-blue-700 text-white">
                   List Your Profile — It's Free
                 </Button>
-              </a>
+              </Link>
             </div>
           )}
 

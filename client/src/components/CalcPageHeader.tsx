@@ -1,11 +1,13 @@
 import { Link } from 'wouter';
 import { Shield, Zap, Clock } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface CalcPageHeaderProps {
   title: string;
   subtitle: string;
   breadcrumbs: { label: string; href?: string }[];
   badge?: string;
+  maxWidth?: string;
 }
 
 const trustChips = [
@@ -18,12 +20,13 @@ export default function CalcPageHeader({
   title,
   subtitle,
   breadcrumbs,
-  badge = "FY 2026-27 · AY 2027-28"
+  badge = "FY 2026-27 · AY 2027-28",
+  maxWidth = "max-w-6xl"
 }: CalcPageHeaderProps) {
   return (
     <header className="bg-white border-b border-slate-100">
       {/* Breadcrumb strip */}
-      <div className="max-w-7xl mx-auto px-6 pt-4">
+      <div className={cn(maxWidth, "mx-auto px-6 pt-4")}>
         <nav className="flex items-center gap-1.5 text-xs text-slate-400" aria-label="Breadcrumb">
           {breadcrumbs.map((crumb, idx) => (
             <span key={idx} className="flex items-center gap-1.5">
@@ -41,7 +44,7 @@ export default function CalcPageHeader({
       </div>
 
       {/* Hero area */}
-      <div className="max-w-7xl mx-auto px-6 pt-6 pb-8">
+      <div className={cn(maxWidth, "mx-auto px-6 pt-6 pb-8")}>
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
 
           {/* Left: title + subtitle + trust chips */}

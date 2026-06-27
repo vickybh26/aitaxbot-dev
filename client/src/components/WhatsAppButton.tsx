@@ -12,7 +12,7 @@ import { useState, useEffect } from "react";
 
 // Replace with your WhatsApp Business number (country code + number, no +, no spaces)
 // e.g. if your number is +91 98765 43210, use "919876543210"
-const WHATSAPP_NUMBER = process.env.VITE_WHATSAPP_NUMBER ?? "";
+const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER ?? "";
 
 const PRE_FILLED_MESSAGE = encodeURIComponent(
   "Hi AiTaxBot! I need help with my taxes."

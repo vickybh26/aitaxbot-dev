@@ -14,14 +14,17 @@ declare global {
   }
 }
 
-export function AdBanner({ 
-  slot, 
-  format = 'auto', 
-  responsive = true, 
+export function AdBanner({
+  slot,
+  format = 'auto',
+  responsive = true,
   style,
   className = ""
 }: AdBannerProps) {
+  const isPlaceholder = slot === "1234567890" || slot === "2345678901" || slot === "3456789012";
+
   useEffect(() => {
+    if (isPlaceholder) return;
     try {
       if (typeof window !== 'undefined' && window.adsbygoogle) {
         (window.adsbygoogle = window.adsbygoogle || []).push({});
@@ -29,7 +32,9 @@ export function AdBanner({
     } catch (error) {
       console.log('AdSense error:', error);
     }
-  }, []);
+  }, [isPlaceholder]);
+
+  if (isPlaceholder) return null;
 
   return (
     <div className={`ad-container ${className}`} role="complementary" aria-label="Advertisement">

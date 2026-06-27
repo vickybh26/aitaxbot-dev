@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Helmet } from "react-helmet-async";
+import { Link } from "wouter";
 import PageHeader from "@/components/PageHeader";
 import { trackPageView } from "@/lib/analytics";
 
@@ -173,12 +174,12 @@ export default function About() {
                   </a>{" "}
                   before engaging their services.
                 </p>
-                <a
+                <Link
                   href="/find-ca"
                   className="inline-block bg-teal-600 text-white px-6 py-3 rounded-lg hover:bg-teal-700 transition-colors font-medium"
                 >
                   Browse CA Directory →
-                </a>
+                </Link>
               </div>
             </section>
 
@@ -235,13 +236,13 @@ export default function About() {
               <div className="bg-gray-50 rounded-lg p-8">
                 <h3 className="text-2xl font-semibold text-gray-900 mb-4">Ready to take control of your taxes?</h3>
                 <p className="text-gray-600 mb-6">Start with our free income tax calculator — compare Old vs New Regime in under a minute.</p>
-                <a
+                <Link
                   href="/calculators/income-tax"
                   className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium inline-block"
                   data-testid="button-start-calculating"
                 >
                   Start Calculating →
-                </a>
+                </Link>
               </div>
             </section>
           </div>

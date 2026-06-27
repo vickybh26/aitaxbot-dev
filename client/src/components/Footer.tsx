@@ -137,12 +137,20 @@ export default function Footer() {
               </ul>
               <div className="mt-6 p-3 bg-slate-800 rounded-lg">
                 <p className="text-xs text-slate-400 mb-1">Email us</p>
-                <a
-                  href="mailto:info@aitaxbot.in"
-                  className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
-                >
-                  info@aitaxbot.in
-                </a>
+                <div className="flex flex-col space-y-1.5">
+                  <a
+                    href="mailto:info@aitaxbot.in"
+                    className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                  >
+                    info@aitaxbot.in
+                  </a>
+                  <a
+                    href="mailto:admin@aitaxbot.co.in"
+                    className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                  >
+                    admin@aitaxbot.co.in
+                  </a>
+                </div>
               </div>
             </div>
           </div>

@@ -98,11 +98,12 @@ export default function TradingTaxCalculatorPage() {
           title="US Stock & F&O Trading Tax Calculator"
           subtitle="Calculate capital gains tax on US stocks, F&O income, dividends & forex trading for Indian residents. Auto-fetches historical USD/INR rates."
           badge="FY 2025-26 · AY 2026-27"
+          maxWidth="max-w-5xl"
         />
 
         {/* SEO intro paragraph */}
         <section className="py-6 px-6 bg-white border-b border-slate-100">
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-5xl mx-auto">
             <p className="text-slate-700 leading-relaxed">
               Indians investing in US markets through platforms like INDmoney, Vested, and Stockal face a
               complex tax calculation challenge at ITR filing time. Every trade requires USD-to-INR conversion

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { Link } from "wouter";
 import { Helmet } from "react-helmet-async";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -99,7 +100,7 @@ function inr(n: number): string {
   return "₹" + Math.round(n).toLocaleString("en-IN");
 }
 
-function useCountUp(target: number, duration = 900) {
+const useCountUp = (target: number, duration = 900) => {
   const [count, setCount] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
   const started = useRef(false);
@@ -122,9 +123,9 @@ function useCountUp(target: number, duration = 900) {
     return () => obs.disconnect();
   }, [target, duration]);
   return { count, ref };
-}
+};
 
-function useAnimatedNumber(target: number, duration = 600): number {
+const useAnimatedNumber = (target: number, duration = 600): number => {
   const [display, setDisplay] = useState(target);
   const prevRef = useRef(target);
   const rafRef = useRef<number>(0);
@@ -144,7 +145,7 @@ function useAnimatedNumber(target: number, duration = 600): number {
     return () => cancelAnimationFrame(rafRef.current);
   }, [target, duration]);
   return display;
-}
+};
 
 function SavingsCard() {
   const [salary, setSalary] = useState(1500000);
@@ -195,10 +196,10 @@ function SavingsCard() {
           <div className="text-4xl font-black tabular-nums leading-none tracking-tight">{inr(animSaving)}</div>
           <div className="text-xs mt-2 opacity-80">Assumes ₹1.5L 80C claimed (Old Regime) · FY 2026-27</div>
         </div>
-        <a href="/calculators/income-tax"
+        <Link href="/calculators/income-tax"
           className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-colors">
           <Calculator className="h-4 w-4" />See full computation<ArrowRight className="h-4 w-4" />
-        </a>
+        </Link>
       </div>
     </div>
   );
@@ -275,19 +276,19 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                 </h1>
                 <p className="text-base lg:text-lg text-slate-600 mb-8 leading-relaxed max-w-xl">{t("hero.subheadline")}</p>
                 <div className="flex flex-wrap gap-3 mb-8">
-                  <a href="/calculators/income-tax" data-testid="button-calculate-tax"
+                  <Link href="/calculators/income-tax" data-testid="button-calculate-tax"
                     className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3.5 rounded-xl transition-colors text-sm">
                     <Calculator className="h-4 w-4" />{t("hero.cta")}
-                  </a>
-                  <a href="/tools/ais-26as-form16" data-testid="button-ais-recon"
+                  </Link>
+                  <Link href="/tools/ais-26as-form16" data-testid="button-ais-recon"
                     className="inline-flex items-center gap-2 border border-slate-300 hover:border-slate-400 text-slate-700 hover:bg-slate-50 font-semibold px-5 py-3.5 rounded-xl transition-colors text-sm">
                     <Layers className="h-4 w-4" />AIS Reconciliation
                     <span className="text-[10px] font-bold text-blue-600 bg-blue-50 border border-blue-100 px-1.5 py-0.5 rounded-full">New</span>
-                  </a>
-                  <a href="/find-ca" data-testid="button-find-ca-hero"
+                  </Link>
+                  <Link href="/find-ca" data-testid="button-find-ca-hero"
                     className="inline-flex items-center gap-2 border border-slate-300 hover:border-slate-400 text-slate-700 hover:bg-slate-50 font-semibold px-5 py-3.5 rounded-xl transition-colors text-sm">
                     <UserCheck className="h-4 w-4" />Find a CA
-                  </a>
+                  </Link>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {[
@@ -337,7 +338,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {TOOLS.map(({ icon: Icon, name, desc, href, color, bg, badge }: any) => (
-                <a key={href} href={href}
+                <Link key={href} href={href}
                   className="group flex gap-4 p-5 bg-white rounded-2xl border border-slate-200 hover:border-blue-200 hover:shadow-md transition-all duration-200">
                   <div className={cn("w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:scale-110", bg)}>
                     <Icon className={cn("h-5 w-5", color)} />
@@ -349,7 +350,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                     </div>
                     <p className="text-xs text-slate-500 leading-relaxed">{desc}</p>
                   </div>
-                </a>
+                </Link>
               ))}
             </div>
           </div>
@@ -384,10 +385,10 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                     </div>
                   ))}
                 </div>
-                <a href="/tools/ais-26as-form16"
+                <Link href="/tools/ais-26as-form16"
                   className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold px-6 py-3.5 rounded-xl transition-colors text-sm">
                   <Layers className="h-4 w-4" />Try AIS Reconciliation<ArrowRight className="h-4 w-4" />
-                </a>
+                </Link>
               </div>
               <div>
                 <div className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden">
@@ -434,13 +435,13 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                 <p className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-2">Tax Guides &amp; Blog</p>
                 <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Latest from AiTaxBot</h2>
               </div>
-              <a href="/blog" className="hidden sm:flex items-center gap-1.5 text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+              <Link href="/blog" className="hidden sm:flex items-center gap-1.5 text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">
                 View all 34 guides <ArrowRight className="h-4 w-4" />
-              </a>
+              </Link>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {latestBlogPosts.map(post => (
-                <a key={post.slug} href={`/blog/${post.slug}`}
+                <Link key={post.slug} href={`/blog/${post.slug}`}
                   className="group block bg-white rounded-2xl border border-slate-200 hover:border-blue-200 hover:shadow-md p-6 transition-all duration-200">
                   <div className="flex items-center gap-2 mb-3">
                     <span className="text-xs bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full font-semibold border border-blue-100">{post.tag}</span>
@@ -450,11 +451,11 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                   <div className="flex items-center gap-1.5 text-xs font-semibold text-blue-600 group-hover:gap-2.5 transition-all">
                     Read guide <ArrowRight className="h-3.5 w-3.5" />
                   </div>
-                </a>
+                </Link>
               ))}
             </div>
             <div className="mt-6 text-center sm:hidden">
-              <a href="/blog" className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600">View all 34 guides <ArrowRight className="h-4 w-4" /></a>
+              <Link href="/blog" className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600">View all 34 guides <ArrowRight className="h-4 w-4" /></Link>
             </div>
           </div>
         </section>
@@ -503,10 +504,10 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                   <div className="flex items-center gap-2 text-sm text-slate-700"><CheckCircle2 className="h-4 w-4 text-green-500" />Free introduction — no platform fees</div>
                   <div className="flex items-center gap-2 text-sm text-orange-700"><Clock className="h-4 w-4 text-orange-500" />Deadline: July 31, 2026 — act now</div>
                 </div>
-                <a href="/find-ca"
+                <Link href="/find-ca"
                   className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3.5 rounded-xl transition-colors text-sm">
                   <UserCheck className="h-4 w-4" />Find a CA near you<ArrowRight className="h-4 w-4" />
-                </a>
+                </Link>
               </div>
             </div>
           </div>
@@ -518,14 +519,14 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
             <h2 className="text-3xl font-bold text-white tracking-tight mb-3">Ready to file smarter?</h2>
             <p className="text-white/80 mb-8 text-base max-w-xl mx-auto">Free calculators, CA-reviewed logic, AI document reconciliation — all in one place.</p>
             <div className="flex flex-wrap justify-center gap-4">
-              <a href="/calculators/income-tax"
+              <Link href="/calculators/income-tax"
                 className="inline-flex items-center gap-2 bg-white text-blue-700 hover:bg-slate-50 font-bold px-7 py-3.5 rounded-xl transition-colors text-sm">
                 <Calculator className="h-4 w-4" />Calculate My Tax
-              </a>
-              <a href="/tools/ais-26as-form16"
+              </Link>
+              <Link href="/tools/ais-26as-form16"
                 className="inline-flex items-center gap-2 bg-transparent border-2 border-white/40 hover:border-white/80 text-white font-bold px-7 py-3.5 rounded-xl transition-colors text-sm">
                 <Layers className="h-4 w-4" />Reconcile Documents
-              </a>
+              </Link>
             </div>
           </div>
         </section>
@@ -571,7 +572,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                 { q: "How is AY (Assessment Year) different from FY (Financial Year)?", a: "Financial Year (FY) is when you earn the income — e.g., FY 2026-27 runs April 2026 to March 2027. Assessment Year (AY) is when you file and pay tax on that income — so AY 2027-28 corresponds to FY 2026-27." },
               ].map(({ q, a }, i) => (
                 <details key={i} className="group rounded-xl border border-slate-200 bg-white open:border-blue-200 transition-all">
-                  <summary className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold text-slate-800 list-none [&::-webkit-details-marker]:hidden">
+                  <summary className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold text-slate-800 list-none [&::-webkit-details-marker]:hidden focus:outline-none">
                     {q}<ChevronDown className="h-4 w-4 flex-shrink-0 text-slate-400 transition-transform group-open:rotate-180" />
                   </summary>
                   <div className="px-5 pb-5 pt-3 text-sm text-slate-600 leading-relaxed border-t border-slate-100">{a}</div>
@@ -589,10 +590,20 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
               <h2 className="text-xl font-bold text-slate-900">Get in Touch</h2>
             </div>
             <div className="grid md:grid-cols-3 gap-4 mb-6">
-              <a href="mailto:info@aitaxbot.in" className="flex items-center gap-3 p-4 bg-white rounded-xl border border-slate-200 hover:border-blue-200 hover:shadow-sm transition-all group">
+              <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-slate-200 hover:border-blue-200 hover:shadow-sm transition-all">
                 <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0"><Mail className="h-5 w-5 text-blue-600" /></div>
-                <div><p className="text-xs text-slate-500 mb-0.5">Email</p><p className="text-sm font-semibold text-slate-800 group-hover:text-blue-600 transition-colors">info@aitaxbot.in</p></div>
-              </a>
+                <div>
+                  <p className="text-xs text-slate-500 mb-0.5">Email</p>
+                  <div className="flex flex-col">
+                    <a href="mailto:info@aitaxbot.in" className="text-sm font-semibold text-slate-800 hover:text-blue-600 transition-colors">
+                      info@aitaxbot.in
+                    </a>
+                    <a href="mailto:admin@aitaxbot.co.in" className="text-sm font-semibold text-slate-800 hover:text-blue-600 transition-colors">
+                      admin@aitaxbot.co.in
+                    </a>
+                  </div>
+                </div>
+              </div>
               <a href="tel:+917899869036" className="flex items-center gap-3 p-4 bg-white rounded-xl border border-slate-200 hover:border-green-200 hover:shadow-sm transition-all group">
                 <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center flex-shrink-0"><Phone className="h-5 w-5 text-green-600" /></div>
                 <div><p className="text-xs text-slate-500 mb-0.5">Phone</p><p className="text-sm font-semibold text-slate-800 group-hover:text-green-600 transition-colors">+91 78998 69036</p></div>
@@ -608,9 +619,9 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                 <a href="https://www.linkedin.com/company/aitaxbot/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full p-2 transition-colors"><Linkedin className="h-4 w-4" /></a>
                 <a href="https://www.instagram.com/aitaxbot/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="bg-pink-100 hover:bg-pink-200 text-pink-600 rounded-full p-2 transition-colors"><Instagram className="h-4 w-4" /></a>
               </div>
-              <a href="/contact" className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors">
+              <Link href="/contact" className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors">
                 <Send className="h-4 w-4" />Send a Message
-              </a>
+              </Link>
             </div>
           </div>
         </section>

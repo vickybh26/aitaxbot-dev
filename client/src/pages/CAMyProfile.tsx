@@ -10,6 +10,7 @@
 
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
+import { Link } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -237,7 +238,7 @@ export default function CAMyProfile() {
                 </Button>
                 <p className="text-xs text-gray-500 text-center">
                   Can't access your registered email?{" "}
-                  <a href="/contact" className="text-blue-600 hover:underline">Contact support</a>.
+                  <Link href="/contact" className="text-blue-600 hover:underline">Contact support</Link>.
                 </p>
               </CardContent>
             </Card>
@@ -365,7 +366,7 @@ export default function CAMyProfile() {
                     Update Another Profile
                   </Button>
                   <Button asChild>
-                    <a href="/find-ca">Back to Directory</a>
+                    <Link href="/find-ca">Back to Directory</Link>
                   </Button>
                 </div>
               </CardContent>

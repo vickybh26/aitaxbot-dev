@@ -469,7 +469,7 @@ export default function SWPCalculatorPage() {
               <p className="text-sm text-purple-900">
                 <strong>Planning tip:</strong> Start your SIP today, accumulate the corpus, then switch to SWP at retirement.
                 A ₹5,000/month SIP for 25 years at 12% p.a. builds ₹94.88L — enough to fund ₹75,000/month SWP for retirement.
-                Use our <a href="/calculators/sip" className="underline font-medium">SIP Calculator</a> to plan your accumulation phase.
+                Use our <Link href="/calculators/sip" className="underline font-medium">SIP Calculator</Link> to plan your accumulation phase.
               </p>
             </div>
 
