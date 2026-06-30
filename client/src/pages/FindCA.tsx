@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "wouter";
 import { Helmet } from "react-helmet-async";
 import {
   Search, MapPin, Mail, Shield, ChevronDown,
@@ -49,7 +50,10 @@ export default function FindCA() {
 
   useEffect(() => {
     fetch("/api/ca/list")
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error(`Server error: ${r.status}`);
+        return r.json();
+      })
       .then((data) => {
         setProfiles(data.profiles || []);
         setFiltered(data.profiles || []);
@@ -161,8 +165,8 @@ export default function FindCA() {
         </div>
 
         {/* Compliance banner */}
-        <div className="bg-amber-50 border-b border-amber-100 py-2.5 px-4">
-          <div className="max-w-5xl mx-auto flex items-center gap-2 text-xs text-amber-700">
+        <div className="bg-amber-50 border-b border-amber-100 py-2.5">
+          <div className="max-w-5xl mx-auto flex items-center gap-2 text-xs text-amber-700 px-6">
             <BookOpen className="w-3.5 h-3.5 flex-shrink-0" />
             <span>
               <strong>Informational directory only.</strong> AiTaxBot does not recommend, endorse, or refer any CA.
@@ -182,7 +186,7 @@ export default function FindCA() {
         </div>
 
         {/* Directory */}
-        <div className="max-w-5xl mx-auto px-4 py-10">
+        <div className="max-w-5xl mx-auto px-6 py-10">
           {loading && (
             <div className="flex items-center justify-center py-20 text-slate-400">
               <Loader2 className="w-6 h-6 animate-spin mr-2" />
@@ -368,13 +372,13 @@ export default function FindCA() {
               form are shared only with the specific CA selected by the user, for the sole purpose of enabling
               the user to seek professional services. Details are not sold, shared with third parties, or used
               for any other purpose. See our{" "}
-              <a href="/privacy" className="underline text-blue-600">Privacy Policy</a> for full details.
+              <Link href="/privacy-policy" className="underline text-blue-600">Privacy Policy</Link> for full details.
             </p>
 
             <p className="pt-1 border-t border-slate-100">
               For questions about this disclaimer, contact us at{" "}
-              <a href="mailto:support@aitaxbot.co.in" className="underline text-blue-600">
-                support@aitaxbot.co.in
+              <a href="mailto:admin@aitaxbot.co.in" className="underline text-blue-600">
+                admin@aitaxbot.co.in
               </a>.
             </p>
           </div>
