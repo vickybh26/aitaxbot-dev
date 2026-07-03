@@ -182,7 +182,7 @@ To give a user admin access, create this Firestore document manually:
 Collection: admin
 Document ID: <Firebase UID of the user>
 Fields:
-  level: 1        (1 = read-only admin, 2 = editor, 3 = super)
+  level: 1        (1 = Super Admin — full access, 2 = Manager — CRM writes, no export/delete, 3 = Viewer — read-only)
   name: "Vikrant Bhargav"
   email: "vickybh26@gmail.com"
 ```

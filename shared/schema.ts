@@ -28,6 +28,7 @@ export interface User {
   authProvider?: string | null;
   isProfileComplete?: boolean;
   tags?: string[];
+  lastNudgedAt?: Date | string | null;
   createdAt?: Date | string;
   updatedAt?: Date | string;
 }

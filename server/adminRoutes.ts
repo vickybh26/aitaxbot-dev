@@ -278,6 +278,7 @@ router.get("/users", adminL3, async (req: any, res) => {
       authProvider: u.authProvider,
       isProfileComplete: u.isProfileComplete,
       tags: u.tags ?? [],
+      lastNudgedAt: u.lastNudgedAt ?? null,
       createdAt: u.createdAt,
       updatedAt: u.updatedAt,
     }));
@@ -323,6 +324,7 @@ router.get("/users/:id", adminL3, async (req: any, res) => {
       authProvider: u.authProvider,
       isProfileComplete: u.isProfileComplete,
       tags: u.tags ?? [],
+      lastNudgedAt: u.lastNudgedAt ?? null,
       createdAt: u.createdAt,
       updatedAt: u.updatedAt,
       notes,
@@ -397,6 +399,94 @@ router.delete("/users/:id/notes/:noteId", adminL1, async (req: any, res) => {
   } catch (err) {
     console.error("[Admin] Note delete error:", err);
     res.status(500).json({ error: "Failed to delete note" });
+  }
+});
+
+// ─────────────────────────────────────────────
+// POST /api/admin/users/:id/nudge — email reminder to complete profile (L2+)
+// Rate-limited to one nudge per user per 7 days.
+// ─────────────────────────────────────────────
+
+const NUDGE_COOLDOWN_MS = 7 * 24 * 60 * 60 * 1000;
+
+function tsToMs(v: any): number {
+  if (!v) return 0;
+  if (v._seconds) return v._seconds * 1000;
+  if (typeof v.toMillis === "function") return v.toMillis();
+  return new Date(v).getTime() || 0;
+}
+
+router.post("/users/:id/nudge", adminL2, async (req: any, res) => {
+  try {
+    const db = getFirestore();
+    const userRef = db.collection("users").doc(req.params.id);
+    const userDoc = await userRef.get();
+    if (!userDoc.exists) return res.status(404).json({ error: "User not found" });
+
+    const u: any = userDoc.data();
+    if (u.isProfileComplete) {
+      return res.status(400).json({ error: "This user's profile is already complete" });
+    }
+    if (!u.email) {
+      return res.status(400).json({ error: "User has no email on file" });
+    }
+
+    const lastNudgedMs = tsToMs(u.lastNudgedAt);
+    if (lastNudgedMs && Date.now() - lastNudgedMs < NUDGE_COOLDOWN_MS) {
+      const daysLeft = Math.ceil((NUDGE_COOLDOWN_MS - (Date.now() - lastNudgedMs)) / (24 * 60 * 60 * 1000));
+      return res.status(429).json({ error: `Already nudged recently — try again in ${daysLeft} day${daysLeft === 1 ? "" : "s"}` });
+    }
+
+    const missing: string[] = [];
+    if (!u.firstName || !u.lastName) missing.push("your name");
+    if (!u.mobile) missing.push("your mobile number");
+
+    await sendBrevoEmail({
+      to: [{ email: u.email, name: u.firstName || "there" }],
+      subject: "Finish setting up your AiTaxBot profile",
+      htmlContent: `
+        <!DOCTYPE html>
+        <html>
+        <body style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:20px;color:#1e293b">
+          <div style="text-align:center;margin-bottom:24px">
+            <img src="https://aitaxbot.co.in/logo.png" alt="AiTaxBot" style="height:40px" onerror="this.style.display='none'"/>
+          </div>
+          <h2 style="font-size:20px;font-weight:700;margin-bottom:4px">Hi ${u.firstName || "there"}! 👋</h2>
+          <p style="color:#475569;margin-top:8px;line-height:1.6">
+            You're just a couple of details away from getting the most out of AiTaxBot —
+            ${missing.length ? "we still need " + missing.join(" and ") + "." : "your profile just needs a final check."}
+          </p>
+          <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:12px;padding:16px;margin:20px 0">
+            <p style="font-size:13px;font-weight:600;color:#0284c7;margin:0 0 8px">Completing your profile unlocks:</p>
+            <ul style="font-size:14px;color:#1e293b;margin:0;padding-left:18px;line-height:1.8">
+              <li>Instant PDF downloads — no forms, every time</li>
+              <li>Personalised tax-saving tips based on your details</li>
+              <li>Saved calculation history on your Dashboard</li>
+            </ul>
+          </div>
+          <div style="margin:24px 0;text-align:center">
+            <a href="https://aitaxbot.co.in/profile"
+               style="display:inline-block;background:#2563eb;color:white;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:600;font-size:14px">
+              Complete My Profile →
+            </a>
+          </div>
+          <hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0"/>
+          <p style="font-size:11px;color:#94a3b8;text-align:center">
+            AiTaxBot · aitaxbot.co.in · Free tax tools for India<br/>
+            <a href="https://aitaxbot.co.in/privacy-policy" style="color:#94a3b8">Privacy Policy</a>
+          </p>
+        </body>
+        </html>
+      `,
+    });
+
+    const now = new Date();
+    await userRef.update({ lastNudgedAt: now });
+
+    res.json({ success: true, lastNudgedAt: now.toISOString() });
+  } catch (err) {
+    console.error("[Admin] Nudge user error:", err);
+    res.status(500).json({ error: "Failed to send nudge email" });
   }
 });
 
