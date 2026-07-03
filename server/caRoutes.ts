@@ -39,7 +39,7 @@ async function requireAdmin(req: any, res: any, next: any): Promise<any> {
     if (!adminDoc.exists) {
       return res.status(403).json({ error: "Not an admin account" });
     }
-    const level = Number(adminDoc.data()!.level);
+    const level = Number((adminDoc.data()! as any).level);
     if (!Number.isInteger(level) || level < 1 || level > 3) {
       return res.status(403).json({ error: "Invalid admin level" });
     }
@@ -101,7 +101,7 @@ router.post("/register", async (req: Request, res: Response) => {
     ]);
 
     if (!icaiSnap.empty) {
-      const ex = icaiSnap.docs[0].data();
+      const ex = icaiSnap.docs[0].data() as any;
       const statusLabel =
         ex.status === "approved"  ? "is already live in our directory" :
         ex.status === "pending"   ? "is already under review" :
@@ -112,7 +112,7 @@ router.post("/register", async (req: Request, res: Response) => {
     }
 
     if (!emailSnap.empty) {
-      const ex = emailSnap.docs[0].data();
+      const ex = emailSnap.docs[0].data() as any;
       const statusLabel =
         ex.status === "approved" ? "is already active" : "is already under review";
       return res.status(409).json({
@@ -201,7 +201,7 @@ router.get("/list", async (req: Request, res: Response) => {
     const db = getFirestore();
     let query = db
       .collection(COLLECTIONS.CA_PROFILES)
-      .where("status", "==", "approved") as FirebaseFirestore.Query;
+      .where("status", "==", "approved") as FirebaseFirestore.Query<any>;
 
     if (req.query.state) {
       query = query.where("state", "==", req.query.state as string);

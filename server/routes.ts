@@ -247,6 +247,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api/tool-usage", toolUsageRoutes);
   registerTaxReconcileRoutes(app);
 
+  // Client debug logger endpoint
+  app.post("/api/logs/client", (req, res) => {
+    console.error("📱 [Client Console Error]", req.body);
+    res.status(200).json({ ok: true });
+  });
+
   // RAG AI routes
   app.use("/api/ai", ragRoutes);
   
@@ -378,7 +384,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const db = getFirestore();
       const doc = await db.collection('counters').doc('taxCalculations').get();
-      const count = doc.exists ? (doc.data()?.count ?? 0) : 0;
+      const count = doc.exists ? ((doc.data() as any)?.count ?? 0) : 0;
       res.json({ count });
     } catch (error) {
       console.error("[Stats] Error fetching calculation count:", error);

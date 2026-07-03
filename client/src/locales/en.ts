@@ -81,4 +81,10 @@ const en = {
 } as const;
 
 export default en;
-export type Translations = typeof en;
+
+// DeepString maps the structure of 'en' but allows any string value,
+// so translated locale files can hold non-English strings.
+type DeepString<T> = {
+  [K in keyof T]: T[K] extends string ? string : DeepString<T[K]>
+};
+export type Translations = DeepString<typeof en>;

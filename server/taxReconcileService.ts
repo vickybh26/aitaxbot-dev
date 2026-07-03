@@ -206,7 +206,7 @@ function parse26ASFromText(text: string): Extracted26AS {
   // ── Salary TDS (Section 192) ──────────────────────────────────────────────
   // Strategy: find all "192" transaction rows, sum up TDS deposited column
   // Row format: "1  192  31-Mar-2026  F  22-Apr-2026  -  221266.67  39847.78  39847.78"
-  const sec192Rows = [...text.matchAll(/\b192\b\s+\d{2}-\w{3}-\d{4}\s+[A-Z]\s+\d{2}-\w{3}-\d{4}\s+-\s+([\d,]+\.\d+)\s+([\d,]+\.\d+)\s+([\d,]+\.\d+)/g)];
+  const sec192Rows = Array.from(text.matchAll(/\b192\b\s+\d{2}-\w{3}-\d{4}\s+[A-Z]\s+\d{2}-\w{3}-\d{4}\s+-\s+([\d,]+\.\d+)\s+([\d,]+\.\d+)\s+([\d,]+\.\d+)/g));
   if (sec192Rows.length > 0) {
     let totalPaid = 0;
     let totalTDS = 0;
@@ -228,7 +228,7 @@ function parse26ASFromText(text: string): Extracted26AS {
 
   // ── Non-salary TDS (194S crypto, 194A interest, etc.) ────────────────────
   // Find 194S / 194A / 194 rows
-  const nonSalaryRows = [...text.matchAll(/\b194[A-Z0-9]*\b\s+\d{2}-\w{3}-\d{4}\s+[A-Z]\s+\d{2}-\w{3}-\d{4}\s+-\s+([\d,]+\.\d+)\s+([\d,]+\.\d+)\s+([\d,]+\.\d+)/g)];
+  const nonSalaryRows = Array.from(text.matchAll(/\b194[A-Z0-9]*\b\s+\d{2}-\w{3}-\d{4}\s+[A-Z]\s+\d{2}-\w{3}-\d{4}\s+-\s+([\d,]+\.\d+)\s+([\d,]+\.\d+)\s+([\d,]+\.\d+)/g));
   if (nonSalaryRows.length > 0) {
     let totalNonSalary = 0;
     for (const row of nonSalaryRows) {
@@ -240,7 +240,7 @@ function parse26ASFromText(text: string): Extracted26AS {
 
   // ── TCS (Part VI — LRS, remittances) ─────────────────────────────────────
   // Kotak / bank TCS rows: "206CQ 21-Mar-2026 F ... 1153.09 0.00 0.00"
-  const tcsRows = [...text.matchAll(/\b206[A-Z]+\b\s+\d{2}-\w{3}-\d{4}\s+[A-Z]\s+\d{2}-\w{3}-\d{4}\s+-\s+([\d,]+\.\d+)\s+([\d,]+\.\d+)\s+([\d,]+\.\d+)/g)];
+  const tcsRows = Array.from(text.matchAll(/\b206[A-Z]+\b\s+\d{2}-\w{3}-\d{4}\s+[A-Z]\s+\d{2}-\w{3}-\d{4}\s+-\s+([\d,]+\.\d+)\s+([\d,]+\.\d+)\s+([\d,]+\.\d+)/g));
   if (tcsRows.length > 0) {
     let totalTCS = 0;
     for (const row of tcsRows) {
@@ -470,19 +470,19 @@ function parseAISFromText(text: string): Partial<ExtractedAIS> {
   );
 
   // Savings interest (SFT-016(SB))
-  const savingsRows = [...text.matchAll(/SFT-016\(SB\)[^\d]*([\d,]+)/gi)];
+  const savingsRows = Array.from(text.matchAll(/SFT-016\(SB\)[^\d]*([\d,]+)/gi));
   if (savingsRows.length > 0) {
     result.interestFromSavings = savingsRows.reduce((s, m) => s + (numOrNull(m[1]) ?? 0), 0);
   }
 
   // FD interest (SFT-016(FD))
-  const fdRows = [...text.matchAll(/SFT-016\(FD\)[^\d]*([\d,]+)/gi)];
+  const fdRows = Array.from(text.matchAll(/SFT-016\(FD\)[^\d]*([\d,]+)/gi));
   if (fdRows.length > 0) {
     result.interestFromFD = fdRows.reduce((s, m) => s + (numOrNull(m[1]) ?? 0), 0);
   }
 
   // Dividend (SFT-015)
-  const divRows = [...text.matchAll(/SFT-015[^\d]*([\d,]+)/gi)];
+  const divRows = Array.from(text.matchAll(/SFT-015[^\d]*([\d,]+)/gi));
   if (divRows.length > 0) {
     result.dividendIncome = divRows.reduce((s, m) => s + (numOrNull(m[1]) ?? 0), 0);
   }
@@ -552,7 +552,7 @@ Extract these values. Use null if not found. Return ONLY this JSON (no markdown,
       }],
     });
 
-    const raw = result.text ?? result.candidates?.[0]?.content?.parts?.[0]?.text ?? "{}";
+    const raw = result.text ?? (result.candidates?.[0] as any)?.content?.parts?.[0]?.text ?? "{}";
     console.log("[parseAISWithGemini] Raw response:", raw.slice(0, 300));
 
     const cleaned = raw.replace(/```json\s*/g, "").replace(/```/g, "").trim();
@@ -629,7 +629,7 @@ Return ONLY this JSON (no markdown, no text before/after the JSON):
       }],
     });
 
-    const raw = result.text ?? result.candidates?.[0]?.content?.parts?.[0]?.text ?? "{}";
+    const raw = result.text ?? (result.candidates?.[0] as any)?.content?.parts?.[0]?.text ?? "{}";
     console.log("[parse26ASWithGemini] Raw response:", raw.slice(0, 400));
 
     const cleaned = raw.replace(/```json\s*/g, "").replace(/```/g, "").trim();
@@ -741,7 +741,7 @@ Extract all values and return ONLY this JSON (no markdown):
       }],
     });
 
-    const raw = result.text ?? result.candidates?.[0]?.content?.parts?.[0]?.text ?? "{}";
+    const raw = result.text ?? (result.candidates?.[0] as any)?.content?.parts?.[0]?.text ?? "{}";
     console.log("[parseForm16WithGemini] Raw response:", raw.slice(0, 400));
 
     const cleaned = raw.replace(/```json\s*/g, "").replace(/```/g, "").trim();

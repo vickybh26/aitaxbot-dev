@@ -77,7 +77,7 @@ export default function Contact() {
       />
 
       <div>
-        <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto px-6 py-8">
           <div className="grid md:grid-cols-2 gap-12">
             {/* Contact Information */}
             <div>
@@ -95,16 +95,17 @@ export default function Contact() {
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">Email</h3>
                     <div className="flex flex-col space-y-1">
-                      <a
-                        href="mailto:info@aitaxbot.in"
+                      <a 
+                        href="mailto:info@aitaxbot.in" 
                         className="text-persian-blue-600 hover:text-persian-blue-700 transition-colors"
                         data-testid="link-email"
                       >
                         info@aitaxbot.in
                       </a>
-                      <a
-                        href="mailto:admin@aitaxbot.co.in"
+                      <a 
+                        href="mailto:admin@aitaxbot.co.in" 
                         className="text-persian-blue-600 hover:text-persian-blue-700 transition-colors"
+                        data-testid="link-admin-email"
                       >
                         admin@aitaxbot.co.in
                       </a>

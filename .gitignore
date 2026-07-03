@@ -49,7 +49,3 @@ __pycache__/
 *.pyo
 
 
-# Replit internal files
-.config/
-.local/
-.replit

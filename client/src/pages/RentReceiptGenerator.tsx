@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { Helmet } from "react-helmet-async";
 import { Link } from "wouter";
+import { Helmet } from "react-helmet-async";
 import { useToast } from "@/hooks/use-toast";
 import { trackPageView } from "@/lib/analytics";
 import {
@@ -224,9 +224,10 @@ export default function RentReceiptGenerator() {
             { label: "Rent Receipt Generator" },
           ]}
           badge="HRA · FY 2026-27"
+          maxWidth="max-w-4xl"
         />
 
-        <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto px-6 py-8">
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 

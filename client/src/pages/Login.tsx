@@ -29,7 +29,11 @@ export default function Login() {
     const urlParam = params.get('returnUrl');
     if (urlParam) {
       try {
-        return decodeURIComponent(urlParam);
+        const decoded = decodeURIComponent(urlParam);
+        // Security check: ensure returnUrl is a local relative path to prevent open redirect
+        if (decoded.startsWith('/')) {
+          return decoded;
+        }
       } catch {
         return '/dashboard';
       }

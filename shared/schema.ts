@@ -64,14 +64,21 @@ export interface SurchargeSlab {
 export interface TaxRates {
   id: string;
   assessmentYear: string;
+  financialYear?: string | null;
   regime: string;
   ageGroup: string;
   slabs: TaxSlab[];
-  standardDeduction?: number | null;
-  basicExemptionLimit?: number | null;
-  rebate87A?: number | null;
+  standardDeduction?: number | string | null;
+  basicExemptionLimit?: number | string | null;
+  rebate87A?: number | string | null;
+  // Rebate fields (ITA 2025 / seed data — stored as strings in seed, parsed to number in use)
+  rebateLimit?: number | string | null;
+  maxRebate?: number | string | null;
+  cessRate?: number | string | null;
   surchargeSlabs?: SurchargeSlab[] | null;
   marginalRelief?: boolean | null;
+  actReference?: string | null;
+  effectiveFrom?: string | Date | null;
   isActive?: boolean;
   createdAt?: Date | string;
   updatedAt?: Date | string;
@@ -204,12 +211,21 @@ export const insertTaxDocumentSchema = z.object({
   processingStatus: optStr,
   firebaseFileId: optStr,
   downloadUrl: optStr,
+  expiresAt: z.date().optional().nullable(),
+  // Processing result flags (set by async pipeline after initial insert)
+  isProcessed: z.boolean().optional().nullable(),
+  errorMessage: z.string().optional().nullable(),
+  // Extracted data as JSON string (set after successful processing)
+  extractedData: z.string().optional().nullable(),
 });
 
 export type TaxDocument = z.infer<typeof insertTaxDocumentSchema> & {
   id: string;
   uploadedAt?: Date | string;
   updatedAt?: Date | string;
+  // Processing status flags (set by async processing pipeline)
+  isProcessed?: boolean | null;
+  errorMessage?: string | null;
 };
 export type InsertTaxDocument = z.infer<typeof insertTaxDocumentSchema>;
 
@@ -371,9 +387,15 @@ export interface SalesRegister {
   userId?: string | null;
   month: string;
   year?: number | null;
-  totalSales?: number | null;
-  totalTax?: number | null;
+  totalSales?: number | string | null;
+  totalTax?: number | string | null;
   totalInvoices?: number | null;
+  // GST-breakdown fields (stored as strings to preserve decimal precision)
+  totalCgst?: number | string | null;
+  totalSgst?: number | string | null;
+  totalIgst?: number | string | null;
+  grandTotal?: number | string | null;
+  invoiceIds?: string[] | null;
   createdAt?: Date | string;
   updatedAt?: Date | string;
 }

@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
+import { getAnalytics, type Analytics } from "firebase/analytics";
 import { getAI, getGenerativeModel, GoogleAIBackend } from "firebase/ai";
 import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
 import {
@@ -13,21 +13,24 @@ import {
   type User
 } from "firebase/auth";
 
+const rawApiKey = import.meta.env.VITE_FIREBASE_API_KEY;
+const isPlaceholderKey = !rawApiKey || rawApiKey === "your_firebase_api_key_here";
+
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.firebaseapp.com`,
-  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.firebasestorage.app`,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
+  apiKey: isPlaceholderKey ? "dummy-firebase-api-key-for-local-dev-rendering" : rawApiKey,
+  authDomain: `${isPlaceholderKey ? "aitaxbot-e5c0e" : import.meta.env.VITE_FIREBASE_PROJECT_ID}.firebaseapp.com`,
+  databaseURL: isPlaceholderKey ? "https://aitaxbot-e5c0e-default-rtdb.firebaseio.com" : import.meta.env.VITE_FIREBASE_DATABASE_URL,
+  projectId: isPlaceholderKey ? "aitaxbot-e5c0e" : import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: `${isPlaceholderKey ? "aitaxbot-e5c0e" : import.meta.env.VITE_FIREBASE_PROJECT_ID}.firebasestorage.app`,
+  messagingSenderId: isPlaceholderKey ? "275518195519" : import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: isPlaceholderKey ? "1:275518195519:web:00bbefb3e9f4c21470358a" : import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: isPlaceholderKey ? "G-WYGS15GW5J" : import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);
 
-let analyticsInstance = null;
+let analyticsInstance: Analytics | null = null;
 if (typeof window !== 'undefined') {
   try {
     analyticsInstance = getAnalytics(app);
@@ -36,6 +39,7 @@ if (typeof window !== 'undefined') {
   }
 }
 export const analytics = analyticsInstance;
+
 export const auth = getAuth(app);
 
 // Firebase App Check — protects Gemini quota from abuse

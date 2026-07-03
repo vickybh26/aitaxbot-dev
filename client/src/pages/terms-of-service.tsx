@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { Helmet } from "react-helmet-async";
 import { Link } from "wouter";
+import { Helmet } from "react-helmet-async";
 import PageHeader from "@/components/PageHeader";
 import { trackPageView } from "@/lib/analytics";
 
@@ -30,7 +30,7 @@ export default function TermsOfService() {
         badge="Last Updated: June 20, 2026"
       />
       <div>
-        <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto px-6 py-8">
           <div className="prose prose-lg max-w-none">
 
             {/* Financial Disclaimer — prominent at top */}

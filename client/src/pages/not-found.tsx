@@ -37,44 +37,40 @@ export default function NotFound() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
-              <Link href="/">
-                <a 
-                  className="w-full h-auto py-4 flex flex-col items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors cursor-pointer"
-                  data-testid="button-home-404"
-                >
-                  <Home className="h-6 w-6" />
-                  <span className="font-semibold">Go to Home</span>
-                </a>
+              <Link
+                href="/"
+                className="w-full h-auto py-4 flex flex-col items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors cursor-pointer text-center justify-center"
+                data-testid="button-home-404"
+              >
+                <Home className="h-6 w-6" />
+                <span className="font-semibold">Go to Home</span>
               </Link>
 
-              <Link href="/calculators">
-                <a 
-                  className="w-full h-auto py-4 flex flex-col items-center gap-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors cursor-pointer"
-                  data-testid="button-calculators-404"
-                >
-                  <Calculator className="h-6 w-6" />
-                  <span className="font-semibold">Tax Calculators</span>
-                </a>
+              <Link
+                href="/calculators"
+                className="w-full h-auto py-4 flex flex-col items-center gap-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors cursor-pointer text-center justify-center"
+                data-testid="button-calculators-404"
+              >
+                <Calculator className="h-6 w-6" />
+                <span className="font-semibold">Tax Calculators</span>
               </Link>
 
-              <Link href="/blog">
-                <a 
-                  className="w-full h-auto py-4 flex flex-col items-center gap-2 border-2 border-gray-300 hover:border-gray-400 rounded-md transition-colors cursor-pointer"
-                  data-testid="button-blog-404"
-                >
-                  <BookOpen className="h-6 w-6" />
-                  <span className="font-semibold">Read Our Blog</span>
-                </a>
+              <Link
+                href="/blog"
+                className="w-full h-auto py-4 flex flex-col items-center gap-2 border-2 border-gray-300 hover:border-gray-400 rounded-md transition-colors cursor-pointer text-center justify-center"
+                data-testid="button-blog-404"
+              >
+                <BookOpen className="h-6 w-6" />
+                <span className="font-semibold">Read Our Blog</span>
               </Link>
 
-              <Link href="/contact">
-                <a 
-                  className="w-full h-auto py-4 flex flex-col items-center gap-2 border-2 border-gray-300 hover:border-gray-400 rounded-md transition-colors cursor-pointer"
-                  data-testid="button-contact-404"
-                >
-                  <Mail className="h-6 w-6" />
-                  <span className="font-semibold">Contact Us</span>
-                </a>
+              <Link
+                href="/contact"
+                className="w-full h-auto py-4 flex flex-col items-center gap-2 border-2 border-gray-300 hover:border-gray-400 rounded-md transition-colors cursor-pointer text-center justify-center"
+                data-testid="button-contact-404"
+              >
+                <Mail className="h-6 w-6" />
+                <span className="font-semibold">Contact Us</span>
               </Link>
             </div>
 

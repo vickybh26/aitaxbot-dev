@@ -33,7 +33,7 @@ export const blogPosts = ([
     tags: ["Investing Basics", "Personal Finance", "India"],
     readingTimeMinutes: 8,
     publishedAt: "September 18, 2025",
-    heroImage: "/images/investment-types-india.jpg",
+    heroImage: "/images/investment-types-india.svg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -130,7 +130,7 @@ export const blogPosts = ([
     tags: ["Investing", "2025", "Tax Planning"],
     readingTimeMinutes: 8,
     publishedAt: "September 25, 2025",
-    heroImage: "/images/best-investment-options-2025.jpg",
+    heroImage: "/images/best-investment-options-2025.svg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -231,7 +231,7 @@ export const blogPosts = ([
     tags: ["Investing Basics", "Personal Finance"],
     readingTimeMinutes: 8,
     publishedAt: "October 2, 2025",
-    heroImage: "/images/risk-profile-india.jpg",
+    heroImage: "/images/risk-profile-india.svg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -311,7 +311,7 @@ export const blogPosts = ([
     tags: ["Tax Planning", "India"],
     readingTimeMinutes: 9,
     publishedAt: "October 9, 2025",
-    heroImage: "/images/taxation-india-guide.jpg",
+    heroImage: "/images/taxation-india-guide.svg",
     disclaimer: "Tax provisions change. Always check the latest Finance Act and rules before filing.",
     schema: {
       "@context": "https://schema.org",
@@ -392,7 +392,7 @@ export const blogPosts = ([
     tags: ["Investing", "India"],
     readingTimeMinutes: 8,
     publishedAt: "October 16, 2025",
-    heroImage: "/images/crypto-india-2025.jpg",
+    heroImage: "/images/crypto-india-2025.svg",
     disclaimer: "Regulations and tax treatment evolve. Verify current rules and exchange compliance before investing.",
     schema: {
       "@context": "https://schema.org",
@@ -473,7 +473,7 @@ export const blogPosts = ([
     tags: ["Investing", "India"],
     readingTimeMinutes: 8,
     publishedAt: "October 23, 2025",
-    heroImage: "/images/alt-investments-gold-silver.jpg",
+    heroImage: "/images/alt-investments-gold-silver.svg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -547,7 +547,7 @@ export const blogPosts = ([
     tags: ["Tax Planning", "Investing"],
     readingTimeMinutes: 8,
     publishedAt: "October 30, 2025",
-    heroImage: "/images/tax-saving-investments.jpg",
+    heroImage: "/images/tax-saving-investments.svg",
     disclaimer: "Verify current provisions before investing solely for tax benefits.",
     schema: {
       "@context": "https://schema.org",
@@ -622,7 +622,7 @@ export const blogPosts = ([
     tags: ["Investing Basics", "Personal Finance"],
     readingTimeMinutes: 8,
     publishedAt: "November 6, 2025",
-    heroImage: "/images/funds-vs-stocks.jpg",
+    heroImage: "/images/funds-vs-stocks.svg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -707,7 +707,7 @@ export const blogPosts = ([
     tags: ["Investing Basics", "Personal Finance"],
     readingTimeMinutes: 8,
     publishedAt: "November 13, 2025",
-    heroImage: "/images/long-term-compounding.jpg",
+    heroImage: "/images/long-term-compounding.svg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -787,7 +787,7 @@ export const blogPosts = ([
     tags: ["Investing", "Personal Finance"],
     readingTimeMinutes: 8,
     publishedAt: "November 20, 2025",
-    heroImage: "/images/portfolio-rebalancing.jpg",
+    heroImage: "/images/portfolio-rebalancing.svg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -867,7 +867,7 @@ export const blogPosts = ([
     tags: ["investment", "mutual fund", "calculator"],
     readingTimeMinutes: 8,
     publishedAt: "November 27, 2025",
-    heroImage: "/images/sip-calculator-guide.jpg",
+    heroImage: "/images/sip-calculator-guide.svg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -949,7 +949,7 @@ export const blogPosts = ([
     tags: ["tax", "salary", "hra"],
     readingTimeMinutes: 7,
     publishedAt: "December 4, 2025",
-    heroImage: "/images/hra-exemption-metro.jpg",
+    heroImage: "/images/hra-exemption-metro.svg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -1039,7 +1039,7 @@ export const blogPosts = ([
     tags: ["investment", "tax saving", "80C"],
     readingTimeMinutes: 9,
     publishedAt: "December 11, 2025",
-    heroImage: "/images/elss-ppf-nps-comparison.jpg",
+    heroImage: "/images/elss-ppf-nps-comparison.svg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -1129,7 +1129,7 @@ export const blogPosts = ([
     tags: ["gst", "business", "compliance"],
     readingTimeMinutes: 10,
     publishedAt: "December 18, 2025",
-    heroImage: "/images/gst-filing-guide.jpg",
+    heroImage: "/images/gst-filing-guide.svg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -1225,7 +1225,7 @@ export const blogPosts = ([
     tags: ["personal finance", "planning"],
     readingTimeMinutes: 8,
     publishedAt: "December 25, 2025",
-    heroImage: "/images/emergency-fund-planning.jpg",
+    heroImage: "/images/emergency-fund-planning.svg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -1326,7 +1326,7 @@ export const blogPosts = ([
     tags: ["investment", "mutual fund", "stock market"],
     readingTimeMinutes: 9,
     publishedAt: "January 8, 2026",
-    heroImage: "/images/index-vs-active-funds.jpg",
+    heroImage: "/images/index-vs-active-funds.svg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -1432,7 +1432,7 @@ export const blogPosts = ([
     tags: ["tax", "investment", "capital gains"],
     readingTimeMinutes: 10,
     publishedAt: "January 22, 2026",
-    heroImage: "/images/capital-gains-tax-guide.jpg",
+    heroImage: "/images/capital-gains-tax-guide.svg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -1538,7 +1538,7 @@ export const blogPosts = ([
     tags: ["retirement", "financial planning", "investment"],
     readingTimeMinutes: 11,
     publishedAt: "January 29, 2026",
-    heroImage: "/images/retirement-planning-guide.jpg",
+    heroImage: "/images/retirement-planning-guide.svg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -1640,7 +1640,7 @@ export const blogPosts = ([
     tags: ["tax", "salary", "planning", "marginal relief", "FY 2026-27", "80C", "HRA"],
     readingTimeMinutes: 15,
     publishedAt: "February 5, 2026",
-    heroImage: "/images/tax-regime-comparison-2025.jpg",
+    heroImage: "/images/tax-regime-comparison-2025.svg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -1747,7 +1747,7 @@ export const blogPosts = ([
     tags: ["tax", "marginal relief", "surcharge", "high income", "CA tips"],
     readingTimeMinutes: 14,
     publishedAt: "February 20, 2026",
-    heroImage: "/images/marginal-relief-guide.jpg",
+    heroImage: "/images/marginal-relief-guide.svg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -1846,7 +1846,7 @@ export const blogPosts = ([
     tags: ["Tax Planning", "Income Tax Act 2025", "Tax Year 2026-27", "India"],
     readingTimeMinutes: 14,
     publishedAt: "March 5, 2026",
-    heroImage: "/images/income-tax-act-2025.jpg",
+    heroImage: "/images/income-tax-act-2025.svg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -1956,7 +1956,7 @@ export const blogPosts = ([
     tags: ["Tax Saving", "Section 80C", "Old Tax Regime"],
     readingTimeMinutes: 14,
     publishedAt: "March 12, 2026",
-    heroImage: "/images/section-80c-deductions.jpg",
+    heroImage: "/images/section-80c-deductions.svg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -2094,7 +2094,7 @@ export const blogPosts = ([
     tags: ["Tax Rules", "Income Tax", "India"],
     readingTimeMinutes: 12,
     publishedAt: "April 1, 2026",
-    heroImage: "/images/taxation-india-guide.jpg",
+    heroImage: "/images/taxation-india-guide.svg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -2233,7 +2233,7 @@ export const blogPosts = ([
     tags: ["ITR Filing", "Tax Rules", "India"],
     readingTimeMinutes: 8,
     publishedAt: "April 2, 2026",
-    heroImage: "/images/taxation-india-guide.jpg",
+    heroImage: "/images/taxation-india-guide.svg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -2320,7 +2320,7 @@ export const blogPosts = ([
     tags: ["Salary", "Income Tax", "Personal Finance"],
     readingTimeMinutes: 8,
     publishedAt: "April 2, 2026",
-    heroImage: "/images/taxation-india-guide.jpg",
+    heroImage: "/images/taxation-india-guide.svg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -2417,7 +2417,7 @@ export const blogPosts = ([
     tags: ["Economy", "Global Markets", "India"],
     readingTimeMinutes: 8,
     publishedAt: "April 2, 2026",
-    heroImage: "/images/taxation-india-guide.jpg",
+    heroImage: "/images/taxation-india-guide.svg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -2509,7 +2509,7 @@ export const blogPosts = ([
     tags: ["Economy", "Currency", "Personal Finance"],
     readingTimeMinutes: 8,
     publishedAt: "April 2, 2026",
-    heroImage: "/images/taxation-india-guide.jpg",
+    heroImage: "/images/taxation-india-guide.svg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -2596,7 +2596,7 @@ export const blogPosts = ([
     tags: ["Tax Planning", "Income Tax", "India"],
     readingTimeMinutes: 7,
     publishedAt: "March 30, 2026",
-    heroImage: "/images/tax-saving-investments.jpg",
+    heroImage: "/images/tax-saving-investments.svg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -2689,7 +2689,7 @@ export const blogPosts = ([
     tags: ["AiTaxBot", "Tax Tools", "India"],
     readingTimeMinutes: 6,
     publishedAt: "March 28, 2026",
-    heroImage: "/images/taxation-india-guide.jpg",
+    heroImage: "/images/taxation-india-guide.svg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -2792,7 +2792,7 @@ export const blogPosts = ([
     tags: ["ITR Filing", "Tax Deadlines", "Income Tax", "FY 2025-26"],
     readingTimeMinutes: 6,
     publishedAt: "April 28, 2026",
-    heroImage: "/images/taxation-india-guide.jpg",
+    heroImage: "/images/taxation-india-guide.svg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -2894,7 +2894,7 @@ export const blogPosts = ([
     tags: ["ITR Filing", "AIS", "Form 26AS", "Income Tax", "FY 2025-26"],
     readingTimeMinutes: 7,
     publishedAt: "April 28, 2026",
-    heroImage: "/images/taxation-india-guide.jpg",
+    heroImage: "/images/taxation-india-guide.svg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -2991,7 +2991,7 @@ export const blogPosts = ([
     tags: ["ITR Filing", "ITR-1", "E-Filing", "Income Tax", "FY 2025-26"],
     readingTimeMinutes: 8,
     publishedAt: "April 28, 2026",
-    heroImage: "/images/taxation-india-guide.jpg",
+    heroImage: "/images/taxation-india-guide.svg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -3088,7 +3088,7 @@ export const blogPosts = ([
     tags: ["Capital Gains", "ITR Filing", "ITR-2", "Stocks", "Mutual Funds", "FY 2025-26"],
     readingTimeMinutes: 8,
     publishedAt: "April 28, 2026",
-    heroImage: "/images/tax-saving-investments.jpg",
+    heroImage: "/images/tax-saving-investments.svg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -3179,7 +3179,7 @@ export const blogPosts = ([
     tags: ["capital gains", "US stocks", "F&O", "international investing", "ITR filing"],
     readingTimeMinutes: 9,
     publishedAt: "2026-05-01",
-    heroImage: "/blog/us-stock-trading-tax-india.jpg",
+    heroImage: "/images/capital-gains-tax-guide.svg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -3277,7 +3277,7 @@ export const blogPosts = ([
     tags: ["ITR Filing", "Offline Utility", "ITDe-Filing", "Income Tax", "AY 2026-27"],
     readingTimeMinutes: 7,
     publishedAt: "June 25, 2026",
-    heroImage: "/images/taxation-india-guide.jpg",
+    heroImage: "/images/taxation-india-guide.svg",
     schema: {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -3375,7 +3375,7 @@ export const blogPosts = ([
 ]) as BlogPost[];
 
 export function getBlogPost(slug: string): BlogPost | undefined {
-  return blogPosts.find((post: BlogPost) => post.slug === slug);
+  return blogPosts.find((post: BlogPost) => post && post.slug === slug);
 }
 
 export function getBlogPostExcerpt(content: string, maxLength: number = 150): string {

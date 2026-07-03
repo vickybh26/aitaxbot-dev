@@ -642,7 +642,29 @@ function generateLegacyPDF(data: TaxComputationData): Promise<Buffer> {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SAVE PDF HELPER
+// Writes to a short-lived temp file, returns the path, and schedules
+// automatic deletion after 60 seconds so disk never accumulates stale PDFs.
+// Also runs a startup sweep that removes files older than 5 minutes.
 // ─────────────────────────────────────────────────────────────────────────────
+
+/** Remove any temp PDFs that are older than `maxAgeMs` milliseconds. */
+export function cleanStalePdfs(maxAgeMs = 5 * 60 * 1000): void {
+  const uploadDir = path.join(process.cwd(), "temp-pdfs");
+  if (!fs.existsSync(uploadDir)) return;
+  const now = Date.now();
+  try {
+    for (const file of fs.readdirSync(uploadDir)) {
+      const fp = path.join(uploadDir, file);
+      const stat = fs.statSync(fp);
+      if (now - stat.mtimeMs > maxAgeMs) {
+        fs.unlinkSync(fp);
+      }
+    }
+  } catch {
+    // Non-fatal: log but don't crash
+    console.warn("[PDF] Could not clean temp-pdfs directory");
+  }
+}
 
 export async function savePDFToStorage(pdfBuffer: Buffer, userId: string): Promise<string> {
   const uploadDir = path.join(process.cwd(), "temp-pdfs");
@@ -650,6 +672,16 @@ export async function savePDFToStorage(pdfBuffer: Buffer, userId: string): Promi
   const fileName = `tax-computation-${randomUUID()}.pdf`;
   const filePath = path.join(uploadDir, fileName);
   fs.writeFileSync(filePath, pdfBuffer);
+
+  // Schedule deletion after 60 seconds — files are single-use for the HTTP response
+  setTimeout(() => {
+    try {
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    } catch {
+      // Non-fatal
+    }
+  }, 60_000);
+
   return `/temp-pdfs/${fileName}`;
 }
 

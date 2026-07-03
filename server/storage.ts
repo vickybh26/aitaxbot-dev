@@ -161,7 +161,7 @@ export class FirestoreStorage implements IStorage {
     try {
       const doc = await this.db.collection('users').doc(id).get();
       if (!doc.exists) return undefined;
-      return { id: doc.id, ...doc.data() } as User;
+      return { id: doc.id, ...doc.data() } as unknown as User;
     } catch (error) {
       console.error('Error getting user:', error);
       return undefined;
@@ -178,19 +178,19 @@ export class FirestoreStorage implements IStorage {
       // NEVER overwrite user-edited fields (firstName, lastName, mobile, gender,
       // occupation, city, state, isProfileComplete) so profile edits are preserved.
       const authUpdate: Partial<User> & { updatedAt: Date } = {
-        email: userData.email || existingDoc.data()!.email,
-        profileImageUrl: userData.profileImageUrl || existingDoc.data()!.profileImageUrl,
-        authProvider: (userData as any).authProvider || existingDoc.data()!.authProvider || 'google',
+        email: userData.email || (existingDoc.data()! as any).email,
+        profileImageUrl: userData.profileImageUrl || (existingDoc.data()! as any).profileImageUrl,
+        authProvider: (userData as any).authProvider || (existingDoc.data()! as any).authProvider || 'google',
         updatedAt: new Date(),
       };
       await docRef.update(authUpdate);
-      return { id: userId, ...existingDoc.data(), ...authUpdate } as User;
+      return { id: userId, ...existingDoc.data(), ...authUpdate } as unknown as User;
     }
 
     // New user — initialise all fields from the auth token payload.
     const user: User = {
       id: userId,
-      email: userData.email || null,
+      email: userData.email ?? '',
       firstName: userData.firstName || null,
       lastName: userData.lastName || null,
       profileImageUrl: userData.profileImageUrl || null,
@@ -217,7 +217,7 @@ export class FirestoreStorage implements IStorage {
       
       if (snapshot.empty) return undefined;
       const doc = snapshot.docs[0];
-      return { id: doc.id, ...doc.data() } as User;
+      return { id: doc.id, ...doc.data() } as unknown as User;
     } catch (error) {
       console.error('Error getting user by username:', error);
       return undefined;
@@ -278,7 +278,7 @@ export class FirestoreStorage implements IStorage {
       
       await this.db.collection('users').doc(id).update(updateData);
       const doc = await this.db.collection('users').doc(id).get();
-      return { id: doc.id, ...doc.data() } as User;
+      return { id: doc.id, ...doc.data() } as unknown as User;
     } catch (error) {
       console.error('Error updating user:', error);
       throw error;
@@ -343,7 +343,7 @@ export class FirestoreStorage implements IStorage {
       
       if (snapshot.empty) return undefined;
       const doc = snapshot.docs[0];
-      return { id: doc.id, ...doc.data() } as TaxProfile;
+      return { id: doc.id, ...doc.data() } as unknown as TaxProfile;
     } catch (error) {
       console.error('Error getting tax profile:', error);
       return undefined;
@@ -357,7 +357,7 @@ export class FirestoreStorage implements IStorage {
       ...profileData,
       createdAt: new Date(),
       updatedAt: new Date(),
-    } as TaxProfile;
+    } as unknown as TaxProfile;
     
     await this.db.collection('taxProfiles').doc(id).set(profile);
     return profile;
@@ -372,7 +372,7 @@ export class FirestoreStorage implements IStorage {
     await docRef.update(updateData);
     
     const doc = await docRef.get();
-    return { id: doc.id, ...doc.data() } as TaxProfile;
+    return { id: doc.id, ...doc.data() } as unknown as TaxProfile;
   }
 
   async getUserTaxProfiles(userId: string): Promise<TaxProfile[]> {
@@ -381,7 +381,7 @@ export class FirestoreStorage implements IStorage {
       .orderBy('assessmentYear')
       .get();
     
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as TaxProfile));
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as unknown as TaxProfile));
   }
 
   // ==========================================
@@ -394,7 +394,7 @@ export class FirestoreStorage implements IStorage {
       id,
       ...transactionData,
       createdAt: new Date(),
-    } as CryptoTransaction;
+    } as unknown as CryptoTransaction;
     
     await this.db.collection('cryptoTransactions').doc(id).set(transaction);
     return transaction;
@@ -408,7 +408,7 @@ export class FirestoreStorage implements IStorage {
     }
     
     const snapshot = await query.orderBy('transactionDate').get();
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as CryptoTransaction));
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as unknown as CryptoTransaction));
   }
 
   async updateCryptoTransaction(id: string, transactionData: Partial<InsertCryptoTransaction>): Promise<CryptoTransaction> {
@@ -416,7 +416,7 @@ export class FirestoreStorage implements IStorage {
     await docRef.update(transactionData);
     
     const doc = await docRef.get();
-    return { id: doc.id, ...doc.data() } as CryptoTransaction;
+    return { id: doc.id, ...doc.data() } as unknown as CryptoTransaction;
   }
 
   async deleteCryptoTransaction(id: string): Promise<void> {
@@ -429,7 +429,7 @@ export class FirestoreStorage implements IStorage {
 
   async getMutualFunds(): Promise<MutualFund[]> {
     const snapshot = await this.db.collection('mutualFunds').get();
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as MutualFund));
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as unknown as MutualFund));
   }
 
   async getMutualFundByCode(schemeCode: string): Promise<MutualFund | undefined> {
@@ -440,7 +440,7 @@ export class FirestoreStorage implements IStorage {
     
     if (snapshot.empty) return undefined;
     const doc = snapshot.docs[0];
-    return { id: doc.id, ...doc.data() } as MutualFund;
+    return { id: doc.id, ...doc.data() } as unknown as MutualFund;
   }
 
   async createMutualFund(insertFund: InsertMutualFund): Promise<MutualFund> {
@@ -450,7 +450,7 @@ export class FirestoreStorage implements IStorage {
       ...insertFund,
       createdAt: new Date(),
       updatedAt: new Date()
-    } as MutualFund;
+    } as unknown as MutualFund;
     
     await this.db.collection('mutualFunds').doc(id).set(fund);
     return fund;
@@ -461,7 +461,7 @@ export class FirestoreStorage implements IStorage {
       const docRef = this.db.collection('mutualFunds').doc(id);
       await docRef.update({ ...updateData, updatedAt: new Date() });
       const doc = await docRef.get();
-      return { id: doc.id, ...doc.data() } as MutualFund;
+      return { id: doc.id, ...doc.data() } as unknown as MutualFund;
     } catch (error) {
       return undefined;
     }
@@ -469,7 +469,7 @@ export class FirestoreStorage implements IStorage {
 
   async getMarketData(): Promise<MarketData[]> {
     const snapshot = await this.db.collection('marketData').get();
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as MarketData));
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as unknown as MarketData));
   }
 
   async getMarketDataBySymbol(symbol: string): Promise<MarketData | undefined> {
@@ -480,7 +480,7 @@ export class FirestoreStorage implements IStorage {
     
     if (snapshot.empty) return undefined;
     const doc = snapshot.docs[0];
-    return { id: doc.id, ...doc.data() } as MarketData;
+    return { id: doc.id, ...doc.data() } as unknown as MarketData;
   }
 
   async createMarketData(insertData: InsertMarketData): Promise<MarketData> {
@@ -489,7 +489,7 @@ export class FirestoreStorage implements IStorage {
       id,
       ...insertData,
       updatedAt: new Date()
-    } as MarketData;
+    } as unknown as MarketData;
     
     await this.db.collection('marketData').doc(id).set(data);
     return data;
@@ -500,7 +500,7 @@ export class FirestoreStorage implements IStorage {
       const docRef = this.db.collection('marketData').doc(id);
       await docRef.update({ ...updateData, updatedAt: new Date() });
       const doc = await docRef.get();
-      return { id: doc.id, ...doc.data() } as MarketData;
+      return { id: doc.id, ...doc.data() } as unknown as MarketData;
     } catch (error) {
       return undefined;
     }
@@ -514,7 +514,7 @@ export class FirestoreStorage implements IStorage {
     }
     
     const snapshot = await query.get();
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as NewsArticle));
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as unknown as NewsArticle));
   }
 
   async createNewsArticle(insertArticle: InsertNewsArticle): Promise<NewsArticle> {
@@ -523,7 +523,7 @@ export class FirestoreStorage implements IStorage {
       id,
       ...insertArticle,
       createdAt: new Date()
-    } as NewsArticle;
+    } as unknown as NewsArticle;
     
     await this.db.collection('newsArticles').doc(id).set(article);
     return article;
@@ -531,7 +531,7 @@ export class FirestoreStorage implements IStorage {
 
   async getIPOData(): Promise<IPOData[]> {
     const snapshot = await this.db.collection('ipoData').get();
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as IPOData));
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as unknown as IPOData));
   }
 
   async createIPOData(insertIPO: InsertIPOData): Promise<IPOData> {
@@ -540,7 +540,7 @@ export class FirestoreStorage implements IStorage {
       id,
       ...insertIPO,
       createdAt: new Date()
-    } as IPOData;
+    } as unknown as IPOData;
     
     await this.db.collection('ipoData').doc(id).set(ipo);
     return ipo;
@@ -556,7 +556,7 @@ export class FirestoreStorage implements IStorage {
         .where('userId', '==', userId)
         .get();
       
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as TaxDocument));
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as unknown as TaxDocument));
     } catch (error) {
       console.error('Error getting tax documents:', error);
       return [];
@@ -571,7 +571,7 @@ export class FirestoreStorage implements IStorage {
     try {
       const doc = await this.db.collection('taxDocuments').doc(id).get();
       if (!doc.exists) return undefined;
-      return { id: doc.id, ...doc.data() } as TaxDocument;
+      return { id: doc.id, ...doc.data() } as unknown as TaxDocument;
     } catch (error) {
       console.error('Error getting tax document:', error);
       return undefined;
@@ -598,7 +598,7 @@ export class FirestoreStorage implements IStorage {
         errorMessage: null,
         createdAt: new Date(),
         updatedAt: new Date()
-      } as TaxDocument;
+      } as unknown as TaxDocument;
       
       await this.db.collection('taxDocuments').doc(id).set(document);
       return document;
@@ -613,7 +613,7 @@ export class FirestoreStorage implements IStorage {
       const docRef = this.db.collection('taxDocuments').doc(id);
       await docRef.update({ ...updateData, updatedAt: new Date() });
       const doc = await docRef.get();
-      return { id: doc.id, ...doc.data() } as TaxDocument;
+      return { id: doc.id, ...doc.data() } as unknown as TaxDocument;
     } catch (error) {
       console.error('Error updating tax document:', error);
       return undefined;
@@ -643,7 +643,7 @@ export class FirestoreStorage implements IStorage {
       
       if (snapshot.empty) return undefined;
       const doc = snapshot.docs[0];
-      return { id: doc.id, ...doc.data() } as ExtractedTaxData;
+      return { id: doc.id, ...doc.data() } as unknown as ExtractedTaxData;
     } catch (error) {
       console.error('Error getting extracted tax data:', error);
       return undefined;
@@ -658,7 +658,7 @@ export class FirestoreStorage implements IStorage {
         ...insertData,
         extractedAt: new Date(),
         createdAt: new Date()
-      } as ExtractedTaxData;
+      } as unknown as ExtractedTaxData;
       
       await this.db.collection('extractedTaxData').doc(id).set(data);
       return data;
@@ -673,7 +673,7 @@ export class FirestoreStorage implements IStorage {
       const docRef = this.db.collection('extractedTaxData').doc(id);
       await docRef.update(updateData);
       const doc = await docRef.get();
-      return { id: doc.id, ...doc.data() } as ExtractedTaxData;
+      return { id: doc.id, ...doc.data() } as unknown as ExtractedTaxData;
     } catch (error) {
       console.error('Error updating extracted tax data:', error);
       return undefined;
@@ -690,7 +690,7 @@ export class FirestoreStorage implements IStorage {
         .where('userId', '==', userId)
         .get();
       
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Firm));
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as unknown as Firm));
     } catch (error) {
       console.error('Error getting firms:', error);
       return [];
@@ -701,7 +701,7 @@ export class FirestoreStorage implements IStorage {
     try {
       const doc = await this.db.collection('firms').doc(id).get();
       if (!doc.exists) return undefined;
-      return { id: doc.id, ...doc.data() } as Firm;
+      return { id: doc.id, ...doc.data() } as unknown as Firm;
     } catch (error) {
       console.error('Error getting firm:', error);
       return undefined;
@@ -715,7 +715,7 @@ export class FirestoreStorage implements IStorage {
       ...firmData,
       createdAt: new Date(),
       updatedAt: new Date()
-    } as Firm;
+    } as unknown as Firm;
     
     await this.db.collection('firms').doc(id).set(firm);
     return firm;
@@ -726,7 +726,7 @@ export class FirestoreStorage implements IStorage {
     await docRef.update({ ...firmData, updatedAt: new Date() });
     
     const doc = await docRef.get();
-    return { id: doc.id, ...doc.data() } as Firm;
+    return { id: doc.id, ...doc.data() } as unknown as Firm;
   }
 
   async deleteFirm(id: string): Promise<void> {
@@ -743,7 +743,7 @@ export class FirestoreStorage implements IStorage {
         .where('firmId', '==', firmId)
         .get();
       
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Client));
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as unknown as Client));
     } catch (error) {
       console.error('Error getting clients:', error);
       return [];
@@ -754,7 +754,7 @@ export class FirestoreStorage implements IStorage {
     try {
       const doc = await this.db.collection('clients').doc(id).get();
       if (!doc.exists) return undefined;
-      return { id: doc.id, ...doc.data() } as Client;
+      return { id: doc.id, ...doc.data() } as unknown as Client;
     } catch (error) {
       console.error('Error getting client:', error);
       return undefined;
@@ -768,7 +768,7 @@ export class FirestoreStorage implements IStorage {
       ...clientData,
       createdAt: new Date(),
       updatedAt: new Date()
-    } as Client;
+    } as unknown as Client;
     
     await this.db.collection('clients').doc(id).set(client);
     return client;
@@ -779,7 +779,7 @@ export class FirestoreStorage implements IStorage {
     await docRef.update({ ...clientData, updatedAt: new Date() });
     
     const doc = await docRef.get();
-    return { id: doc.id, ...doc.data() } as Client;
+    return { id: doc.id, ...doc.data() } as unknown as Client;
   }
 
   async deleteClient(id: string): Promise<void> {
@@ -796,7 +796,7 @@ export class FirestoreStorage implements IStorage {
         .where('firmId', '==', firmId)
         .get();
       
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Invoice));
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as unknown as Invoice));
     } catch (error) {
       console.error('Error getting invoices:', error);
       return [];
@@ -807,7 +807,7 @@ export class FirestoreStorage implements IStorage {
     try {
       const doc = await this.db.collection('invoices').doc(id).get();
       if (!doc.exists) return undefined;
-      return { id: doc.id, ...doc.data() } as Invoice;
+      return { id: doc.id, ...doc.data() } as unknown as Invoice;
     } catch (error) {
       console.error('Error getting invoice:', error);
       return undefined;
@@ -821,7 +821,7 @@ export class FirestoreStorage implements IStorage {
       ...invoiceData,
       createdAt: new Date(),
       updatedAt: new Date()
-    } as Invoice;
+    } as unknown as Invoice;
     
     await this.db.collection('invoices').doc(id).set(invoice);
     return invoice;
@@ -832,7 +832,7 @@ export class FirestoreStorage implements IStorage {
     await docRef.update({ ...invoiceData, updatedAt: new Date() });
     
     const doc = await docRef.get();
-    return { id: doc.id, ...doc.data() } as Invoice;
+    return { id: doc.id, ...doc.data() } as unknown as Invoice;
   }
 
   async deleteInvoice(id: string): Promise<void> {
@@ -849,7 +849,7 @@ export class FirestoreStorage implements IStorage {
         .where('invoiceId', '==', invoiceId)
         .get();
       
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as InvoiceItem));
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as unknown as InvoiceItem));
     } catch (error) {
       console.error('Error getting invoice items:', error);
       return [];
@@ -862,7 +862,7 @@ export class FirestoreStorage implements IStorage {
       id,
       ...itemData,
       createdAt: new Date()
-    } as InvoiceItem;
+    } as unknown as InvoiceItem;
     
     await this.db.collection('invoiceItems').doc(id).set(item);
     return item;
@@ -873,7 +873,7 @@ export class FirestoreStorage implements IStorage {
     await docRef.update(itemData);
     
     const doc = await docRef.get();
-    return { id: doc.id, ...doc.data() } as InvoiceItem;
+    return { id: doc.id, ...doc.data() } as unknown as InvoiceItem;
   }
 
   async deleteInvoiceItem(id: string): Promise<void> {
@@ -894,7 +894,7 @@ export class FirestoreStorage implements IStorage {
       
       if (snapshot.empty) return undefined;
       const doc = snapshot.docs[0];
-      return { id: doc.id, ...doc.data() } as SalesRegister;
+      return { id: doc.id, ...doc.data() } as unknown as SalesRegister;
     } catch (error) {
       console.error('Error getting sales register:', error);
       return undefined;
@@ -909,7 +909,7 @@ export class FirestoreStorage implements IStorage {
         const docRef = this.db.collection('salesRegister').doc(existing.id);
         await docRef.update({ ...data, updatedAt: new Date() });
         const doc = await docRef.get();
-        return { id: doc.id, ...doc.data() } as SalesRegister;
+        return { id: doc.id, ...doc.data() } as unknown as SalesRegister;
       } else {
         const id = randomUUID();
         const register: SalesRegister = {
@@ -919,7 +919,7 @@ export class FirestoreStorage implements IStorage {
           ...data,
           createdAt: new Date(),
           updatedAt: new Date()
-        } as SalesRegister;
+        } as unknown as SalesRegister;
         
         await this.db.collection('salesRegister').doc(id).set(register);
         return register;
@@ -937,7 +937,7 @@ export class FirestoreStorage implements IStorage {
         .orderBy('month', 'desc')
         .get();
       
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as SalesRegister));
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as unknown as SalesRegister));
     } catch (error) {
       console.error('Error getting all sales registers:', error);
       return [];
@@ -958,7 +958,7 @@ export class FirestoreStorage implements IStorage {
       
       if (snapshot.empty) return undefined;
       const doc = snapshot.docs[0];
-      return { id: doc.id, ...doc.data() } as PurchaseRegister;
+      return { id: doc.id, ...doc.data() } as unknown as PurchaseRegister;
     } catch (error) {
       console.error('Error getting purchase register:', error);
       return undefined;
@@ -972,7 +972,7 @@ export class FirestoreStorage implements IStorage {
         .orderBy('month', 'desc')
         .get();
       
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as PurchaseRegister));
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as unknown as PurchaseRegister));
     } catch (error) {
       console.error('Error getting all purchase registers:', error);
       return [];
@@ -987,7 +987,7 @@ export class FirestoreStorage implements IStorage {
         const docRef = this.db.collection('purchaseRegister').doc(existing.id);
         await docRef.update({ ...data, updatedAt: new Date() });
         const doc = await docRef.get();
-        return { id: doc.id, ...doc.data() } as PurchaseRegister;
+        return { id: doc.id, ...doc.data() } as unknown as PurchaseRegister;
       } else {
         const id = randomUUID();
         const register: PurchaseRegister = {
@@ -997,7 +997,7 @@ export class FirestoreStorage implements IStorage {
           ...data,
           createdAt: new Date(),
           updatedAt: new Date()
-        } as PurchaseRegister;
+        } as unknown as PurchaseRegister;
         
         await this.db.collection('purchaseRegister').doc(id).set(register);
         return register;
@@ -1021,17 +1021,17 @@ export class FirestoreStorage implements IStorage {
         .get();
       
       const results = snapshot.docs.map(doc => {
-        const data = doc.data();
+        const data = doc.data() as Record<string, any>;
         return {
           id: doc.id,
           ...data,
-          createdAt: data.createdAt?.toDate?.() || data.createdAt,
-          expiresAt: data.expiresAt?.toDate?.() || data.expiresAt,
-        } as TaxCalculationHistory;
+          createdAt: data['createdAt']?.toDate?.() || data['createdAt'],
+          expiresAt: data['expiresAt']?.toDate?.() || data['expiresAt'],
+        } as unknown as TaxCalculationHistory;
       });
-      
+
       return results
-        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .sort((a, b) => new Date(b.calculatedAt as string).getTime() - new Date(a.calculatedAt as string).getTime())
         .slice(0, 10);
     } catch (error) {
       console.error('Error getting tax calculation history:', error);
@@ -1044,13 +1044,13 @@ export class FirestoreStorage implements IStorage {
       const doc = await this.db.collection('taxCalculationHistory').doc(id).get();
       if (!doc.exists) return undefined;
       
-      const data = doc.data();
+      const data = doc.data() as Record<string, any>;
       return {
         id: doc.id,
         ...data,
-        createdAt: data?.createdAt?.toDate?.() || data?.createdAt,
-        expiresAt: data?.expiresAt?.toDate?.() || data?.expiresAt,
-      } as TaxCalculationHistory;
+        createdAt: data?.['createdAt']?.toDate?.() || data?.['createdAt'],
+        expiresAt: data?.['expiresAt']?.toDate?.() || data?.['expiresAt'],
+      } as unknown as TaxCalculationHistory;
     } catch (error) {
       console.error('Error getting tax calculation:', error);
       return undefined;
@@ -1065,10 +1065,10 @@ export class FirestoreStorage implements IStorage {
       
       if (existingCalcs.docs.length >= 10) {
         const sortedDocs = existingCalcs.docs
-          .map(doc => ({ doc, data: doc.data() }))
+          .map(doc => ({ doc, data: doc.data() as Record<string, any> }))
           .sort((a, b) => {
-            const dateA = a.data.createdAt?.toDate?.() || new Date(a.data.createdAt);
-            const dateB = b.data.createdAt?.toDate?.() || new Date(b.data.createdAt);
+            const dateA = a.data['createdAt']?.toDate?.() || new Date(a.data['createdAt']);
+            const dateB = b.data['createdAt']?.toDate?.() || new Date(b.data['createdAt']);
             return dateB.getTime() - dateA.getTime();
           });
         
@@ -1083,7 +1083,7 @@ export class FirestoreStorage implements IStorage {
         id,
         ...data,
         createdAt: new Date(),
-      } as TaxCalculationHistory;
+      } as unknown as TaxCalculationHistory;
       
       await this.db.collection('taxCalculationHistory').doc(id).set(calculation);
       return calculation;

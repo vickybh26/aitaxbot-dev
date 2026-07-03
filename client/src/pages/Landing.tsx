@@ -313,10 +313,10 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
           <div className="max-w-7xl mx-auto px-4">
             <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-slate-200">
               {[
-                { val: "₹12L",  label: "Zero tax limit",     sub: "New Regime FY 2026-27",     ref: s1.ref },
-                { val: "₹75K",  label: "Standard deduction", sub: "For salaried employees",    ref: s2.ref },
-                { val: "18+",         label: "Free tools",         sub: "Calculators & generators",  ref: s3.ref },
-                { val: "5 min",       label: "Time to clarity",    sub: "ITR complexity decoded",    ref: s4.ref },
+                { val: `₹${s1.count}L`,  label: "Zero tax limit",     sub: "New Regime FY 2026-27",     ref: s1.ref },
+                { val: `₹${s2.count}K`,  label: "Standard deduction", sub: "For salaried employees",    ref: s2.ref },
+                { val: `${s3.count}+`,         label: "Free tools",         sub: "Calculators & generators",  ref: s3.ref },
+                { val: `${s4.count} min`,       label: "Time to clarity",    sub: "ITR complexity decoded",    ref: s4.ref },
               ].map(({ val, label, sub, ref }) => (
                 <div key={label} ref={ref} className="text-center px-6 py-8">
                   <div className="text-3xl font-black text-slate-900 tracking-tight mb-1">{val}</div>
@@ -540,9 +540,9 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
             </div>
             <div className="grid md:grid-cols-3 gap-6">
               {[
-                { num: "01", icon: <Users className="h-6 w-6 text-blue-600" />,        bg: "bg-blue-50",    title: "Pick your profile",  desc: "Salaried, freelancer, or investor — choose what fits. Takes 10 seconds." },
+                { num: "01", icon: <FileText className="h-6 w-6 text-blue-600" />,     bg: "bg-blue-50",    title: "Enter your income",  desc: "Input your salary, business, capital gains, or other income. Takes 10 seconds." },
                 { num: "02", icon: <Calculator className="h-6 w-6 text-emerald-600" />, bg: "bg-emerald-50", title: "Enter deductions",    desc: "Add 80C, HRA, home loan interest — only what applies to you." },
-                { num: "03", icon: <BarChart2 className="h-6 w-6 text-orange-500" />,   bg: "bg-orange-50",  title: "See your result",     desc: "Old vs New Regime comparison. Know exactly which saves you more." },
+                { num: "03", icon: <BarChart2 className="h-6 w-6 text-orange-500" />,   bg: "bg-orange-50",  title: "See your result",     desc: "Get a side-by-side Old vs New Regime comparison with personalized AI tax tips." },
               ].map(({ num, icon, bg, title, desc }) => (
                 <div key={num} className="relative p-6 bg-white rounded-2xl border border-slate-200">
                   <div className="text-6xl font-black text-slate-100 absolute top-4 right-4 leading-none select-none">{num}</div>

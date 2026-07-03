@@ -14,10 +14,10 @@ declare global {
   }
 }
 
-export function AdBanner({
-  slot,
-  format = 'auto',
-  responsive = true,
+export function AdBanner({ 
+  slot, 
+  format = 'auto', 
+  responsive = true, 
   style,
   className = ""
 }: AdBannerProps) {

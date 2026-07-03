@@ -58,13 +58,34 @@ export async function setupVite(app: Express, server: Server) {
         `src="/src/main.tsx"`,
         `src="/src/main.tsx?v=${nanoid()}"`,
       );
-      const page = await vite.transformIndexHtml(url, template);
+
+      let page = await vite.transformIndexHtml(url, template);
+
+      // Inject CSP nonce into inline scripts (dev mode)
+      const nonce = res.locals.cspNonce as string | undefined;
+      if (nonce) {
+        page = injectNonce(page, nonce);
+      }
+
       res.status(200).set({ "Content-Type": "text/html" }).end(page);
     } catch (e) {
       vite.ssrFixStacktrace(e as Error);
       next(e);
     }
   });
+}
+
+/**
+ * Injects a CSP nonce into all <script> tags (except JSON-LD data blocks)
+ * in the given HTML string.
+ */
+function injectNonce(html: string, nonce: string): string {
+  // Match opening <script> tags that are NOT type="application/ld+json"
+  // (those are data blocks, not executable scripts — CSP does not restrict them)
+  return html.replace(
+    /<script\b(?![^>]*\btype=["']application\/ld\+json["'])/gi,
+    `<script nonce="${nonce}"`,
+  );
 }
 
 export function serveStatic(app: Express) {
@@ -76,10 +97,22 @@ export function serveStatic(app: Express) {
     );
   }
 
+  // Serve static assets (JS bundles, CSS, images, etc.) — these have no inline
+  // scripts so no nonce injection is needed.
   app.use(express.static(distPath));
 
-  // fall through to index.html if the file doesn't exist
+  // Cache the HTML template in memory (read once, inject nonce per request).
+  let htmlTemplate: string | null = null;
+  const indexPath = path.resolve(distPath, "index.html");
+
+  // SPA fallback: serve index.html dynamically so the CSP nonce can be
+  // injected into the two inline scripts (GTM config + Clarity snippet).
   app.use("*", (_req, res) => {
-    res.sendFile(path.resolve(distPath, "index.html"));
+    if (!htmlTemplate) {
+      htmlTemplate = fs.readFileSync(indexPath, "utf-8");
+    }
+    const nonce = res.locals.cspNonce as string | undefined;
+    const html = nonce ? injectNonce(htmlTemplate, nonce) : htmlTemplate;
+    res.set("Content-Type", "text/html").send(html);
   });
 }

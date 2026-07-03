@@ -31,7 +31,7 @@ async function requireAdmin(req: any, res: any, next: any): Promise<any> {
     if (!adminDoc.exists) {
       return res.status(403).json({ error: "Not an admin account" });
     }
-    const level = Number(adminDoc.data()!.level);
+    const level = Number((adminDoc.data()! as any).level);
     if (!Number.isInteger(level) || level < 1 || level > 3) {
       return res.status(403).json({ error: "Invalid admin level" });
     }

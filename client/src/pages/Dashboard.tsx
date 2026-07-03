@@ -17,7 +17,6 @@ import {
   ArrowRight,
   User,
   Activity,
-  CreditCard,
   DollarSign,
   Loader2,
   Download,
@@ -591,7 +590,7 @@ export default function Dashboard() {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-900">Saved Tax Calculations</h2>
-            <Link href="/">
+            <Link href="/calculators/income-tax">
               <Button variant="outline" className="text-blue-600 border-blue-600 hover:bg-blue-50">
                 <Calculator className="h-4 w-4 mr-2" />
                 New Calculation
@@ -609,7 +608,7 @@ export default function Dashboard() {
                   <Calculator className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-600 mb-2">No saved calculations</p>
                   <p className="text-sm text-gray-500 mb-4">Use the Income Tax Calculator and click "Save Calculation" to store your results here.</p>
-                  <Link href="/">
+                  <Link href="/calculators/income-tax">
                     <Button variant="default">
                       Go to Tax Calculator
                     </Button>

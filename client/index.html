@@ -1,6 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <!-- Client-Side Debug/Error Logger -->
+    <script>
+      (function() {
+        function logError(type, payload) {
+          console.error('[' + type + ']', payload);
+          var div = document.getElementById('debug-error-banner');
+          if (!div) {
+            div = document.createElement('div');
+            div.id = 'debug-error-banner';
+            div.style.position = 'fixed';
+            div.style.top = '0';
+            div.style.left = '0';
+            div.style.width = '100%';
+            div.style.background = '#fee2e2';
+            div.style.color = '#991b1b';
+            div.style.padding = '20px';
+            div.style.borderBottom = '4px solid #f87171';
+            div.style.zIndex = '99999999';
+            div.style.fontFamily = 'monospace';
+            div.style.fontSize = '14px';
+            div.style.whiteSpace = 'pre-wrap';
+            div.style.overflow = 'auto';
+            div.style.maxHeight = '50vh';
+            if (document.body) {
+              document.body.appendChild(div);
+            } else {
+              document.documentElement.appendChild(div);
+            }
+          }
+          div.textContent = '❌ CLIENT ERROR: ' + type + '\n\n' + JSON.stringify(payload, null, 2);
+
+          fetch('/api/logs/client', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: type, payload: payload })
+          }).catch(function() {});
+        }
+
+        window.onerror = function(msg, url, line, col, err) {
+          logError('onerror', { message: msg, url: url, line: line, col: col, stack: err ? err.stack : null });
+          return false;
+        };
+
+        window.onunhandledrejection = function(event) {
+          logError('onunhandledrejection', {
+            reason: event.reason ? (event.reason.message || String(event.reason)) : null,
+            stack: (event.reason && event.reason.stack) ? event.reason.stack : null
+          });
+        };
+      })();
+    </script>
+
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-9NMYMNBYFV"></script>
     <script>

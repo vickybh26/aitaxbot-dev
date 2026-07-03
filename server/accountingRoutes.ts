@@ -77,7 +77,7 @@ router.get("/dashboard/activities", authenticateFirebaseToken, async (req: Authe
     const topInvoices = allInvoices.slice(0, 10);
 
     // Step 4: fetch only the unique clients we actually need (de-duplicated batch)
-    const uniqueClientIds = [...new Set(topInvoices.map((i) => i.clientId).filter(Boolean))];
+    const uniqueClientIds = Array.from(new Set(topInvoices.map((i) => i.clientId).filter(Boolean)));
     const clientDocs = await Promise.all(uniqueClientIds.map((id) => storage.getClient(id as string)));
     const clientMap = new Map(
       clientDocs.filter(Boolean).map((c) => [c!.id, c!])

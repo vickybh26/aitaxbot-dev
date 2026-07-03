@@ -16,11 +16,13 @@ import {
 } from "lucide-react";
 import { getBlogPost } from "@/data/blogPosts";
 import { ResponsiveAd, RectangleAd } from "@/components/AdBanner";
+import { useToast } from "@/hooks/use-toast";
 
 export default function BlogPost() {
   const [match, params] = useRoute("/blog/:slug");
   const slug = params?.slug || "";
   const post = getBlogPost(slug);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (post) {
@@ -51,6 +53,12 @@ export default function BlogPost() {
         title: post.metaTitle,
         text: post.metaDescription,
         url: window.location.href,
+      }).catch(err => console.log('Error sharing:', err));
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      toast({
+        title: "Link Copied!",
+        description: "Blog post link copied to clipboard.",
       });
     }
   };

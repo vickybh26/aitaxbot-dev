@@ -384,7 +384,7 @@ export default function AIS26ASForm16Tool() {
 
         {/* ── Hero ───────────────────────────────────────────────────────── */}
         <div className="bg-gradient-to-br from-blue-700 via-blue-800 to-indigo-900 text-white">
-          <div className="max-w-4xl mx-auto px-4 py-10 text-center">
+          <div className="max-w-4xl mx-auto px-6 py-10 text-center">
             <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
               <span className="inline-flex items-center gap-1.5 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">
                 <Clock className="w-3 h-3" /> ITR Deadline: July 31, 2026
@@ -409,7 +409,7 @@ export default function AIS26ASForm16Tool() {
           </div>
         </div>
 
-        <div className="max-w-4xl mx-auto px-4 py-7 space-y-5">
+        <div className="max-w-4xl mx-auto px-6 py-7 space-y-5">
 
           {/* ── Auth gate ─────────────────────────────────────────────────── */}
           {!isAuthenticated && (

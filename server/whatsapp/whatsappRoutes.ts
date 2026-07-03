@@ -85,7 +85,7 @@ function safeEqual(a: string, b: string): boolean {
 // Previously accepted the key via query string, which leaks into access logs,
 // browser history, referer headers, and analytics tools. Moved to
 // Authorization: Bearer header + timing-safe compare.
-router.get("/whatsapp/leads", (req: Request, res: Response) => {
+router.get("/whatsapp/leads", async (req: Request, res: Response) => {
   const adminKey = process.env.ADMIN_KEY;
   if (!adminKey) {
     res.status(503).json({ error: "Admin auth not configured" });
@@ -101,7 +101,7 @@ router.get("/whatsapp/leads", (req: Request, res: Response) => {
     res.status(401).json({ error: "Unauthorized" });
     return;
   }
-  const leads = getAllLeads();
+  const leads = await getAllLeads();
   res.json({
     total: leads.length,
     leads,

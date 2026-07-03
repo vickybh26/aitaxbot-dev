@@ -1,82 +1,75 @@
 /**
  * leadsStore.ts
- * Simple JSON-file CRM for WhatsApp leads.
- * Stores every user who contacts AiTaxBot on WhatsApp.
- * No dependencies — just Node.js fs.
+ * Firestore-backed CRM for WhatsApp leads.
+ * Migrated from flat JSON file to avoid race conditions under concurrent writes
+ * and to prevent PII accumulation on disk.
+ *
+ * Firestore collection: "whatsapp_leads"
+ * Document ID: phone number (E.164 without '+', e.g. "919876543210")
  */
 
-import fs from "fs";
-import path from "path";
-
-const LEADS_FILE = path.join(process.cwd(), "server", "whatsapp", "leads.json");
+import { getFirestore } from "../firebase.js";
 
 export interface Lead {
-  phone: string;           // WhatsApp phone number (E.164, e.g. "919876543210")
-  name: string;            // Collected during onboarding
-  firstContact: string;    // ISO timestamp of first message
-  lastContact: string;     // ISO timestamp of most recent message
-  messageCount: number;    // Total messages received
-  queryType: string;       // Last detected intent (e.g. "HRA", "ITR", "general")
-  notes: string;           // Any freeform notes (auto-populated by bot)
+  phone: string;        // WhatsApp phone number (E.164, e.g. "919876543210")
+  name: string;         // Collected during onboarding
+  firstContact: string; // ISO timestamp of first message
+  lastContact: string;  // ISO timestamp of most recent message
+  messageCount: number; // Total messages received
+  queryType: string;    // Last detected intent (e.g. "HRA", "ITR", "general")
+  notes: string;        // Any freeform notes (auto-populated by bot)
 }
 
-// ── In-memory cache ──────────────────────────────────────────────────────────
-let leadsCache: Record<string, Lead> = {};
-let loaded = false;
+const COLLECTION = "whatsapp_leads";
 
-function load(): void {
-  if (loaded) return;
-  try {
-    if (fs.existsSync(LEADS_FILE)) {
-      const raw = fs.readFileSync(LEADS_FILE, "utf-8");
-      leadsCache = JSON.parse(raw);
-    } else {
-      leadsCache = {};
-      save();
-    }
-  } catch {
-    leadsCache = {};
-  }
-  loaded = true;
-}
+// ── Public API ────────────────────────────────────────────────────────────────
 
-function save(): void {
+export async function getLead(phone: string): Promise<Lead | null> {
   try {
-    fs.writeFileSync(LEADS_FILE, JSON.stringify(leadsCache, null, 2), "utf-8");
+    const db = getFirestore();
+    const doc = await db.collection(COLLECTION).doc(phone).get();
+    if (!doc.exists) return null;
+    return doc.data() as Lead;
   } catch (err) {
-    console.error("[WhatsApp CRM] Failed to save leads:", err);
+    console.error("[WhatsApp CRM] getLead failed:", err);
+    return null;
   }
 }
 
-// ── Public API ───────────────────────────────────────────────────────────────
-
-export function getLead(phone: string): Lead | null {
-  load();
-  return leadsCache[phone] || null;
-}
-
-export function upsertLead(phone: string, update: Partial<Lead>): Lead {
-  load();
+export async function upsertLead(phone: string, update: Partial<Lead>): Promise<Lead> {
+  const db = getFirestore();
+  const ref = db.collection(COLLECTION).doc(phone);
   const now = new Date().toISOString();
-  const existing = leadsCache[phone];
 
-  leadsCache[phone] = {
-    phone,
-    name: update.name ?? existing?.name ?? "",
-    firstContact: existing?.firstContact ?? now,
-    lastContact: now,
-    messageCount: (existing?.messageCount ?? 0) + 1,
-    queryType: update.queryType ?? existing?.queryType ?? "unknown",
-    notes: update.notes ?? existing?.notes ?? "",
-  };
+  // Use a Firestore transaction to atomically increment messageCount
+  const lead = await db.runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    const existing = snap.exists ? (snap.data() as Lead) : null;
 
-  save();
-  return leadsCache[phone];
+    const updated: Lead = {
+      phone,
+      name:         update.name        ?? existing?.name        ?? "",
+      firstContact: existing?.firstContact                       ?? now,
+      lastContact:  now,
+      messageCount: (existing?.messageCount ?? 0) + 1,
+      queryType:    update.queryType   ?? existing?.queryType   ?? "unknown",
+      notes:        update.notes       ?? existing?.notes       ?? "",
+    };
+
+    tx.set(ref as FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>, updated as FirebaseFirestore.DocumentData);
+    return updated;
+  });
+
+  return lead;
 }
 
-export function getAllLeads(): Lead[] {
-  load();
-  return Object.values(leadsCache).sort(
-    (a, b) => new Date(b.lastContact).getTime() - new Date(a.lastContact).getTime()
-  );
+export async function getAllLeads(): Promise<Lead[]> {
+  try {
+    const db = getFirestore();
+    const snap = await db.collection(COLLECTION).orderBy("lastContact", "desc").get();
+    return snap.docs.map((d) => d.data() as Lead);
+  } catch (err) {
+    console.error("[WhatsApp CRM] getAllLeads failed:", err);
+    return [];
+  }
 }

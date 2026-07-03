@@ -67,3 +67,4 @@ export default function PageHeader({ title, subtitle, breadcrumbs, badge, maxWid
     </header>
   );
 }
+

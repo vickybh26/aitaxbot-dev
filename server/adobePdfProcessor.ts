@@ -69,7 +69,7 @@ export class AdobeTaxDocumentProcessor {
         this.accessToken = null;
       }, 23 * 60 * 60 * 1000); // Refresh after 23 hours
 
-      return this.accessToken;
+      return this.accessToken ?? '';
     } catch (error) {
       console.error('Failed to get Adobe access token:', error);
       throw new Error('Failed to authenticate with Adobe PDF Services');

@@ -27,7 +27,7 @@ export default function PrivacyPolicy() {
         badge="Last Updated: June 20, 2026"
       />
       <div>
-        <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto px-6 py-8">
           <div className="prose prose-lg max-w-none" data-testid="heading-privacy">
 
             {/* Intro */}

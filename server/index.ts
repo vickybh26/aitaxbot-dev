@@ -2,9 +2,11 @@ import express, { type Request, Response, NextFunction } from "express";
 import compression from "compression";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
+import { randomBytes } from "crypto";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { initializeFirebase } from "./firebase";
+import { cleanStalePdfs } from "./pdfGenerator";
 
 // Initialize Firebase on startup
 try {
@@ -16,6 +18,20 @@ try {
   // Don't exit - allow app to start for non-Firebase features
 }
 
+// ── Startup maintenance ───────────────────────────────────────────────────────
+// Remove any temp PDFs left over from previous server runs (older than 5 min)
+cleanStalePdfs();
+
+// ── Security startup warnings ─────────────────────────────────────────────────
+if (process.env.NODE_ENV === 'production' && process.env.APP_CHECK_ENFORCE !== 'true') {
+  console.warn(
+    '⚠️  [Security] APP_CHECK_ENFORCE is not set to "true".\n' +
+    '   Firebase App Check is running in warn-only mode — requests without\n' +
+    '   a valid App Check token are being ALLOWED.\n' +
+    '   Set APP_CHECK_ENFORCE=true in your production environment variables.'
+  );
+}
+
 const app = express();
 
 // Trust the first proxy hop (Railway / Cloud Run / Vercel).
@@ -23,18 +39,31 @@ const app = express();
 app.set("trust proxy", 1);
 
 // ─────────────────────────────────────────────────────────────────────
-// Security headers (helmet) — CSP is permissive to accommodate GA,
-// Google Ads, AdSense, Clarity, Firebase, Gemini, and our own CDN usage.
-// Tighten further once all third-party origins are finalised.
+// CSP nonce — generate a unique nonce for every request so inline
+// scripts (GTM config, Clarity snippet) can be whitelisted without
+// the broad 'unsafe-inline' directive.
+// ─────────────────────────────────────────────────────────────────────
+app.use((_req: Request, res: Response, next: NextFunction) => {
+  res.locals.cspNonce = randomBytes(16).toString("base64url");
+  next();
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// Security headers (helmet) — CSP whitelists external analytics and
+// ad origins, and uses per-request nonces for the two inline scripts
+// in index.html (GTM config + Clarity) instead of 'unsafe-inline'.
 // ─────────────────────────────────────────────────────────────────────
 app.use(helmet({
   contentSecurityPolicy: {
-    useDefaults: true,
+    useDefaults: false,
     directives: {
       "default-src": ["'self'"],
       "script-src": [
         "'self'",
-        "'unsafe-inline'", // needed for inline JSON-LD schema blocks
+        // Per-request nonce for the two inline scripts in index.html.
+        // In dev mode, Vite's HMR also needs 'unsafe-inline' and 'unsafe-eval'
+        (_req: any, res: any) => `'nonce-${res.locals.cspNonce}'`,
+        ...(process.env.NODE_ENV === "development" ? ["'unsafe-inline'", "'unsafe-eval'"] : []),
         "https://www.googletagmanager.com",
         "https://www.google-analytics.com",
         "https://pagead2.googlesyndication.com",
@@ -51,6 +80,7 @@ app.use(helmet({
       "font-src": ["'self'", "data:", "https://fonts.gstatic.com"],
       "connect-src": [
         "'self'",
+        ...(process.env.NODE_ENV === "development" ? ["ws:", "wss:"] : []),
         "https://*.googleapis.com",
         "https://*.firebaseio.com",
         "https://*.firebaseapp.com",
@@ -168,7 +198,7 @@ app.use((req, res, next) => {
   server.listen({
     port,
     host: "0.0.0.0",
-    reusePort: true,
+    reusePort: process.platform !== "win32",
   }, () => {
     log(`serving on port ${port}`);
   });

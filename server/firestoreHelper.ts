@@ -59,7 +59,7 @@ export class FirestoreCollection<T extends { id: string }> {
 
   async getAll(options?: QueryOptions): Promise<T[]> {
     try {
-      let query: FirebaseFirestore.Query = this.collection;
+      let query: FirebaseFirestore.Query<any> = this.collection;
       
       if (options?.orderBy) {
         query = query.orderBy(options.orderBy.field, options.orderBy.direction);
@@ -70,7 +70,7 @@ export class FirestoreCollection<T extends { id: string }> {
       }
       
       const snapshot = await query.get();
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as T));
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as unknown as T));
     } catch (error) {
       console.error(`Error getting all ${this.collectionName}:`, error);
       return [];
@@ -79,7 +79,7 @@ export class FirestoreCollection<T extends { id: string }> {
 
   async query(filters: QueryFilter[], options?: QueryOptions): Promise<T[]> {
     try {
-      let query: FirebaseFirestore.Query = this.collection;
+      let query: FirebaseFirestore.Query<any> = this.collection;
       
       for (const filter of filters) {
         query = query.where(filter.field, filter.operator, filter.value);
@@ -94,7 +94,7 @@ export class FirestoreCollection<T extends { id: string }> {
       }
       
       const snapshot = await query.get();
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as T));
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as unknown as T));
     } catch (error) {
       console.error(`Error querying ${this.collectionName}:`, error);
       return [];
@@ -156,7 +156,7 @@ export class FirestoreCollection<T extends { id: string }> {
 
   async count(filters?: QueryFilter[]): Promise<number> {
     try {
-      let query: FirebaseFirestore.Query = this.collection;
+      let query: FirebaseFirestore.Query<any> = this.collection;
       
       if (filters) {
         for (const filter of filters) {

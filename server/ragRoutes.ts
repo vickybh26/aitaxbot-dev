@@ -121,7 +121,7 @@ async function requireAdminL1(req: Request, res: Response, next: any): Promise<a
       return r.apiError(403, "NOT_ADMIN", "This account does not have admin access.");
     }
 
-    const level = Number(adminDoc.data()!.level);
+    const level = Number((adminDoc.data()! as any).level);
     if (!Number.isInteger(level) || level < 1 || level > 3) {
       return r.apiError(403, "INVALID_ADMIN_LEVEL", "Admin level is missing or invalid.");
     }

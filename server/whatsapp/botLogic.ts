@@ -230,7 +230,7 @@ export async function handleIncomingMessage(body: any): Promise<void> {
 
     // ── Get or init session ────────────────────────────────────────────────
     let session = sessions.get(from);
-    const lead  = getLead(from);
+    const lead  = await getLead(from);
 
     if (!session) {
       session = { state: lead?.name ? "active" : "awaiting_name", name: lead?.name ?? "" };
@@ -241,7 +241,7 @@ export async function handleIncomingMessage(body: any): Promise<void> {
     if (session.state === "awaiting_name") {
       // First message — send welcome and ask name
       if (!lead) {
-        upsertLead(from, { queryType: "new_user" });
+        await upsertLead(from, { queryType: "new_user" });
         await sendMessage(
           from,
           `Welcome to *AiTaxBot!*\n\nI'm your free Indian tax assistant. I can help with:\n• HRA, SIP, NPS, PF, SWP calculators\n• Income tax (New vs Old regime)\n• Rent receipts\n• ITR filing tips\n• Quick tax answers\n\nWhat's your name? I'll personalise your experience.`
@@ -254,7 +254,7 @@ export async function handleIncomingMessage(body: any): Promise<void> {
       session.name  = name;
       session.state = "active";
       sessions.set(from, session);
-      upsertLead(from, { name, queryType: "onboarding" });
+      await upsertLead(from, { name, queryType: "onboarding" });
 
       await sendMessage(
         from,
@@ -268,7 +268,7 @@ export async function handleIncomingMessage(body: any): Promise<void> {
 
     // Menu command
     if (/^menu$|^help$|^hi$|^hello$|^hey$|^start$/i.test(lower)) {
-      upsertLead(from, { queryType: "menu" });
+      await upsertLead(from, { queryType: "menu" });
       await sendMessage(
         from,
         `Hi *${name}!* Here's what I can help with:\n\n*Free Calculators:*\n• HRA\n• SIP\n• SWP\n• NPS\n• PF\n• Income Tax (New vs Old Regime)\n\n*Free Tools:*\n• Rent Receipt Generator\n• NRI Corner (DTAA, NRO/NRE)\n\n*Just type the name* of what you need, or ask a tax question!\n\nAll tools are free at ${BASE_URL}`
@@ -279,13 +279,13 @@ export async function handleIncomingMessage(body: any): Promise<void> {
     // Detect intent and reply
     const match = detectAndReply(text);
     if (match) {
-      upsertLead(from, { queryType: match.intent });
+      await upsertLead(from, { queryType: match.intent });
       await sendMessage(from, match.reply);
       return;
     }
 
     // Fallback — unknown query
-    upsertLead(from, { queryType: "unknown", notes: `Asked: ${text.slice(0, 100)}` });
+    await upsertLead(from, { queryType: "unknown", notes: `Asked: ${text.slice(0, 100)}` });
     await sendMessage(
       from,
       `Thanks *${name}*, I've noted your question: _"${text}"_\n\nI'll get back to you shortly.\n\nMeanwhile, you can explore our free tools at:\n${BASE_URL}\n\nType *menu* to see what I can help with right now.`

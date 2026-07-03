@@ -55,7 +55,7 @@ async function requireAdmin(req: any, res: any, next: any, minLevel = 1) {
     const adminData = adminDoc.data()!;
     // Coerce + validate level strictly. A missing/invalid `level` must FAIL CLOSED,
     // not pass through as undefined (undefined > 1 === false → previous bypass).
-    const level = Number(adminData.level);
+    const level = Number((adminData as any).level);
     if (!Number.isInteger(level) || level < 1 || level > 3) {
       return res.status(403).json({ error: "Invalid admin level" });
     }
@@ -131,7 +131,7 @@ router.get("/stats", adminL3, async (req: any, res) => {
 
     // Build 30-day trend
     const signupsByDay: Record<string, number> = {};
-    trendSnap.docs.forEach((doc) => {
+    trendSnap.docs.forEach((doc: any) => {
       const raw = doc.data().createdAt;
       const createdAt = raw?.toDate?.() ?? new Date(raw);
       const dateKey = createdAt.toISOString().split("T")[0];
@@ -180,9 +180,9 @@ router.get("/analytics", adminL3, async (req: any, res) => {
 
     usersSnap.docs.forEach((doc) => {
       const d = doc.data();
-      const occ      = d.occupation  || "Not specified";
-      const state    = d.state       || "Not specified";
-      const provider = d.authProvider || "google";
+      const occ      = (d as any).occupation  || "Not specified";
+      const state    = (d as any).state       || "Not specified";
+      const provider = (d as any).authProvider || "google";
       occupationCount[occ]   = (occupationCount[occ]   ?? 0) + 1;
       stateCount[state]       = (stateCount[state]       ?? 0) + 1;
       providerCount[provider] = (providerCount[provider] ?? 0) + 1;
