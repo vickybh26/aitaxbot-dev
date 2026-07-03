@@ -10,10 +10,10 @@ import PDFDocument from "pdfkit";
 import { reconcileTaxDocuments, type ReconciliationReport } from "./taxReconcileService.js";
 import { authenticateFirebaseToken, type AuthenticatedRequest } from "./middleware/auth.js";
 
-// ─── Multer: memory storage, 3 PDFs, 10 MB each ──────────────────────────────
+// ─── Multer: memory storage, up to 5 PDFs (AIS + 26AS + up to 3 Form 16s), 10 MB each ──
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024, files: 3 },
+  limits: { fileSize: 10 * 1024 * 1024, files: 5 },
   fileFilter: (_req, file, cb) => {
     if (file.mimetype === "application/pdf" || file.originalname.toLowerCase().endsWith(".pdf")) {
       cb(null, true);
@@ -184,6 +184,38 @@ function generatePDFReport(report: ReconciliationReport): Promise<Buffer> {
     }
 
     // ────────────────────────────────────────────────────────────────────────
+    // MULTIPLE EMPLOYERS — per-employer breakdown + combined estimate
+    // ────────────────────────────────────────────────────────────────────────
+    if (report.multiEmployer && report.multiEmployer.employerCount > 1) {
+      sectionHeader(`Multiple Employers This Year (${report.multiEmployer.employerCount})`);
+
+      report.extractedData.form16Employers.forEach((emp, i) => {
+        ensureSpace(16);
+        doc.fillColor(BLACK).font("Helvetica-Bold").fontSize(8.5)
+           .text(`Employer ${i + 1}: ${pdfSafe(emp.employerName || "Unknown")}`, M, doc.y, { continued: true, width: CW });
+        doc.font("Helvetica").fillColor(GRAY)
+           .text(`   Gross: ${fmtRs(emp.grossSalary)}   TDS: ${fmtRs(emp.totalTaxDeducted)}   Regime: ${emp.newRegime == null ? "Unknown" : emp.newRegime ? "New" : "Old"}`);
+        doc.moveDown(0.15);
+      });
+
+      doc.moveDown(0.2);
+      if (report.multiEmployer.regimeConsistent && report.multiEmployer.estimatedTaxLiability != null) {
+        doc.fillColor(BLACK).font("Helvetica-Bold").fontSize(8.5)
+           .text(`Combined estimated tax liability: ${fmtRs(report.multiEmployer.estimatedTaxLiability)}`, M, doc.y, { width: CW });
+        doc.font("Helvetica").fillColor(GRAY).fontSize(8)
+           .text(`Credited via TDS + advance tax (26AS): ${fmtRs(report.multiEmployer.creditedTax)}`, M, doc.y, { width: CW });
+        if (report.multiEmployer.estimatedShortfall != null && report.multiEmployer.estimatedShortfall > 1000) {
+          doc.fillColor(RED).font("Helvetica-Bold")
+             .text(`Estimated shortfall: ${fmtRs(report.multiEmployer.estimatedShortfall)} — see Issues Found below`, M, doc.y, { width: CW });
+        }
+      } else if (!report.multiEmployer.regimeConsistent) {
+        doc.fillColor(ORANGE).font("Helvetica").fontSize(8.5)
+           .text("Employers used different tax regimes — combined shortfall could not be estimated. See Issues Found below.", M, doc.y, { width: CW });
+      }
+      doc.moveDown(0.4);
+    }
+
+    // ────────────────────────────────────────────────────────────────────────
     // RECONCILIATION CHECKS
     // ────────────────────────────────────────────────────────────────────────
     sectionHeader("Reconciliation Checks");
@@ -293,34 +325,45 @@ export function registerTaxReconcileRoutes(app: Express): void {
     upload.fields([
       { name: "ais", maxCount: 1 },
       { name: "form26as", maxCount: 1 },
-      { name: "form16", maxCount: 1 },
+      { name: "form16", maxCount: 3 }, // up to 3 employers — mid-year job changes
     ]),
     async (req: AuthenticatedRequest, res: Response) => {
       try {
         const files = req.files as Record<string, Express.Multer.File[]> | undefined;
         const aisBuf = files?.["ais"]?.[0]?.buffer;
         const form26asBuf = files?.["form26as"]?.[0]?.buffer;
-        const form16Buf = files?.["form16"]?.[0]?.buffer;
+        const form16Files = files?.["form16"] ?? [];
+        const form16Bufs = form16Files.map((f) => f.buffer);
 
-        if (!aisBuf || !form26asBuf || !form16Buf) {
-          return res.status(400).json({ error: "Please upload all three files: AIS, 26AS, and Form 16" });
+        if (!aisBuf || !form26asBuf || form16Bufs.length === 0) {
+          return res.status(400).json({ error: "Please upload AIS, Form 26AS, and at least one Form 16" });
+        }
+        if (form16Bufs.length > 3) {
+          return res.status(400).json({ error: "You can upload up to 3 Form 16s (one per employer)" });
         }
 
         // Verify PDF magic bytes
-        for (const [name, buf] of [["AIS", aisBuf], ["26AS", form26asBuf], ["Form 16", form16Buf]] as [string, Buffer][]) {
+        const allFiles: [string, Buffer][] = [
+          ["AIS", aisBuf],
+          ["26AS", form26asBuf],
+          ...form16Bufs.map((buf, i): [string, Buffer] => [`Form 16 #${i + 1}`, buf]),
+        ];
+        for (const [name, buf] of allFiles) {
           if (!looksLikePdf(buf)) {
             return res.status(400).json({ error: `${name} file does not appear to be a valid PDF` });
           }
         }
 
-        // Optional per-document passwords (for password-protected PDFs)
+        // Optional per-document passwords (for password-protected PDFs).
+        // Form 16 passwords are indexed to match upload order: form16Password_0, form16Password_1, ...
+        const form16Passwords: string[] = form16Bufs.map((_, i) => req.body?.[`form16Password_${i}`] as string | undefined ?? "");
         const passwords = {
           ais: req.body?.aisPassword as string | undefined,
           form26as: req.body?.form26asPassword as string | undefined,
-          form16: req.body?.form16Password as string | undefined,
+          form16: form16Passwords,
         };
 
-        const report = await reconcileTaxDocuments(aisBuf, form26asBuf, form16Buf, passwords);
+        const report = await reconcileTaxDocuments(aisBuf, form26asBuf, form16Bufs, passwords);
         return res.json({ success: true, report });
       } catch (err) {
         console.error("[tax-reconcile] Error:", err);

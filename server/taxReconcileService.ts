@@ -27,6 +27,7 @@ try {
 // Gemini (optional — for AIS image-PDF reading)
 // ─────────────────────────────────────────────────────────────────────────────
 import { GoogleGenAI } from "@google/genai";
+import { computeTaxLiability } from "@shared/taxLiability";
 
 function buildAI(): InstanceType<typeof GoogleGenAI> | null {
   const key = process.env.GOOGLE_API_KEY;
@@ -118,11 +119,19 @@ export interface ReconciliationCheck {
   note: string;
 }
 
+export interface MultiEmployerFlags {
+  employerCount: number;
+  standardDeductionDoubleCounted: boolean;
+  regimeConsistent: boolean;
+  regimesSeen: (boolean | null)[];
+}
+
 export interface ReconciliationReport {
   extractedData: {
     ais: ExtractedAIS;
     form26as: Extracted26AS;
-    form16: ExtractedForm16;
+    form16: ExtractedForm16;          // combined/aggregated across all employers
+    form16Employers: ExtractedForm16[]; // raw per-employer parses, one per uploaded Form 16
   };
   checks: ReconciliationCheck[];
   mismatches: ReconciliationMismatch[];
@@ -133,6 +142,13 @@ export interface ReconciliationReport {
   itrImpact: string;
   generatedAt: string;
   aisNote?: string;  // shown in UI when AIS parsing is limited
+  multiEmployer?: {
+    employerCount: number;
+    regimeConsistent: boolean;
+    estimatedTaxLiability: number | null;  // combined annual liability on aggregated income
+    creditedTax: number | null;            // TDS + advance tax + self-assessment tax per 26AS
+    estimatedShortfall: number | null;     // null when not computable (e.g. regime mismatch)
+  };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -779,6 +795,108 @@ Extract all values and return ONLY this JSON (no markdown):
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Combine multiple Form 16s (multiple employers in one FY) into one
+// aggregate view. This is the core of multi-employer / mid-year job-change
+// support: AIS and 26AS are already whole-PAN, whole-year documents from the
+// IT department, so they need no combining — only the user-uploaded Form 16s
+// are inherently per-employer.
+// ─────────────────────────────────────────────────────────────────────────────
+
+function sumField(employers: ExtractedForm16[], key: keyof ExtractedForm16): number | null {
+  const vals = employers
+    .map((e) => e[key])
+    .filter((v): v is number => typeof v === "number");
+  return vals.length ? vals.reduce((a, b) => a + b, 0) : null;
+}
+
+function combineForm16s(
+  employers: ExtractedForm16[],
+  financialYear: string
+): { combined: ExtractedForm16; flags: MultiEmployerFlags } {
+  const n = employers.length;
+
+  const grossSalary = sumField(employers, "grossSalary");
+  const salaryU17_1 = sumField(employers, "salaryU17_1");
+  const perquisites = sumField(employers, "perquisites");
+  const hraExempt = sumField(employers, "hraExempt");
+  const professionalTax = sumField(employers, "professionalTax");
+  const totalTaxDeducted = sumField(employers, "totalTaxDeducted");
+  const tdsDeposited = sumField(employers, "tdsDeposited");
+
+  // Standard deduction is a once-per-year, per-taxpayer benefit — NOT
+  // per employment. Each employer applies it independently since they only
+  // see the salary they themselves paid. Take the max reported by any one
+  // employer (not the sum), and flag when more than one employer applied it.
+  const stdDeductions = employers
+    .map((e) => e.standardDeduction)
+    .filter((v): v is number => typeof v === "number" && v > 0);
+  const standardDeduction = stdDeductions.length ? Math.max(...stdDeductions) : null;
+  const standardDeductionDoubleCounted = stdDeductions.length > 1;
+
+  // 80C is capped at ₹1.5L/year regardless of how many employers separately
+  // accepted investment declarations against it.
+  const raw80C = sumField(employers, "deduction80C") ?? 0;
+  const deduction80C = employers.some((e) => e.deduction80C != null) ? Math.min(raw80C, 150000) : null;
+  const deduction80D = sumField(employers, "deduction80D");
+  const totalDeductionsVI_A = sumField(employers, "totalDeductionsVI_A");
+
+  const regimes = employers.map((e) => e.newRegime);
+  const distinctRegimes = new Set(regimes.filter((r): r is boolean => r != null));
+  const regimeConsistent = distinctRegimes.size <= 1;
+  const newRegime = distinctRegimes.size === 1 ? [...distinctRegimes][0] : regimes[n - 1] ?? null;
+
+  let taxableIncome: number | null = null;
+  let taxOnIncome: number | null = null;
+  let rebate87A: number | null = null;
+  let cess: number | null = null;
+  let totalTaxPayable: number | null = null;
+
+  if (grossSalary != null && newRegime != null) {
+    const deductions = newRegime
+      ? (standardDeduction ?? 0)
+      : (standardDeduction ?? 0) + (hraExempt ?? 0) + (professionalTax ?? 0) + (totalDeductionsVI_A ?? 0);
+    taxableIncome = Math.max(0, grossSalary - deductions);
+    const liability = computeTaxLiability(taxableIncome, newRegime ? "new" : "old", financialYear);
+    taxOnIncome = liability.incomeTax;
+    rebate87A = liability.rebate;
+    cess = liability.cess;
+    totalTaxPayable = liability.totalTax;
+  }
+
+  const combined: ExtractedForm16 = {
+    employerName: employers.map((e) => e.employerName).filter(Boolean).join("  +  ") || null,
+    employerTAN: n === 1 ? employers[0]?.employerTAN ?? null : null,
+    employeePAN: employers.find((e) => e.employeePAN)?.employeePAN ?? null,
+    tdsDeposited,
+    grossSalary,
+    salaryU17_1,
+    perquisites,
+    hraExempt,
+    standardDeduction,
+    professionalTax,
+    netSalary:
+      grossSalary != null && standardDeduction != null
+        ? grossSalary - standardDeduction - (professionalTax ?? 0)
+        : null,
+    deduction80C,
+    deduction80D,
+    totalDeductionsVI_A,
+    taxableIncome,
+    taxOnIncome,
+    rebate87A,
+    cess,
+    totalTaxPayable,
+    totalTaxDeducted: totalTaxDeducted ?? tdsDeposited,
+    newRegime,
+  };
+
+  return {
+    combined,
+    flags: { employerCount: n, standardDeductionDoubleCounted, regimeConsistent, regimesSeen: regimes },
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Rule-based reconciliation engine
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -916,6 +1034,7 @@ function buildMismatches(
   f26as: Extracted26AS,
   f16: ExtractedForm16,
   checks: ReconciliationCheck[],
+  multiEmployerFlags?: MultiEmployerFlags,
 ): ReconciliationMismatch[] {
   const mismatches: ReconciliationMismatch[] = [];
   let id = 1;
@@ -1024,6 +1143,50 @@ function buildMismatches(
     });
   }
 
+  // ── Multiple employers (mid-year job change) ────────────────────────────
+  if (multiEmployerFlags && multiEmployerFlags.employerCount > 1) {
+    if (multiEmployerFlags.standardDeductionDoubleCounted) {
+      mismatches.push({
+        id: String(id++),
+        category: "Multiple Employers",
+        severity: "MEDIUM",
+        title: "Standard deduction was applied by more than one employer",
+        description: `You uploaded ${multiEmployerFlags.employerCount} Form 16s, and more than one shows a standard deduction. Only ONE standard deduction is allowed per year across all employers combined.`,
+        aisValue: null, form16Value: f16.standardDeduction, form26asValue: null, difference: null,
+        ruleExplanation: "Standard deduction u/s 16(ia) is a per-taxpayer, per-year benefit, not per employment. Each employer applies it independently against only the salary they themselves paid, since they can't see your other Form 16s.",
+        suggestedAction: "The combined figures below already count the standard deduction once — use those, not the sum of each employer's individually-reported numbers.",
+      });
+    }
+
+    if (!multiEmployerFlags.regimeConsistent) {
+      mismatches.push({
+        id: String(id++),
+        category: "Multiple Employers",
+        severity: "HIGH",
+        title: "Employers used different tax regimes",
+        description: `Your Form 16s show different regime elections across employers (${multiEmployerFlags.regimesSeen.map(r => r === true ? "New" : r === false ? "Old" : "Unknown").join(", ")}).`,
+        aisValue: null, form16Value: null, form26asValue: null, difference: null,
+        ruleExplanation: "Employers withhold TDS based on whatever regime you (or their default) selected with them individually. At ITR filing time you choose ONE regime for salary income for the whole year — it doesn't have to match what any single employer assumed.",
+        suggestedAction: "We could not estimate a combined shortfall automatically because the regime is ambiguous. Add your combined gross salary into the Income Tax Calculator under both regimes to see which is more beneficial before filing.",
+      });
+    } else if (f16.totalTaxPayable != null) {
+      const creditedTax = (f26as.tdsSalary ?? 0) + (f26as.tdsNonSalary ?? 0) + (f26as.advanceTaxPaid ?? 0) + (f26as.selfAssessmentTax ?? 0);
+      const shortfall = f16.totalTaxPayable - creditedTax;
+      if (shortfall > 1000) {
+        mismatches.push({
+          id: String(id++),
+          category: "Multiple Employers",
+          severity: "HIGH",
+          title: "Estimated tax shortfall across employers",
+          description: `Combined salary across ${multiEmployerFlags.employerCount} employers gives an estimated annual tax liability of ${fmt(f16.totalTaxPayable)}, versus ${fmt(creditedTax)} credited via TDS/advance tax in your 26AS — an estimated shortfall of ${fmt(shortfall)}.`,
+          aisValue: null, form16Value: f16.totalTaxPayable, form26asValue: creditedTax, difference: shortfall,
+          ruleExplanation: "Each employer applies slab rates and the standard deduction independently to only what they paid you. Combined, your true income can sit in a higher bracket than either employer withheld for — very common when Form 12B (previous employment declaration) isn't filed with the new employer. This is an AI-extracted estimate using standard slab math, not an exact computation.",
+          suggestedAction: `Consider paying the estimated shortfall of ${fmt(shortfall)} as self-assessment tax before filing to limit further interest under Sections 234B/234C. This tool does not compute exact interest — use the Income Tax Calculator or a CA for the precise figure, since it depends on payment dates.`,
+        });
+      }
+    }
+  }
+
   return mismatches;
 }
 
@@ -1061,6 +1224,7 @@ async function generateAIInsights(
   f26as: Extracted26AS,
   f16: ExtractedForm16,
   mismatches: ReconciliationMismatch[],
+  multiEmployerFlags?: MultiEmployerFlags,
 ): Promise<{ insights: string; actionItems: string[]; itrImpact: string }> {
   const fallback = {
     insights: "Upload all three documents and ensure Google API key is configured for AI-powered insights.",
@@ -1096,6 +1260,9 @@ Tax Document Summary:
 
 Issues Found:
 ${mismatchText || "No major mismatches — documents appear consistent."}
+${multiEmployerFlags && multiEmployerFlags.employerCount > 1
+  ? `\nNote: The taxpayer had ${multiEmployerFlags.employerCount} employers this FY (mid-year job change). The figures above are already combined across employers with the standard deduction counted once. ${multiEmployerFlags.regimeConsistent ? "" : "Their employers used inconsistent tax regimes, so treat any regime-specific advice as provisional."} Specifically mention that job-changers are commonly under-withheld because each employer applies slabs independently, and that Form 12B could have prevented this at the new employer.`
+  : ""}
 
 Respond ONLY in this JSON (no markdown, no leading/trailing text):
 {
@@ -1130,24 +1297,27 @@ Respond ONLY in this JSON (no markdown, no leading/trailing text):
 export async function reconcileTaxDocuments(
   aisPdfBuffer: Buffer,
   form26asPdfBuffer: Buffer,
-  form16PdfBuffer: Buffer,
-  _passwords?: { ais?: string; form26as?: string; form16?: string },
+  form16PdfBuffers: Buffer[],
+  _passwords?: { ais?: string; form26as?: string; form16?: string[] },
 ): Promise<ReconciliationReport> {
-  console.log("[reconcileTaxDocuments] Starting reconciliation...");
+  console.log(`[reconcileTaxDocuments] Starting reconciliation with ${form16PdfBuffers.length} Form 16(s)...`);
 
   // ── Step 1: Extract text (for logging/debugging only) ─────────────────────
   const aisText = await extractText(aisPdfBuffer, "AIS");
 
-  // ── Step 2: Parse all three documents with Gemini inline PDF ──────────────
+  // ── Step 2: Parse all documents with Gemini inline PDF ─────────────────────
   //    AIS is an image PDF (IT portal) — always needs Gemini
   //    26AS and Form 16 are TRACES PDFs — Gemini is more reliable than regex
-  //    All three run in parallel for speed
-  console.log("[reconcileTaxDocuments] Parsing all 3 PDFs with Gemini...");
-  const [aisPartial, form26as, form16] = await Promise.all([
+  //    Form 16 may be multiple files (mid-year job change) — parsed in parallel
+  //    Everything runs in parallel for speed
+  console.log("[reconcileTaxDocuments] Parsing all PDFs with Gemini...");
+  const [aisPartial, form26as, form16Employers] = await Promise.all([
     parseAISWithGemini(aisPdfBuffer),
     parse26ASWithGemini(form26asPdfBuffer),
-    parseForm16WithGemini(form16PdfBuffer),
+    Promise.all(form16PdfBuffers.map((buf) => parseForm16WithGemini(buf))),
   ]);
+
+  const { combined: form16, flags: multiEmployerFlags } = combineForm16s(form16Employers, "2025-26");
 
   // ── Step 3: Fallback — try text regex for AIS if Gemini returned nothing ──
   let aisFinal = aisPartial;
@@ -1185,21 +1355,43 @@ export async function reconcileTaxDocuments(
 
   // ── Step 5: Build reconciliation ─────────────────────────────────────────
   const checks = buildChecks(ais, form26as, form16);
-  const mismatches = buildMismatches(ais, form26as, form16, checks);
+  if (multiEmployerFlags.employerCount > 1) {
+    checks.push({
+      name: "Multiple Employers Detected",
+      status: multiEmployerFlags.regimeConsistent ? "OK" : "PARTIAL",
+      aisValue: null,
+      form16Value: form16.grossSalary,
+      form26asValue: null,
+      note: `${multiEmployerFlags.employerCount} Form 16s uploaded — combined gross salary ${fmt(form16.grossSalary)}. ${
+        multiEmployerFlags.regimeConsistent
+          ? "Regime elections were consistent across employers."
+          : "Regime elections differed across employers — see Issues Found below."
+      }`,
+    });
+  }
+  const mismatches = buildMismatches(ais, form26as, form16, checks, multiEmployerFlags);
   const overallStatus = determineOverallStatus(mismatches);
   const summary = generateSummary(overallStatus, mismatches, form16);
 
   // ── Step 6: AI insights ───────────────────────────────────────────────────
   const { insights, actionItems, itrImpact } = await generateAIInsights(
-    ais, form26as, form16, mismatches
+    ais, form26as, form16, mismatches, multiEmployerFlags
   );
 
   const aisNote = !process.env.GOOGLE_API_KEY
     ? "AIS data (dividends, interest, capital gains) requires a Google Gemini API key to parse. Form 16 and 26AS data shown above is complete. Add GOOGLE_API_KEY to your server .env to enable AIS parsing."
     : undefined;
 
+  const creditedTax = multiEmployerFlags.employerCount > 1
+    ? (form26as.tdsSalary ?? 0) + (form26as.tdsNonSalary ?? 0) + (form26as.advanceTaxPaid ?? 0) + (form26as.selfAssessmentTax ?? 0)
+    : null;
+  const estimatedShortfall =
+    multiEmployerFlags.employerCount > 1 && multiEmployerFlags.regimeConsistent && form16.totalTaxPayable != null && creditedTax != null
+      ? form16.totalTaxPayable - creditedTax
+      : null;
+
   return {
-    extractedData: { ais, form26as, form16 },
+    extractedData: { ais, form26as, form16, form16Employers },
     checks,
     mismatches,
     overallStatus,
@@ -1209,5 +1401,14 @@ export async function reconcileTaxDocuments(
     itrImpact,
     generatedAt: new Date().toISOString(),
     ...(aisNote && { aisNote }),
+    ...(multiEmployerFlags.employerCount > 1 && {
+      multiEmployer: {
+        employerCount: multiEmployerFlags.employerCount,
+        regimeConsistent: multiEmployerFlags.regimeConsistent,
+        estimatedTaxLiability: form16.totalTaxPayable,
+        creditedTax,
+        estimatedShortfall,
+      },
+    }),
   };
 }

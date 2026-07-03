@@ -72,8 +72,21 @@ interface ReconciliationCheck {
   note: string;
 }
 
+interface MultiEmployerInfo {
+  employerCount: number;
+  regimeConsistent: boolean;
+  estimatedTaxLiability: number | null;
+  creditedTax: number | null;
+  estimatedShortfall: number | null;
+}
+
 interface ReconciliationReport {
-  extractedData: { ais: ExtractedAIS; form26as: Extracted26AS; form16: ExtractedForm16 };
+  extractedData: {
+    ais: ExtractedAIS;
+    form26as: Extracted26AS;
+    form16: ExtractedForm16;            // combined across all employers
+    form16Employers: ExtractedForm16[]; // one entry per uploaded Form 16
+  };
   checks: ReconciliationCheck[];
   mismatches: ReconciliationMismatch[];
   overallStatus: "CLEAN" | "NEEDS_ATTENTION" | "CRITICAL";
@@ -83,6 +96,7 @@ interface ReconciliationReport {
   itrImpact: string;
   generatedAt: string;
   aisNote?: string;
+  multiEmployer?: MultiEmployerInfo;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -223,10 +237,11 @@ export default function AIS26ASForm16Tool() {
 
   const [aisFile, setAisFile] = useState<File | null>(null);
   const [form26asFile, setForm26asFile] = useState<File | null>(null);
-  const [form16File, setForm16File] = useState<File | null>(null);
+  // Up to 3 Form 16s — one per employer, for mid-year job changes
+  const [form16Files, setForm16Files] = useState<(File | null)[]>([null]);
+  const [form16Passwords, setForm16Passwords] = useState<string[]>([""]);
   const [aisPassword, setAisPassword] = useState("");
   const [form26asPassword, setForm26asPassword] = useState("");
-  const [form16Password, setForm16Password] = useState("");
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [progressLabel, setProgressLabel] = useState("");
@@ -238,14 +253,32 @@ export default function AIS26ASForm16Tool() {
     trackPageView("/tools/ais-26as-form16", "AIS vs 26AS vs Form 16 — AiTaxBot");
   }, []);
 
-  const allFilesReady = !!(aisFile && form26asFile && form16File);
+  const allFilesReady = !!(aisFile && form26asFile && form16Files[0]);
 
   // ── Missing files hint ──────────────────────────────────────────────────────
   const missingFiles = [
     !aisFile && "AIS",
     !form26asFile && "Form 26AS",
-    !form16File && "Form 16",
+    !form16Files[0] && "Form 16",
   ].filter(Boolean) as string[];
+
+  // ── Multi-Form16 helpers ─────────────────────────────────────────────────
+  const setForm16FileAt = (index: number, f: File | null) => {
+    setForm16Files((prev) => prev.map((x, i) => (i === index ? f : x)));
+  };
+  const setForm16PasswordAt = (index: number, p: string) => {
+    setForm16Passwords((prev) => prev.map((x, i) => (i === index ? p : x)));
+  };
+  const addForm16Slot = () => {
+    if (form16Files.length >= 3) return;
+    setForm16Files((prev) => [...prev, null]);
+    setForm16Passwords((prev) => [...prev, ""]);
+  };
+  const removeForm16Slot = (index: number) => {
+    if (form16Files.length <= 1) return;
+    setForm16Files((prev) => prev.filter((_, i) => i !== index));
+    setForm16Passwords((prev) => prev.filter((_, i) => i !== index));
+  };
 
   // ── Analyse ────────────────────────────────────────────────────────────────
   async function handleAnalyse() {
@@ -265,12 +298,25 @@ export default function AIS26ASForm16Tool() {
       const formData = new FormData();
       formData.append("ais", aisFile!);
       formData.append("form26as", form26asFile!);
-      formData.append("form16", form16File!);
       if (aisPassword) formData.append("aisPassword", aisPassword);
       if (form26asPassword) formData.append("form26asPassword", form26asPassword);
-      if (form16Password) formData.append("form16Password", form16Password);
 
-      setProgress(20); setProgressLabel("Reading AIS with Gemini AI…");
+      // Only send filled Form 16 slots; password indices must line up with
+      // the order files are appended, not the original slot index.
+      const filledForm16 = form16Files
+        .map((f, i) => ({ file: f, password: form16Passwords[i] ?? "" }))
+        .filter((x): x is { file: File; password: string } => x.file != null);
+      filledForm16.forEach(({ file }) => formData.append("form16", file));
+      filledForm16.forEach(({ password }, i) => {
+        if (password) formData.append(`form16Password_${i}`, password);
+      });
+
+      setProgress(20);
+      setProgressLabel(
+        filledForm16.length > 1
+          ? `Reading ${filledForm16.length} Form 16s + AIS with Gemini AI…`
+          : "Reading AIS with Gemini AI…"
+      );
 
       const resp = await fetch("/api/tools/tax-reconcile", {
         method: "POST",
@@ -397,7 +443,7 @@ export default function AIS26ASForm16Tool() {
               AIS vs 26AS vs Form 16
             </h1>
             <p className="text-blue-100 text-base max-w-xl mx-auto mb-5">
-              Upload your 3 tax documents — AI reads them, spots every mismatch, explains it in plain English, and tells you exactly what to fix before filing.
+              Upload your tax documents — AI reads them, spots every mismatch, explains it in plain English, and tells you exactly what to fix before filing. Changed jobs mid-year? Upload each employer's Form 16.
             </p>
             <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-xs text-blue-200">
               {["Salary reconciliation", "TDS mismatch detection", "Capital gains alert", "AI filing guidance"].map((f) => (
@@ -470,17 +516,59 @@ export default function AIS26ASForm16Tool() {
                     />
                     <FileCard
                       label="Form 16"
-                      sublabel="TDS Certificate from Employer"
+                      sublabel={form16Files.length > 1 ? "Employer 1" : "TDS Certificate from Employer"}
                       tip="Part A: quarterly TDS deposited. Part B: gross salary, deductions, taxable income."
                       accentBg="bg-green-600"
                       selectedBorder="border-green-400"
-                      file={form16File}
-                      onSelect={setForm16File}
-                      password={form16Password}
-                      onPasswordChange={setForm16Password}
+                      file={form16Files[0]}
+                      onSelect={(f) => setForm16FileAt(0, f)}
+                      password={form16Passwords[0] ?? ""}
+                      onPasswordChange={(p) => setForm16PasswordAt(0, p)}
                       passwordHint="Try PAN or PAN+DOB (ABCDE1234F01011990)"
                     />
                   </div>
+
+                  {/* Additional Form 16s — changed jobs mid-year */}
+                  {form16Files.length > 1 && (
+                    <div className="grid md:grid-cols-3 gap-4 mt-4">
+                      {form16Files.slice(1).map((f, idx) => {
+                        const i = idx + 1;
+                        return (
+                          <div key={i} className="relative">
+                            <FileCard
+                              label={`Form 16`}
+                              sublabel={`Employer ${i + 1}`}
+                              tip="From the employer you worked for after switching jobs this year."
+                              accentBg="bg-green-600"
+                              selectedBorder="border-green-400"
+                              file={f}
+                              onSelect={(file) => setForm16FileAt(i, file)}
+                              password={form16Passwords[i] ?? ""}
+                              onPasswordChange={(p) => setForm16PasswordAt(i, p)}
+                              passwordHint="Try PAN or PAN+DOB (ABCDE1234F01011990)"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removeForm16Slot(i)}
+                              title="Remove this Form 16"
+                              className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-white border border-gray-300 text-gray-400 hover:text-red-500 hover:border-red-300 flex items-center justify-center text-xs shadow-sm"
+                            >×</button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {form16Files.length < 3 && (
+                    <button
+                      type="button"
+                      onClick={addForm16Slot}
+                      disabled={!form16Files[form16Files.length - 1]}
+                      className="mt-3 text-xs font-medium text-blue-600 hover:text-blue-700 disabled:text-gray-300 disabled:cursor-not-allowed"
+                    >
+                      + Add another Form 16 — changed jobs this year?
+                    </button>
+                  )}
 
                   {/* Progress */}
                   {loading && (
@@ -524,7 +612,7 @@ export default function AIS26ASForm16Tool() {
                   {/* connector line */}
                   <div className="hidden md:block absolute top-5 left-[calc(16.7%+20px)] right-[calc(16.7%+20px)] h-px bg-gray-200" />
                   {[
-                    { n: "1", title: "Upload 3 PDFs", desc: "AIS, Form 26AS, and Form 16 — all from the Income Tax portal and your employer", color: "bg-blue-600" },
+                    { n: "1", title: "Upload your PDFs", desc: "AIS and Form 26AS from the Income Tax portal, plus Form 16 from each employer — changed jobs? Add up to 3.", color: "bg-blue-600" },
                     { n: "2", title: "AI Reads & Extracts", desc: "Gemini AI parses every page of all 3 documents and pulls every salary, TDS, and income figure", color: "bg-[#4685d8]" },
                     { n: "3", title: "Get Your Report", desc: "Instant mismatches with severity ratings, Indian tax law explanations, and exact action steps", color: "bg-green-600" },
                   ].map((s) => (
@@ -593,6 +681,70 @@ export default function AIS26ASForm16Tool() {
                 <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl p-4">
                   <Info className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
                   <p className="text-sm text-amber-900">{report.aisNote}</p>
+                </div>
+              )}
+
+              {/* ── Multiple Employers ─────────────────────────────────────── */}
+              {report.multiEmployer && report.multiEmployer.employerCount > 1 && (
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                  <div className="px-5 py-4 border-b border-gray-100">
+                    <h3 className="font-bold text-gray-900">
+                      {report.multiEmployer.employerCount} Employers This Year
+                    </h3>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Salary and TDS combined across all uploaded Form 16s — standard deduction counted once.
+                    </p>
+                  </div>
+                  <div className="p-5 space-y-3">
+                    {report.extractedData.form16Employers.map((emp, i) => (
+                      <div key={i} className="flex items-center justify-between gap-3 bg-gray-50 rounded-xl px-4 py-2.5 text-sm">
+                        <div className="min-w-0">
+                          <div className="font-semibold text-gray-800 truncate">
+                            {emp.employerName || `Employer ${i + 1}`}
+                          </div>
+                          <div className="text-xs text-gray-400">
+                            {emp.newRegime == null ? "Regime unknown" : emp.newRegime ? "New Regime" : "Old Regime"}
+                          </div>
+                        </div>
+                        <div className="text-right flex-shrink-0">
+                          <div className="font-mono text-xs text-gray-700">{fmt(emp.grossSalary)} gross</div>
+                          <div className="font-mono text-xs text-green-700">{fmt(emp.totalTaxDeducted)} TDS</div>
+                        </div>
+                      </div>
+                    ))}
+
+                    {report.multiEmployer.regimeConsistent && report.multiEmployer.estimatedTaxLiability != null ? (
+                      <div className={`rounded-xl p-4 mt-2 ${
+                        report.multiEmployer.estimatedShortfall != null && report.multiEmployer.estimatedShortfall > 1000
+                          ? "bg-red-50 border border-red-200"
+                          : "bg-green-50 border border-green-200"
+                      }`}>
+                        <div className="flex justify-between text-sm mb-1">
+                          <span className="text-gray-600">Estimated combined tax liability</span>
+                          <span className="font-semibold text-gray-900">{fmt(report.multiEmployer.estimatedTaxLiability)}</span>
+                        </div>
+                        <div className="flex justify-between text-sm mb-1">
+                          <span className="text-gray-600">Credited via TDS + advance tax (26AS)</span>
+                          <span className="font-semibold text-gray-900">{fmt(report.multiEmployer.creditedTax)}</span>
+                        </div>
+                        {report.multiEmployer.estimatedShortfall != null && report.multiEmployer.estimatedShortfall > 1000 ? (
+                          <div className="flex justify-between text-sm pt-2 mt-2 border-t border-red-200">
+                            <span className="font-bold text-red-700">Estimated shortfall</span>
+                            <span className="font-bold text-red-700">{fmt(report.multiEmployer.estimatedShortfall)}</span>
+                          </div>
+                        ) : (
+                          <p className="text-xs text-green-700 mt-1">No significant shortfall detected — TDS and advance tax appear to cover the estimated liability.</p>
+                        )}
+                        <p className="text-[11px] text-gray-400 mt-2 leading-relaxed">
+                          Estimate only, from AI-extracted figures and standard slab math — not exact interest under Sections 234B/234C. Consult a CA or use the Income Tax Calculator to confirm before paying.
+                        </p>
+                      </div>
+                    ) : !report.multiEmployer.regimeConsistent ? (
+                      <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
+                        Your employers used different tax regimes, so a combined shortfall couldn't be estimated automatically — see Issues Found below.
+                      </div>
+                    ) : null}
+                  </div>
                 </div>
               )}
 
@@ -818,8 +970,8 @@ export default function AIS26ASForm16Tool() {
                 <Button
                   onClick={() => {
                     setReport(null);
-                    setAisFile(null); setForm26asFile(null); setForm16File(null);
-                    setAisPassword(""); setForm26asPassword(""); setForm16Password("");
+                    setAisFile(null); setForm26asFile(null); setForm16Files([null]);
+                    setAisPassword(""); setForm26asPassword(""); setForm16Passwords([""]);
                     setExpandedMismatch(null);
                   }}
                   variant="outline"
