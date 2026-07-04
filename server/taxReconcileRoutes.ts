@@ -9,6 +9,7 @@ import rateLimit from "express-rate-limit";
 import PDFDocument from "pdfkit";
 import { reconcileTaxDocuments, type ReconciliationReport } from "./taxReconcileService.js";
 import { authenticateFirebaseToken, type AuthenticatedRequest } from "./middleware/auth.js";
+import { logoWhiteBuffer, watermarkBuffer } from "./assets/logoAssets.js";
 
 // ─── Multer: memory storage, up to 5 PDFs (AIS + 26AS + up to 3 Form 16s), 10 MB each ──
 const upload = multer({
@@ -85,6 +86,20 @@ function generatePDFReport(report: ReconciliationReport): Promise<Buffer> {
       if (doc.y + needed > doc.page.height - 60) doc.addPage();
     };
 
+    // ── watermark — faint logo centred on every page, drawn before content ──
+    const WM_BUF = watermarkBuffer();
+    const drawWatermark = () => {
+      const size = 340;
+      const x = (PAGE_W - size) / 2;
+      const y = (doc.page.height - size) / 2;
+      doc.image(WM_BUF, x, y, { width: size, height: size });
+    };
+    // `pageAdded` does not fire for the automatically-created first page, only
+    // for later doc.addPage() calls (e.g. from ensureSpace) — so draw the
+    // first page's watermark manually, then hook the rest.
+    drawWatermark();
+    doc.on("pageAdded", drawWatermark);
+
     // ── section header ───────────────────────────────────────────────────────
     const sectionHeader = (title: string) => {
       ensureSpace(30);
@@ -100,13 +115,20 @@ function generatePDFReport(report: ReconciliationReport): Promise<Buffer> {
     // HEADER
     // ────────────────────────────────────────────────────────────────────────
     doc.rect(0, 0, PAGE_W, 65).fill(BLUE);
+    // Logo (white silhouette — the full-colour blue mark would disappear
+    // against this banner) at top-left, title/subtitle shifted right of it.
+    const LOGO_H = 30;
+    const LOGO_W = LOGO_H * (328 / 200); // source asset aspect ratio
+    doc.image(logoWhiteBuffer(), M, 12, { height: LOGO_H, width: LOGO_W });
+    const TEXT_X = M + LOGO_W + 12;
+    const TEXT_W = CW - LOGO_W - 12;
     doc.fillColor("white").font("Helvetica-Bold").fontSize(16)
-       .text("AiTaxBot - Tax Document Reconciliation Report", M, 14, { width: CW });
+       .text("AiTaxBot - Tax Document Reconciliation Report", TEXT_X, 14, { width: TEXT_W });
     doc.fillColor("white").font("Helvetica").fontSize(9)
        .text(
          "AIS + Form 26AS + Form 16  |  FY 2025-26 / AY 2026-27  |  Generated: " +
          new Date().toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }),
-         M, 40, { width: CW }
+         TEXT_X, 40, { width: TEXT_W }
        );
     doc.y = 75;
 

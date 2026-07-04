@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { Linkedin, Instagram } from "lucide-react";
-import logoImagePng from "@assets/aitaxbot-logo-lovable.png";
-import logoImageWebP from "@assets/aitaxbot-logo-lovable.webp";
+import logoImagePng from "@assets/aitaxbot-logo-white.png";
+import logoImageWebP from "@assets/aitaxbot-logo-white.webp";
 
 export default function Footer() {
   const calculators: [string, string][] = [
@@ -58,7 +58,9 @@ export default function Footer() {
                   <img
                     src={logoImagePng}
                     alt="AiTaxBot"
-                    className="h-14 w-auto mb-3 brightness-110"
+                    className="h-16 w-auto mb-3"
+                    width={328}
+                    height={200}
                     loading="lazy"
                     data-testid="logo-footer"
                   />
