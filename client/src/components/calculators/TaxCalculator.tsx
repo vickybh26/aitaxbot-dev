@@ -33,6 +33,7 @@ import jsPDF from 'jspdf';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useTrackToolUse } from '@/hooks/useTrackToolUse';
+import { recommendITRForm, type ITRFormResult } from '@shared/itrFormSelector';
 
 interface AiTip {
   title: string;
@@ -179,7 +180,15 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
     isMetroCity: false,
     otherDeductions: '',
     ageGroup: 'below60' as 'below60' | '60to80' | 'above80',
-    financialYear: '2026-27' as '2024-25' | '2025-26' | '2026-27'
+    financialYear: '2026-27' as '2024-25' | '2025-26' | '2026-27',
+    // ── ITR form recommendation inputs (classification only — don't affect tax) ──
+    hasMultipleHouseProperties: false,
+    hasCryptoIncome: false,
+    isPresumptiveScheme: false,
+    isDirector: false,
+    isNonResident: false,
+    hasForeignAssets: false,
+    agriculturalIncome: ''
   });
 
   const updateFormData = (field: string, value: any) => {
@@ -517,7 +526,14 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
       isMetroCity: false,
       otherDeductions: '',
       ageGroup: 'below60',
-      financialYear: '2026-27'
+      financialYear: '2026-27',
+      hasMultipleHouseProperties: false,
+      hasCryptoIncome: false,
+      isPresumptiveScheme: false,
+      isDirector: false,
+      isNonResident: false,
+      hasForeignAssets: false,
+      agriculturalIncome: ''
     });
     setActiveTab('calculator');
   };
@@ -1088,6 +1104,90 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                       data-testid="input-other-income"
                     />
                   </div>
+
+                  <Separator />
+
+                  <div>
+                    <Label className="mb-2 block text-sm text-muted-foreground">
+                      A few more details — used only to recommend your ITR form, not for tax calculation
+                    </Label>
+                    <div className="space-y-2.5">
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id="multiple-house-properties"
+                          checked={formData.hasMultipleHouseProperties}
+                          onChange={(e) => updateFormData('hasMultipleHouseProperties', e.target.checked)}
+                          data-testid="checkbox-multiple-house-properties"
+                        />
+                        <Label htmlFor="multiple-house-properties" className="font-normal">More than one house property</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id="crypto-income"
+                          checked={formData.hasCryptoIncome}
+                          onChange={(e) => updateFormData('hasCryptoIncome', e.target.checked)}
+                          data-testid="checkbox-crypto-income"
+                        />
+                        <Label htmlFor="crypto-income" className="font-normal">Crypto / Virtual Digital Asset income (Sec 115BBH)</Label>
+                      </div>
+                      {parseFloat(formData.businessIncome) > 0 && (
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            id="presumptive-scheme"
+                            checked={formData.isPresumptiveScheme}
+                            onChange={(e) => updateFormData('isPresumptiveScheme', e.target.checked)}
+                            data-testid="checkbox-presumptive-scheme"
+                          />
+                          <Label htmlFor="presumptive-scheme" className="font-normal">Business income declared under presumptive scheme (44AD/44ADA/44AE)</Label>
+                        </div>
+                      )}
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id="is-director"
+                          checked={formData.isDirector}
+                          onChange={(e) => updateFormData('isDirector', e.target.checked)}
+                          data-testid="checkbox-is-director"
+                        />
+                        <Label htmlFor="is-director" className="font-normal">Director in a company</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id="is-non-resident"
+                          checked={formData.isNonResident}
+                          onChange={(e) => updateFormData('isNonResident', e.target.checked)}
+                          data-testid="checkbox-is-non-resident"
+                        />
+                        <Label htmlFor="is-non-resident" className="font-normal">Non-resident / RNOR (not ordinarily resident)</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id="foreign-assets"
+                          checked={formData.hasForeignAssets}
+                          onChange={(e) => updateFormData('hasForeignAssets', e.target.checked)}
+                          data-testid="checkbox-foreign-assets"
+                        />
+                        <Label htmlFor="foreign-assets" className="font-normal">Foreign income or foreign assets</Label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="agricultural-income">Agricultural Income (if any)</Label>
+                    <Input
+                      id="agricultural-income"
+                      type="number"
+                      placeholder="e.g., 3000"
+                      value={formData.agriculturalIncome}
+                      onChange={(e) => updateFormData('agriculturalIncome', e.target.value)}
+                      data-testid="input-agricultural-income"
+                    />
+                  </div>
                 </div>
               </Card>
             </div>
@@ -1361,6 +1461,60 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                   </div>
                 )}
               </div>
+
+              {/* Recommended ITR Form */}
+              {(() => {
+                const itr: ITRFormResult = recommendITRForm({
+                  residentialStatus: formData.isNonResident ? 'nonResident' : 'resident',
+                  totalIncome: result.oldRegime.grossIncome,
+                  hasSalaryIncome: (parseFloat(formData.salaryIncome) || 0) > 0,
+                  housePropertyCount: formData.hasMultipleHouseProperties ? 2 : ((parseFloat(formData.housePropertyIncome) || 0) > 0 ? 1 : 0),
+                  hasBusinessIncome: (parseFloat(formData.businessIncome) || 0) > 0,
+                  isPresumptiveScheme: formData.isPresumptiveScheme,
+                  hasCapitalGains: (parseFloat(formData.capitalGainsIncome) || 0) > 0,
+                  hasVDAIncome: formData.hasCryptoIncome,
+                  hasOtherSources: (parseFloat(formData.otherIncome) || 0) > 0,
+                  agriculturalIncome: parseFloat(formData.agriculturalIncome) || 0,
+                  isDirectorInCompany: formData.isDirector,
+                  hasForeignIncomeOrAssets: formData.hasForeignAssets,
+                });
+                return (
+                  <Card className="p-5 premium-glass-card premium-glass-card-hover transition-all duration-300">
+                    <div className="flex items-start justify-between gap-4 flex-wrap">
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">Recommended ITR Form</p>
+                        <h3 className="text-2xl font-bold text-slate-900">{itr.formLabel}</h3>
+                      </div>
+                      <Badge variant="secondary" className="mt-1">Based on income sources entered above</Badge>
+                    </div>
+                    <div className="mt-3 space-y-1.5">
+                      {itr.reasons.map((r, i) => (
+                        <p key={i} className="text-sm text-readable-light">{r}</p>
+                      ))}
+                    </div>
+                    {itr.blockers.length > 0 && (
+                      <div className="mt-3 pt-3 border-t border-slate-100">
+                        <p className="text-xs font-semibold text-slate-500 mb-1.5">Why not the simpler form:</p>
+                        <ul className="space-y-1">
+                          {itr.blockers.map((b, i) => (
+                            <li key={i} className="text-xs text-slate-500 flex items-start gap-1.5">
+                              <span className="mt-1 w-1 h-1 rounded-full bg-slate-400 flex-shrink-0" />
+                              {b}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {itr.warnings.length > 0 && (
+                      <div className="mt-3">
+                        <Callout tone="warning">
+                          {itr.warnings.join(' ')}
+                        </Callout>
+                      </div>
+                    )}
+                  </Card>
+                );
+              })()}
 
               {/* Regime Comparison Bar Chart */}
               <Card className="p-5 premium-glass-card premium-glass-card-hover transition-all duration-300">

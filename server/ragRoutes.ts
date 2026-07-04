@@ -142,12 +142,17 @@ async function requireAdminL1(req: Request, res: Response, next: any): Promise<a
 router.get("/admin/queries", requireAdminL1, async (req: Request, res: Response) => {
   try {
     const limit = Math.min(Number(req.query.limit) || 100, 500);
+    const onlyGraphAvailable = req.query.graph_available === "true";
 
-    const snapshot = await getFirestore()
-      .collection("ai_queries")
+    let queryRef: FirebaseFirestore.Query<FirebaseFirestore.DocumentData> = getFirestore().collection("ai_queries");
+    if (onlyGraphAvailable) {
+      queryRef = queryRef.where("graph_available", "==", true);
+    }
+    const snapshot = await queryRef
       .orderBy("timestamp", "desc")
       .limit(limit)
       .get();
+
 
     const queries = snapshot.docs.map(doc => ({
       id: doc.id,
@@ -157,6 +162,68 @@ router.get("/admin/queries", requireAdminL1, async (req: Request, res: Response)
     return res.json({ queries, total: queries.length });
   } catch (err) {
     return (res as any).apiError(500, "QUERY_FETCH_FAILED", "Failed to fetch queries.");
+  }
+});
+
+// ─── POST /api/ai/admin/queries/:id/grade ────────────────────────────────────
+// Admin-level grading for the shadow-mode Gemini-vs-graph-answer comparison.
+// Records whether the graph (deterministic) answer was as good as Gemini's
+// for a given question — the evidence base for eventually trusting the
+// graph path to answer users directly without an AI-vendor call.
+
+const VALID_MATCH_STATUSES = new Set(["match", "partial", "mismatch", "pending"]);
+
+router.post("/admin/queries/:id/grade", requireAdminL1, async (req: Request, res: Response) => {
+  const r = res as any;
+  try {
+    const { match_status, notes } = req.body as { match_status?: string; notes?: string };
+
+    if (!match_status || !VALID_MATCH_STATUSES.has(match_status)) {
+      return r.apiError(400, "INVALID_MATCH_STATUS", `match_status must be one of: ${[...VALID_MATCH_STATUSES].join(", ")}`);
+    }
+
+    const docRef = getFirestore().collection("ai_queries").doc(req.params.id);
+    const doc = await docRef.get();
+    if (!doc.exists) {
+      return r.apiError(404, "QUERY_NOT_FOUND", "No query found with that ID.");
+    }
+
+    await docRef.update({
+      match_status,
+      notes: notes?.trim() || null,
+      graded_at: new Date().toISOString(),
+      graded_by: (req as any).adminUid || null,
+    });
+
+    return res.json({ success: true });
+  } catch (err) {
+    console.error("[RAG] Grade query error:", err);
+    return r.apiError(500, "GRADE_FAILED", "Failed to save grade.");
+  }
+});
+
+// ─── GET /api/ai/admin/eval-stats ────────────────────────────────────────────
+// Quick aggregate view of how the graph path is doing against Gemini —
+// counts by match_status among graded, graph-available comparisons.
+
+router.get("/admin/eval-stats", requireAdminL1, async (_req: Request, res: Response) => {
+  try {
+    const snapshot = await getFirestore()
+      .collection("ai_queries")
+      .where("graph_available", "==", true)
+      .limit(2000)
+      .get();
+
+    const stats = { total: 0, pending: 0, match: 0, partial: 0, mismatch: 0 };
+    snapshot.docs.forEach(doc => {
+      const status = ((doc.data() as any).match_status as string) || "pending";
+      stats.total++;
+      if (status in stats) (stats as any)[status]++;
+    });
+
+    return res.json(stats);
+  } catch (err) {
+    return (res as any).apiError(500, "STATS_FETCH_FAILED", "Failed to fetch eval stats.");
   }
 });
 

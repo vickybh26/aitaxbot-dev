@@ -12,6 +12,7 @@ import {
   ChevronRight,
   UserCheck,
   Inbox,
+  Scale,
 } from "lucide-react";
 import { logout } from "@/lib/firebase";
 import { cn } from "@/lib/utils";
@@ -23,6 +24,7 @@ const navItems = [
   { href: "/admin/analytics", label: "Analytics", icon: BarChart3, minLevel: 3 },
   { href: "/admin/cas", label: "CA Directory", icon: UserCheck, minLevel: 3 },
   { href: "/admin/leads", label: "Leads", icon: Inbox, minLevel: 3 },
+  { href: "/admin/ai-review", label: "AI Answer Review", icon: Scale, minLevel: 3 },
 ];
 
 const LEVEL_LABELS: Record<number, { label: string; color: string }> = {
@@ -151,6 +153,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className="w-5" />
           )}
         </div>
+
 
         {/* Page content */}
         <main className="flex-1 p-6 overflow-auto">{children}</main>

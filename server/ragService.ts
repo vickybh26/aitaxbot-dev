@@ -71,6 +71,14 @@ export interface RAGResult {
   concepts_triggered: string[];
   confidence: "high" | "medium" | "low";
   disclaimer: string;
+  /**
+   * "graph"  — answered directly from the Tax Topic Graph's key_facts,
+   *            zero Gemini/Qdrant calls made.
+   * "rag"    — went through the full embed → Qdrant search → Gemini
+   *            generation pipeline (novel question or needs personalised
+   *            computation).
+   */
+  answered_by: "graph" | "rag";
 }
 
 // ─── Tax Topic Graph helpers ─────────────────────────────────────────────────
@@ -90,13 +98,20 @@ const nodes: Record<string, GraphNode> = (taxTopicGraph as any).nodes;
  * Extract tax concepts from a query by keyword matching.
  * Returns a set of concept IDs from the Tax Topic Graph.
  */
+// Word-boundary match instead of plain substring — short keywords like "PT"
+// (Professional Tax) or "GST" would otherwise false-positive inside
+// unrelated words (e.g. "PT" matches inside "exem-PT-ion"). This mattered
+// less when Gemini smoothed over noisy extra context, but the deterministic
+// graph-answer path below has no LLM to filter out a wrong match, so
+// precision here now directly affects what gets shown to the user.
 function extractConcepts(query: string): Set<string> {
-  const q = query.toLowerCase();
   const found = new Set<string>();
 
   for (const [conceptId, node] of Object.entries(nodes)) {
     for (const keyword of node.keywords) {
-      if (q.includes(keyword.toLowerCase())) {
+      const escaped = keyword.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const pattern = new RegExp(`\\b${escaped}\\b`, "i");
+      if (pattern.test(query)) {
         found.add(conceptId);
         break;
       }
@@ -212,6 +227,80 @@ async function searchQdrant(
   }));
 }
 
+// ─── Deterministic (graph-only) answer path ─────────────────────────────────
+//
+// This is the "own agent" layer: the Tax Topic Graph's key_facts were
+// hand-built and verified against ICAI material + ITA 2025, so for the ~30
+// topics it covers, composing an answer straight from those facts is more
+// reliable, instant, and free than a Gemini call — and it's ours, not a
+// vendor's. Gemini/Qdrant stay in the loop only as a fallback for questions
+// that miss the graph entirely, or that need real number-crunching against
+// the user's own figures (which a canned template can't safely answer).
+
+// Signals that the question wants personalised computation rather than a
+// generic factual answer (specific rupee figures, "calculate", "my case",
+// etc.) — these skip the template path and go to the LLM fallback instead,
+// since giving a fixed key_facts answer to a numeric question risks being
+// wrong for that user's specific numbers.
+const COMPUTATION_SIGNAL =
+  /\d{3,}|lakh|crore|calculat|comput|how much (tax|will|do|should)|my (salary|income|case|situation)|for me\b|in my case/i;
+
+function isComputationalQuestion(question: string): boolean {
+  return COMPUTATION_SIGNAL.test(question);
+}
+
+interface DeterministicAnswer {
+  answer: string;
+  sources: Array<{ document: string; page?: number }>;
+}
+
+/**
+ * Build an answer directly from the Tax Topic Graph — no network calls.
+ * Returns null if none of the directly-matched concepts have key_facts
+ * (some graph entries, e.g. "stt"/"grandfathering", are trigger-only stubs
+ * with no facts of their own), in which case the caller should fall back
+ * to the full RAG/Gemini pipeline.
+ */
+function composeDeterministicAnswer(
+  directConcepts: Set<string>,
+  expandedConcepts: Set<string>
+): DeterministicAnswer | null {
+  const primary = [...directConcepts].filter(id => (nodes[id]?.key_facts?.length ?? 0) > 0);
+  if (primary.length === 0) return null;
+
+  const sections: string[] = [];
+  const citedSources: Array<{ document: string; page?: number }> = [];
+
+  for (const id of primary) {
+    const node = nodes[id];
+    const sectionRefs = [
+      ...(node.sections_ita2025 || []).map(s => `ITA 2025: ${s}`),
+      ...(node.sections_ita1961 || []).map(s => `ITA 1961: ${s}`),
+    ];
+    const refString = sectionRefs.length ? ` (${sectionRefs.join(", ")})` : "";
+    const facts = (node.key_facts || []).map(f => `- ${f}`).join("\n");
+    sections.push(`**${node.label}**${refString}\n${facts}`);
+    if (sectionRefs.length) {
+      citedSources.push({ document: `${node.label} — ${sectionRefs.join("; ")}` });
+    }
+  }
+
+  // Point at related (triggered but not directly asked-about) concepts by
+  // name only — keeps the answer focused instead of dumping the whole
+  // expanded graph.
+  const related = [...expandedConcepts]
+    .filter(id => !primary.includes(id) && nodes[id]?.label)
+    .map(id => nodes[id].label)
+    .slice(0, 5);
+
+  let answer = sections.join("\n\n");
+  if (related.length > 0) {
+    answer += `\n\nRelated topics worth checking: ${related.join(", ")}.`;
+  }
+
+  return { answer, sources: citedSources };
+}
+
 // ─── Answer generation ───────────────────────────────────────────────────────
 
 function buildPrompt(
@@ -300,26 +389,48 @@ async function generateAnswer(
   return { answer, confidence };
 }
 
-// ─── Query logging ───────────────────────────────────────────────────────────
+// ─── Evaluation mode ─────────────────────────────────────────────────────────
+//
+// We're not confident enough yet in the graph-only answers to let them reach
+// users directly, so for now Gemini's answer is ALWAYS what gets shown/
+// returned, and the graph answer (when available) is computed silently in
+// parallel purely for admin-level comparison. Every query with a graph
+// answer gets logged with both texts side by side in Firestore so an admin
+// can grade match/partial/mismatch (see /admin/queries + /admin/queries/:id/grade
+// in ragRoutes.ts). Once enough graded comparisons show the graph path is
+// "up to the mark," flip this to false to let it skip Gemini/Qdrant entirely
+// for eligible queries again (the original cost/latency-saving behaviour).
+const RAG_SHADOW_EVAL_MODE = true;
 
-async function logQuery(
+// ─── Query + shadow-comparison logging ───────────────────────────────────────
+
+async function logComparison(
   question: string,
   concepts: string[],
-  sessionId?: string,
-  source?: string
+  sessionId: string | undefined,
+  source: string | undefined,
+  answeredBy: "graph" | "rag",
+  geminiAnswer: string | null,
+  graphAnswer: string | null
 ): Promise<void> {
   try {
+    const graphAvailable = graphAnswer !== null;
     await getFirestore().collection("ai_queries").add({
       question,                    // The query text (no user PII stored)
       concepts_triggered: concepts,
       session_id: sessionId || null,
       source: source || "unknown",
+      answered_by: answeredBy,     // which answer the user actually received
+      gemini_answer: geminiAnswer, // null only when the graph path served the user directly (non-eval mode)
+      graph_answer: graphAnswer,   // null when no graph concept matched
+      graph_available: graphAvailable,
+      match_status: graphAvailable ? "pending" : null, // admin grades this once both answers exist
       timestamp: new Date().toISOString(),
       // No user ID, email, or identifying information
     });
   } catch (err) {
     // Non-fatal — log failure doesn't break the response
-    console.error("[RAG] Query log failed:", err);
+    console.error("[RAG] Comparison log failed:", err);
   }
 }
 
@@ -337,6 +448,26 @@ export async function runRAGQuery(input: RAGQuery): Promise<RAGResult> {
 
   // Step 2: Expand via Tax Topic Graph (BFS depth 2)
   const allConcepts = expandConceptGraph(initialConcepts);
+
+  // Step 2.5: Compute the graph-only answer whenever eligible (direct topic
+  // match, not a personalised/computational question). In shadow-eval mode
+  // this is NOT returned to the caller — it's only logged for comparison.
+  const graphEligible = initialConcepts.size > 0 && !isComputationalQuestion(question);
+  const graphAnswer = graphEligible ? composeDeterministicAnswer(initialConcepts, allConcepts) : null;
+
+  if (!RAG_SHADOW_EVAL_MODE && graphAnswer) {
+    // Production fast-path (not currently active): serve the graph answer
+    // directly, zero Gemini/Qdrant calls.
+    logComparison(question, [...allConcepts], sessionId, source, "graph", null, graphAnswer.answer);
+    return {
+      answer: graphAnswer.answer,
+      sources: graphAnswer.sources,
+      concepts_triggered: [...allConcepts],
+      confidence: "high",
+      disclaimer: TAX_DISCLAIMER,
+      answered_by: "graph",
+    };
+  }
 
   // Step 3: Build expanded query for better semantic search
   const expandedQuery = buildExpandedQuery(question, allConcepts);
@@ -356,14 +487,17 @@ export async function runRAGQuery(input: RAGQuery): Promise<RAGResult> {
   );
 
   if (chunks.length === 0) {
+    const fallbackAnswer =
+      "I couldn't find relevant information in my knowledge base for this question. " +
+      "Please try rephrasing, or consult a Chartered Accountant for personalised advice.";
+    logComparison(question, [...allConcepts], sessionId, source, "rag", fallbackAnswer, graphAnswer?.answer ?? null);
     return {
-      answer:
-        "I couldn't find relevant information in my knowledge base for this question. " +
-        "Please try rephrasing, or consult a Chartered Accountant for personalised advice.",
+      answer: fallbackAnswer,
       sources: [],
       concepts_triggered: [...allConcepts],
       confidence: "low",
       disclaimer: TAX_DISCLAIMER,
+      answered_by: "rag",
     };
   }
 
@@ -374,8 +508,8 @@ export async function runRAGQuery(input: RAGQuery): Promise<RAGResult> {
     "Gemini generation"
   );
 
-  // Step 7: Log anonymously (fire and forget)
-  logQuery(question, [...allConcepts], sessionId, source);
+  // Step 7: Log both answers side by side for admin comparison (fire and forget)
+  logComparison(question, [...allConcepts], sessionId, source, "rag", answer, graphAnswer?.answer ?? null);
 
   // Step 8: Deduplicate sources
   const seen = new Set<string>();
@@ -395,6 +529,7 @@ export async function runRAGQuery(input: RAGQuery): Promise<RAGResult> {
     concepts_triggered: [...allConcepts],
     confidence,
     disclaimer: TAX_DISCLAIMER,
+    answered_by: "rag",
   };
 }
 
