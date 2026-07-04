@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import type { ITRFormResult } from "@shared/itrFormSelector";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -97,6 +98,7 @@ interface ReconciliationReport {
   generatedAt: string;
   aisNote?: string;
   multiEmployer?: MultiEmployerInfo;
+  recommendedITRForm: ITRFormResult;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -744,6 +746,48 @@ export default function AIS26ASForm16Tool() {
                         Your employers used different tax regimes, so a combined shortfall couldn't be estimated automatically — see Issues Found below.
                       </div>
                     ) : null}
+                  </div>
+                </div>
+              )}
+
+              {/* ── Recommended ITR Form ───────────────────────────────────── */}
+              {report.recommendedITRForm && (
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                  <div className="px-5 py-4 border-b border-gray-100 flex items-start justify-between gap-4 flex-wrap">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">Recommended ITR Form</p>
+                      <h3 className="font-bold text-xl text-gray-900">{report.recommendedITRForm.formLabel}</h3>
+                    </div>
+                    <span className="text-xs bg-gray-100 text-gray-500 rounded-full px-3 py-1 mt-1">
+                      Based on your AIS, 26AS, and Form 16
+                    </span>
+                  </div>
+                  <div className="p-5 space-y-3">
+                    <ul className="space-y-1.5">
+                      {report.recommendedITRForm.reasons.map((r, i) => (
+                        <li key={i} className="text-sm text-gray-700">{r}</li>
+                      ))}
+                    </ul>
+                    {report.recommendedITRForm.blockers.length > 0 && (
+                      <div className="pt-3 border-t border-gray-100">
+                        <p className="text-xs font-semibold text-gray-500 mb-1.5">Why not the simpler form:</p>
+                        <ul className="space-y-1">
+                          {report.recommendedITRForm.blockers.map((b, i) => (
+                            <li key={i} className="text-xs text-gray-500 flex items-start gap-1.5">
+                              <span className="mt-1 w-1 h-1 rounded-full bg-gray-400 flex-shrink-0" />
+                              {b}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {report.recommendedITRForm.warnings.length > 0 && (
+                      <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 space-y-1.5">
+                        {report.recommendedITRForm.warnings.map((w, i) => (
+                          <p key={i} className="text-xs text-amber-800 leading-relaxed">{w}</p>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               )}

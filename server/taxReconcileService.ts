@@ -28,6 +28,7 @@ try {
 // ─────────────────────────────────────────────────────────────────────────────
 import { GoogleGenAI } from "@google/genai";
 import { computeTaxLiability } from "@shared/taxLiability";
+import { recommendITRForm, type ITRFormInput, type ITRFormResult } from "@shared/itrFormSelector";
 
 function buildAI(): InstanceType<typeof GoogleGenAI> | null {
   const key = process.env.GOOGLE_API_KEY;
@@ -57,9 +58,18 @@ export interface ExtractedAIS {
   rawText?: string;
 }
 
+export interface NonSalaryTDSSection {
+  section: string;   // e.g. "194A", "194C", "194J", "194Q", "194S", "194IA"
+  amount: number;    // Tax Deposited for that section (aggregated across deductors)
+}
+
 export interface Extracted26AS {
   tdsSalary: number | null;         // Part I TDS deposited on salary (section 192)
-  tdsNonSalary: number | null;      // Part I TDS on non-salary (194S etc.)
+  tdsNonSalary: number | null;      // Part I TDS on non-salary (194S etc.) — aggregate total
+  nonSalarySections: NonSalaryTDSSection[] | null; // same total, broken out by section code —
+                                                    // lets us infer income type (194J → professional,
+                                                    // 194IA → property sale, 194S → crypto, etc.)
+                                                    // for the ITR form recommendation below.
   advanceTaxPaid: number | null;    // Part C advance tax
   selfAssessmentTax: number | null; // Part D self-assessment tax
   totalTdsCredits: number | null;   // total TDS deposited across all deductors
@@ -122,6 +132,8 @@ export interface ReconciliationCheck {
 export interface MultiEmployerFlags {
   employerCount: number;
   standardDeductionDoubleCounted: boolean;
+  totalDeductionsVIADoubleCounted: boolean;
+  deduction80DDoubleCounted: boolean;
   regimeConsistent: boolean;
   regimesSeen: (boolean | null)[];
 }
@@ -149,6 +161,86 @@ export interface ReconciliationReport {
     creditedTax: number | null;            // TDS + advance tax + self-assessment tax per 26AS
     estimatedShortfall: number | null;     // null when not computable (e.g. regime mismatch)
   };
+  recommendedITRForm: ITRFormResult;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ITR form recommendation, inferred from AIS + 26AS (incl. section-level TDS
+// breakdown) + Form 16 — NOT from user-entered checkboxes the way the Income
+// Tax Calculator's version works. Several ITRFormInput fields have no
+// reliable signal in these three documents at all (house property count,
+// director status, residential status, foreign assets, agricultural income)
+// — those default to the "simple" case and get called out explicitly in the
+// warnings, rather than silently guessed at.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const BUSINESS_SIGNAL_SECTIONS = ["194C", "194J", "194Q", "194H"];
+
+function inferITRFormRecommendation(
+  ais: ExtractedAIS,
+  form26as: Extracted26AS,
+  form16: ExtractedForm16
+): ITRFormResult {
+  const sections = form26as.nonSalarySections ?? [];
+  const sectionCodes = new Set(sections.map((s) => s.section));
+
+  const businessSectionsSeen = BUSINESS_SIGNAL_SECTIONS.filter((s) => sectionCodes.has(s));
+  const hasBusinessIncome = businessSectionsSeen.length > 0;
+  const hasPropertySaleSignal = sectionCodes.has("194IA");
+  const hasSecuritiesGains = (ais.securitiesTransactions ?? 0) > 0 || (ais.mutualFundTransactions ?? 0) > 0;
+  const hasCapitalGains = hasPropertySaleSignal || hasSecuritiesGains;
+  const hasVDAIncome = sectionCodes.has("194S") || (ais.cryptoIncome ?? 0) > 0;
+  const hasOtherSources =
+    (ais.interestFromSavings ?? 0) > 0 || (ais.interestFromFD ?? 0) > 0 || (ais.dividendIncome ?? 0) > 0;
+  const hasSalaryIncome = (form16.grossSalary ?? 0) > 0 || (ais.salaryIncome ?? 0) > 0;
+
+  // Best-effort total income: salary (Form 16, most reliable figure we have)
+  // + AIS other-source amounts. Capital gains are deliberately excluded —
+  // AIS shows gross transaction value, not net gain, so adding it in would
+  // overstate "total income" for the ₹50L ITR-1/4 ceiling check.
+  const totalIncome =
+    (form16.taxableIncome ?? form16.grossSalary ?? 0) +
+    (ais.interestFromSavings ?? 0) +
+    (ais.interestFromFD ?? 0) +
+    (ais.dividendIncome ?? 0);
+
+  const input: ITRFormInput = {
+    residentialStatus: "resident", // no reliable signal in these documents — see warnings
+    totalIncome,
+    hasSalaryIncome,
+    housePropertyCount: 0,         // no reliable signal — see warnings
+    hasBusinessIncome,
+    isPresumptiveScheme: false,    // conservative default when business income is detected — see warnings
+    hasCapitalGains,
+    hasVDAIncome,
+    hasOtherSources,
+    agriculturalIncome: 0,
+    isDirectorInCompany: false,    // no reliable signal — see warnings
+    hasForeignIncomeOrAssets: false, // LRS remittance alone isn't proof of foreign assets/income — see warnings
+  };
+
+  const result = recommendITRForm(input);
+
+  const documentCaveats: string[] = [
+    "Inferred only from your AIS, 26AS, and Form 16 — these documents can't reliably show house property count, director status, NRI/RNOR residential status, foreign assets, or agricultural income. Confirm those yourself before relying on this recommendation.",
+  ];
+  if (hasBusinessIncome) {
+    documentCaveats.push(
+      `TDS under section(s) ${businessSectionsSeen.join(", ")} on your 26AS suggests business/professional income. If this is declared under a presumptive scheme (44AD/44ADA/44AE), ITR-4 may apply instead of ITR-3 — this tool conservatively assumes it is NOT presumptive unless you confirm otherwise.`
+    );
+  }
+  if (hasPropertySaleSignal) {
+    documentCaveats.push(
+      "TDS under section 194IA on your 26AS (buyer-deducted TDS on property purchase) suggests you sold immovable property this year — treated as a capital gains signal here."
+    );
+  }
+  if ((ais.lrsRemittance ?? 0) > 0) {
+    documentCaveats.push(
+      "You have LRS remittances on your AIS. If these resulted in foreign bank accounts or investments you still hold, Schedule FA disclosure is required — only available in ITR-2/ITR-3, not ITR-1/ITR-4."
+    );
+  }
+
+  return { ...result, warnings: [...result.warnings, ...documentCaveats] };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -208,6 +300,7 @@ function parse26ASFromText(text: string): Extracted26AS {
   const result: Extracted26AS = {
     tdsSalary: null,
     tdsNonSalary: null,
+    nonSalarySections: null, // dead-code path (see file header) — not extended, live parsing is parse26ASWithGemini below
     advanceTaxPaid: null,
     selfAssessmentTax: null,
     totalTdsCredits: null,
@@ -592,7 +685,7 @@ Extract these values. Use null if not found. Return ONLY this JSON (no markdown,
 
 async function parse26ASWithGemini(pdfBuffer: Buffer): Promise<Extracted26AS> {
   const empty: Extracted26AS = {
-    tdsSalary: null, tdsNonSalary: null, advanceTaxPaid: null,
+    tdsSalary: null, tdsNonSalary: null, nonSalarySections: null, advanceTaxPaid: null,
     selfAssessmentTax: null, totalTdsCredits: null, tcsPaid: null,
   };
   if (!ai) {
@@ -615,6 +708,13 @@ Find ALL deductors and their TDS. Section 192 entries are salary TDS.
 Sum up:
 - tdsSalary = total Tax Deposited for all section 192 (salary) rows across all deductors
 - tdsNonSalary = total Tax Deposited for all non-192 section rows (194A, 194S, etc.)
+- nonSalarySections = a breakdown of tdsNonSalary BY section code — one entry per distinct
+  non-192 section found (e.g. 194A, 194C, 194J, 194Q, 194S, 194IA, 194H, 194I, 194D, 194B),
+  with the Tax Deposited summed across all deductors under that same section. This tells us
+  what KIND of non-salary income the person has (194J = professional/technical fees, 194C =
+  contractor payments, 194IA = TDS on sale of immovable property i.e. this person sold
+  property, 194S = crypto/VDA, 194Q = sale of goods, 194A = interest, etc.) — needed to
+  recommend the correct ITR form, not just to total up the credit.
 - advanceTaxPaid = total advance tax from Part C/III (BSR code entries, not TDS)
 - selfAssessmentTax = self-assessment tax paid (if any)
 - tcsPaid = total TCS collected (Part VI/D, section 206CQ etc.)
@@ -625,6 +725,7 @@ Return ONLY this JSON (no markdown, no text before/after the JSON):
 {
   "tdsSalary": <number or null>,
   "tdsNonSalary": <number or null>,
+  "nonSalarySections": [{ "section": "<e.g. 194J>", "amount": <number> }, ...] or [],
   "advanceTaxPaid": <number or null>,
   "selfAssessmentTax": <number or null>,
   "tcsPaid": <number or null>,
@@ -653,9 +754,19 @@ Return ONLY this JSON (no markdown, no text before/after the JSON):
     if (!match) { console.warn("[parse26ASWithGemini] No JSON found"); return empty; }
     const parsed = JSON.parse(match[0]);
     console.log("[parse26ASWithGemini] Parsed:", JSON.stringify(parsed));
+
+    // Validate nonSalarySections defensively — this feeds the ITR form
+    // recommendation, so a malformed entry from the model shouldn't crash
+    // the pipeline or silently poison the recommendation with garbage.
+    const rawSections = Array.isArray(parsed.nonSalarySections) ? parsed.nonSalarySections : [];
+    const nonSalarySections: NonSalaryTDSSection[] = rawSections
+      .filter((s: any) => s && typeof s.section === "string" && typeof s.amount === "number")
+      .map((s: any) => ({ section: s.section.trim().toUpperCase(), amount: s.amount }));
+
     return {
       tdsSalary: parsed.tdsSalary ?? null,
       tdsNonSalary: parsed.tdsNonSalary ?? null,
+      nonSalarySections: nonSalarySections.length ? nonSalarySections : null,
       advanceTaxPaid: parsed.advanceTaxPaid ?? null,
       selfAssessmentTax: parsed.selfAssessmentTax ?? null,
       totalTdsCredits: (parsed.tdsSalary ?? 0) + (parsed.tdsNonSalary ?? 0) || null,
@@ -837,8 +948,30 @@ function combineForm16s(
   // accepted investment declarations against it.
   const raw80C = sumField(employers, "deduction80C") ?? 0;
   const deduction80C = employers.some((e) => e.deduction80C != null) ? Math.min(raw80C, 150000) : null;
-  const deduction80D = sumField(employers, "deduction80D");
-  const totalDeductionsVI_A = sumField(employers, "totalDeductionsVI_A");
+
+  // Chapter VI-A deductions (80C, 80D, and everything else in that figure)
+  // are investment/expense declarations the taxpayer submits independently
+  // to each employer — not something each employer computes from their own
+  // payroll data the way HRA or professional tax is. A mid-year job switcher
+  // who declared the SAME investments to both employers (common when the
+  // new employer doesn't know what was already claimed elsewhere) would have
+  // that double-declaration summed here, inflating deductions and
+  // understating real tax liability — the opposite of what a reconciliation
+  // tool should ever do. Take the max reported by any single employer
+  // instead of the raw sum (same treatment as standardDeduction above), and
+  // flag when employers disagree so it's visible rather than silently
+  // averaged away.
+  const deduction80DValues = employers
+    .map((e) => e.deduction80D)
+    .filter((v): v is number => typeof v === "number" && v > 0);
+  const deduction80D = deduction80DValues.length ? Math.max(...deduction80DValues) : null;
+  const deduction80DDoubleCounted = deduction80DValues.length > 1 && new Set(deduction80DValues).size > 1;
+
+  const viaValues = employers
+    .map((e) => e.totalDeductionsVI_A)
+    .filter((v): v is number => typeof v === "number" && v > 0);
+  const totalDeductionsVI_A = viaValues.length ? Math.max(...viaValues) : null;
+  const totalDeductionsVIADoubleCounted = viaValues.length > 1 && new Set(viaValues).size > 1;
 
   const regimes = employers.map((e) => e.newRegime);
   const distinctRegimes = new Set(regimes.filter((r): r is boolean => r != null));
@@ -892,7 +1025,14 @@ function combineForm16s(
 
   return {
     combined,
-    flags: { employerCount: n, standardDeductionDoubleCounted, regimeConsistent, regimesSeen: regimes },
+    flags: {
+      employerCount: n,
+      standardDeductionDoubleCounted,
+      totalDeductionsVIADoubleCounted,
+      deduction80DDoubleCounted,
+      regimeConsistent,
+      regimesSeen: regimes,
+    },
   };
 }
 
@@ -1158,6 +1298,19 @@ function buildMismatches(
       });
     }
 
+    if (multiEmployerFlags.totalDeductionsVIADoubleCounted) {
+      mismatches.push({
+        id: String(id++),
+        category: "Multiple Employers",
+        severity: "MEDIUM",
+        title: "Chapter VI-A deductions differ across employers",
+        description: `Your Form 16s report different total Chapter VI-A deduction figures (80C, 80D, and others) across employers. If you declared the same investments (e.g. the same PPF/LIC/insurance premium) to more than one employer, only claim it once — it is not per-employment.`,
+        aisValue: null, form16Value: f16.totalDeductionsVI_A, form26asValue: null, difference: null,
+        ruleExplanation: "Chapter VI-A deductions (80C up to ₹1,50,000, 80D, and others) are personal, per-year benefits based on investments/expenses you declare — not something each employer computes independently the way HRA is. A taxpayer who declared the same investments to both employers around a mid-year job change risks double-counting.",
+        suggestedAction: "The combined figure shown uses the higher of what any single employer reported, not the sum — verify against your actual investment proofs before filing, especially if the two employers' figures differ substantially.",
+      });
+    }
+
     if (!multiEmployerFlags.regimeConsistent) {
       mismatches.push({
         id: String(id++),
@@ -1243,6 +1396,14 @@ async function generateAIInsights(
     .join("\n");
 
   const prompt = `You are an expert Indian Chartered Accountant helping taxpayer file ITR for FY 2025-26 (AY 2026-27).
+
+GROUND TRUTH — CURRENT LAW (do not contradict these, even if your training data suggests otherwise; tax rules changed in recent Budgets and your recollection may be out of date):
+- Standard deduction u/s 16(ia), New Tax Regime (115BAC), FY 2024-25 AND FY 2025-26: ₹75,000 (raised from ₹50,000 by Budget 2024, effective FY 2024-25 onwards — this is NOT an error to flag or correct).
+- Standard deduction, Old Tax Regime, all these years: ₹50,000 (unchanged).
+- Do NOT tell the taxpayer to "add back" or "rectify" a standard deduction amount that matches one of the figures above — it is already correct.
+- New Regime Section 87A rebate: full rebate (tax = nil) up to ₹12,00,000 total income for FY 2025-26/2026-27 (with marginal relief above that up to ~₹12.7L); up to ₹7,00,000 for FY 2023-24/2024-25 (also with marginal relief).
+- HRA exemption u/s 10(13A) and LTA u/s 10(5) are NOT available under the New Regime — do not suggest claiming them there.
+- If the Form 16 standard deduction figure conflicts with the rule above for its stated regime and year, flag it as a specific numeric mismatch (state both numbers) rather than a generic "rectify" instruction — but for FY 2024-25/2025-26 New Regime, ₹75,000 is the correct, current figure.
 
 Tax Document Summary:
 - Gross Salary (Form 16): ${fmt(f16.grossSalary)}
@@ -1347,6 +1508,7 @@ export async function reconcileTaxDocuments(
     // unless we extract transaction rows. Leave null — it'll show PARTIAL in UI.
   }
 
+
   console.log("[reconcileTaxDocuments] Final extracted data:", {
     ais: { salary: ais.salaryIncome, interest: ais.interestFromSavings, div: ais.dividendIncome },
     form26as: { tdsSalary: form26as.tdsSalary, advTax: form26as.advanceTaxPaid },
@@ -1369,6 +1531,13 @@ export async function reconcileTaxDocuments(
       }`,
     });
   }
+
+  // Recommended ITR form gets its own dedicated section in the PDF report
+  // and frontend (both render report.recommendedITRForm directly with full
+  // reasons/blockers/warnings) rather than a one-line entry in the generic
+  // checks grid, which would just duplicate it with less detail.
+  const recommendedITRForm = inferITRFormRecommendation(ais, form26as, form16);
+
   const mismatches = buildMismatches(ais, form26as, form16, checks, multiEmployerFlags);
   const overallStatus = determineOverallStatus(mismatches);
   const summary = generateSummary(overallStatus, mismatches, form16);
@@ -1410,5 +1579,6 @@ export async function reconcileTaxDocuments(
         estimatedShortfall,
       },
     }),
+    recommendedITRForm,
   };
 }

@@ -388,9 +388,39 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
         cessAmount = taxAfterRebate * 0.04;
         finalTax = taxAfterRebate + cessAmount;
       }
+    } else if (regime === 'new') {
+      // New Regime, FY 2023-24 / FY 2024-25 — Section 87A rebate up to ₹7 lakh.
+      // Budget 2023 legislated marginal relief at this cliff too (same shape
+      // as the ₹12L branch above, just at the ₹7L threshold): tax payable on
+      // income marginally above ₹7L can't exceed the amount by which income
+      // exceeds ₹7L. This was previously missing here, which overstated tax
+      // by a wide margin for income just above ₹7,00,000 (e.g. ₹7.1L showed
+      // ~₹27,040 instead of the correct ~₹10,400).
+      if (taxableIncome <= rebateLimit) {
+        rebate87A = incomeTax;
+        taxAfterRebate = 0;
+        cessAmount = 0;
+        finalTax = 0;
+      } else {
+        rebate87A = 0;
+        taxAfterRebate = incomeTax;
+
+        const excessIncome = taxableIncome - rebateLimit;
+
+        if (taxAfterRebate > excessIncome) {
+          marginalRelief = taxAfterRebate - excessIncome;
+          taxAfterRebate = excessIncome;
+          marginalReliefApplied = true;
+        }
+
+        cessAmount = taxAfterRebate * 0.04;
+        finalTax = taxAfterRebate + cessAmount;
+      }
     } else {
-      // Old regime and non-2025-26 new regime:
-      // Step 2: Rebate u/s 156 (ITA 2025) / 87A (ITA 1961) — applied against income tax only, before cess
+      // Old Regime — Section 87A rebate up to ₹5 lakh. NO statutory marginal
+      // relief exists for this cliff (unlike the New Regime cliffs above) —
+      // crossing ₹5,00,000 by even ₹1 loses the entire ₹12,500 rebate. This
+      // is a real, well-known quirk of Indian tax law, not a gap in this code.
       if (taxableIncome <= rebateLimit) {
         rebate87A = Math.min(incomeTax, rebateAmount);
       }

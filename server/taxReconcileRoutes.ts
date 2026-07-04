@@ -238,6 +238,41 @@ function generatePDFReport(report: ReconciliationReport): Promise<Buffer> {
     }
 
     // ────────────────────────────────────────────────────────────────────────
+    // RECOMMENDED ITR FORM
+    // ────────────────────────────────────────────────────────────────────────
+    if (report.recommendedITRForm) {
+      const itr = report.recommendedITRForm;
+      sectionHeader("Recommended ITR Form");
+      doc.fillColor(BLACK).font("Helvetica-Bold").fontSize(10)
+         .text(itr.formLabel, M, doc.y, { width: CW });
+      doc.moveDown(0.15);
+      itr.reasons.forEach((r) => {
+        ensureSpace(14);
+        doc.font("Helvetica").fillColor(GRAY).fontSize(8)
+           .text(`- ${pdfSafe(r)}`, M, doc.y, { width: CW });
+      });
+      if (itr.blockers.length > 0) {
+        doc.moveDown(0.15);
+        doc.font("Helvetica-Bold").fillColor(BLACK).fontSize(8)
+           .text("Why not the simpler form:", M, doc.y, { width: CW });
+        itr.blockers.forEach((b) => {
+          ensureSpace(14);
+          doc.font("Helvetica").fillColor(GRAY).fontSize(8)
+             .text(`- ${pdfSafe(b)}`, M, doc.y, { width: CW });
+        });
+      }
+      if (itr.warnings.length > 0) {
+        doc.moveDown(0.15);
+        itr.warnings.forEach((w) => {
+          ensureSpace(14);
+          doc.font("Helvetica-Oblique").fillColor(ORANGE).fontSize(7.5)
+             .text(pdfSafe(w), M, doc.y, { width: CW });
+        });
+      }
+      doc.moveDown(0.4);
+    }
+
+    // ────────────────────────────────────────────────────────────────────────
     // RECONCILIATION CHECKS
     // ────────────────────────────────────────────────────────────────────────
     sectionHeader("Reconciliation Checks");

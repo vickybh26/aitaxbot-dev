@@ -144,23 +144,41 @@ router.get("/admin/queries", requireAdminL1, async (req: Request, res: Response)
     const limit = Math.min(Number(req.query.limit) || 100, 500);
     const onlyGraphAvailable = req.query.graph_available === "true";
 
-    let queryRef: FirebaseFirestore.Query<FirebaseFirestore.DocumentData> = getFirestore().collection("ai_queries");
+    let queries: any[];
+
     if (onlyGraphAvailable) {
-      queryRef = queryRef.where("graph_available", "==", true);
+      // Firestore requires a manually-provisioned composite index to combine
+      // an equality filter (graph_available == true) with orderBy on a
+      // different field (timestamp) — and nothing in our deploy flow
+      // (plain `git push` to Railway) provisions Firestore indexes, so that
+      // combined query throws FAILED_PRECONDITION on every call. Filter
+      // server-side, then sort/limit in memory instead — timestamp is
+      // stored as an ISO string (see logComparison in ragService.ts), which
+      // sorts correctly as a plain string. ai_queries is a low-volume,
+      // admin-only collection, so this is cheap.
+      const snapshot = await getFirestore()
+        .collection("ai_queries")
+        .where("graph_available", "==", true)
+        .limit(2000)
+        .get();
+      queries = snapshot.docs
+        .map((doc: any) => ({ id: doc.id, ...doc.data() }))
+        .sort((a: any, b: any) => String(b.timestamp || "").localeCompare(String(a.timestamp || "")))
+        .slice(0, limit);
+    } else {
+      // No equality filter here, so ordering by a single field works fine
+      // with Firestore's automatic single-field indexes.
+      const snapshot = await getFirestore()
+        .collection("ai_queries")
+        .orderBy("timestamp", "desc")
+        .limit(limit)
+        .get();
+      queries = snapshot.docs.map((doc: any) => ({ id: doc.id, ...doc.data() }));
     }
-    const snapshot = await queryRef
-      .orderBy("timestamp", "desc")
-      .limit(limit)
-      .get();
-
-
-    const queries = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
 
     return res.json({ queries, total: queries.length });
   } catch (err) {
+    console.error("[RAG] Admin queries fetch error:", err);
     return (res as any).apiError(500, "QUERY_FETCH_FAILED", "Failed to fetch queries.");
   }
 });
