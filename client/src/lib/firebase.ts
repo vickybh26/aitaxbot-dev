@@ -6,6 +6,8 @@ import {
   getAuth,
   GoogleAuthProvider,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
@@ -89,8 +91,42 @@ googleProvider.setCustomParameters({
 });
 
 // Auth functions
-// Using signInWithPopup for reliable auth in all environments (dev & production)
-export const signInWithGoogle = () => signInWithPopup(auth, googleProvider);
+// Google sign-in: try popup first (fastest, no page reload). If the popup
+// itself is blocked or gets cancelled by the browser — very common with
+// third-party-cookie blocking in Safari/Chrome privacy modes and most
+// ad/privacy extensions, and reported by users as "sign-in cancelled" even
+// though they didn't close anything — fall back to a full-page redirect
+// flow instead of surfacing an error. Genuine user-initiated cancellation
+// (closing the popup deliberately) still fails normally via the catch in
+// the calling code, since redirect can't distinguish "blocked" from
+// "closed" — but redirect itself doesn't have the blocking problem, so
+// this converts most environmental failures into a successful sign-in.
+const POPUP_FALLBACK_CODES = new Set([
+  "auth/popup-blocked",
+  "auth/cancelled-popup-request",
+  "auth/popup-closed-by-user",
+]);
+
+export const signInWithGoogle = async () => {
+  try {
+    return await signInWithPopup(auth, googleProvider);
+  } catch (error: any) {
+    if (POPUP_FALLBACK_CODES.has(error?.code)) {
+      // signInWithRedirect navigates away — the promise never resolves in
+      // this tab. The caller's .then()/finally logic simply won't run
+      // before navigation, which is expected for a redirect flow.
+      await signInWithRedirect(auth, googleProvider);
+      return undefined as any;
+    }
+    throw error;
+  }
+};
+
+// Completes a redirect-based sign-in on page load, if one is in progress.
+// Call this once on app init (see AuthContext) — resolves to null if the
+// user didn't just come back from a redirect sign-in.
+export const completeGoogleRedirectSignIn = () => getRedirectResult(auth);
+
 export const signInWithEmail = (email: string, password: string) => signInWithEmailAndPassword(auth, email, password);
 export const signUpWithEmail = (email: string, password: string) => createUserWithEmailAndPassword(auth, email, password);
 export const logout = () => signOut(auth);

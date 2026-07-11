@@ -35,7 +35,7 @@ export default function ResultAuthGate({ toolName }: ResultAuthGateProps) {
         </h3>
         <p className="text-sm text-slate-600 mb-6 max-w-sm mx-auto">
           Your {toolName} result is ready. Sign in or create a free AiTaxBot
-          account to view it — takes 10 seconds, no credit card required.
+          account to view it — takes 10 seconds.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <a href={`/login?tab=signup&returnUrl=${returnUrl}`}>

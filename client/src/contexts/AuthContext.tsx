@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, useRef, type ReactNode } from "react";
-import { onAuthStateChanged, type User, logout } from "@/lib/firebase";
+import { onAuthStateChanged, type User, logout, completeGoogleRedirectSignIn } from "@/lib/firebase";
 import { auth } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
 
@@ -177,6 +177,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, [user]);
 
+  // Completes a Google sign-in that fell back to redirect (see signInWithGoogle
+  // in lib/firebase.ts — happens when the popup itself is blocked, which
+  // reports as "sign-in cancelled" even though the user didn't cancel
+  // anything). onAuthStateChanged below already picks up the resulting user
+  // automatically; this just surfaces a toast if the redirect flow itself
+  // failed (e.g. the user actually cancelled on Google's consent screen).
+  useEffect(() => {
+    completeGoogleRedirectSignIn()
+      .then((result) => {
+        if (result?.user) {
+          toast({ title: "Success", description: "Signed in with Google successfully!" });
+        }
+      })
+      .catch((error) => {
+        console.error("[AuthContext] Redirect sign-in error:", error);
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: User | null) => {
       console.log('[AuthContext] Auth state changed:', firebaseUser ? `User: ${firebaseUser.email}` : 'No user');
@@ -231,4 +250,3 @@ export function useAuth() {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
-}
