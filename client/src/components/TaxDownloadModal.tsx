@@ -35,6 +35,8 @@ export default function TaxDownloadModal({
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [mobile, setMobile] = useState("");
+  const [dataConsent, setDataConsent] = useState(false);
+  const [marketingConsent, setMarketingConsent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -53,6 +55,10 @@ export default function TaxDownloadModal({
     }
     if (!mobile.trim() || !/^[6-9]\d{9}$/.test(mobile.replace(/\s/g, ""))) {
       setError("Please enter a valid 10-digit Indian mobile number.");
+      return;
+    }
+    if (!dataConsent) {
+      setError("Please agree to the Privacy Policy to continue.");
       return;
     }
 
@@ -81,6 +87,8 @@ export default function TaxDownloadModal({
           whatsapp: mobile.trim(),
           source,
           summaryText,
+          dataConsent,
+          marketingConsent,
         }),
       });
 
@@ -103,6 +111,8 @@ export default function TaxDownloadModal({
     setName("");
     setEmail("");
     setMobile("");
+    setDataConsent(false);
+    setMarketingConsent(false);
     setError("");
     onClose();
   }
@@ -226,14 +236,46 @@ export default function TaxDownloadModal({
                 />
               </div>
 
+              <div className="space-y-2 pt-1">
+                <label className="flex items-start gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={dataConsent}
+                    onChange={(e) => setDataConsent(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-slate-300"
+                    data-testid="checkbox-data-consent"
+                  />
+                  <span className="text-xs text-slate-600">
+                    I agree to AiTaxBot's{" "}
+                    <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                      Privacy Policy
+                    </a>{" "}
+                    and consent to my name, email, and mobile number being used to send me
+                    this tax computation. <span className="text-red-500">*</span>
+                  </span>
+                </label>
+                <label className="flex items-start gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={marketingConsent}
+                    onChange={(e) => setMarketingConsent(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-slate-300"
+                    data-testid="checkbox-marketing-consent"
+                  />
+                  <span className="text-xs text-slate-600">
+                    Also send me occasional tax tips and deadline reminders by email (optional).
+                  </span>
+                </label>
+              </div>
+
               {error && (
                 <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>
               )}
 
               <Button
                 type="submit"
-                disabled={loading}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5"
+                disabled={loading || !dataConsent}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 disabled:opacity-50"
               >
                 {loading ? (
                   <span className="flex items-center gap-2">
@@ -247,10 +289,6 @@ export default function TaxDownloadModal({
                   </span>
                 )}
               </Button>
-
-              <p className="text-xs text-slate-400 text-center">
-                No spam. We'll only send your computation and useful tax reminders.
-              </p>
             </form>
           )}
 

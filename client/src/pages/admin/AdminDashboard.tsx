@@ -28,6 +28,9 @@ interface AdminStats {
   completedProfiles: number;
   profileCompletionRate: number;
   signupTrend: { date: string; signups: number }[];
+  activeUsers: number;
+  returningUsers: number;
+  returningUserRate: number;
 }
 
 function StatCard({
@@ -119,7 +122,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Stat cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-4">
           <StatCard
             label="Total Users"
             value={(stats?.totalUsers ?? 0).toLocaleString("en-IN")}
@@ -160,6 +163,13 @@ export default function AdminDashboard() {
             sub="profile fill rate"
             icon={TrendingUp}
             color="bg-sky-500"
+          />
+          <StatCard
+            label="Returning Users"
+            value={(stats?.returningUsers ?? 0).toLocaleString("en-IN")}
+            sub={`${stats?.returningUserRate ?? 0}% of ${(stats?.activeUsers ?? 0).toLocaleString("en-IN")} active users`}
+            icon={UserCheck}
+            color="bg-indigo-600"
           />
         </div>
 

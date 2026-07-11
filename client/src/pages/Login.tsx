@@ -22,6 +22,7 @@ export default function Login() {
   const [loginPassword, setLoginPassword] = useState("");
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
+  const [signupConsent, setSignupConsent] = useState(false);
   
   const returnUrl = useMemo(() => {
     // Check URL params for returnUrl
@@ -89,6 +90,10 @@ export default function Login() {
 
   const handleEmailSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!signupConsent) {
+      toast({ title: "Please agree to our Privacy Policy to create an account.", variant: "destructive" });
+      return;
+    }
     setIsLoading(true);
     try {
       await signUpWithEmail(signupEmail, signupPassword);
@@ -185,7 +190,7 @@ export default function Login() {
 
             {/* Login/Signup Section */}
             <Card className="p-6">
-              <Tabs defaultValue="login" className="w-full">
+              <Tabs defaultValue={new URLSearchParams(searchString).get('tab') === 'signup' ? 'signup' : 'login'} className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="login">Login</TabsTrigger>
                   <TabsTrigger value="signup">Sign Up</TabsTrigger>
@@ -293,10 +298,29 @@ export default function Login() {
                       />
                       <p className="text-xs text-gray-500 mt-1">Minimum 6 characters</p>
                     </div>
-                    <Button 
-                      type="submit" 
-                      className="w-full" 
-                      disabled={isLoading}
+                    <label className="flex items-start gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={signupConsent}
+                        onChange={(e) => setSignupConsent(e.target.checked)}
+                        className="mt-0.5 h-4 w-4 rounded border-gray-300"
+                        data-testid="checkbox-signup-consent"
+                      />
+                      <span className="text-xs text-gray-600">
+                        I agree to AiTaxBot's{" "}
+                        <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                          Privacy Policy
+                        </a>{" "}
+                        and{" "}
+                        <a href="/terms-of-service" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                          Terms of Service
+                        </a>.
+                      </span>
+                    </label>
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      disabled={isLoading || !signupConsent}
                       data-testid="button-signup-email"
                     >
                       {isLoading ? "Creating account..." : "Create Account"}
@@ -312,11 +336,17 @@ export default function Login() {
                     </div>
                   </div>
 
-                  <Button 
-                    variant="outline" 
-                    className="w-full" 
-                    onClick={handleGoogleSignIn}
-                    disabled={isLoading}
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => {
+                      if (!signupConsent) {
+                        toast({ title: "Please agree to our Privacy Policy to create an account.", variant: "destructive" });
+                        return;
+                      }
+                      handleGoogleSignIn();
+                    }}
+                    disabled={isLoading || !signupConsent}
                     data-testid="button-google-signup"
                   >
                     <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">

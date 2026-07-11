@@ -3,6 +3,8 @@ import { useTrackToolUse } from '@/hooks/useTrackToolUse';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useAuth } from "@/contexts/AuthContext";
+import ResultAuthGate from "@/components/ResultAuthGate";
 
 interface HomeLoanResult {
   maxLoanEligible: number;
@@ -26,6 +28,7 @@ function formatINR(n: number): string {
 }
 
 export default function HomeLoanCalculator() {
+  const { user } = useAuth();
   const trackTool = useTrackToolUse();
   const [monthlyIncome, setMonthlyIncome] = useState<number>(100000);
   const [existingEMI, setExistingEMI] = useState<number>(0);
@@ -184,7 +187,9 @@ export default function HomeLoanCalculator() {
 
           {/* Results */}
           <div>
-            {result ? (
+            {result && !user ? (
+              <ResultAuthGate toolName="Home Loan Calculator" />
+            ) : result ? (
               <div className="space-y-4">
 
                 {/* Eligibility check */}

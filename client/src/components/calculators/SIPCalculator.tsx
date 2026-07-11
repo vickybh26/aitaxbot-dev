@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
+import { useAuth } from "@/contexts/AuthContext";
+import ResultAuthGate from "@/components/ResultAuthGate";
 
 interface SIPCalculatorProps {
   onClose?: () => void;
@@ -20,6 +22,7 @@ interface SIPResult {
 
 export default function SIPCalculator({ onClose }: SIPCalculatorProps = {}) {
   const trackTool = useTrackToolUse();
+  const { user } = useAuth();
   const [monthlyInvestment, setMonthlyInvestment] = useState<number>(5000);
   const [annualReturn, setAnnualReturn] = useState<number>(12);
   const [years, setYears] = useState<number>(10);
@@ -213,7 +216,9 @@ export default function SIPCalculator({ onClose }: SIPCalculatorProps = {}) {
         {/* Results */}
         <Card className="bg-gray-50 p-6">
           <h3 className="font-semibold text-gray-900 mb-4">Investment Summary</h3>
-          {result && (
+          {result && !user ? (
+            <ResultAuthGate toolName="SIP Calculator" />
+          ) : result && (
             <div className="space-y-4">
               <Card className="bg-white p-4">
                 <div className="text-sm text-gray-600">Total Investment</div>

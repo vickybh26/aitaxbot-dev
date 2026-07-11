@@ -48,7 +48,7 @@ const en = {
     headline:    "Smart Tax Calculator for\nIndian Taxpayers",
     subheadline: "Calculate your tax liability in minutes — compare Old vs New Regime, estimate deductions, and get personalised AI suggestions. Built for salaried employees, freelancers, and investors.",
     cta:         "Calculate Tax Now",
-    ctaFree:     "100% Free — no signup needed",
+    ctaFree:     "100% Free — sign in to see your result",
     trustBadge:  "Trusted by {count}+ taxpayers",
   },
 

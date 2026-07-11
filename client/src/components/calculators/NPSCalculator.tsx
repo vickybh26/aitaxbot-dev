@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
+import { useAuth } from "@/contexts/AuthContext";
+import ResultAuthGate from "@/components/ResultAuthGate";
 
 interface NPSResult {
   totalCorpus: number;
@@ -19,6 +21,7 @@ interface NPSResult {
 }
 
 export default function NPSCalculator() {
+  const { user } = useAuth();
   const trackTool = useTrackToolUse();
   const [currentAge, setCurrentAge] = useState<number>(30);
   const [retirementAge, setRetirementAge] = useState<number>(60);
@@ -308,7 +311,9 @@ export default function NPSCalculator() {
       </Card>
 
       {/* Results */}
-      {result && (
+      {result && !user ? (
+        <ResultAuthGate toolName="NPS Calculator" />
+      ) : result && (
         <div className="space-y-6">
 
           {/* Main Result Cards */}

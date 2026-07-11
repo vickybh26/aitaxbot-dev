@@ -24,7 +24,7 @@ export default function PrivacyPolicy() {
           { label: "Home", href: "/" },
           { label: "Privacy Policy" }
         ]}
-        badge="Last Updated: June 20, 2026"
+        badge="Last Updated: July 11, 2026"
       />
       <div>
         <div className="max-w-4xl mx-auto px-6 py-8">
@@ -54,9 +54,11 @@ export default function PrivacyPolicy() {
                 </p>
               </div>
 
-              <h3 className="text-xl font-semibold text-gray-900 mb-3 mt-6">1b. Account Registration (Optional)</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3 mt-6">1b. Account Registration (Required to View Results)</h3>
               <p className="text-gray-700 mb-3">
-                If you choose to create an account, we collect and store in Firebase:
+                A free account (sign in or sign up) is required to view the result of any calculator.
+                Educational content — blog articles and the NRI Corner — remains accessible without an
+                account. When you create an account, we collect and store in Firebase:
               </p>
               <ul className="list-disc pl-6 mb-4 text-gray-700 space-y-1">
                 <li>Full name</li>
@@ -66,12 +68,13 @@ export default function PrivacyPolicy() {
                 <li>Account creation timestamp</li>
               </ul>
               <p className="text-gray-600 text-sm">
-                Account creation is entirely optional. All calculators work without an account.
+                Account creation is always free — there is no fee or paywall of any kind.
               </p>
 
               <h3 className="text-xl font-semibold text-gray-900 mb-3 mt-6">1c. Download Gate (Lead Capture)</h3>
               <p className="text-gray-700 mb-3">
-                When you download a PDF summary of your tax calculation, we collect:
+                Some tools may offer a guest download option requiring name, email, and mobile number
+                instead of a full account. When available and used, we collect:
               </p>
               <ul className="list-disc pl-6 mb-4 text-gray-700 space-y-1">
                 <li>Name</li>
@@ -80,8 +83,10 @@ export default function PrivacyPolicy() {
                 <li>A brief text summary of the calculation type (e.g., "Income Tax — New Regime")</li>
               </ul>
               <p className="text-gray-600 text-sm">
-                This information is stored in our Firestore database and used to email you the PDF and
-                provide occasional tax updates. You may unsubscribe at any time.
+                This information is stored in our Firestore database and used to email you the PDF. We ask
+                for two separate consents at the point of collection: one to send you the computation
+                itself (required), and a second, optional opt-in to also receive occasional tax tips and
+                deadline reminders. You may unsubscribe from the optional emails at any time.
               </p>
 
               <h3 className="text-xl font-semibold text-gray-900 mb-3 mt-6">1d. CA Directory Profiles</h3>
@@ -353,8 +358,11 @@ export default function PrivacyPolicy() {
               <p className="text-gray-700">
                 Your data is stored on Google Firebase infrastructure, which may process data outside India.
                 Google Cloud and Firebase comply with applicable data protection standards. By creating an
-                account or submitting a download request, you consent to such transfer. We will comply with
-                any future DPDPA rules on cross-border data transfers once notified.
+                account or submitting a download request, you consent to such transfer. Under DPDPA 2023,
+                cross-border transfer is permitted to any country except ones the Central Government
+                specifically restricts by notification — as of this policy's last update, no such
+                restricted-country list has been notified. We will update this section immediately if that
+                changes.
               </p>
             </section>
 
@@ -386,11 +394,11 @@ export default function PrivacyPolicy() {
                 For privacy queries, data requests, or grievances under DPDPA 2023, contact our Grievance Officer:
               </p>
               <div className="bg-gray-50 rounded-lg p-6">
-                <p className="text-gray-800 font-semibold mb-1">AiTaxBot — Data Grievance Officer</p>
+                <p className="text-gray-800 font-semibold mb-1">Pragati Jyotishi — Grievance Officer, AiTaxBot</p>
                 <p className="text-gray-700 mb-1">
                   📧 Email:{" "}
-                  <a href="mailto:info@aitaxbot.in" className="text-blue-600 hover:underline" data-testid="link-contact-email">
-                    info@aitaxbot.in
+                  <a href="mailto:admin@aitaxbot.co.in" className="text-blue-600 hover:underline" data-testid="link-contact-email">
+                    admin@aitaxbot.co.in
                   </a>
                 </p>
                 <p className="text-gray-700 mb-1">
@@ -401,7 +409,7 @@ export default function PrivacyPolicy() {
                 </p>
                 <p className="text-gray-600 text-sm mt-4">
                   We acknowledge grievances within 48 hours and resolve them within 30 days. If unsatisfied,
-                  you may approach the Data Protection Board of India once it is constituted under DPDPA 2023.
+                  you may approach the Data Protection Board of India, constituted 14 November 2025 under DPDPA 2023.
                 </p>
               </div>
             </section>

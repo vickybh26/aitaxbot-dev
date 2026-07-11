@@ -25,8 +25,17 @@ export function AdBanner({
 
   useEffect(() => {
     if (isPlaceholder) return;
+    // DPDP: the adsbygoogle.js script itself is only injected after the
+    // user grants advertising consent (see CookieConsent.tsx) — it may not
+    // exist yet when this component mounts. Queueing onto
+    // window.adsbygoogle unconditionally is the standard, documented
+    // AdSense pattern: it creates the array if needed, and whenever the
+    // script does load (immediately, or later once consent is granted) it
+    // drains whatever was queued. Gating this push on window.adsbygoogle
+    // already being truthy would silently drop the ad for anyone who
+    // consents after this component has already mounted.
     try {
-      if (typeof window !== 'undefined' && window.adsbygoogle) {
+      if (typeof window !== 'undefined') {
         (window.adsbygoogle = window.adsbygoogle || []).push({});
       }
     } catch (error) {

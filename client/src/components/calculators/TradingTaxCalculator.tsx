@@ -3,6 +3,8 @@ import { useTrackToolUse } from '@/hooks/useTrackToolUse';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useAuth } from "@/contexts/AuthContext";
+import ResultAuthGate from "@/components/ResultAuthGate";
 import {
   AlertTriangle, Info, Plus, Trash2, RefreshCw, TrendingUp,
   DollarSign, BarChart2, Globe, ArrowLeftRight, FileText,
@@ -1058,6 +1060,7 @@ function computeGrandTotal(
 
 export default function TradingTaxCalculator() {
   const trackTool = useTrackToolUse();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>("us-stocks");
   const [annualIncome, setAnnualIncome] = useState<number>(2500000);
 
@@ -1128,7 +1131,11 @@ export default function TradingTaxCalculator() {
             <span className="text-sm text-slate-600">Running total</span>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-lg font-bold text-red-600">{fmt(grandTotal)}</span>
+            {user ? (
+              <span className="text-lg font-bold text-red-600">{fmt(grandTotal)}</span>
+            ) : (
+              <span className="text-sm font-semibold text-blue-600">Sign in to view</span>
+            )}
             <span className="text-xs text-slate-400 flex items-center gap-1">
               View breakdown <ChevronRight className="w-3 h-3" />
             </span>
@@ -1181,7 +1188,11 @@ export default function TradingTaxCalculator() {
             {activeTab === "indian-fo" && <IndianFOTab trades={indianFO} setTrades={setIndianFO} slabRate={slabRate} />}
             {activeTab === "us-fo" && <USFOTab trades={usFO} setTrades={setUSFO} slabRate={slabRate} />}
             {activeTab === "forex" && <ForexTab trades={forex} setTrades={setForex} slabRate={slabRate} />}
-            {activeTab === "summary" && <SummaryTab usStocks={usStocks} usDividends={usDividends} indianFO={indianFO} usFO={usFO} forex={forex} slabRate={slabRate} />}
+            {activeTab === "summary" && (
+              user
+                ? <SummaryTab usStocks={usStocks} usDividends={usDividends} indianFO={indianFO} usFO={usFO} forex={forex} slabRate={slabRate} />
+                : <ResultAuthGate toolName="Trading Tax Calculator" />
+            )}
           </>
         )}
 

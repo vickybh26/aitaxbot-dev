@@ -34,6 +34,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useTrackToolUse } from '@/hooks/useTrackToolUse';
 import { recommendITRForm, type ITRFormResult } from '@shared/itrFormSelector';
+import ResultAuthGate from '@/components/ResultAuthGate';
 
 interface AiTip {
   title: string;
@@ -1442,6 +1443,8 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                 size="lg"
               />
             </div>
+          ) : result && !user ? (
+            <ResultAuthGate toolName="Income Tax Calculator" />
           ) : result ? (
             <div className="space-y-6">
               {/* Recommendation Banner — DS Callout style */}
@@ -1696,7 +1699,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
           )}
 
           {/* ── AI TAX ADVISOR PANEL ── */}
-          {result && (
+          {result && user && (
             <div className="mt-6">
               {aiLoading ? (
                 <Card className="p-5 border-2 border-purple-100 bg-gradient-to-r from-purple-50/70 to-indigo-50/70 backdrop-blur-md shadow-sm transition-all duration-300">
@@ -1785,7 +1788,9 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
         </TabsContent>
 
         <TabsContent value="breakdown" className="space-y-6">
-          {result ? (
+          {result && !user ? (
+            <ResultAuthGate toolName="Income Tax Calculator" />
+          ) : result ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Old Regime Breakdown */}
               <Card className="p-6 premium-glass-card premium-glass-card-hover transition-all duration-300">

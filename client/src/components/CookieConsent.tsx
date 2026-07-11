@@ -67,38 +67,48 @@ export default function CookieConsent() {
     enableTracking(preferences);
   };
 
+  // adsbygoogle.js is intentionally NOT loaded in index.html anymore (DPDP:
+  // consent before processing). Inject it only once the user actually
+  // grants advertising consent, and only once per page load.
+  const loadAdSenseScript = () => {
+    if (typeof document === 'undefined') return;
+    if (document.getElementById('adsbygoogle-script')) return;
+    const script = document.createElement('script');
+    script.id = 'adsbygoogle-script';
+    script.async = true;
+    script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6497933645628124';
+    script.crossOrigin = 'anonymous';
+    document.head.appendChild(script);
+  };
+
   const enableTracking = (prefs: typeof preferences) => {
-    // This function would integrate with your analytics/ad platforms
     // Store preferences for use by analytics scripts
     if (typeof window !== 'undefined') {
       (window as any).cookiePreferences = prefs;
-      
-      // For Google Analytics
-      if (window.gtag) {
-        if (prefs.analytics) {
-          window.gtag('consent', 'update', {
-            'analytics_storage': 'granted'
-          } as any);
-        } else {
-          window.gtag('consent', 'update', {
-            'analytics_storage': 'denied'
-          } as any);
-        }
 
-        // For Google AdSense
-        if (prefs.advertising) {
-          window.gtag('consent', 'update', {
-            'ad_storage': 'granted',
-            'ad_user_data': 'granted',
-            'ad_personalization': 'granted'
-          } as any);
-        } else {
-          window.gtag('consent', 'update', {
-            'ad_storage': 'denied',
-            'ad_user_data': 'denied',
-            'ad_personalization': 'denied'
-          } as any);
-        }
+      // Google Analytics / Ads — Consent Mode v2. index.html sets the
+      // default to 'denied' before gtag/Clarity/AdSense ever load, so
+      // nothing collects data until this update actually runs.
+      if (window.gtag) {
+        window.gtag('consent', 'update', {
+          'analytics_storage': prefs.analytics ? 'granted' : 'denied',
+        } as any);
+        window.gtag('consent', 'update', {
+          'ad_storage': prefs.advertising ? 'granted' : 'denied',
+          'ad_user_data': prefs.advertising ? 'granted' : 'denied',
+          'ad_personalization': prefs.advertising ? 'granted' : 'denied',
+        } as any);
+      }
+
+      // Microsoft Clarity — separate consent API, not covered by gtag.
+      if (typeof (window as any).clarity === 'function') {
+        (window as any).clarity('consent', prefs.analytics);
+      }
+
+      // Google AdSense — only start requesting/serving ads once the user
+      // has actually opted in to advertising cookies.
+      if (prefs.advertising) {
+        loadAdSenseScript();
       }
     }
   };

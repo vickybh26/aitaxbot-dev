@@ -540,7 +540,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to get profile logs" });
     }
   });
-  
+
+  // DELETE /api/user/account — DPDP Right to Erasure, self-service.
+  // A user can only ever delete their OWN account: the uid comes from the
+  // verified Firebase ID token (req.userId), never from the request body or
+  // params, so there's no way to point this at someone else's account.
+  // Deletes: the Firestore user profile, profile change logs, saved tax
+  // calculation history, admin CRM notes about this user, and the actual
+  // Firebase Auth account (so the person can no longer sign back in — the
+  // admin-side delete at DELETE /api/admin/users/:id previously missed this
+  // last step and should be reconciled to match).
+  app.delete("/api/user/account", authenticateFirebaseToken, async (req: AuthenticatedRequest, res) => {
+    const uid = req.userId!;
+    try {
+      const db = getFirestore();
+
+      const logsSnap = await db.collection("userProfileLogs").where("userId", "==", uid).get();
+      const calcSnap = await db.collection("taxCalculationHistory").where("userId", "==", uid).get();
+
+      const batch = db.batch();
+      logsSnap.docs.forEach((d) => batch.delete(d.ref));
+      calcSnap.docs.forEach((d) => batch.delete(d.ref));
+      batch.delete(db.collection("crmNotes").doc(uid));
+      batch.delete(db.collection("users").doc(uid));
+      await batch.commit();
+
+      // Remove the Firebase Auth account itself last, so a failure above
+      // leaves the person still able to log in (fail-safe) rather than
+      // deleted-but-orphaned in a half-cleaned state.
+      try {
+        await admin.auth().deleteUser(uid);
+      } catch (authErr: any) {
+        // If the auth user is already gone (e.g. retried request), that's
+        // fine — the Firestore data is what mattered and it's cleaned up.
+        if (authErr?.code !== "auth/user-not-found") throw authErr;
+      }
+
+      console.log(`[User] Self-service account deletion: ${uid}`);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting user account:", error);
+      res.status(500).json({ error: "Failed to delete account. Please try again or email us." });
+    }
+  });
+
+
   // Contact Form API - Save to Firebase Firestore
   // Contact form — public endpoint, rate-limited to 5/min to slow spam.
   // Wrapped in App Check so scripts can't hit the form from outside our app.

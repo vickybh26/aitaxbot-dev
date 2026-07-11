@@ -39,6 +39,24 @@ const app = express();
 app.set("trust proxy", 1);
 
 // ─────────────────────────────────────────────────────────────────────
+// Apex → www redirect. AdSense has the site registered as the bare apex
+// domain (aitaxbot.co.in), but the canonical host is www.aitaxbot.co.in.
+// Without this, requests that reach the app on the apex host (including
+// aitaxbot.co.in/ads.txt) were falling through to an empty response
+// instead of the real file, which is why AdSense's Sites dashboard
+// showed "Ads.txt: Not found" and the site stayed stuck on "Getting
+// ready". This 301s every apex request — including /ads.txt — to the
+// same path on www before anything else runs.
+// ─────────────────────────────────────────────────────────────────────
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const host = req.headers.host || "";
+  if (host === "aitaxbot.co.in") {
+    return res.redirect(301, `https://www.aitaxbot.co.in${req.originalUrl}`);
+  }
+  next();
+});
+
+// ─────────────────────────────────────────────────────────────────────
 // CSP nonce — generate a unique nonce for every request so inline
 // scripts (GTM config, Clarity snippet) can be whitelisted without
 // the broad 'unsafe-inline' directive.

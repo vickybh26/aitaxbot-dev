@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/contexts/AuthContext";
+import ResultAuthGate from "@/components/ResultAuthGate";
 
 interface SWPCalculatorProps {
   onClose?: () => void;
@@ -32,6 +34,7 @@ interface SWPResult {
 
 export default function SWPCalculator({ onClose }: SWPCalculatorProps = {}) {
   const trackTool = useTrackToolUse();
+  const { user } = useAuth();
   const [initialCorpus, setInitialCorpus] = useState<number>(5000000);
   const [monthlyWithdrawal, setMonthlyWithdrawal] = useState<number>(50000);
   const [annualReturn, setAnnualReturn] = useState<number>(8);
@@ -198,7 +201,9 @@ export default function SWPCalculator({ onClose }: SWPCalculatorProps = {}) {
               <Badge className="bg-blue-100 text-blue-800 text-xs">Inflation-Adjusted</Badge>
             )}
           </div>
-          {result && (
+          {result && !user ? (
+            <ResultAuthGate toolName="SWP Calculator" />
+          ) : result && (
             <div className="space-y-3">
               <Card className="bg-white p-4">
                 <div className="text-sm text-gray-600">Initial Corpus</div>

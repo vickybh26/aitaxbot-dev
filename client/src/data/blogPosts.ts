@@ -2748,7 +2748,7 @@ export const blogPosts = ([
         type: "faq",
         heading: "",
         question: "Do I need to create an account to use AiTaxBot?",
-        answer: "No. Every tool on AiTaxBot is accessible without creating an account or providing any personal information. You can calculate your tax liability, generate a rent receipt, estimate your SIP returns, and explore NRI tax rules entirely anonymously. There is no signup wall, no email gate, and no paywall. This is by design — financial clarity should have zero friction."
+        answer: "You can explore our NRI tax guides and educational content without an account. To calculate your tax liability, generate a rent receipt, or estimate your SIP returns, you'll need to sign in or create a free account — this takes seconds and there is no paywall. We made this change so every user has a private, revisitable record of their own calculations. Creating an account is always free, with no hidden fees."
       },
       {
         type: "h2",

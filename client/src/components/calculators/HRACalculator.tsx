@@ -13,6 +13,7 @@ import { AlertTriangle, Calculator, FileText, Lightbulb, Save, X } from 'lucide-
 import LoadingState from '@/components/ui/loading-state';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import ResultAuthGate from '@/components/ResultAuthGate';
 
 interface HRACalculatorProps {
   onClose?: () => void;
@@ -430,6 +431,8 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
             <TabsContent value="results" className="space-y-6">
               {isCalculating ? (
                 <LoadingState message="Calculating HRA exemption..." />
+              ) : result && !user ? (
+                <ResultAuthGate toolName="HRA Calculator" />
               ) : result ? (
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -526,7 +529,9 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
 
             {/* Breakdown Tab */}
             <TabsContent value="breakdown" className="space-y-6">
-              {result && (
+              {result && !user ? (
+                <ResultAuthGate toolName="HRA Calculator" />
+              ) : result && (
                 <>
                   <Card>
                     <CardHeader>

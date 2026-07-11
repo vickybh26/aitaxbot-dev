@@ -178,6 +178,13 @@ export class GeminiTaxService {
 
     const prompt = `You are an expert Indian Chartered Accountant providing personalised income tax advice for FY ${input.financialYear}.
 
+GROUND TRUTH — CURRENT LAW (treat as authoritative; do not contradict these even if your training data suggests otherwise, since tax rules changed in recent Budgets and your recollection may be out of date):
+- Standard deduction u/s 16(ia): New Tax Regime (115BAC) = ₹75,000 for FY 2024-25 and FY 2025-26 (raised from ₹50,000 by Budget 2024 — do not call ₹75,000 an error). Old Tax Regime = ₹50,000, unchanged.
+- Section 87A rebate: New Regime FY 2025-26/2026-27 — nil tax up to ₹12,00,000 total income, with marginal relief up to ~₹12.7L. New Regime FY 2023-24/2024-25 — nil tax up to ₹7,00,000, also with marginal relief. Old Regime — nil tax up to ₹5,00,000 only, NO marginal relief at that cliff.
+- UNDER THE NEW REGIME (115BAC), THESE ARE NOT AVAILABLE: Section 80C, Section 80D (self/family/parents), HRA exemption u/s 10(13A), LTA u/s 10(5), home loan interest on self-occupied property u/s 24(b), and the extra NPS u/s 80CCD(1B). Only the standard deduction (₹75,000) and employer NPS contribution u/s 80CCD(2) remain available under the New Regime.
+- If the user's RECOMMENDED REGIME below is "new", do NOT suggest investing more in 80C/80D/NPS-80CCD(1B), claiming HRA, or claiming home loan interest as ways to reduce THIS YEAR's tax — those deductions do not apply to their New Regime computation. You may still note that switching to Old Regime could unlock those deductions if their numbers support it, but do not present them as available alongside the New Regime tax figure already shown.
+- Under the OLD REGIME: Section 80C cap ₹1,50,000; Section 80D cap ₹25,000 (below 60) or ₹50,000 (60+, including parents' premium); NPS 80CCD(1B) additional ₹50,000 on top of 80C; home loan interest u/s 24(b) up to ₹2,00,000/year for a self-occupied property.
+
 USER PROFILE:
 - Occupation: ${occupationLabel[input.occupation || ''] || 'Not specified'}
 - Age Group: ${input.ageGroup || 'below60'}
@@ -203,8 +210,8 @@ TAX CALCULATION RESULT:
 - Recommended Regime: ${input.recommendedRegime.toUpperCase()}
 - Savings from choosing recommended regime: ₹${input.taxSavings.toLocaleString('en-IN')}
 
-TASK: Provide exactly 3–5 specific, actionable tax-saving tips for THIS user based on their actual numbers. Focus on:
-1. Deduction gaps they are missing (with exact ₹ amounts they can still claim)
+TASK: Provide exactly 3–5 specific, actionable tax-saving tips for THIS user based on their actual numbers and the GROUND TRUTH rules above. Focus on:
+1. Deduction gaps they are missing (with exact ₹ amounts they can still claim) — ONLY deductions actually available under their Recommended Regime (see GROUND TRUTH above for what's disallowed under the New Regime)
 2. Investment suggestions relevant to their occupation
 3. Any regime switching advice based on their specific deduction profile
 4. Any occupation-specific tips (NRI DTAA, professional 44ADA, etc.)
@@ -275,7 +282,11 @@ Rules: priority must be "high", "medium", or "low". savingsScore is 0-100 (100 =
       ? input.financialYear
       : '2025-26';
 
-    const prompt = `You are a friendly Indian tax advisor. Give 3 short, specific insights (1 sentence each) for this user's tax dashboard:
+    const prompt = `You are a friendly Indian tax advisor. Give 3 short, specific insights (1 sentence each) for this user's tax dashboard.
+
+GROUND TRUTH — do not contradict: ITR filing deadline for FY ${safeFy} is 31st July 2026. Section 80C cap is ₹1,50,000 (Old Regime only — 80C does not apply under the New Regime, so don't suggest topping it up unless you know this user is on the Old Regime). Advance tax instalments (Section 234B/C, 1% monthly interest on shortfall) apply once total tax liability exceeds ₹10,000 for the year.
+
+USER:
 - Occupation: ${safeOccupation}
 - Annual Income: ₹${(input.totalIncome || 0).toLocaleString('en-IN')}
 - Tax Paid: ₹${(input.lastTaxPaid || 0).toLocaleString('en-IN')}

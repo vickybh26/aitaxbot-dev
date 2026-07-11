@@ -14,7 +14,7 @@ import { generateBreadcrumbSchema, generateOrganizationSchema } from '@/lib/stru
 const hubFAQs = [
   {
     question: "Are the AiTaxBot calculators free to use?",
-    answer: "Yes, all calculators on AiTaxBot are 100% free with unlimited usage. No registration is required. We offer Income Tax, HRA, SIP, SWP, NPS, PF, Home Loan, Vehicle Loan, and Trading Tax calculators updated for FY 2026-27 (AY 2027-28)."
+    answer: "Yes, all calculators on AiTaxBot are 100% free with unlimited usage — no fees, no paywall, ever. A free account (sign in or sign up) is required to view your result. We offer Income Tax, HRA, SIP, SWP, NPS, PF, Home Loan, Vehicle Loan, and Trading Tax calculators updated for FY 2026-27 (AY 2027-28)."
   },
   {
     question: "Are the calculators updated for the latest tax rules?",
@@ -190,7 +190,7 @@ const documentTools: CalcDef[] = [
       'PDF receipts for full year in one click',
       'Landlord PAN & revenue stamp guidance',
       'Email delivery with dashboard link',
-      '100% free — no registration needed'
+      '100% free — sign in to generate'
     ]
   },
   {
@@ -370,7 +370,7 @@ export default function Calculators() {
           <div>
             <SectionTitle
               title="Tools & Document Generators"
-              subtitle="Generate tax-compliant documents instantly — free, no account needed."
+              subtitle="Generate tax-compliant documents instantly — free, sign in to access your result."
             />
             <div className="grid gap-6 md:grid-cols-2">
               {documentTools.map((calc, i) => <CalculatorCard key={i} calc={calc} />)}
@@ -385,7 +385,7 @@ export default function Calculators() {
             <div className="grid gap-8 md:grid-cols-3">
               {[
                 { icon: Award,      title: "CA Reviewed",          body: "All calculations are reviewed by a Chartered Accountant and follow the latest Income Tax Act provisions for maximum accuracy." },
-                { icon: PiggyBank,  title: "Always Free",          body: "Use all our calculators unlimited times at no cost. No hidden fees, no registration required." },
+                { icon: PiggyBank,  title: "Always Free",          body: "Use all our calculators unlimited times at no cost. No hidden fees — just a free account so you can view your result and access it later." },
                 { icon: TrendingUp, title: "Updated for FY 2026-27", body: "We update our calculators immediately when tax laws or interest rates change so you always get current information." },
               ].map(({ icon: Icon, title, body }) => (
                 <div key={title} className="text-center">

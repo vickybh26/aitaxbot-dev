@@ -1,13 +1,21 @@
 import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { useAuth } from "@/contexts/AuthContext";
+import { logout } from "@/lib/firebase";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { User, Phone, MapPin, Briefcase, Mail, Shield, CheckCircle, Clock, Edit2 } from "lucide-react";
+import { User, Phone, MapPin, Briefcase, Mail, Shield, CheckCircle, Clock, Edit2, AlertTriangle, Trash2 } from "lucide-react";
 
 const OCCUPATIONS: Record<string, string> = {
   salaried: "Salaried Employee",
@@ -34,6 +42,8 @@ export default function Profile() {
   const { toast } = useToast();
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const [form, setForm] = useState({
     firstName: '',
@@ -85,6 +95,24 @@ export default function Profile() {
       toast({ title: "Error", description: "Could not save profile.", variant: "destructive" });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    setDeleting(true);
+    try {
+      const token = await getIdToken();
+      const res = await fetch('/api/user/account', {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error();
+      await logout();
+      toast({ title: "Account deleted", description: "Your account and data have been removed." });
+      setLocation('/');
+    } catch {
+      toast({ title: "Error", description: "Could not delete your account. Please try again or email info@aitaxbot.in.", variant: "destructive" });
+      setDeleting(false);
     }
   };
 
@@ -236,8 +264,62 @@ export default function Profile() {
             </CardContent>
           </Card>
 
+          {/* Danger zone — DPDP Right to Erasure */}
+          <Card className="border-red-200">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base font-semibold text-red-700 flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4" /> Delete Account
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-600 mb-4">
+                Permanently delete your AiTaxBot account and all associated personal data
+                (profile, saved calculation history, profile change logs). This cannot be
+                undone. Under India's Digital Personal Data Protection Act, 2023, you have
+                the right to request erasure of your data at any time.
+              </p>
+              <Button
+                variant="outline"
+                className="border-red-300 text-red-700 hover:bg-red-50"
+                onClick={() => setDeleteOpen(true)}
+              >
+                <Trash2 className="w-4 h-4 mr-2" /> Delete My Account & Data
+              </Button>
+            </CardContent>
+          </Card>
+
         </div>
       </div>
+
+      <Dialog open={deleteOpen} onOpenChange={(open) => !deleting && setDeleteOpen(open)}>
+        <DialogContent className="max-w-md bg-white">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-700">
+              <AlertTriangle className="h-5 w-5" />
+              Delete Your Account
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <p className="text-sm text-slate-700">
+              You are about to <strong>permanently delete</strong> your AiTaxBot account
+              and all data linked to it — profile, saved calculations, and profile history.
+            </p>
+            <p className="text-sm text-red-600 font-medium">
+              This action cannot be undone. You will be signed out immediately.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" disabled={deleting} onClick={() => setDeleteOpen(false)}>Cancel</Button>
+            <Button
+              className="bg-red-700 hover:bg-red-800 text-white"
+              disabled={deleting}
+              onClick={handleDeleteAccount}
+            >
+              {deleting ? "Deleting…" : "Yes, Delete My Account"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

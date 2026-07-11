@@ -3,6 +3,8 @@ import { useTrackToolUse } from '@/hooks/useTrackToolUse';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useAuth } from "@/contexts/AuthContext";
+import ResultAuthGate from "@/components/ResultAuthGate";
 
 type VehicleType = "two-wheeler" | "four-wheeler";
 type RateType = "reducing" | "flat";
@@ -76,6 +78,7 @@ function computeFlat(principal: number, annualRate: number, tenureYears: number)
 }
 
 export default function VehicleLoanCalculator() {
+  const { user } = useAuth();
   const trackTool = useTrackToolUse();
   const [vehicleType, setVehicleType] = useState<VehicleType>("four-wheeler");
   const [onRoadPrice, setOnRoadPrice] = useState<number>(DEFAULTS["four-wheeler"].onRoadPrice);
@@ -298,7 +301,9 @@ export default function VehicleLoanCalculator() {
 
           {/* Results */}
           <div>
-            {result ? (
+            {result && !user ? (
+              <ResultAuthGate toolName="Vehicle Loan Calculator" />
+            ) : result ? (
               <div className="space-y-4">
                 {/* EMI highlight */}
                 <div className={`rounded-xl p-5 text-center border ${accentBg}`}>

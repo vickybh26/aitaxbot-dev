@@ -53,30 +53,54 @@
       })();
     </script>
 
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-9NMYMNBYFV"></script>
+    <!-- DPDP consent gate: default every category to DENIED before any tag
+         library initializes. This must run before gtag/Clarity/AdSense are
+         loaded — Google Consent Mode v2 only limits data collection if the
+         default is set ahead of 'config'. CookieConsent.tsx calls
+         gtag('consent','update',...) and window.__setClarityConsent(...)
+         once the user actually makes a choice; until then, nothing here
+         should collect or transmit personal data. -->
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+      gtag('consent', 'default', {
+        'analytics_storage': 'denied',
+        'ad_storage': 'denied',
+        'ad_user_data': 'denied',
+        'ad_personalization': 'denied',
+        'wait_for_update': 500
+      });
 
+      // Clarity queues calls made before its script loads, so this is safe
+      // to call immediately — it starts Clarity in consent-required mode,
+      // meaning it won't send data until window.clarity('consent') is
+      // called (done in CookieConsent.tsx once the user opts in).
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "rdz8mw3fw4");
+      window.clarity("consent", false);
+
+      // adsbygoogle.js itself has no consent-gate API — whether it fires
+      // (and requests personalized vs. non-personalized ads) is controlled
+      // entirely by CookieConsent.tsx, which only pushes ad requests after
+      // the user opts in. Not loaded here; see CookieConsent.tsx.
+    </script>
+
+    <!-- Google tag (gtag.js) — loaded after the consent default above, so
+         it starts in denied mode until the user consents. -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-9NMYMNBYFV"></script>
+    <script>
+      gtag('js', new Date());
       gtag('config', 'G-9NMYMNBYFV');
       gtag('config', 'AW-17983211580');
     </script>
-    
-    <!-- Microsoft Clarity -->
-    <script type="text/javascript">
-        (function(c,l,a,r,i,t,y){
-            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-        })(window, document, "clarity", "script", "rdz8mw3fw4");
-    </script>
 
-    <!-- Google AdSense -->
+    <!-- Google AdSense account verification tag (does not itself serve ads
+         or set cookies — safe to declare unconditionally). Ad script
+         loading is deferred until consent; see CookieConsent.tsx. -->
     <meta name="google-adsense-account" content="ca-pub-6497933645628124">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6497933645628124"
-            crossorigin="anonymous"></script>
     
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />

@@ -8,6 +8,8 @@ import {
   ArrowRight, Home, Calculator, Info, Loader2, Plus, Trash2,
 } from "lucide-react";
 import CalcPageHeader from "@/components/CalcPageHeader";
+import { useAuth } from "@/contexts/AuthContext";
+import ResultAuthGate from "@/components/ResultAuthGate";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface ReceiptForm {
@@ -55,6 +57,7 @@ function buildReceiptDate(m: number, y: number): string {
 // ── Component ─────────────────────────────────────────────────────────────────
 export default function RentReceiptGenerator() {
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const [form, setForm] = useState<ReceiptForm>({
     tenantName: "", tenantAddress: "", landlordName: "",
@@ -120,6 +123,7 @@ export default function RentReceiptGenerator() {
 
   // ── Download PDF ──────────────────────────────────────────────────────────
   async function handleDownload() {
+    if (!user) return;
     if (!validate()) return;
     setIsGenerating(true);
     try {
@@ -149,6 +153,7 @@ export default function RentReceiptGenerator() {
 
   // ── Email PDF ─────────────────────────────────────────────────────────────
   async function handleEmail() {
+    if (!user) return;
     if (!validate()) return;
     if (!emailTo || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTo)) {
       setErrors(e => ({ ...e, email: "Enter a valid email address" }));
@@ -209,7 +214,7 @@ export default function RentReceiptGenerator() {
     <>
       <Helmet>
         <title>Free Rent Receipt Generator India — Download & Email PDF | AiTaxBot</title>
-        <meta name="description" content="Generate professional rent receipts instantly. Download as PDF or email to yourself. Includes landlord PAN, revenue stamp reminder, and HRA exemption link. Free, no signup required." />
+        <meta name="description" content="Generate professional rent receipts instantly. Download as PDF or email to yourself. Includes landlord PAN, revenue stamp reminder, and HRA exemption link. Free with a quick sign-in." />
         <meta name="keywords" content="rent receipt generator India, rent receipt PDF, HRA rent receipt, landlord tenant receipt, free rent receipt" />
         <link rel="canonical" href="https://aitaxbot.co.in/tools/rent-receipt" />
       </Helmet>
@@ -217,7 +222,7 @@ export default function RentReceiptGenerator() {
       <div>
         <CalcPageHeader
           title="Rent Receipt Generator"
-          subtitle="Generate HRA-compliant rent receipts in seconds. Download as PDF or send to your email — free, no account needed."
+          subtitle="Generate HRA-compliant rent receipts in seconds. Download as PDF or send to your email — free, sign in required."
           breadcrumbs={[
             { label: "Home", href: "/" },
             { label: "Tools", href: "/tools" },
@@ -367,6 +372,10 @@ export default function RentReceiptGenerator() {
               <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
                 <h2 className="text-base font-bold text-slate-900 mb-4">Generate Receipt</h2>
 
+                {!user ? (
+                  <ResultAuthGate toolName="Rent Receipt Generator" />
+                ) : (
+                <>
                 {/* Download */}
                 <button onClick={handleDownload} disabled={isGenerating}
                   className="w-full flex items-center justify-center gap-2 bg-persian-blue-600 hover:bg-persian-blue-700 disabled:opacity-60 text-white font-bold py-3 rounded-xl transition text-sm mb-4">
@@ -413,6 +422,8 @@ export default function RentReceiptGenerator() {
                     </div>
                   )}
                 </div>
+                </>
+                )}
               </div>
 
             </div>

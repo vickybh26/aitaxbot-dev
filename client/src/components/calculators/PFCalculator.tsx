@@ -9,6 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Calculator, TrendingUp, PieChart, IndianRupee, Info } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import ResultAuthGate from "@/components/ResultAuthGate";
 
 interface PFResult {
   monthlyBasicDA: number;
@@ -41,6 +43,7 @@ interface YearlyBreakdown {
 }
 
 export default function PFCalculator() {
+  const { user } = useAuth();
   const trackTool = useTrackToolUse();
   const [monthlyBasicDA, setMonthlyBasicDA] = useState<number>(50000);
   const [annualIncrement, setAnnualIncrement] = useState<number>(5);
@@ -517,7 +520,9 @@ export default function PFCalculator() {
         </TabsContent>
 
         <TabsContent value="results" className="space-y-6">
-          {result ? (
+          {result && !user ? (
+            <ResultAuthGate toolName="PF Calculator" />
+          ) : result ? (
             <>
               <Card className="border-persian-blue-200 bg-gradient-to-br from-persian-blue-50 to-blue-50">
                 <CardHeader>
@@ -641,7 +646,9 @@ export default function PFCalculator() {
         </TabsContent>
 
         <TabsContent value="breakdown" className="space-y-6">
-          {result ? (
+          {result && !user ? (
+            <ResultAuthGate toolName="PF Calculator" />
+          ) : result ? (
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Year-wise PF Growth</CardTitle>
@@ -697,7 +704,9 @@ export default function PFCalculator() {
         </TabsContent>
 
         <TabsContent value="growth" className="space-y-6">
-          {result ? (
+          {result && !user ? (
+            <ResultAuthGate toolName="PF Calculator" />
+          ) : result ? (
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">PF Corpus Growth Chart</CardTitle>

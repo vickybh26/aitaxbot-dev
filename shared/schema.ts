@@ -526,6 +526,12 @@ export interface Lead {
   utmSource?: string | null;
   utmMedium?: string | null;
   utmCampaign?: string | null;
+  // DPDP: granular consent captured at the point of collection. dataConsent
+  // covers the one-time computation email this lead was captured for;
+  // marketingConsent is a separate opt-in for any future/recurring tax tips
+  // — required to be false unless the user actively checked it.
+  dataConsent?: boolean;
+  marketingConsent?: boolean;
   createdAt?: Date | string;
 }
 
@@ -540,4 +546,8 @@ export const insertLeadSchema = z.object({
   utmSource: optStr,
   utmMedium: optStr,
   utmCampaign: optStr,
+  dataConsent: z.boolean().refine((v) => v === true, {
+    message: "You must agree to the Privacy Policy to continue.",
+  }),
+  marketingConsent: z.boolean().optional().default(false),
 });

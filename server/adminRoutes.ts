@@ -107,6 +107,7 @@ router.get("/stats", adminL3, async (req: any, res) => {
       completedSnap,
       counterDoc,
       trendSnap,
+      toolUsageSnap,
     ] = await Promise.all([
       db.collection("users").count().get(),
       db.collection("users").where("createdAt", ">=", sevenDaysAgo).count().get(),
@@ -119,6 +120,8 @@ router.get("/stats", adminL3, async (req: any, res) => {
         .orderBy("createdAt", "asc")
         .select("createdAt")
         .get(),
+      // Fetch only userId + createdAt for retention calc — capped for safety
+      db.collection(COLLECTIONS.TOOL_USAGE).select("userId", "createdAt").limit(5000).get(),
     ]);
 
     const totalUsers         = usersSnap.data().count;
@@ -128,6 +131,27 @@ router.get("/stats", adminL3, async (req: any, res) => {
     const totalCalculations  = counterDoc.exists ? (counterDoc.data()?.count ?? 0) : 0;
     const profileCompletionRate = totalUsers > 0
       ? Math.round((completedProfiles / totalUsers) * 100) : 0;
+
+    // Returning users = signed-in users with calculator activity on 2+ distinct
+    // calendar days. Now that sign-in is required to view any calculator result,
+    // toolUsage reliably captures every calculation by every registered user —
+    // this is the funding/traction metric (real users, real repeat usage).
+    const daysByUser: Record<string, Set<string>> = {};
+    toolUsageSnap.docs.forEach((doc: any) => {
+      const d = doc.data();
+      const uid = d.userId;
+      if (!uid) return;
+      const raw = d.createdAt;
+      const dt = raw?.toDate ? raw.toDate() : new Date(raw);
+      if (isNaN(dt.getTime())) return;
+      const dayKey = dt.toISOString().split("T")[0];
+      if (!daysByUser[uid]) daysByUser[uid] = new Set();
+      daysByUser[uid].add(dayKey);
+    });
+    const activeUsers = Object.keys(daysByUser).length;
+    const returningUsers = Object.values(daysByUser).filter((days) => days.size >= 2).length;
+    const returningUserRate = activeUsers > 0
+      ? Math.round((returningUsers / activeUsers) * 100) : 0;
 
     // Build 30-day trend
     const signupsByDay: Record<string, number> = {};
@@ -147,6 +171,7 @@ router.get("/stats", adminL3, async (req: any, res) => {
     const result = {
       totalUsers, newUsersWeek, newUsersMonth, totalCalculations,
       completedProfiles, profileCompletionRate, signupTrend,
+      activeUsers, returningUsers, returningUserRate,
     };
     setCache("admin:stats", result, 5 * 60 * 1000); // 5 min TTL
     res.json(result);
@@ -729,7 +754,25 @@ router.delete("/users/:id", adminL1, async (req: any, res) => {
     if (!snap.exists) return res.status(404).json({ error: "User not found" });
 
     const userData: any = snap.data();
-    await ref.delete();
+
+    const logsSnap = await db.collection("userProfileLogs").where("userId", "==", id).get();
+    const calcSnap = await db.collection("taxCalculationHistory").where("userId", "==", id).get();
+    const batch = db.batch();
+    logsSnap.docs.forEach((d) => batch.delete(d.ref));
+    calcSnap.docs.forEach((d) => batch.delete(d.ref));
+    batch.delete(db.collection("crmNotes").doc(id));
+    batch.delete(ref);
+    await batch.commit();
+
+    // Previously this route only deleted the Firestore profile, leaving the
+    // actual Firebase Auth account intact — the person could still log in
+    // with a "deleted" account. Delete the Auth user too, same as the
+    // self-service DELETE /api/user/account route.
+    try {
+      await admin.auth().deleteUser(id);
+    } catch (authErr: any) {
+      if (authErr?.code !== "auth/user-not-found") throw authErr;
+    }
 
     console.log(`[Admin] User deleted: ${id} (${userData?.email || "unknown"}) by admin ${req.adminUid}`);
     res.json({ success: true, deleted: id });
@@ -738,6 +781,7 @@ router.delete("/users/:id", adminL1, async (req: any, res) => {
     res.status(500).json({ error: "Failed to delete user" });
   }
 });
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // LEADS
