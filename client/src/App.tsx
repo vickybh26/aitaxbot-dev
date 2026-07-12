@@ -9,6 +9,7 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import CookieConsent from "@/components/CookieConsent";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import GlobalProfilePrompt from "@/components/GlobalProfilePrompt";
 import Layout from "@/components/Layout";
 
 // Landing and Login are eagerly loaded — they're needed on first paint
@@ -228,6 +229,7 @@ function App() {
               </ErrorBoundary>
               <CookieConsent />
               <WhatsAppButton />
+              <GlobalProfilePrompt />
             </TooltipProvider>
           </AuthProvider>
         </QueryClientProvider>

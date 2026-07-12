@@ -86,15 +86,13 @@ export default function Dashboard() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [showProfileModal, setShowProfileModal] = useState(false);
 
-  // Show profile completion modal once for new users
-  useEffect(() => {
-    if (userProfile && !isProfileComplete) {
-      const dismissed = sessionStorage.getItem('profileModalDismissed');
-      if (!dismissed) setShowProfileModal(true);
-    }
-  }, [userProfile, isProfileComplete]);
+  // The automatic once-per-session nudge now lives in GlobalProfilePrompt
+  // (mounted once at the app root — see App.tsx) so it fires for every entry
+  // point, not just visits to this page. This local state is only for the
+  // manual "Complete Now" button below — a separate, user-initiated trigger
+  // that doesn't conflict with the automatic global one.
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   useEffect(() => {
     trackPageView('/dashboard', 'User Dashboard - AiTaxBot');
@@ -385,12 +383,9 @@ export default function Dashboard() {
         <link rel="canonical" href="https://aitaxbot.co.in/dashboard" />
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
-      
+
       {showProfileModal && (
-        <ProfileCompletionModal onClose={() => {
-          sessionStorage.setItem('profileModalDismissed', '1');
-          setShowProfileModal(false);
-        }} />
+        <ProfileCompletionModal onClose={() => setShowProfileModal(false)} />
       )}
 
       <div className="bg-gradient-to-br from-slate-50 to-blue-50">
