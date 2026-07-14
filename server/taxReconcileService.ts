@@ -1379,8 +1379,13 @@ async function generateAIInsights(
   mismatches: ReconciliationMismatch[],
   multiEmployerFlags?: MultiEmployerFlags,
 ): Promise<{ insights: string; actionItems: string[]; itrImpact: string }> {
-  const fallback = {
-    insights: "Upload all three documents and ensure Google API key is configured for AI-powered insights.",
+  // Two distinct fallback reasons — do not conflate them. Reusing one message for
+  // both "no API key" and "the API call itself failed" is what caused the live
+  // bug where users with AIS/26AS/Form16 successfully parsed by this exact same
+  // `ai` client still saw "ensure Google API key is configured", which is simply
+  // false in that case and just confuses/alarms users.
+  const noKeyFallback = {
+    insights: "Upload all three documents and ensure a Google API key is configured for AI-powered insights.",
     actionItems: [
       "Cross-check Form 16, 26AS, and AIS figures manually",
       "Declare all interest income, dividends, and capital gains in ITR",
@@ -1388,8 +1393,12 @@ async function generateAIInsights(
     ],
     itrImpact: "Review all extracted data above and resolve mismatches before filing your Income Tax Return.",
   };
+  const tempErrorFallback = {
+    ...noKeyFallback,
+    insights: "AI-powered insights are temporarily unavailable — please try again in a moment. The extracted document data and mismatches above are unaffected.",
+  };
 
-  if (!ai) return fallback;
+  if (!ai) return noKeyFallback;
 
   const mismatchText = mismatches.filter(m => m.severity !== "OK")
     .map(m => `- [${m.severity}] ${m.title}: ${m.description}`)
@@ -1438,16 +1447,26 @@ Respond ONLY in this JSON (no markdown, no leading/trailing text):
       contents: [{ role: "user", parts: [{ text: prompt }] }],
     });
     const raw = result.text ?? "{}";
-    const cleaned = raw.replace(/```json|```/g, "").trim();
-    const parsed = JSON.parse(cleaned);
+    // Match the same robust extraction parseAISWithGemini/26AS/Form16 parsers
+    // use below: strip code fences, then pull out just the {...} block instead
+    // of assuming the entire response is clean JSON. Gemini frequently adds a
+    // sentence of preamble even when told "respond ONLY in JSON", which broke
+    // JSON.parse on the raw response and silently fell back every time.
+    const cleaned = raw.replace(/```json\s*/g, "").replace(/```/g, "").trim();
+    const match = cleaned.match(/\{[\s\S]*\}/);
+    if (!match) {
+      console.warn("[generateAIInsights] No JSON found in response:", raw.slice(0, 300));
+      return tempErrorFallback;
+    }
+    const parsed = JSON.parse(match[0]);
     return {
-      insights: parsed.insights || fallback.insights,
-      actionItems: Array.isArray(parsed.actionItems) ? parsed.actionItems : fallback.actionItems,
-      itrImpact: parsed.itrImpact || fallback.itrImpact,
+      insights: parsed.insights || tempErrorFallback.insights,
+      actionItems: Array.isArray(parsed.actionItems) ? parsed.actionItems : tempErrorFallback.actionItems,
+      itrImpact: parsed.itrImpact || tempErrorFallback.itrImpact,
     };
   } catch (err) {
     console.error("[generateAIInsights] Error:", err);
-    return fallback;
+    return tempErrorFallback;
   }
 }
 
