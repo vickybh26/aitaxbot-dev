@@ -28,6 +28,7 @@ try {
 // ─────────────────────────────────────────────────────────────────────────────
 import { GoogleGenAI } from "@google/genai";
 import { computeTaxLiability } from "@shared/taxLiability";
+import { runProductionShadowComparison } from "./ragService";
 import { recommendITRForm, type ITRFormInput, type ITRFormResult } from "@shared/itrFormSelector";
 
 function buildAI(): InstanceType<typeof GoogleGenAI> | null {
@@ -138,6 +139,12 @@ export interface MultiEmployerFlags {
   regimesSeen: (boolean | null)[];
 }
 
+export interface DocumentsProvided {
+  ais: boolean;
+  form26as: boolean;
+  form16: boolean;
+}
+
 export interface ReconciliationReport {
   extractedData: {
     ais: ExtractedAIS;
@@ -145,6 +152,10 @@ export interface ReconciliationReport {
     form16: ExtractedForm16;          // combined/aggregated across all employers
     form16Employers: ExtractedForm16[]; // raw per-employer parses, one per uploaded Form 16
   };
+  // Which of the three document types the user actually uploaded. Optional for
+  // backwards compatibility with reports generated before partial uploads were
+  // allowed (absent = all three were required, so all three are present).
+  documentsProvided?: DocumentsProvided;
   checks: ReconciliationCheck[];
   mismatches: ReconciliationMismatch[];
   overallStatus: "CLEAN" | "NEEDS_ATTENTION" | "CRITICAL";
@@ -1056,41 +1067,51 @@ function buildChecks(
   ais: ExtractedAIS,
   f26as: Extracted26AS,
   f16: ExtractedForm16,
+  provided: DocumentsProvided = { ais: true, form26as: true, form16: true },
 ): ReconciliationCheck[] {
   const checks: ReconciliationCheck[] = [];
 
+  // Cross-document checks are only meaningful when BOTH sides were uploaded —
+  // otherwise they'd all read NOT_FOUND and bury the real, per-document
+  // findings in noise. Single-document checks run whenever their document
+  // is present.
+
   // ── 1. Gross Salary: AIS vs Form 16 ──────────────────────────────────────
-  const salaryDiff = absDiff(ais.salaryIncome, f16.grossSalary);
-  checks.push({
-    name: "Gross Salary",
-    status: salaryDiff == null ? "NOT_FOUND" : salaryDiff <= THRESHOLD ? "MATCH" : "MISMATCH",
-    aisValue: ais.salaryIncome,
-    form16Value: f16.grossSalary,
-    form26asValue: null,
-    note: salaryDiff == null
-      ? "Could not compare — ensure all documents are uploaded"
-      : salaryDiff <= THRESHOLD
-      ? `Salary matches ✓ (${fmt(f16.grossSalary)} in Form 16)`
-      : `Difference of ${fmt(salaryDiff)} between AIS and Form 16`,
-  });
+  if (provided.ais && provided.form16) {
+    const salaryDiff = absDiff(ais.salaryIncome, f16.grossSalary);
+    checks.push({
+      name: "Gross Salary",
+      status: salaryDiff == null ? "NOT_FOUND" : salaryDiff <= THRESHOLD ? "MATCH" : "MISMATCH",
+      aisValue: ais.salaryIncome,
+      form16Value: f16.grossSalary,
+      form26asValue: null,
+      note: salaryDiff == null
+        ? "Could not compare — ensure all documents are uploaded"
+        : salaryDiff <= THRESHOLD
+        ? `Salary matches ✓ (${fmt(f16.grossSalary)} in Form 16)`
+        : `Difference of ${fmt(salaryDiff)} between AIS and Form 16`,
+    });
+  }
 
   // ── 2. TDS on Salary: Form 16 vs 26AS ────────────────────────────────────
-  const tdsDiff = absDiff(f16.totalTaxDeducted, f26as.tdsSalary);
-  checks.push({
-    name: "TDS on Salary",
-    status: tdsDiff == null ? "NOT_FOUND" : tdsDiff <= THRESHOLD ? "MATCH" : "MISMATCH",
-    aisValue: null,
-    form16Value: f16.totalTaxDeducted,
-    form26asValue: f26as.tdsSalary,
-    note: tdsDiff == null
-      ? "Could not compare — check 26AS and Form 16 uploads"
-      : tdsDiff <= THRESHOLD
-      ? `TDS matches ✓ (${fmt(f16.totalTaxDeducted)} confirmed in 26AS)`
-      : `⚠ TDS mismatch of ${fmt(tdsDiff)} — critical issue!`,
-  });
+  if (provided.form16 && provided.form26as) {
+    const tdsDiff = absDiff(f16.totalTaxDeducted, f26as.tdsSalary);
+    checks.push({
+      name: "TDS on Salary",
+      status: tdsDiff == null ? "NOT_FOUND" : tdsDiff <= THRESHOLD ? "MATCH" : "MISMATCH",
+      aisValue: null,
+      form16Value: f16.totalTaxDeducted,
+      form26asValue: f26as.tdsSalary,
+      note: tdsDiff == null
+        ? "Could not compare — check 26AS and Form 16 uploads"
+        : tdsDiff <= THRESHOLD
+        ? `TDS matches ✓ (${fmt(f16.totalTaxDeducted)} confirmed in 26AS)`
+        : `⚠ TDS mismatch of ${fmt(tdsDiff)} — critical issue!`,
+    });
+  }
 
   // ── 3. Tax Regime ─────────────────────────────────────────────────────────
-  checks.push({
+  if (provided.form16) checks.push({
     name: "Tax Regime",
     status: f16.newRegime != null ? "OK" : "NOT_FOUND",
     aisValue: null,
@@ -1104,7 +1125,7 @@ function buildChecks(
   });
 
   // ── 4. Standard Deduction ─────────────────────────────────────────────────
-  checks.push({
+  if (provided.form16) checks.push({
     name: "Standard Deduction",
     status: f16.standardDeduction != null ? "OK" : "NOT_FOUND",
     aisValue: null,
@@ -1117,7 +1138,7 @@ function buildChecks(
 
   // ── 5. Savings / FD Interest (AIS) ───────────────────────────────────────
   const totalInterest = (ais.interestFromSavings ?? 0) + (ais.interestFromFD ?? 0);
-  checks.push({
+  if (provided.ais) checks.push({
     name: "Interest Income (AIS)",
     status: ais.interestFromSavings == null && ais.interestFromFD == null ? "NOT_FOUND" : "OK",
     aisValue: totalInterest || null,
@@ -1129,7 +1150,7 @@ function buildChecks(
   });
 
   // ── 6. Dividend Income (AIS) ──────────────────────────────────────────────
-  checks.push({
+  if (provided.ais) checks.push({
     name: "Dividend Income (AIS)",
     status: ais.dividendIncome == null ? "NOT_FOUND" : ais.dividendIncome > 0 ? "OK" : "OK",
     aisValue: ais.dividendIncome,
@@ -1142,7 +1163,7 @@ function buildChecks(
 
   // ── 7. Capital Gains (AIS) ────────────────────────────────────────────────
   const cgGross = (ais.securitiesTransactions ?? 0) + (ais.mutualFundTransactions ?? 0);
-  checks.push({
+  if (provided.ais) checks.push({
     name: "Capital Gains Transactions",
     status: ais.securitiesTransactions == null && ais.mutualFundTransactions == null ? "NOT_FOUND" : "OK",
     aisValue: cgGross || null,
@@ -1155,7 +1176,7 @@ function buildChecks(
 
   // ── 8. Advance Tax / SAT ──────────────────────────────────────────────────
   const totalTaxPaid = (f26as.advanceTaxPaid ?? 0) + (f26as.selfAssessmentTax ?? 0);
-  checks.push({
+  if (provided.form26as) checks.push({
     name: "Advance / Self-Assessment Tax",
     status: f26as.advanceTaxPaid == null && f26as.selfAssessmentTax == null ? "NOT_FOUND" : "OK",
     aisValue: null,
@@ -1164,6 +1185,20 @@ function buildChecks(
     note: totalTaxPaid > 0
       ? `${fmt(totalTaxPaid)} paid — include in ITR Schedule Taxes Paid`
       : "No advance tax or self-assessment tax in 26AS",
+  });
+
+  // ── 9. TDS Credits (26AS) — single-document summary line ─────────────────
+  // Especially useful when 26AS is the only document uploaded: it tells the
+  // user exactly how much tax credit they're entitled to claim in the ITR.
+  if (provided.form26as) checks.push({
+    name: "TDS Credits (26AS)",
+    status: f26as.totalTdsCredits == null && f26as.tdsSalary == null ? "NOT_FOUND" : "OK",
+    aisValue: null,
+    form16Value: null,
+    form26asValue: f26as.totalTdsCredits ?? ((f26as.tdsSalary ?? 0) + (f26as.tdsNonSalary ?? 0) || null),
+    note: (f26as.totalTdsCredits ?? f26as.tdsSalary)
+      ? `${fmt(f26as.totalTdsCredits ?? ((f26as.tdsSalary ?? 0) + (f26as.tdsNonSalary ?? 0)))} total TDS deposited against your PAN — this is the tax credit you can claim in your ITR`
+      : "No TDS credits found in 26AS",
   });
 
   return checks;
@@ -1354,18 +1389,37 @@ function generateSummary(
   status: "CLEAN" | "NEEDS_ATTENTION" | "CRITICAL",
   mismatches: ReconciliationMismatch[],
   f16: ExtractedForm16,
+  provided: DocumentsProvided = { ais: true, form26as: true, form16: true },
 ): string {
   const emp = f16.employerName ? ` (${f16.employerName.replace(/\s+/g, " ").trim()})` : "";
   const itrNote = f16.taxableIncome
     ? ` Taxable salary income: ${fmt(f16.taxableIncome)}.`
     : "";
+
+  const providedNames = [
+    provided.ais && "AIS",
+    provided.form26as && "Form 26AS",
+    provided.form16 && "Form 16",
+  ].filter(Boolean) as string[];
+  const missingNames = [
+    !provided.ais && "AIS",
+    !provided.form26as && "Form 26AS",
+    !provided.form16 && "Form 16",
+  ].filter(Boolean) as string[];
+  const partialNote = missingNames.length > 0
+    ? ` Based on ${providedNames.join(" + ")} only — upload ${missingNames.join(" and ")} for a full cross-document check.`
+    : "";
+
   if (status === "CLEAN") {
+    if (missingNames.length > 0) {
+      return `✅ No issues found in ${providedNames.join(" + ")}${emp}.${itrNote}${partialNote}`;
+    }
     return `✅ Tax documents look clean${emp}.${itrNote} Form 16, 26AS, and AIS are consistent. You can proceed to file ITR.`;
   }
   if (status === "CRITICAL") {
-    return `⚠️ Critical issues found${emp}. ${mismatches.filter(m => m.severity === "HIGH").length} high-severity item(s) must be resolved before filing ITR.${itrNote}`;
+    return `⚠️ Critical issues found${emp}. ${mismatches.filter(m => m.severity === "HIGH").length} high-severity item(s) must be resolved before filing ITR.${itrNote}${partialNote}`;
   }
-  return `${mismatches.length} item(s) need attention${emp}.${itrNote} Review all items and resolve before filing ITR by July 31, 2026.`;
+  return `${mismatches.length} item(s) need attention${emp}.${itrNote}${partialNote} Review all items and resolve before filing ITR by July 31, 2026.`;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1378,6 +1432,7 @@ async function generateAIInsights(
   f16: ExtractedForm16,
   mismatches: ReconciliationMismatch[],
   multiEmployerFlags?: MultiEmployerFlags,
+  provided: DocumentsProvided = { ais: true, form26as: true, form16: true },
 ): Promise<{ insights: string; actionItems: string[]; itrImpact: string }> {
   // Two distinct fallback reasons — do not conflate them. Reusing one message for
   // both "no API key" and "the API call itself failed" is what caused the live
@@ -1404,6 +1459,24 @@ async function generateAIInsights(
     .map(m => `- [${m.severity}] ${m.title}: ${m.description}`)
     .join("\n");
 
+  const providedNames = [
+    provided.ais && "AIS",
+    provided.form26as && "Form 26AS",
+    provided.form16 && "Form 16",
+  ].filter(Boolean) as string[];
+  const missingNames = [
+    !provided.ais && "AIS",
+    !provided.form26as && "Form 26AS",
+    !provided.form16 && "Form 16",
+  ].filter(Boolean) as string[];
+  const singleDoc = providedNames.length === 1;
+
+  const docContextNote = missingNames.length === 0
+    ? ""
+    : singleDoc
+    ? `\nIMPORTANT DOCUMENT CONTEXT: The taxpayer uploaded ONLY their ${providedNames[0]} — no other documents. Treat any figure shown as "N/A" for the missing documents (${missingNames.join(", ")}) as UNKNOWN, not zero. Your job for this response: (1) summarise clearly what this one document shows, (2) list the specific things from THIS document that must not be missed when filing the ITR (incomes to declare, TDS credits to claim, deductions visible), and (3) tell them what the missing documents (${missingNames.join(", ")}) would add and why cross-checking all three before filing matters. Do NOT invent or guess figures for the missing documents.`
+    : `\nIMPORTANT DOCUMENT CONTEXT: The taxpayer uploaded ${providedNames.join(" and ")} but NOT ${missingNames.join(" or ")}. Treat "N/A" figures from the missing document(s) as UNKNOWN, not zero. Compare the uploaded documents against each other, call out what shouldn't be missed when filing based on what IS available, and note what the missing document(s) would add.`;
+
   const prompt = `You are an expert Indian Chartered Accountant helping taxpayer file ITR for FY 2025-26 (AY 2026-27).
 
 GROUND TRUTH — CURRENT LAW (do not contradict these, even if your training data suggests otherwise; tax rules changed in recent Budgets and your recollection may be out of date):
@@ -1428,8 +1501,9 @@ Tax Document Summary:
 - Mutual Fund Sold (AIS): ${fmt(ais.mutualFundTransactions)}
 - LRS Remittance (AIS): ${fmt(ais.lrsRemittance)}
 
+${docContextNote}
 Issues Found:
-${mismatchText || "No major mismatches — documents appear consistent."}
+${mismatchText || (missingNames.length > 0 ? "No issues found in the uploaded document(s) — a full cross-check needs all three documents." : "No major mismatches — documents appear consistent.")}
 ${multiEmployerFlags && multiEmployerFlags.employerCount > 1
   ? `\nNote: The taxpayer had ${multiEmployerFlags.employerCount} employers this FY (mid-year job change). The figures above are already combined across employers with the standard deduction counted once. ${multiEmployerFlags.regimeConsistent ? "" : "Their employers used inconsistent tax regimes, so treat any regime-specific advice as provisional."} Specifically mention that job-changers are commonly under-withheld because each employer applies slabs independently, and that Form 12B could have prevented this at the new employer.`
   : ""}
@@ -1474,26 +1548,87 @@ Respond ONLY in this JSON (no markdown, no leading/trailing text):
 // Main entry point
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Synthesizes a PII-free question describing the taxpayer's situation from
+// the extracted figures — this is what gets fed to the RAG pipeline for the
+// production-vs-RAG shadow comparison. Figures only; no names/PAN/TAN.
+function buildReconcileShadowQuestion(
+  ais: ExtractedAIS,
+  f26as: Extracted26AS,
+  f16: ExtractedForm16,
+  mismatches: ReconciliationMismatch[],
+  provided: DocumentsProvided,
+): string {
+  const parts: string[] = [];
+  if (f16.grossSalary != null) parts.push(`gross salary ${fmt(f16.grossSalary)}`);
+  if (f16.newRegime != null) parts.push(f16.newRegime ? "New Tax Regime (115BAC)" : "Old Tax Regime");
+  const interest = (ais.interestFromSavings ?? 0) + (ais.interestFromFD ?? 0);
+  if (interest > 0) parts.push(`bank/FD interest ${fmt(interest)}`);
+  if (ais.dividendIncome) parts.push(`dividend income ${fmt(ais.dividendIncome)}`);
+  const cg = (ais.securitiesTransactions ?? 0) + (ais.mutualFundTransactions ?? 0);
+  if (cg > 0) parts.push(`securities/MF sale proceeds ${fmt(cg)}`);
+  if (ais.cryptoIncome) parts.push(`VDA/crypto receipts ${fmt(ais.cryptoIncome)}`);
+  if (f26as.tdsSalary != null) parts.push(`TDS on salary ${fmt(f26as.tdsSalary)} per 26AS`);
+  if ((f26as.advanceTaxPaid ?? 0) > 0) parts.push(`advance tax paid ${fmt(f26as.advanceTaxPaid)}`);
+
+  const issueTitles = mismatches
+    .filter(m => m.severity === "HIGH" || m.severity === "MEDIUM")
+    .map(m => m.title)
+    .slice(0, 4);
+
+  const docNames = [
+    provided.ais && "AIS",
+    provided.form26as && "Form 26AS",
+    provided.form16 && "Form 16",
+  ].filter(Boolean).join(", ");
+
+  return (
+    `A salaried Indian taxpayer is filing ITR for FY 2025-26 (AY 2026-27) using ${docNames}. ` +
+    (parts.length ? `Their figures: ${parts.join("; ")}. ` : "") +
+    (issueTitles.length ? `Issues found in reconciliation: ${issueTitles.join("; ")}. ` : "") +
+    `What should they verify, declare, and resolve before filing, and which ITR form applies?`
+  );
+}
+
+const EMPTY_AIS: ExtractedAIS = {
+  salaryIncome: null, interestFromSavings: null, interestFromFD: null,
+  dividendIncome: null, securitiesTransactions: null, mutualFundTransactions: null,
+  cryptoIncome: null, lrsRemittance: null, taxPaidSelfAssessment: null,
+};
+
+const EMPTY_26AS: Extracted26AS = {
+  tdsSalary: null, tdsNonSalary: null, nonSalarySections: null,
+  advanceTaxPaid: null, selfAssessmentTax: null, totalTdsCredits: null, tcsPaid: null,
+};
+
 export async function reconcileTaxDocuments(
-  aisPdfBuffer: Buffer,
-  form26asPdfBuffer: Buffer,
+  aisPdfBuffer: Buffer | null,
+  form26asPdfBuffer: Buffer | null,
   form16PdfBuffers: Buffer[],
   _passwords?: { ais?: string; form26as?: string; form16?: string[] },
 ): Promise<ReconciliationReport> {
-  console.log(`[reconcileTaxDocuments] Starting reconciliation with ${form16PdfBuffers.length} Form 16(s)...`);
+  const provided: DocumentsProvided = {
+    ais: aisPdfBuffer != null,
+    form26as: form26asPdfBuffer != null,
+    form16: form16PdfBuffers.length > 0,
+  };
+  if (!provided.ais && !provided.form26as && !provided.form16) {
+    throw new Error("At least one document (AIS, Form 26AS, or Form 16) is required");
+  }
+  console.log(`[reconcileTaxDocuments] Starting reconciliation — AIS: ${provided.ais}, 26AS: ${provided.form26as}, Form 16s: ${form16PdfBuffers.length}`);
 
   // ── Step 1: Extract text (for logging/debugging only) ─────────────────────
-  const aisText = await extractText(aisPdfBuffer, "AIS");
+  const aisText = aisPdfBuffer ? await extractText(aisPdfBuffer, "AIS") : "";
 
-  // ── Step 2: Parse all documents with Gemini inline PDF ─────────────────────
+  // ── Step 2: Parse the uploaded documents with Gemini inline PDF ────────────
   //    AIS is an image PDF (IT portal) — always needs Gemini
   //    26AS and Form 16 are TRACES PDFs — Gemini is more reliable than regex
   //    Form 16 may be multiple files (mid-year job change) — parsed in parallel
-  //    Everything runs in parallel for speed
-  console.log("[reconcileTaxDocuments] Parsing all PDFs with Gemini...");
+  //    Missing documents are skipped and represented as all-null extracts
+  //    (null = unknown, never zero). Everything present runs in parallel.
+  console.log("[reconcileTaxDocuments] Parsing uploaded PDFs with Gemini...");
   const [aisPartial, form26as, form16Employers] = await Promise.all([
-    parseAISWithGemini(aisPdfBuffer),
-    parse26ASWithGemini(form26asPdfBuffer),
+    aisPdfBuffer ? parseAISWithGemini(aisPdfBuffer) : Promise.resolve({ ...EMPTY_AIS }),
+    form26asPdfBuffer ? parse26ASWithGemini(form26asPdfBuffer) : Promise.resolve({ ...EMPTY_26AS }),
     Promise.all(form16PdfBuffers.map((buf) => parseForm16WithGemini(buf))),
   ]);
 
@@ -1535,7 +1670,7 @@ export async function reconcileTaxDocuments(
   });
 
   // ── Step 5: Build reconciliation ─────────────────────────────────────────
-  const checks = buildChecks(ais, form26as, form16);
+  const checks = buildChecks(ais, form26as, form16, provided);
   if (multiEmployerFlags.employerCount > 1) {
     checks.push({
       name: "Multiple Employers Detected",
@@ -1559,14 +1694,37 @@ export async function reconcileTaxDocuments(
 
   const mismatches = buildMismatches(ais, form26as, form16, checks, multiEmployerFlags);
   const overallStatus = determineOverallStatus(mismatches);
-  const summary = generateSummary(overallStatus, mismatches, form16);
+  const summary = generateSummary(overallStatus, mismatches, form16, provided);
 
   // ── Step 6: AI insights ───────────────────────────────────────────────────
   const { insights, actionItems, itrImpact } = await generateAIInsights(
-    ais, form26as, form16, mismatches, multiEmployerFlags
+    ais, form26as, form16, mismatches, multiEmployerFlags, provided
   );
 
-  const aisNote = !process.env.GOOGLE_API_KEY
+  // ── Step 6.5: Shadow-compare production insights against the RAG pipeline ─
+  // The long-term plan is to replace generateAIInsights' ad-hoc Gemini prompt
+  // with the RAG pipeline (Tax Topic Graph + Qdrant-grounded generation).
+  // Every real production analysis gets re-run through the RAG pipeline in
+  // shadow and logged side by side for grading on /admin/ai-review.
+  // Fire-and-forget — must never delay or break the user's report.
+  const insightsAreReal =
+    !insights.startsWith("Upload all three documents") &&
+    !insights.startsWith("AI-powered insights are temporarily unavailable");
+  if (insightsAreReal) {
+    const q = buildReconcileShadowQuestion(ais, form26as, form16, mismatches, provided);
+    const productionText = [
+      insights,
+      actionItems.length ? "Action items: " + actionItems.join(" | ") : "",
+      itrImpact ? "ITR impact: " + itrImpact : "",
+    ].filter(Boolean).join("\n\n");
+    void runProductionShadowComparison({
+      question: q,
+      productionAnswer: productionText,
+      source: "reconcile-insights",
+    });
+  }
+
+  const aisNote = provided.ais && !process.env.GOOGLE_API_KEY
     ? "AIS data (dividends, interest, capital gains) requires a Google Gemini API key to parse. Form 16 and 26AS data shown above is complete. Add GOOGLE_API_KEY to your server .env to enable AIS parsing."
     : undefined;
 
@@ -1580,6 +1738,7 @@ export async function reconcileTaxDocuments(
 
   return {
     extractedData: { ais, form26as, form16, form16Employers },
+    documentsProvided: provided,
     checks,
     mismatches,
     overallStatus,

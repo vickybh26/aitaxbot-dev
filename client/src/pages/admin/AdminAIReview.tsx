@@ -2,19 +2,24 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import AdminLayout from "@/components/AdminLayout";
-import { Scale, CheckCircle2, AlertTriangle, XCircle, Loader2 } from "lucide-react";
+import { Scale, CheckCircle2, AlertTriangle, XCircle, Loader2, Send } from "lucide-react";
 
 interface AIQuery {
   id: string;
   question: string;
   concepts_triggered: string[];
-  answered_by: "graph" | "rag";
+  answered_by: "graph" | "rag" | "production";
   gemini_answer: string | null;
   graph_answer: string | null;
   graph_available: boolean;
   match_status: "pending" | "match" | "partial" | "mismatch" | null;
   notes?: string | null;
   timestamp: string;
+  source?: string;
+  // "production_vs_rag" rows come from the reconcile tool / calculator advice:
+  // gemini_answer = the ad-hoc production analysis the user saw,
+  // graph_answer = the RAG pipeline's shadow answer (candidate replacement).
+  comparison_type?: "production_vs_rag";
 }
 
 type FilterStatus = "all" | "pending" | "match" | "partial" | "mismatch";
@@ -83,6 +88,84 @@ function useGradeMutation() {
   });
 }
 
+// The public site has no AI chat page yet, so /api/ai/query never gets called
+// organically — which left this review page permanently empty ("comparison not
+// working"). This box lets an admin fire test questions directly: each one runs
+// the full Gemini + graph shadow pipeline and logs a fresh comparison below.
+function TestQuestionBox() {
+  const queryClient = useQueryClient();
+  const [question, setQuestion] = useState("");
+  const ask = useMutation({
+    mutationFn: async (q: string) => {
+      const res = await fetch("/api/ai/query", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: q, source: "admin-eval" }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body?.error?.message || "AI query failed");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      setQuestion("");
+      // The comparison row is written fire-and-forget server-side; give
+      // Firestore a beat before refetching so the new row actually appears.
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ["/api/ai/admin/queries", "graph_available"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/ai/admin/eval-stats"] });
+      }, 1500);
+    },
+  });
+
+  return (
+    <div className="rounded-2xl border border-persian-blue-100 bg-persian-blue-50/50 p-4 mb-6">
+      <p className="text-xs font-semibold text-persian-blue-700 uppercase tracking-wide mb-2">
+        Ask a test question
+      </p>
+      <p className="text-xs text-slate-500 mb-3">
+        Runs the full AI pipeline (Gemini answer + graph shadow answer) and logs the comparison below for grading.
+        Try questions on known topics — HRA, 80C, capital gains, advance tax.
+      </p>
+      <form
+        className="flex flex-col sm:flex-row gap-2"
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (question.trim().length >= 5 && !ask.isPending) ask.mutate(question.trim());
+        }}
+      >
+        <input
+          type="text"
+          value={question}
+          onChange={(e) => setQuestion(e.target.value)}
+          placeholder="e.g. How is HRA exemption calculated?"
+          className="flex-1 rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-persian-blue-200 bg-white"
+          data-testid="input-eval-question"
+        />
+        <button
+          type="submit"
+          disabled={ask.isPending || question.trim().length < 5}
+          className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-persian-blue-600 hover:bg-persian-blue-700 text-white text-sm font-semibold px-4 py-2 transition-colors disabled:opacity-50"
+          data-testid="button-eval-ask"
+        >
+          {ask.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+          {ask.isPending ? "Running…" : "Ask"}
+        </button>
+      </form>
+      {ask.isError && (
+        <p className="text-xs text-red-500 mt-2">{(ask.error as Error).message}</p>
+      )}
+      {ask.isSuccess && !ask.isPending && (
+        <p className="text-xs text-emerald-600 mt-2">
+          Answer generated — the comparison will appear in the Pending list in a moment.
+          {!(ask.data as any)?.concepts_triggered?.length && " (Note: no graph concepts matched this question, so it won't appear in the graph-comparison list — try a more standard tax topic.)"}
+        </p>
+      )}
+    </div>
+  );
+}
+
 function StatChip({ label, value, tone }: { label: string; value: number; tone: string }) {
   return (
     <div className="flex-1 min-w-[110px] rounded-xl border border-slate-100 bg-white px-4 py-3">
@@ -116,6 +199,7 @@ function QueryRow({ item }: { item: AIQuery }) {
           <p className="font-semibold text-slate-900 break-words">{item.question}</p>
           <p className="text-xs text-slate-400 mt-1">
             {new Date(item.timestamp).toLocaleString("en-IN")} · concepts: {item.concepts_triggered.join(", ") || "none"}
+            {item.source ? ` · source: ${item.source}` : ""}
           </p>
         </div>
         <span className={`shrink-0 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${statusStyle.classes}`}>
@@ -124,8 +208,17 @@ function QueryRow({ item }: { item: AIQuery }) {
       </div>
 
       <div className="flex flex-col md:flex-row gap-4 mb-3">
-        <AnswerCard title="Gemini (shown to user)" text={item.gemini_answer} accent="text-persian-blue-600" />
-        <AnswerCard title="Our graph agent (shadow, not shown)" text={item.graph_answer} accent="text-emerald-600" />
+        {item.comparison_type === "production_vs_rag" ? (
+          <>
+            <AnswerCard title="Production AI analysis (shown to user)" text={item.gemini_answer} accent="text-persian-blue-600" />
+            <AnswerCard title="RAG pipeline (shadow — candidate replacement)" text={item.graph_answer} accent="text-emerald-600" />
+          </>
+        ) : (
+          <>
+            <AnswerCard title="Gemini (shown to user)" text={item.gemini_answer} accent="text-persian-blue-600" />
+            <AnswerCard title="Our graph agent (shadow, not shown)" text={item.graph_answer} accent="text-emerald-600" />
+          </>
+        )}
       </div>
 
       <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
@@ -188,12 +281,15 @@ export default function AdminAIReview() {
           <h1 className="text-xl font-bold text-slate-900">AI Answer Review</h1>
         </div>
         <p className="text-sm text-slate-500">
-          Every question shown here got answered by Gemini (what the user saw) and, in parallel, by our own
-          deterministic Tax Topic Graph (not shown to the user yet). Grade whether our agent's answer is
-          up to the mark — this is the evidence base for eventually letting it answer directly, at zero
-          Gemini cost, for the topics it covers well.
+          Two kinds of comparisons land here. <span className="font-medium text-slate-600">Production analyses</span> —
+          every time a user reconciles documents or gets calculator tax advice, the same situation is re-run through
+          our RAG pipeline in shadow, so you can grade whether the RAG answer is good enough to replace the ad-hoc
+          Gemini analysis. <span className="font-medium text-slate-600">Test questions</span> — asked below, compared
+          Gemini-vs-graph. Grade each pair: match / partial / mismatch.
         </p>
       </div>
+
+      <TestQuestionBox />
 
       {stats && (
         <div className="flex gap-3 flex-wrap mb-6">

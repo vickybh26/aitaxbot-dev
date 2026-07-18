@@ -21,6 +21,7 @@ import { TransactionalEmailsApi, TransactionalEmailsApiApiKeys } from '@getbrevo
 import { seedTaxRates, getTaxSlabsForCalculation } from "./seedTaxRates";
 import { generateTaxComputationPDF, savePDFToStorage, generateRentReceiptPDF, type TaxComputationData, type RentReceiptData } from "./pdfGenerator";
 import { geminiTaxService, type TaxAdviceInput } from "./geminiTaxService";
+import { runProductionShadowComparison } from "./ragService";
 import { authenticateFirebaseToken, appCheckGuard, type AuthenticatedRequest } from "./middleware/auth.js";
 
 // ─────────────────────────────────────────────────────────────────────
@@ -358,6 +359,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       const advice = await geminiTaxService.getTaxAdvice(input);
       res.json(advice);
+
+      // Shadow-compare this production analysis against the RAG pipeline
+      // (fire-and-forget, after the response is already sent — zero user
+      // latency). Evidence base for eventually replacing the ad-hoc Gemini
+      // advice prompt with the RAG pipeline; graded on /admin/ai-review.
+      if (process.env.GOOGLE_API_KEY) {
+        const q =
+          `A salaried Indian taxpayer is planning taxes for FY ${input.financialYear || "2025-26"}. ` +
+          `Total income ₹${(input.totalIncome || 0).toLocaleString("en-IN")}; ` +
+          `80C invested ₹${(input.section80C || 0).toLocaleString("en-IN")}; ` +
+          `80D ₹${(input.section80D || 0).toLocaleString("en-IN")}; ` +
+          (input.hraReceived ? `HRA received ₹${input.hraReceived.toLocaleString("en-IN")}, rent paid ₹${(input.rentPaid || 0).toLocaleString("en-IN")} (${input.isMetroCity ? "metro" : "non-metro"} city); ` : "") +
+          `old regime tax ₹${(input.oldRegimeTax || 0).toLocaleString("en-IN")} vs new regime tax ₹${(input.newRegimeTax || 0).toLocaleString("en-IN")}. ` +
+          `Which regime should they choose and what tax-saving steps should they take before March 31?`;
+        const productionText = [
+          advice.summary,
+          ...advice.tips.map(t => `[${t.priority}] ${t.title}: ${t.detail}${t.potentialSaving ? ` (saves ~₹${t.potentialSaving.toLocaleString("en-IN")})` : ""}`),
+        ].join("\n");
+        void runProductionShadowComparison({
+          question: q,
+          productionAnswer: productionText,
+          source: "calculator-advice",
+        });
+      }
     } catch (error) {
       console.error("Error getting AI tax advice:", error);
       res.status(500).json({ error: "Failed to generate tax advice" });

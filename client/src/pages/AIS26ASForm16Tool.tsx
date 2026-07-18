@@ -1,6 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
-import { useLocation } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { trackPageView } from "@/lib/analytics";
@@ -11,6 +10,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import AuthModal from "@/components/AuthModal";
 import type { ITRFormResult } from "@shared/itrFormSelector";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -88,6 +88,7 @@ interface ReconciliationReport {
     form16: ExtractedForm16;            // combined across all employers
     form16Employers: ExtractedForm16[]; // one entry per uploaded Form 16
   };
+  documentsProvided?: { ais: boolean; form26as: boolean; form16: boolean };
   checks: ReconciliationCheck[];
   mismatches: ReconciliationMismatch[];
   overallStatus: "CLEAN" | "NEEDS_ATTENTION" | "CRITICAL";
@@ -233,8 +234,7 @@ function FileCard({
 // ─── Main component ────────────────────────────────────────────────────────────
 
 export default function AIS26ASForm16Tool() {
-  const { isAuthenticated, getIdToken } = useAuth();
-  const [, setLocation] = useLocation();
+  const { isAuthenticated, getIdToken, loading: authLoading } = useAuth();
   const { toast } = useToast();
 
   const [aisFile, setAisFile] = useState<File | null>(null);
@@ -250,12 +250,20 @@ export default function AIS26ASForm16Tool() {
   const [report, setReport] = useState<ReconciliationReport | null>(null);
   const [expandedMismatch, setExpandedMismatch] = useState<string | null>(null);
   const [downloadingPdf, setDownloadingPdf] = useState(false);
+  // In-page auth modal — keeps uploaded files and the page itself intact,
+  // unlike navigating to /login which loses everything and lands the user
+  // on /dashboard afterwards.
+  const [authModalTab, setAuthModalTab] = useState<"login" | "signup" | null>(null);
 
   useEffect(() => {
     trackPageView("/tools/ais-26as-form16", "AIS vs 26AS vs Form 16 — AiTaxBot");
   }, []);
 
   const allFilesReady = !!(aisFile && form26asFile && form16Files[0]);
+  // Any single document is enough to generate a report: one doc → summary of
+  // what not to miss when filing; two or more → cross-document comparison.
+  const anyFileReady = !!(aisFile || form26asFile || form16Files.some(Boolean));
+  const uploadedCount = [aisFile, form26asFile, form16Files.some(Boolean) ? true : null].filter(Boolean).length;
 
   // ── Missing files hint ──────────────────────────────────────────────────────
   const missingFiles = [
@@ -284,9 +292,14 @@ export default function AIS26ASForm16Tool() {
 
   // ── Analyse ────────────────────────────────────────────────────────────────
   async function handleAnalyse() {
-    if (!isAuthenticated) { setLocation("/login"); return; }
-    if (!allFilesReady) {
-      toast({ title: "Upload all 3 files", description: "AIS, Form 26AS, and Form 16 are all required.", variant: "destructive" });
+    // While Firebase auth state is still resolving, a signed-in user briefly
+    // reads as unauthenticated — clicking during that window used to bounce
+    // them to /login and then /dashboard. Just ignore the click until auth
+    // state settles instead.
+    if (authLoading) return;
+    if (!isAuthenticated) { setAuthModalTab("login"); return; }
+    if (!anyFileReady) {
+      toast({ title: "Upload at least one document", description: "Add your AIS, Form 26AS, or Form 16 — any one is enough for a summary report. All three give the full cross-check.", variant: "destructive" });
       return;
     }
 
@@ -298,10 +311,10 @@ export default function AIS26ASForm16Tool() {
     try {
       const token = await getIdToken();
       const formData = new FormData();
-      formData.append("ais", aisFile!);
-      formData.append("form26as", form26asFile!);
-      if (aisPassword) formData.append("aisPassword", aisPassword);
-      if (form26asPassword) formData.append("form26asPassword", form26asPassword);
+      if (aisFile) formData.append("ais", aisFile);
+      if (form26asFile) formData.append("form26as", form26asFile);
+      if (aisFile && aisPassword) formData.append("aisPassword", aisPassword);
+      if (form26asFile && form26asPassword) formData.append("form26asPassword", form26asPassword);
 
       // Only send filled Form 16 slots; password indices must line up with
       // the order files are appended, not the original slot index.
@@ -316,8 +329,10 @@ export default function AIS26ASForm16Tool() {
       setProgress(20);
       setProgressLabel(
         filledForm16.length > 1
-          ? `Reading ${filledForm16.length} Form 16s + AIS with Gemini AI…`
-          : "Reading AIS with Gemini AI…"
+          ? `Reading ${filledForm16.length} Form 16s + documents with Gemini AI…`
+          : uploadedCount === 1
+          ? "Reading your document with Gemini AI…"
+          : "Reading your documents with Gemini AI…"
       );
 
       const resp = await fetch("/api/tools/tax-reconcile", {
@@ -465,12 +480,21 @@ export default function AIS26ASForm16Tool() {
               <LogIn className="w-5 h-5 text-amber-600 flex-shrink-0" />
               <p className="text-sm text-amber-800">
                 Your tax documents are sensitive — please{" "}
-                <button onClick={() => setLocation("/login")} className="underline font-semibold">sign in</button>
+                <button onClick={() => setAuthModalTab("login")} className="underline font-semibold">sign in</button>
                 {" "}or{" "}
-                <button onClick={() => setLocation("/login")} className="underline font-semibold">create a free account</button>
-                {" "}to use this tool securely.
+                <button onClick={() => setAuthModalTab("signup")} className="underline font-semibold">create a free account</button>
+                {" "}to use this tool securely. You'll stay right here — nothing resets.
               </p>
             </div>
+          )}
+
+          {authModalTab && (
+            <AuthModal
+              open={!!authModalTab}
+              onOpenChange={(open) => setAuthModalTab(open ? authModalTab : null)}
+              defaultTab={authModalTab}
+              toolName="AIS/26AS/Form 16 Reconciliation"
+            />
           )}
 
           {!report ? (
@@ -585,11 +609,15 @@ export default function AIS26ASForm16Tool() {
 
                   <Button
                     onClick={handleAnalyse}
-                    disabled={loading || !allFilesReady}
+                    disabled={loading || !anyFileReady}
                     className="mt-4 w-full bg-blue-700 hover:bg-blue-800 text-white font-semibold py-3 text-base rounded-xl"
                   >
                     {loading ? (
                       <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Analysing with AI…</>
+                    ) : allFilesReady ? (
+                      <><Zap className="w-4 h-4 mr-2" /> Reconcile My Documents</>
+                    ) : uploadedCount > 0 ? (
+                      <><Zap className="w-4 h-4 mr-2" /> Generate Report ({uploadedCount} of 3 documents)</>
                     ) : (
                       <><Zap className="w-4 h-4 mr-2" /> Reconcile My Documents</>
                     )}
@@ -597,7 +625,9 @@ export default function AIS26ASForm16Tool() {
 
                   {!loading && missingFiles.length > 0 && (
                     <p className="text-xs text-center text-gray-400 mt-2">
-                      Still needed: {missingFiles.join(", ")}
+                      {uploadedCount > 0
+                        ? <>You can generate a report now — adding {missingFiles.join(" and ")} enables the full cross-document check.</>
+                        : <>Upload at least one document — any one gives a summary; all three give the full cross-check.</>}
                     </p>
                   )}
 
@@ -615,7 +645,7 @@ export default function AIS26ASForm16Tool() {
                   <div className="hidden md:block absolute top-5 left-[calc(16.7%+20px)] right-[calc(16.7%+20px)] h-px bg-gray-200" />
                   {[
                     { n: "1", title: "Upload your PDFs", desc: "AIS and Form 26AS from the Income Tax portal, plus Form 16 from each employer — changed jobs? Add up to 3.", color: "bg-blue-600" },
-                    { n: "2", title: "AI Reads & Extracts", desc: "Gemini AI parses every page of all 3 documents and pulls every salary, TDS, and income figure", color: "bg-[#4685d8]" },
+                    { n: "2", title: "AI Reads & Extracts", desc: "Gemini AI parses every page of your uploaded documents and pulls every salary, TDS, and income figure — even one document gives you a summary", color: "bg-[#4685d8]" },
                     { n: "3", title: "Get Your Report", desc: "Instant mismatches with severity ratings, Indian tax law explanations, and exact action steps", color: "bg-green-600" },
                   ].map((s) => (
                     <div key={s.n} className="flex-1 flex flex-col items-center text-center px-4 relative">
@@ -642,6 +672,31 @@ export default function AIS26ASForm16Tool() {
                RESULTS
             ────────────────────────────────────────────────────────────── */
             <>
+              {/* ── Partial-documents notice ──────────────────────────────── */}
+              {report.documentsProvided &&
+                !(report.documentsProvided.ais && report.documentsProvided.form26as && report.documentsProvided.form16) && (
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-start gap-3">
+                  <AlertTriangle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-blue-800">
+                    This report is based on{" "}
+                    <span className="font-semibold">
+                      {[
+                        report.documentsProvided.ais && "AIS",
+                        report.documentsProvided.form26as && "Form 26AS",
+                        report.documentsProvided.form16 && "Form 16",
+                      ].filter(Boolean).join(" + ")}
+                    </span>{" "}
+                    only. Upload{" "}
+                    {[
+                      !report.documentsProvided.ais && "AIS",
+                      !report.documentsProvided.form26as && "Form 26AS",
+                      !report.documentsProvided.form16 && "Form 16",
+                    ].filter(Boolean).join(" and ")}{" "}
+                    as well to cross-check documents against each other — that's where most filing mistakes are caught.
+                  </p>
+                </div>
+              )}
+
               {/* ── Status Banner ─────────────────────────────────────────── */}
               <div className={`rounded-2xl border p-5 ${statusCfg?.wrapClass}`}>
                 <div className="flex items-start gap-4">

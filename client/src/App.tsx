@@ -51,7 +51,6 @@ const AdminDashboard = lazy(() => import("@/pages/admin/AdminDashboard"));
 const AdminUsers = lazy(() => import("@/pages/admin/AdminUsers"));
 const AdminAnalytics = lazy(() => import("@/pages/admin/AdminAnalytics"));
 const AdminCAs = lazy(() => import("@/pages/admin/AdminCAs"));
-const AdminLeads = lazy(() => import("@/pages/admin/AdminLeads"));
 const AdminAIReview = lazy(() => import("@/pages/admin/AdminAIReview"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 
@@ -158,9 +157,6 @@ function Router() {
           </Route>
           <Route path="/admin/cas">
             {() => <AdminRoute component={AdminCAs} minLevel={3} />}
-          </Route>
-          <Route path="/admin/leads">
-            {() => <AdminRoute component={AdminLeads} minLevel={3} />}
           </Route>
           <Route path="/admin/ai-review">
             {() => <AdminRoute component={AdminAIReview} minLevel={3} />}

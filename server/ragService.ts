@@ -533,6 +533,65 @@ export async function runRAGQuery(input: RAGQuery): Promise<RAGResult> {
   };
 }
 
+// ─── Production-analysis shadow comparison ───────────────────────────────────
+// The site's real, production Gemini usage is not a chat page — it's the
+// ad-hoc analysis prompts inside the reconciliation tool (generateAIInsights)
+// and the calculator's tax-advice endpoint (geminiTaxService.getTaxAdvice).
+// The long-term plan is to replace those ad-hoc prompts with this RAG
+// pipeline (graph + Qdrant-grounded generation). This function is the
+// evidence-gathering step: every time production Gemini analysis is shown to
+// a user, run the SAME situation through the RAG pipeline in shadow and log
+// both answers side by side in ai_queries for admin grading on /admin/ai-review.
+//
+// Fire-and-forget: callers must NOT await this on the user's request path.
+// Failures are swallowed — a shadow-eval error must never break the tool.
+//
+// Cost note: each call spends one Gemini embed + one Gemini generate + one
+// Qdrant search on top of the production call. Volume today is low (a few
+// reconciliations/advice requests per day); revisit if usage grows 100×.
+
+export async function runProductionShadowComparison(opts: {
+  question: string;          // synthesized, PII-free description of the taxpayer situation
+  productionAnswer: string;  // the ad-hoc Gemini analysis actually shown to the user
+  source: string;            // e.g. "reconcile-insights", "calculator-advice"
+}): Promise<void> {
+  const { question, productionAnswer, source } = opts;
+  try {
+    const initialConcepts = extractConcepts(question);
+    const allConcepts = expandConceptGraph(initialConcepts);
+
+    const expandedQuery = buildExpandedQuery(question, allConcepts);
+    const queryVector = await withTimeout(embedText(expandedQuery), TIMEOUT_EMBED_MS, "Gemini embedding");
+    const chunks = await withTimeout(searchQdrant(queryVector, [...allConcepts]), TIMEOUT_SEARCH_MS, "Qdrant search");
+
+    let ragAnswer: string;
+    if (chunks.length === 0) {
+      ragAnswer = "[RAG pipeline found no relevant knowledge-base chunks for this situation]";
+    } else {
+      const generated = await withTimeout(generateAnswer(question, chunks, allConcepts), TIMEOUT_GENERATE_MS, "Gemini generation");
+      ragAnswer = generated.answer;
+    }
+
+    await getFirestore().collection("ai_queries").add({
+      question,
+      concepts_triggered: [...allConcepts],
+      session_id: null,
+      source,
+      comparison_type: "production_vs_rag", // distinguishes these rows from chat-style gemini-vs-graph rows
+      answered_by: "production",            // the user saw the ad-hoc production analysis
+      gemini_answer: productionAnswer,      // what the user actually saw
+      graph_answer: ragAnswer,              // the RAG pipeline's candidate replacement
+      graph_available: true,                // ensures it appears in the /admin/ai-review list
+      match_status: "pending",
+      timestamp: new Date().toISOString(),
+      // No user ID, email, PAN, or identifying information — question is a
+      // synthesized summary of figures only.
+    });
+  } catch (err) {
+    console.warn(`[RAG] Production shadow comparison failed (${source}) — non-fatal:`, err instanceof Error ? err.message : err);
+  }
+}
+
 // ─── Health check ────────────────────────────────────────────────────────────
 
 export async function checkRAGHealth(): Promise<{

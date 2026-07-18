@@ -3371,6 +3371,94 @@ export const blogPosts = ([
       { slug: "itr-filing-deadline-2026-july-31", title: "ITR Filing Deadline 2026: What Happens If You Miss July 31?" },
       { slug: "ais-vs-form-26as-difference", title: "AIS vs Form 26AS: What Is the Difference?" }
     ]
+  },
+
+  {
+    slug: "ais-26as-form16-reconciliation-upgrade",
+    status: "published",
+    metaTitle: "Why AIS, 26AS, and Form 16 Don't Always Match (and How We're Fixing It)",
+    metaDescription: "AIS, Form 26AS, and Form 16 often show different numbers when filing your ITR. Here is why that happens, and how AiTaxBot's upcoming Heads-of-Income reconciliation will catch gaps like unreported rental income and dropped deductions automatically.",
+    keywords: ["AIS 26AS Form16 mismatch", "AIS vs 26AS vs Form 16", "tax reconciliation tool India", "rental income TDS 194IB", "which ITR form for business income", "AiTaxBot reconciliation tool"],
+    ogTitle: "Why Your AIS, 26AS, and Form 16 Don't Always Match",
+    ogDescription: "A real filing walkthrough found genuine reconciliation gaps between AIS, 26AS, and Form 16 — here is what we found, and what AiTaxBot is building to catch it automatically.",
+    tags: ["Tax Reconciliation", "AIS", "Form 26AS", "Form 16", "Income Tax", "Product Update"],
+    readingTimeMinutes: 6,
+    publishedAt: "July 14, 2026",
+    heroImage: "/images/taxation-india-guide.svg",
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Why AIS, 26AS, and Form 16 Don't Always Match (and How We're Fixing It)",
+      "author": { "@type": "Organization", "name": "AiTaxBot" },
+      "publisher": { "@type": "Organization", "name": "AiTaxBot" },
+      "datePublished": "2026-07-14",
+      "dateModified": "2026-07-14",
+      "wordCount": 1050,
+      "reviewedBy": { "@type": "Organization", "name": "AiTaxBot Tax Research Team" }
+    },
+    bodySections: [
+      {
+        type: "intro",
+        content_md: "If you have ever compared your AIS, Form 26AS, and Form 16 side by side while filing your ITR, you have probably noticed the numbers do not always agree. Sometimes it is a rupee or two — harmless rounding. Sometimes it is a real gap that changes what you owe.\n\nMost tax tools, including AiTaxBot today, treat these three documents as separate checklists: upload each one, see three sets of numbers, and leave the cross-checking to you. We recently reviewed a real FY 2025-26 filing end-to-end against all three source documents, line by line, and found genuine gaps that a document-by-document approach misses entirely. This post explains what each document actually tells you, why they disagree, and what we are building to catch these gaps automatically."
+      },
+      {
+        type: "h2",
+        heading: "What AIS, 26AS, and Form 16 Actually Tell You",
+        content_md: "These three documents are not three versions of the same thing — each one is authoritative for a different slice of your financial year:\n\n**AIS (Annual Information Statement)** casts the widest net. It aggregates financial transactions reported to the tax department by banks, brokers, employers, and other third parties — dividends, interest, securities and mutual fund sales, and more. It is the most complete picture available, but it is also the least precise, since it is built from monthly aggregates rounded by each reporting entity.\n\n**Form 26AS** is the ledger of tax actually deducted and deposited against your PAN. For anything related to TDS — how much was withheld, by whom, and when — 26AS is the one to trust. It does not, however, tell you much about income where no TDS applies.\n\n**Form 16** is your employer's own computation of your salary and the tax withheld on it. For salary specifically, it is the most precise of the three, since it reflects exactly what was paid and exactly what was deducted, down to the rupee."
+      },
+      {
+        type: "h2",
+        heading: "Why the Numbers Do Not Always Match",
+        content_md: "A few different things cause AIS, 26AS, and Form 16 to disagree, and they are not all the same kind of problem:\n\n**Rounding is normal, not an error.** AIS sums rounded monthly figures; 26AS and Form 16 carry paise-level precision. In the filing we reviewed, AIS showed a salary total about ₹2 higher than Form 16's exact figure — both were correct for their own method of aggregation. A gap of a few rupees between these documents is expected and should not be treated as a mismatch.\n\n**Payroll lines can go missing between payslip and Form 16.** In the same review, one month's payslip included a line item worth ₹1,133.72 that never appeared in the Form 16 annexure. Neither the payslip nor Form 16 was wrong on its own — but comparing only one of them against AIS would never have surfaced the gap at all.\n\n**Deduction sources can get lost between reports.** A payroll deduction worth ₹11,212 was correctly identified in one computation, but the same figure never resurfaced in a follow-up reconciliation report for the same filing — even though it was a real, potentially self-declarable expense. Nothing was technically wrong with either report individually; the information simply was not carried forward."
+      },
+      {
+        type: "h2",
+        heading: "The Real Cost of Not Reconciling",
+        content_md: "None of these gaps involve AiTaxBot (or any tool) computing a number incorrectly — every total in the filing we reviewed was arithmetically correct. The risk is filing off an incomplete picture: a salary-only computation that never mentions capital gains, interest, or dividend income; a deduction that was identified once and then quietly dropped; a payroll line with no Form 16 counterpart that nobody ever asked payroll about.\n\nEach of these, left uncaught, either understates what you owe (risking a notice later) or overstates it (leaving money on the table you were entitled to claim). Catching them requires comparing documents against each other, not just reading each one in isolation."
+      },
+      {
+        type: "h2",
+        heading: "What We Are Building: Heads-of-Income Reconciliation",
+        content_md: "We are rebuilding the reconciliation engine behind AiTaxBot's AIS/26AS/Form 16 tool around the same five **heads of income** the ITR form itself uses — Salary, House Property, Capital Gains, Business/Profession, and Other Sources — instead of comparing three parallel documents against each other.\n\nThe idea is simple: assign one authoritative source per head, and treat everything else as a cross-check rather than a competing total. Form 16 becomes the trusted source for Salary. AIS becomes the trusted source for Other Sources — interest, dividends, and similar income. Form 26AS remains the ledger of record for TDS, across every head, always.\n\nTwo new capabilities are coming out of this that the tool cannot do today. The first is automatic **rental income detection** — when a tenant deducts TDS under Section 194-IB, that shows up in both 26AS and AIS, and the upgraded tool will read it and surface it under House Property instead of requiring you to notice and declare it yourself. The second is **business-income flagging** — the tool will not compute a business income total, but it will recognise the TDS patterns that typically indicate business or professional income and let you know you likely need ITR-3 or ITR-4, rather than silently producing an incomplete result.\n\nThis is in active development, not live yet. We will publish an update here once it ships — in the meantime, the current AIS/26AS/Form 16 tool is live today and still catches the salary, TDS, and AIS-level mismatches it was built for."
+      },
+      {
+        type: "faq",
+        heading: "Frequently Asked Questions",
+        items: [
+          {
+            q: "Should I worry if AIS and Form 16 show slightly different salary figures?",
+            a: "Not if the gap is a few rupees — that is normal rounding, since AIS aggregates rounded monthly figures while Form 16 carries exact paise-level totals. Treat Form 16's figure as authoritative for salary and note the small AIS variance as informational, not an error."
+          },
+          {
+            q: "If AIS and Form 26AS disagree on TDS, which one should I trust?",
+            a: "Form 26AS, always. It is the actual ledger of tax deposited against your PAN. AIS may reference TDS in context, but 26AS is the source of record for tax credit claims."
+          },
+          {
+            q: "Can AiTaxBot already detect rental income automatically?",
+            a: "Not yet — that is part of the Heads-of-Income upgrade described above, currently in development. Today, rental income and House Property details still need to be entered manually."
+          },
+          {
+            q: "I have business income — can I use AiTaxBot's reconciliation tool?",
+            a: "The tool does not currently compute business or professional income. If you have income from a business or profession, you will likely need to file ITR-3 or ITR-4 and should consult a Chartered Accountant. The upcoming business-income flagging feature is meant to help you recognise when this applies, not to replace that filing."
+          }
+        ]
+      },
+      {
+        type: "cta",
+        content_md: "**Want to check your own AIS, 26AS, and Form 16 for mismatches today?**\n\nAiTaxBot's reconciliation tool is live now — upload your documents and see salary, TDS, and AIS-level mismatches flagged automatically. Sign in to view your results.",
+        internal_links: [
+          { label: "AIS/26AS/Form16 Reconciliation Tool", href: "/tools/ais-26as-form16" },
+          { label: "Income Tax Calculator", href: "/calculators/income-tax" },
+          { label: "AIS vs Form 26AS Explained", href: "/blog/ais-vs-form-26as-difference" }
+        ]
+      }
+    ],
+    disclaimer: "This article describes both current AiTaxBot functionality and features under active development; features described as upcoming are not yet live. Figures referenced are from an anonymised real-filing review and are illustrative, not universal thresholds. This is general information, not tax advice — consult a Chartered Accountant for guidance specific to your filing.",
+    relatedPosts: [
+      { slug: "ais-vs-form-26as-difference", title: "AIS vs Form 26AS: What Is the Difference?" },
+      { slug: "itr-filing-checklist-documents-fy2026-27", title: "ITR Filing Checklist: Documents You Need for FY 2026-27" },
+      { slug: "capital-gains-itr-where-to-report", title: "Capital Gains in ITR: Where to Report in Schedule CG" }
+    ]
   }
 ]) as BlogPost[];
 

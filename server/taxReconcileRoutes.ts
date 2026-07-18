@@ -387,22 +387,25 @@ export function registerTaxReconcileRoutes(app: Express): void {
     async (req: AuthenticatedRequest, res: Response) => {
       try {
         const files = req.files as Record<string, Express.Multer.File[]> | undefined;
-        const aisBuf = files?.["ais"]?.[0]?.buffer;
-        const form26asBuf = files?.["form26as"]?.[0]?.buffer;
+        const aisBuf = files?.["ais"]?.[0]?.buffer ?? null;
+        const form26asBuf = files?.["form26as"]?.[0]?.buffer ?? null;
         const form16Files = files?.["form16"] ?? [];
         const form16Bufs = form16Files.map((f) => f.buffer);
 
-        if (!aisBuf || !form26asBuf || form16Bufs.length === 0) {
-          return res.status(400).json({ error: "Please upload AIS, Form 26AS, and at least one Form 16" });
+        // Partial uploads are allowed: any single document produces a summary
+        // report, two or more produce a cross-document comparison. At least
+        // one document is still required.
+        if (!aisBuf && !form26asBuf && form16Bufs.length === 0) {
+          return res.status(400).json({ error: "Please upload at least one document (AIS, Form 26AS, or Form 16)" });
         }
         if (form16Bufs.length > 3) {
           return res.status(400).json({ error: "You can upload up to 3 Form 16s (one per employer)" });
         }
 
-        // Verify PDF magic bytes
+        // Verify PDF magic bytes (only for files actually uploaded)
         const allFiles: [string, Buffer][] = [
-          ["AIS", aisBuf],
-          ["26AS", form26asBuf],
+          ...(aisBuf ? [["AIS", aisBuf] as [string, Buffer]] : []),
+          ...(form26asBuf ? [["26AS", form26asBuf] as [string, Buffer]] : []),
           ...form16Bufs.map((buf, i): [string, Buffer] => [`Form 16 #${i + 1}`, buf]),
         ];
         for (const [name, buf] of allFiles) {

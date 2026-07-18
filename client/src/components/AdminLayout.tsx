@@ -11,7 +11,6 @@ import {
   Shield,
   ChevronRight,
   UserCheck,
-  Inbox,
   Scale,
 } from "lucide-react";
 import { logout } from "@/lib/firebase";
@@ -23,7 +22,10 @@ const navItems = [
   { href: "/admin/users", label: "Users & CRM", icon: Users, minLevel: 3 },
   { href: "/admin/analytics", label: "Analytics", icon: BarChart3, minLevel: 3 },
   { href: "/admin/cas", label: "CA Directory", icon: UserCheck, minLevel: 3 },
-  { href: "/admin/leads", label: "Leads", icon: Inbox, minLevel: 3 },
+  // Leads page removed from the admin panel (2026-07-18, per founder) — lead
+  // captures are checked directly in the Firebase console instead. The
+  // backend capture endpoints and the Firestore `leads` collection are
+  // untouched; only this UI entry point is gone.
   { href: "/admin/ai-review", label: "AI Answer Review", icon: Scale, minLevel: 3 },
 ];
 
