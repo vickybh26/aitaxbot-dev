@@ -46,6 +46,12 @@ const ai = buildAI();
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
 
+export interface HighValueTransaction {
+  code: string;         // SFT code, e.g. "SFT-005", "SFT-004", "SFT-012"
+  description: string;  // e.g. "Purchase of time deposits"
+  amount: number;
+}
+
 export interface ExtractedAIS {
   salaryIncome: number | null;
   interestFromSavings: number | null;
@@ -56,6 +62,14 @@ export interface ExtractedAIS {
   cryptoIncome: number | null;            // VDA receipts (194S)
   lrsRemittance: number | null;           // LRS remittances (206CQ TCS)
   taxPaidSelfAssessment: number | null;   // self-assessment tax in AIS Part B3
+  // Specified Financial Transactions reported in Part B2 that are NOT taxable
+  // income by themselves (e.g. buying a time deposit is not income) but are
+  // still worth surfacing — the IT dept already has them on file, and a large
+  // unexplained-looking transaction is a common scrutiny trigger. Covers
+  // SFT-005 (time deposit purchase), SFT-004 (cash deposits), SFT-006 (credit
+  // card payments), SFT-010/SFT-012 (immovable property), SFT-013 (cash
+  // payment for goods/services), SFT-014 (cash withdrawal/deposit), etc.
+  highValueTransactions: HighValueTransaction[] | null;
   rawText?: string;
 }
 
@@ -637,7 +651,7 @@ It shows financial data reported to the IT department for FY 2025-26.
 
 Read EVERY page carefully. The document has sections:
 - Part B1: TDS/TCS (salary TDS-192, crypto VDA TDS-194S, etc.)
-- Part B2: SFT (dividends SFT-015, savings interest SFT-016(SB), FD interest SFT-016(FD), securities sale SFT-17-LS, mutual fund sale SFT-18-4MF, MF purchase SFT-18-Pur)
+- Part B2: SFT (dividends SFT-015, savings interest SFT-016(SB), FD interest SFT-016(FD), securities sale SFT-17-LS, mutual fund sale SFT-18-4MF, MF purchase SFT-18-Pur, purchase of time deposits SFT-005, cash deposits SFT-004, credit card payments SFT-006, purchase/sale of immovable property SFT-010/SFT-012, cash payment for goods/services SFT-013, cash withdrawal SFT-014)
 - Part B3: Tax payments (advance tax, self-assessment tax)
 - Part B7: Salary Annexure II
 
@@ -651,7 +665,8 @@ Extract these values. Use null if not found. Return ONLY this JSON (no markdown,
   "mutualFundTransactions": <total from SFT-18-4MF(M) — sale of mutual fund units, number>,
   "cryptoIncome": <total from TDS-194S / VDA / virtual digital asset section, number>,
   "lrsRemittance": <total LRS remittance from TCS-206CQ section, number>,
-  "taxPaidSelfAssessment": <self-assessment tax paid in Part B3, number>
+  "taxPaidSelfAssessment": <self-assessment tax paid in Part B3, number>,
+  "highValueTransactions": [{ "code": "<e.g. SFT-005>", "description": "<e.g. Purchase of time deposits>", "amount": <number> }, ...] — EVERY SFT entry in Part B2 that is NOT already captured above (i.e. not interest, dividend, securities sale, or MF sale) goes here, one entry per distinct SFT code+description found, amount summed if it appears more than once. This commonly includes SFT-005 (purchase of time deposits) which is easy to miss — do not skip it. Use [] if none found.
 }`;
 
   try {
@@ -683,7 +698,24 @@ Extract these values. Use null if not found. Return ONLY this JSON (no markdown,
     }
     const parsed = JSON.parse(match[0]);
     console.log("[parseAISWithGemini] Parsed:", JSON.stringify(parsed));
-    return parsed;
+
+    // Validate highValueTransactions defensively — same reasoning as
+    // nonSalarySections in parse26ASWithGemini: this feeds directly into a
+    // user-facing report, so a malformed entry from the model shouldn't
+    // silently poison it or crash the pipeline.
+    const rawHVT = Array.isArray(parsed.highValueTransactions) ? parsed.highValueTransactions : [];
+    const highValueTransactions: HighValueTransaction[] = rawHVT
+      .filter((t: any) => t && typeof t.code === "string" && typeof t.amount === "number" && t.amount > 0)
+      .map((t: any) => ({
+        code: t.code.trim().toUpperCase(),
+        description: typeof t.description === "string" ? t.description.trim() : t.code.trim(),
+        amount: t.amount,
+      }));
+
+    return {
+      ...parsed,
+      highValueTransactions: highValueTransactions.length ? highValueTransactions : null,
+    };
   } catch (err) {
     console.error("[parseAISWithGemini] Error:", err);
     return {};
@@ -707,15 +739,18 @@ async function parse26ASWithGemini(pdfBuffer: Buffer): Promise<Extracted26AS> {
   const prompt = `This is an Annual Tax Statement / Annual Information Statement (Form 26AS or ATS) downloaded from TRACES for FY 2025-26 / AY 2026-27.
 
 The document has sections like:
-- PART-I or PART A: TDS details — each row shows Deductor Name, TAN, Section code, Amount Paid, Tax Deducted, Tax Deposited
+- PART-I or PART A: TDS details. This section can appear in TWO different layouts — check for BOTH:
+  (a) One row per deductor with columns Deductor Name, TAN, Section code, Amount Paid, Tax Deducted, Tax Deposited — read the section directly off that row.
+  (b) A SUMMARY row per deductor (Sr. No, Name of Deductor, TAN, Total Amount Paid/Credited, Total Tax Deducted, Total TDS Deposited) with NO section column, immediately followed by an ITEMIZED sub-table of individual transactions for that same deductor, where EACH transaction row has its own "Section" column (e.g. "194A"), transaction date, amount, and tax deducted/deposited. In this layout, use the section code(s) from the itemized sub-table rows — they apply to the deductor's summary total above them. Do not skip this deductor just because the summary row itself has no section column.
   * Section 192 = salary TDS
-  * Section 194A = interest TDS
+  * Section 194A = interest TDS (bank/FD/savings account interest — very common, do not miss this)
   * Section 194S = crypto/VDA TDS
   * Section 194Q = purchase TDS
 - PART-III or PART C: Advance Tax / Self-Assessment Tax payments
 - PART-VI or PART D: TCS collected
 
-Find ALL deductors and their TDS. Section 192 entries are salary TDS.
+Find ALL deductors and their TDS, using whichever layout (a) or (b) above applies — do not stop at the first deductor. If a deductor's summary "Total Tax Deducted" / "Total TDS Deposited" figure is available, use that figure directly rather than re-summing the itemized rows yourself (it's the authoritative total; the itemized rows are just there to show you the section code).
+Section 192 entries are salary TDS. Section 194A and all other non-192 sections are non-salary TDS.
 Sum up:
 - tdsSalary = total Tax Deposited for all section 192 (salary) rows across all deductors
 - tdsNonSalary = total Tax Deposited for all non-192 section rows (194A, 194S, etc.)
@@ -774,13 +809,22 @@ Return ONLY this JSON (no markdown, no text before/after the JSON):
       .filter((s: any) => s && typeof s.section === "string" && typeof s.amount === "number")
       .map((s: any) => ({ section: s.section.trim().toUpperCase(), amount: s.amount }));
 
+    // Fallback: if the model found and itemized the per-section breakdown but
+    // left the tdsNonSalary total itself null (observed on real TRACES PDFs
+    // with the summary-row + itemized-sub-table layout — the model
+    // sometimes populates nonSalarySections correctly while dropping the
+    // rollup field), derive it from the sections we DO have rather than
+    // reporting "no TDS credits found" when the credit is clearly on record.
+    const sectionsTotal = nonSalarySections.reduce((sum, s) => sum + s.amount, 0);
+    const tdsNonSalary = parsed.tdsNonSalary ?? (nonSalarySections.length ? sectionsTotal : null);
+
     return {
       tdsSalary: parsed.tdsSalary ?? null,
-      tdsNonSalary: parsed.tdsNonSalary ?? null,
+      tdsNonSalary,
       nonSalarySections: nonSalarySections.length ? nonSalarySections : null,
       advanceTaxPaid: parsed.advanceTaxPaid ?? null,
       selfAssessmentTax: parsed.selfAssessmentTax ?? null,
-      totalTdsCredits: (parsed.tdsSalary ?? 0) + (parsed.tdsNonSalary ?? 0) || null,
+      totalTdsCredits: (parsed.tdsSalary ?? 0) + (tdsNonSalary ?? 0) || null,
       tcsPaid: parsed.tcsPaid ?? null,
       employerName: parsed.employerName ?? undefined,
       employerTAN: parsed.employerTAN ?? undefined,
@@ -1187,7 +1231,28 @@ function buildChecks(
       : "No advance tax or self-assessment tax in 26AS",
   });
 
-  // ── 9. TDS Credits (26AS) — single-document summary line ─────────────────
+  // ── 9. High-Value Transactions (AIS) ──────────────────────────────────────
+  // Not taxable income by itself (e.g. buying a time deposit), but the IT
+  // dept already has it on file (SFT-005 etc.), and it's exactly the kind of
+  // thing a taxpayer should know is being tracked — flag it for awareness,
+  // not as an "issue."
+  if (provided.ais) {
+    const hvt = ais.highValueTransactions ?? [];
+    const hvtTotal = hvt.reduce((sum, t) => sum + t.amount, 0);
+    checks.push({
+      name: "High-Value Transactions (AIS)",
+      status: "OK",
+      aisValue: hvt.length ? hvtTotal : null,
+      form16Value: null,
+      form26asValue: null,
+      note: hvt.length
+        ? hvt.map(t => `${t.code} (${t.description}): ${fmt(t.amount)}`).join("; ") +
+          " — not taxable income by itself, but reported to the IT dept under Part B2 (SFT); be ready to explain the source of funds if asked."
+        : "No high-value SFT transactions (e.g. large deposits, property, time deposits) found in AIS",
+    });
+  }
+
+  // ── 10. TDS Credits (26AS) — single-document summary line ────────────────
   // Especially useful when 26AS is the only document uploaded: it tells the
   // user exactly how much tax credit they're entitled to claim in the ITR.
   if (provided.form26as) checks.push({
@@ -1500,6 +1565,13 @@ Tax Document Summary:
 - Securities Sold (AIS): ${fmt(ais.securitiesTransactions)}
 - Mutual Fund Sold (AIS): ${fmt(ais.mutualFundTransactions)}
 - LRS Remittance (AIS): ${fmt(ais.lrsRemittance)}
+- TDS on Salary (26AS): ${fmt(f26as.tdsSalary)}
+- TDS Non-Salary e.g. interest (26AS): ${fmt(f26as.tdsNonSalary)}
+- Total TDS Credit Available (26AS): ${fmt(f26as.totalTdsCredits)}
+- Advance/Self-Assessment Tax Paid (26AS): ${fmt((f26as.advanceTaxPaid ?? 0) + (f26as.selfAssessmentTax ?? 0) || null)}
+${ais.highValueTransactions?.length
+  ? `- High-Value Transactions on record (AIS, not taxable income by itself but reported to IT dept): ${ais.highValueTransactions.map(t => `${t.code} ${t.description} ${fmt(t.amount)}`).join("; ")} — mention this so the taxpayer is aware it's on file, even though it doesn't need to be declared as income.`
+  : ""}
 
 ${docContextNote}
 Issues Found:
@@ -1568,7 +1640,9 @@ function buildReconcileShadowQuestion(
   if (cg > 0) parts.push(`securities/MF sale proceeds ${fmt(cg)}`);
   if (ais.cryptoIncome) parts.push(`VDA/crypto receipts ${fmt(ais.cryptoIncome)}`);
   if (f26as.tdsSalary != null) parts.push(`TDS on salary ${fmt(f26as.tdsSalary)} per 26AS`);
+  if ((f26as.tdsNonSalary ?? 0) > 0) parts.push(`non-salary TDS (e.g. interest) ${fmt(f26as.tdsNonSalary)} per 26AS`);
   if ((f26as.advanceTaxPaid ?? 0) > 0) parts.push(`advance tax paid ${fmt(f26as.advanceTaxPaid)}`);
+  if (ais.highValueTransactions?.length) parts.push(`high-value transactions on record: ${ais.highValueTransactions.map(t => `${t.code} ${fmt(t.amount)}`).join(", ")}`);
 
   const issueTitles = mismatches
     .filter(m => m.severity === "HIGH" || m.severity === "MEDIUM")
@@ -1593,6 +1667,7 @@ const EMPTY_AIS: ExtractedAIS = {
   salaryIncome: null, interestFromSavings: null, interestFromFD: null,
   dividendIncome: null, securitiesTransactions: null, mutualFundTransactions: null,
   cryptoIncome: null, lrsRemittance: null, taxPaidSelfAssessment: null,
+  highValueTransactions: null,
 };
 
 const EMPTY_26AS: Extracted26AS = {
@@ -1652,6 +1727,7 @@ export async function reconcileTaxDocuments(
     cryptoIncome: aisFinal.cryptoIncome ?? null,
     lrsRemittance: aisFinal.lrsRemittance ?? null,
     taxPaidSelfAssessment: aisFinal.taxPaidSelfAssessment ?? null,
+    highValueTransactions: aisFinal.highValueTransactions ?? null,
     rawText: aisText.slice(0, 300),
   };
 

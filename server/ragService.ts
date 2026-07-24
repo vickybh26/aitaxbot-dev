@@ -216,7 +216,27 @@ async function searchQdrant(
     };
   }
 
-  const results = await qdrant.search(COLLECTION, searchParams);
+  // Filtered search requires a keyword payload index on "concepts" (created
+  // 2026-07-24 — every filtered search 400'd with "Bad Request" before that,
+  // which took down the whole query pipeline). If the filter ever fails again
+  // (e.g. index dropped after a collection rebuild), degrade to an unfiltered
+  // semantic search instead of failing the query: worse ranking, still useful.
+  let results;
+  try {
+    results = await qdrant.search(COLLECTION, searchParams);
+  } catch (err) {
+    if (searchParams.filter) {
+      console.warn(
+        "[RAG] Filtered Qdrant search failed — retrying without concept filter. " +
+        "If this recurs, recreate the keyword payload index on 'concepts':",
+        err instanceof Error ? err.message : err
+      );
+      const { filter: _dropped, ...unfiltered } = searchParams;
+      results = await qdrant.search(COLLECTION, unfiltered);
+    } else {
+      throw err;
+    }
+  }
 
   return results.map(r => ({
     text: String(r.payload?.text || ""),
