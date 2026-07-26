@@ -1332,7 +1332,11 @@ function buildChecks(
     form16Value: null,
     form26asValue: null,
     note: cgGross > 0
-      ? `${fmt(cgGross)} gross securities/MF sales — compute STCG/LTCG, use ITR-2`
+      // Deliberately does NOT name a form. Capital gains rule ITR-1/ITR-4 out,
+      // but they do not imply ITR-2 — a taxpayer with business income as well
+      // needs ITR-3. Only inferITRFormRecommendation() sees the whole picture,
+      // so static strings must defer to it rather than contradict it.
+      ? `${fmt(cgGross)} gross securities/MF sales — compute STCG/LTCG and report in Schedule CG (see Recommended ITR Form above)`
       : "No securities/MF transactions in AIS (or AIS not parsed)",
   });
 
@@ -1505,8 +1509,11 @@ function buildMismatches(
       title: "Securities/MF transactions found — compute capital gains",
       description: `AIS shows ${fmt(ais.securitiesTransactions)} equity sales + ${fmt(ais.mutualFundTransactions)} MF redemptions = ${fmt(cgGross)} gross`,
       aisValue: cgGross, form16Value: null, form26asValue: null, difference: null,
-      ruleExplanation: "AIS shows gross sale value, not capital gains. Under ITA 2025/IT Rules 2026: STCG on equity at 20%, LTCG (>12 months, >₹1.25L gain) at 12.5%. Use ITR-2.",
-      suggestedAction: "Get capital gains statement from broker (Zerodha/Groww) and CAMS/KFintech for MFs. Compute actual gains. Use ITR-2 (not ITR-1) if capital gains exist.",
+      ruleExplanation: "AIS shows gross sale value, not capital gains. Under ITA 2025/IT Rules 2026: STCG on equity at 20%, LTCG (>12 months, >₹1.25L gain) at 12.5%.",
+      // No form named here — capital gains rule out ITR-1/ITR-4, but whether
+      // ITR-2 or ITR-3 applies depends on whether business income also exists.
+      // The Recommended ITR Form section is the single source of truth.
+      suggestedAction: "Get your capital gains statement from your broker (Zerodha/Groww) and CAMS/KFintech for mutual funds, then compute the actual gain. AIS often also shows cost of acquisition per transaction — cross-check it. Report in Schedule CG; see the Recommended ITR Form section for which return to file.",
     });
   }
 
