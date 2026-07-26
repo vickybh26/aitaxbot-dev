@@ -52,6 +52,32 @@ export interface HighValueTransaction {
   amount: number;
 }
 
+/**
+ * Catch-all for any income row in the AIS that does NOT map to one of the
+ * named fields below.
+ *
+ * Why this exists: the named fields enumerate the income types we knew about
+ * when the parser was written. Anything outside that list — contract receipts
+ * (194C), professional fees (194J), commission (194H), rent (194I), lottery
+ * winnings (194B), EPF withdrawal (192A), partner remuneration (194T), and
+ * whatever the department adds next — had nowhere to be stored, so it was
+ * silently dropped. A taxpayer would then see a confident report that simply
+ * omitted a whole head of income.
+ *
+ * This bucket makes the parser fail LOUD instead of silent: anything it can't
+ * classify still gets captured verbatim and surfaced to the user, who can
+ * recognise their own income even when our schema doesn't.
+ * Added 2026-07-26 after a real AIS carrying ₹45,500 of 194C contract
+ * receipts produced a report that never mentioned them.
+ */
+export interface OtherIncomeItem {
+  code: string;         // information code exactly as printed, e.g. "TDS-194C"
+  description: string;  // description exactly as printed
+  source?: string;      // deductor / reporting entity, if shown
+  amount: number;       // gross amount credited (NOT the TDS)
+  tdsDeducted?: number; // TDS on it, if the row shows one
+}
+
 export interface ExtractedAIS {
   salaryIncome: number | null;
   interestFromSavings: number | null;
@@ -70,6 +96,14 @@ export interface ExtractedAIS {
   // card payments), SFT-010/SFT-012 (immovable property), SFT-013 (cash
   // payment for goods/services), SFT-014 (cash withdrawal/deposit), etc.
   highValueTransactions: HighValueTransaction[] | null;
+  /** Income rows that matched none of the named fields above — see OtherIncomeItem. */
+  otherIncomeItems: OtherIncomeItem[] | null;
+  /**
+   * Every section heading Gemini reported seeing in the document. Used as a
+   * coverage check: if the model saw a heading we have no figure for, that's
+   * a signal something was missed rather than absent.
+   */
+  sectionsSeen: string[] | null;
   rawText?: string;
 }
 
@@ -699,8 +733,36 @@ in the document. Return ONLY this JSON (no markdown, no text before/after):
   "cryptoIncome": <total from TDS-194S / VDA / virtual digital asset section, number>,
   "lrsRemittance": <total LRS remittance from TCS-206CQ section, number>,
   "taxPaidSelfAssessment": <self-assessment tax paid in Part B3, number>,
-  "highValueTransactions": [{ "code": "<the code exactly as printed, e.g. SFT-005>", "description": "<the description exactly as printed, e.g. Purchase of time deposits>", "amount": <number> }, ...] — EVERY Part B2 SFT entry NOT already captured above (i.e. not interest, dividend, securities sale, or MF sale). One entry per distinct code+description, amounts summed if repeated. Commonly includes purchase of time deposits (SFT-005), purchase of securities (SFT-17(Pur) / SFT-18(Pur)), cash deposits (SFT-004), credit card payments (SFT-006), immovable property (SFT-010/SFT-012), cash payments (SFT-013), cash withdrawals (SFT-014). These are easy to miss — do not skip them. Use [] if none found.
-}`;
+  "highValueTransactions": [{ "code": "<the code exactly as printed, e.g. SFT-005>", "description": "<the description exactly as printed, e.g. Purchase of time deposits>", "amount": <number> }, ...] — EVERY Part B2 SFT entry NOT already captured above (i.e. not interest, dividend, securities sale, or MF sale). One entry per distinct code+description, amounts summed if repeated. Commonly includes purchase of time deposits (SFT-005), purchase of securities (SFT-17(Pur) / SFT-18(Pur)), cash deposits (SFT-004), credit card payments (SFT-006), immovable property (SFT-010/SFT-012), cash payments (SFT-013), cash withdrawals (SFT-014). These are easy to miss — do not skip them. Use [] if none found.,
+  "otherIncomeItems": [{ "code": "<code exactly as printed, e.g. TDS-194C>", "description": "<description exactly as printed>", "source": "<deductor/reporting entity name>", "amount": <GROSS amount paid or credited, NOT the TDS>, "tdsDeducted": <TDS on that row, or null> }, ...],
+  "sectionsSeen": ["<every section/sub-heading you saw, verbatim, e.g. 'Business receipts', 'Interest from deposit', 'Sale of securities and units of mutual fund'>"]
+}
+
+MANDATORY CATCH-ALL RULE — read this twice.
+"otherIncomeItems" must contain EVERY income row in the document that you did
+NOT already report in one of the named fields above. This is not optional and
+it is not a fallback for odd cases; it is how the system stays correct when it
+meets an AIS containing something it has never seen before.
+
+Examples that MUST land in otherIncomeItems because they have no named field:
+  • TDS-194C  contract / business receipts        • TDS-194J professional or technical fees
+  • TDS-194H  commission or brokerage             • TDS-194I  rent received
+  • TDS-194B/194BB lottery, betting, horse race   • TDS-192A EPF withdrawal
+  • TDS-194T  partner remuneration from a firm    • TDS-194D insurance commission
+  • TDS-194N  large cash withdrawals              • any 'Business receipts' heading
+  • ANY other income row whose type is not one of: salary, savings interest,
+    term-deposit interest, dividend, listed-share sale, mutual-fund sale,
+    VDA/crypto, LRS remittance, self-assessment tax.
+
+Record the GROSS amount paid/credited for these — not the TDS. A row showing
+₹45,500 credited with ₹455 TDS must be captured as amount 45500, tdsDeducted 455.
+
+If you are unsure whether something belongs in a named field or in
+otherIncomeItems, put it in otherIncomeItems. Reporting a figure twice is a
+minor annoyance a human can spot; omitting it entirely means the taxpayer
+under-reports income and receives a notice. Never return [] for
+otherIncomeItems unless you have genuinely accounted for every row in Parts
+B1, B2 and B7 in the named fields above.`;
 
   try {
     console.log("[parseAISWithGemini] Sending AIS PDF to Gemini...");
@@ -745,9 +807,32 @@ in the document. Return ONLY this JSON (no markdown, no text before/after):
         amount: t.amount,
       }));
 
+    // Same defensive validation for the catch-all bucket.
+    const rawOther = Array.isArray(parsed.otherIncomeItems) ? parsed.otherIncomeItems : [];
+    const otherIncomeItems: OtherIncomeItem[] = rawOther
+      .filter((t: any) => t && typeof t.amount === "number" && t.amount > 0 && (typeof t.code === "string" || typeof t.description === "string"))
+      .map((t: any) => ({
+        code: typeof t.code === "string" ? t.code.trim() : "UNKNOWN",
+        description: typeof t.description === "string" ? t.description.trim() : String(t.code ?? "").trim(),
+        source: typeof t.source === "string" ? t.source.trim() : undefined,
+        amount: t.amount,
+        tdsDeducted: typeof t.tdsDeducted === "number" ? t.tdsDeducted : undefined,
+      }));
+
+    const sectionsSeen = Array.isArray(parsed.sectionsSeen)
+      ? parsed.sectionsSeen.filter((s: any) => typeof s === "string" && s.trim()).map((s: string) => s.trim())
+      : [];
+
+    if (otherIncomeItems.length) {
+      console.log("[parseAISWithGemini] Unmapped income rows captured:",
+        otherIncomeItems.map(o => `${o.code}=${o.amount}`).join(", "));
+    }
+
     return {
       ...parsed,
       highValueTransactions: highValueTransactions.length ? highValueTransactions : null,
+      otherIncomeItems: otherIncomeItems.length ? otherIncomeItems : null,
+      sectionsSeen: sectionsSeen.length ? sectionsSeen : null,
     };
   } catch (err) {
     console.error("[parseAISWithGemini] Error:", err);
@@ -1285,6 +1370,29 @@ function buildChecks(
     });
   }
 
+  // ── 9b. Other income the parser could not classify ───────────────────────
+  // These are real income rows the AIS reported that don't fit any named
+  // field. They're shown verbatim precisely because the taxpayer will
+  // recognise their own income even when our schema doesn't have a slot
+  // for it — this is the guard against a future AIS carrying something
+  // this tool has never seen.
+  if (provided.ais) {
+    const other = ais.otherIncomeItems ?? [];
+    const otherTotal = other.reduce((sum, o) => sum + o.amount, 0);
+    if (other.length > 0) {
+      checks.push({
+        name: "Other Income Reported in AIS",
+        status: "OK",
+        aisValue: otherTotal || null,
+        form16Value: null,
+        form26asValue: null,
+        note:
+          other.map(o => `${o.description || o.code}${o.source ? ` (${o.source})` : ""}: ${fmt(o.amount)}`).join("; ") +
+          ` — total ${fmt(otherTotal)}. This income is on record with the IT department and must be declared under the correct head; it is NOT covered by the salary/interest/dividend lines above.`,
+      });
+    }
+  }
+
   // ── 10. TDS Credits (26AS) — single-document summary line ────────────────
   // Especially useful when 26AS is the only document uploaded: it tells the
   // user exactly how much tax credit they're entitled to claim in the ITR.
@@ -1605,6 +1713,9 @@ Tax Document Summary:
 ${ais.highValueTransactions?.length
   ? `- High-Value Transactions on record (AIS, not taxable income by itself but reported to IT dept): ${ais.highValueTransactions.map(t => `${t.code} ${t.description} ${fmt(t.amount)}`).join("; ")} — mention this so the taxpayer is aware it's on file, even though it doesn't need to be declared as income.`
   : ""}
+${ais.otherIncomeItems?.length
+  ? `- OTHER INCOME reported in the AIS that does not fall under salary/interest/dividend/capital-gains: ${ais.otherIncomeItems.map(o => `${o.code} ${o.description}${o.source ? ` from ${o.source}` : ""} — gross ${fmt(o.amount)}${o.tdsDeducted != null ? `, TDS ${fmt(o.tdsDeducted)}` : ""}`).join("; ")}. This is REAL TAXABLE INCOME already on record with the department. You MUST tell the taxpayer which head it belongs under (e.g. 194C/194J/194H receipts are business or professional income, 194I is rent, 192A is EPF withdrawal) and which ITR schedule it goes in. Do not ignore it, and do not describe the return as complete without it.`
+  : ""}
 
 ${docContextNote}
 Issues Found:
@@ -1701,6 +1812,8 @@ const EMPTY_AIS: ExtractedAIS = {
   dividendIncome: null, securitiesTransactions: null, mutualFundTransactions: null,
   cryptoIncome: null, lrsRemittance: null, taxPaidSelfAssessment: null,
   highValueTransactions: null,
+  otherIncomeItems: null,
+  sectionsSeen: null,
 };
 
 const EMPTY_26AS: Extracted26AS = {
@@ -1761,6 +1874,8 @@ export async function reconcileTaxDocuments(
     lrsRemittance: aisFinal.lrsRemittance ?? null,
     taxPaidSelfAssessment: aisFinal.taxPaidSelfAssessment ?? null,
     highValueTransactions: aisFinal.highValueTransactions ?? null,
+    otherIncomeItems: aisFinal.otherIncomeItems ?? null,
+    sectionsSeen: aisFinal.sectionsSeen ?? null,
     rawText: aisText.slice(0, 300),
   };
 
@@ -1787,7 +1902,9 @@ export async function reconcileTaxDocuments(
     ais.salaryIncome, ais.interestFromSavings, ais.interestFromFD,
     ais.dividendIncome, ais.securitiesTransactions, ais.mutualFundTransactions,
     ais.cryptoIncome, ais.lrsRemittance, ais.taxPaidSelfAssessment,
-  ].some(v => v != null) || (ais.highValueTransactions?.length ?? 0) > 0;
+  ].some(v => v != null)
+    || (ais.highValueTransactions?.length ?? 0) > 0
+    || (ais.otherIncomeItems?.length ?? 0) > 0;
 
   const f26asFieldsRead = [
     form26as.tdsSalary, form26as.tdsNonSalary, form26as.advanceTaxPaid,
