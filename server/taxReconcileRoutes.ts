@@ -11,6 +11,7 @@ import { reconcileTaxDocuments, type ReconciliationReport } from "./taxReconcile
 import { authenticateFirebaseToken, type AuthenticatedRequest } from "./middleware/auth.js";
 import { logoWhiteBuffer, watermarkBuffer } from "./assets/logoAssets.js";
 import { fontRegular, fontBold } from "./assets/pdfFonts.js";
+import { buildSummaryRows, type SummaryRow } from "@shared/reconcileSummaryRows";
 
 // ─── Multer: memory storage, up to 5 PDFs (AIS + 26AS + up to 3 Form 16s), 10 MB each ──
 const upload = multer({
@@ -213,7 +214,7 @@ function generatePDFReport(report: ReconciliationReport): Promise<Buffer> {
     const tableRows: [string, string, string, string][] = buildSummaryRows(
       report.extractedData,
       fmtRs, // PDFKit's standard fonts have no ₹ glyph, so this formatter uses "Rs."
-    ).map(r => [r.label, r.ais, r.form16, r.form26as] as [string, string, string, string]);
+    ).map((r: SummaryRow) => [r.label, r.ais, r.form16, r.form26as] as [string, string, string, string]);
 
     tableRows.forEach((row, ri) => {
       const y = doc.y;
