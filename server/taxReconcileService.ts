@@ -70,6 +70,33 @@ export interface HighValueTransaction {
  * Added 2026-07-26 after a real AIS carrying ₹45,500 of 194C contract
  * receipts produced a report that never mentioned them.
  */
+/**
+ * One declared section of the AIS, as the document itself describes it.
+ *
+ * The AIS states what it contains BEFORE it lists the detail: every Part B
+ * section carries an information code, a description, a COUNT of rows and a
+ * total AMOUNT, followed by that many itemised rows. That header is a
+ * completeness oracle — it lets us check our own extraction instead of
+ * asking the user to trust it.
+ *
+ * Two failure modes become detectable that were previously invisible:
+ *   1. We mapped a section but our figure is short of the declared AMOUNT
+ *      → we dropped rows, and we can say so instead of reporting a low number.
+ *   2. The document declares a category we have no field for at all
+ *      → we can name it and its amount even though we can't classify it,
+ *        rather than omitting it silently.
+ *
+ * This is the answer to "what about income types we've never seen": the
+ * document tells us they exist. We don't have to guess.
+ */
+export interface AISSectionTotal {
+  code: string;         // information code as printed, e.g. "SFT-016(TD)", "TDS-194C"
+  description: string;  // description as printed
+  heading?: string;     // section heading, e.g. "Interest from deposit"
+  count: number | null; // declared number of rows
+  amount: number;       // declared total for the section
+}
+
 export interface OtherIncomeItem {
   code: string;         // information code exactly as printed, e.g. "TDS-194C"
   description: string;  // description exactly as printed
@@ -104,7 +131,30 @@ export interface ExtractedAIS {
    * a signal something was missed rather than absent.
    */
   sectionsSeen: string[] | null;
+  /** Declared section headers with their own COUNT/AMOUNT — see AISSectionTotal. */
+  sectionTotals: AISSectionTotal[] | null;
   rawText?: string;
+}
+
+/** Per-section verdict produced by reconciling our figures against the document's own totals. */
+export interface CoverageItem {
+  code: string;
+  description: string;
+  declaredAmount: number;
+  mappedAmount: number | null;   // what we actually captured for it, if we could tell
+  status: "RECONCILED" | "SHORT" | "UNMAPPED";
+  note: string;
+}
+
+export interface CoverageReport {
+  sectionsDeclared: number;
+  sectionsReconciled: number;
+  totalDeclared: number;         // sum of all declared income-bearing section amounts
+  totalMapped: number;           // sum of what we captured against them
+  items: CoverageItem[];
+  /** True only when every declared section reconciles — the claim we can defend. */
+  complete: boolean;
+  summary: string;
 }
 
 export interface NonSalaryTDSSection {
@@ -226,6 +276,8 @@ export interface ReconciliationReport {
   documentsProvided?: DocumentsProvided;
   /** Uploaded documents from which nothing could be extracted — see ParseFailures. */
   parseFailures?: ParseFailures;
+  /** Whether our figures account for every section the AIS declares — see CoverageReport. */
+  coverage?: CoverageReport;
   checks: ReconciliationCheck[];
   mismatches: ReconciliationMismatch[];
   overallStatus: "CLEAN" | "NEEDS_ATTENTION" | "CRITICAL";
@@ -735,8 +787,27 @@ in the document. Return ONLY this JSON (no markdown, no text before/after):
   "taxPaidSelfAssessment": <self-assessment tax paid in Part B3, number>,
   "highValueTransactions": [{ "code": "<the code exactly as printed, e.g. SFT-005>", "description": "<the description exactly as printed, e.g. Purchase of time deposits>", "amount": <number> }, ...] — EVERY Part B2 SFT entry NOT already captured above (i.e. not interest, dividend, securities sale, or MF sale). One entry per distinct code+description, amounts summed if repeated. Commonly includes purchase of time deposits (SFT-005), purchase of securities (SFT-17(Pur) / SFT-18(Pur)), cash deposits (SFT-004), credit card payments (SFT-006), immovable property (SFT-010/SFT-012), cash payments (SFT-013), cash withdrawals (SFT-014). These are easy to miss — do not skip them. Use [] if none found.,
   "otherIncomeItems": [{ "code": "<code exactly as printed, e.g. TDS-194C>", "description": "<description exactly as printed>", "source": "<deductor/reporting entity name>", "amount": <GROSS amount paid or credited, NOT the TDS>, "tdsDeducted": <TDS on that row, or null> }, ...],
-  "sectionsSeen": ["<every section/sub-heading you saw, verbatim, e.g. 'Business receipts', 'Interest from deposit', 'Sale of securities and units of mutual fund'>"]
+  "sectionsSeen": ["<every section/sub-heading you saw, verbatim, e.g. 'Business receipts', 'Interest from deposit', 'Sale of securities and units of mutual fund'>"],
+  "sectionTotals": [{ "code": "<information code exactly as printed>", "description": "<information description exactly as printed>", "heading": "<the sub-heading above it, e.g. 'Interest from deposit'>", "count": <the COUNT column value, or null>, "amount": <the AMOUNT column value> }, ...]
 }
+
+SECTION TOTALS — this is a completeness check, treat it as seriously as the figures themselves.
+Every Part B entry in an AIS is introduced by a header row of the form:
+    SR.NO | INFORMATION CODE | INFORMATION DESCRIPTION | INFORMATION SOURCE | COUNT | AMOUNT
+followed by COUNT itemised detail rows. Transcribe EVERY such header row into
+"sectionTotals" exactly as printed — the code, the description, the count and
+the total amount — for ALL of Part B1, B2, B3, B4 and B7, including:
+  • sections you already reported in a named field above
+  • sections you put in otherIncomeItems or highValueTransactions
+  • sections you could not classify at all
+  • sections whose subject matter is unfamiliar to you
+Report the header's own AMOUNT, not your sum of the detail rows. If the same
+code appears more than once from different sources (e.g. two registrars, two
+banks), emit one entry PER header row — do not merge them.
+Do not omit a section because it seems irrelevant, non-taxable, or duplicated
+elsewhere in your answer. This list is used to verify that nothing in the
+document was missed, so an incomplete list defeats its entire purpose.
+Use [] only if Part B genuinely contains no entries at all.
 
 MANDATORY CATCH-ALL RULE — read this twice.
 "otherIncomeItems" must contain EVERY income row in the document that you did
@@ -828,11 +899,30 @@ B1, B2 and B7 in the named fields above.`;
         otherIncomeItems.map(o => `${o.code}=${o.amount}`).join(", "));
     }
 
+    const rawTotals = Array.isArray(parsed.sectionTotals) ? parsed.sectionTotals : [];
+    const sectionTotals: AISSectionTotal[] = rawTotals
+      .filter((s: any) => s && typeof s.amount === "number" && (typeof s.code === "string" || typeof s.description === "string"))
+      .map((s: any) => ({
+        code: typeof s.code === "string" ? s.code.trim() : "UNKNOWN",
+        description: typeof s.description === "string" ? s.description.trim() : "",
+        heading: typeof s.heading === "string" ? s.heading.trim() : undefined,
+        count: typeof s.count === "number" ? s.count : null,
+        amount: s.amount,
+      }));
+
+    if (sectionTotals.length) {
+      console.log("[parseAISWithGemini] Declared sections:",
+        sectionTotals.map(s => `${s.code}=${s.amount}`).join(", "));
+    } else {
+      console.warn("[parseAISWithGemini] No sectionTotals returned — coverage cannot be verified for this document");
+    }
+
     return {
       ...parsed,
       highValueTransactions: highValueTransactions.length ? highValueTransactions : null,
       otherIncomeItems: otherIncomeItems.length ? otherIncomeItems : null,
       sectionsSeen: sectionsSeen.length ? sectionsSeen : null,
+      sectionTotals: sectionTotals.length ? sectionTotals : null,
     };
   } catch (err) {
     console.error("[parseAISWithGemini] Error:", err);
@@ -1207,6 +1297,131 @@ function combineForm16s(
       regimesSeen: regimes,
     },
   };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Coverage verification — do our figures account for what the document says
+// it contains?
+//
+// The AIS declares each section's total before listing its rows. By matching
+// every declared section against what we actually captured, we can state
+// whether the extraction is complete instead of asking the user to assume it.
+// A section we cannot account for is reported by name and amount — which is
+// how a category nobody has coded for still reaches the user.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Read variance on PDF+LLM extraction is real (observed ±264 on a ~₹1L
+// figure across repeat reads of one file). Reconciliation therefore allows a
+// small relative drift rather than demanding exact equality — tight enough to
+// catch a dropped row, loose enough not to cry wolf over digit jitter.
+const COVERAGE_ABS_TOLERANCE = 100;      // ₹100
+const COVERAGE_REL_TOLERANCE = 0.01;     // or 1% of the declared amount
+
+function amountsAgree(declared: number, mapped: number): boolean {
+  const allowed = Math.max(COVERAGE_ABS_TOLERANCE, Math.abs(declared) * COVERAGE_REL_TOLERANCE);
+  return Math.abs(declared - mapped) <= allowed;
+}
+
+/**
+ * Classify a declared section by matching its description/code against the
+ * named field it should have landed in. Matching is on description text for
+ * the same reason the extraction prompt is: information codes vary between
+ * documents, so keying off them reintroduces the exact bug this file has
+ * already shipped once.
+ */
+function mappedAmountForSection(s: AISSectionTotal, ais: ExtractedAIS): number | null {
+  const t = `${s.code} ${s.description} ${s.heading ?? ""}`.toLowerCase();
+
+  const isInterest = t.includes("interest");
+  const isSavings = isInterest && (t.includes("saving") || t.includes("(sb)"));
+  const isDeposit = isInterest && (t.includes("term deposit") || t.includes("deposit") || t.includes("(td)") || t.includes("(fd)"));
+  const isDividend = t.includes("dividend");
+  const isEquitySale = t.includes("sale") && (t.includes("equity") || t.includes("securit")) && !t.includes("mutual");
+  const isMFSale = t.includes("sale") && t.includes("mutual");
+  const isSalary = t.includes("salary");
+
+  // Purchases and other non-income SFTs are accounted for by the
+  // high-value bucket rather than an income field.
+  const isPurchase = t.includes("purchase") || t.includes("(pur)");
+
+  if (isSavings) return ais.interestFromSavings;
+  if (isDeposit) return ais.interestFromFD;
+  if (isDividend) return ais.dividendIncome;
+  if (isEquitySale) return ais.securitiesTransactions;
+  if (isMFSale) return ais.mutualFundTransactions;
+  if (isSalary) return ais.salaryIncome;
+
+  if (isPurchase) {
+    const hv = (ais.highValueTransactions ?? []).filter(h =>
+      h.code.toLowerCase() === s.code.toLowerCase() && amountsAgree(s.amount, h.amount));
+    if (hv.length) return hv[0].amount;
+    const anyCode = (ais.highValueTransactions ?? []).filter(h => h.code.toLowerCase() === s.code.toLowerCase());
+    if (anyCode.length) return anyCode.reduce((sum, h) => sum + h.amount, 0);
+  }
+
+  // Anything else: did the catch-all pick it up?
+  const other = (ais.otherIncomeItems ?? []).filter(o =>
+    o.code.toLowerCase() === s.code.toLowerCase() || amountsAgree(s.amount, o.amount));
+  if (other.length) return other.reduce((sum, o) => sum + o.amount, 0);
+
+  const hvAny = (ais.highValueTransactions ?? []).filter(h =>
+    h.code.toLowerCase() === s.code.toLowerCase() || amountsAgree(s.amount, h.amount));
+  if (hvAny.length) return hvAny.reduce((sum, h) => sum + h.amount, 0);
+
+  return null;
+}
+
+function buildCoverageReport(ais: ExtractedAIS): CoverageReport | null {
+  const sections = ais.sectionTotals ?? [];
+  if (!sections.length) return null;
+
+  // Sections repeating the same code from different sources (two banks, two
+  // registrars) are summed before comparison — a named field holds the
+  // combined figure, so comparing per-source would false-positive.
+  const grouped = new Map<string, AISSectionTotal[]>();
+  for (const s of sections) {
+    const key = `${s.code}|${s.description}`.toLowerCase();
+    grouped.set(key, [...(grouped.get(key) ?? []), s]);
+  }
+
+  const items: CoverageItem[] = [];
+  for (const group of grouped.values()) {
+    const declared = group.reduce((sum, g) => sum + g.amount, 0);
+    const head = group[0];
+    const mapped = mappedAmountForSection({ ...head, amount: declared }, ais);
+
+    if (mapped == null) {
+      items.push({
+        code: head.code, description: head.description, declaredAmount: declared, mappedAmount: null,
+        status: "UNMAPPED",
+        note: `The AIS reports ${head.description || head.code} of ${fmt(declared)}, which this tool could not classify into any known category. It is NOT included in the figures above — check it manually and declare it under the correct head.`,
+      });
+    } else if (amountsAgree(declared, mapped)) {
+      items.push({
+        code: head.code, description: head.description, declaredAmount: declared, mappedAmount: mapped,
+        status: "RECONCILED",
+        note: `${head.description || head.code}: ${fmt(declared)} declared, ${fmt(mapped)} captured ✓`,
+      });
+    } else {
+      items.push({
+        code: head.code, description: head.description, declaredAmount: declared, mappedAmount: mapped,
+        status: "SHORT",
+        note: `${head.description || head.code}: the AIS declares ${fmt(declared)} but only ${fmt(mapped)} was captured — a shortfall of ${fmt(Math.abs(declared - mapped))}. Some rows were not read. Verify this figure against your AIS directly before filing.`,
+      });
+    }
+  }
+
+  const reconciled = items.filter(i => i.status === "RECONCILED").length;
+  const complete = items.every(i => i.status === "RECONCILED");
+  const totalDeclared = items.reduce((s, i) => s + i.declaredAmount, 0);
+  const totalMapped = items.reduce((s, i) => s + (i.mappedAmount ?? 0), 0);
+
+  const problems = items.filter(i => i.status !== "RECONCILED");
+  const summary = complete
+    ? `All ${items.length} sections declared in your AIS reconcile against the figures in this report — every amount the document says it contains has been accounted for.`
+    : `${reconciled} of ${items.length} AIS sections reconcile. ${problems.length} need manual checking: ${problems.map(p => `${p.description || p.code} (${fmt(p.declaredAmount)})`).join("; ")}.`;
+
+  return { sectionsDeclared: items.length, sectionsReconciled: reconciled, totalDeclared, totalMapped, items, complete, summary };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1821,6 +2036,7 @@ const EMPTY_AIS: ExtractedAIS = {
   highValueTransactions: null,
   otherIncomeItems: null,
   sectionsSeen: null,
+  sectionTotals: null,
 };
 
 const EMPTY_26AS: Extracted26AS = {
@@ -1883,6 +2099,7 @@ export async function reconcileTaxDocuments(
     highValueTransactions: aisFinal.highValueTransactions ?? null,
     otherIncomeItems: aisFinal.otherIncomeItems ?? null,
     sectionsSeen: aisFinal.sectionsSeen ?? null,
+    sectionTotals: aisFinal.sectionTotals ?? null,
     rawText: aisText.slice(0, 300),
   };
 
@@ -1956,7 +2173,46 @@ export async function reconcileTaxDocuments(
   // checks grid, which would just duplicate it with less detail.
   const recommendedITRForm = inferITRFormRecommendation(ais, form26as, form16);
 
+  // ── Coverage: does what we extracted account for what the AIS declares? ──
+  const coverage = provided.ais ? buildCoverageReport(ais) : null;
+  if (coverage) {
+    if (!coverage.complete) console.warn("[reconcileTaxDocuments] Coverage incomplete:", coverage.summary);
+    // The claim this tool can actually defend: not "these numbers are right",
+    // but "these numbers account for everything the document says it contains".
+    checks.push({
+      name: "AIS Coverage Check",
+      status: coverage.complete ? "OK" : "PARTIAL",
+      aisValue: coverage.totalDeclared || null,
+      form16Value: null,
+      form26asValue: null,
+      note: coverage.summary,
+    });
+  }
+
   const mismatches = buildMismatches(ais, form26as, form16, checks, multiEmployerFlags);
+
+  // An unaccounted-for section is a real filing risk, not a footnote: the
+  // department already holds that figure. Surface it as an issue so it
+  // reaches the user's action list rather than sitting in a coverage panel
+  // they might scroll past.
+  for (const item of coverage?.items ?? []) {
+    if (item.status === "RECONCILED") continue;
+    mismatches.push({
+      id: `coverage-${item.code.replace(/[^a-z0-9]/gi, "-").toLowerCase()}`,
+      category: "Unverified AIS Section",
+      severity: item.status === "UNMAPPED" ? "HIGH" : "MEDIUM",
+      title: item.status === "UNMAPPED"
+        ? `AIS reports ${item.description || item.code} — not included in this report`
+        : `${item.description || item.code} may be incomplete in this report`,
+      description: item.note,
+      aisValue: item.declaredAmount,
+      form16Value: null,
+      form26asValue: null,
+      difference: item.mappedAmount == null ? null : Math.abs(item.declaredAmount - item.mappedAmount),
+      ruleExplanation: "Your AIS states a total for each category before listing the individual entries. This tool compares its own extracted figures against those stated totals, so any gap means something in your AIS was not fully read — the Income Tax Department still has that information on record regardless.",
+      suggestedAction: `Open your AIS on the income tax portal, find "${item.description || item.code}" (${fmt(item.declaredAmount)}), and declare it under the appropriate head yourself. Do not assume it is nil just because it is absent from the figures above.`,
+    });
+  }
 
   // Surface parse failures as HIGH-severity issues. They must appear in the
   // user-facing issue list, not just server logs — the user is the only one
@@ -2032,6 +2288,7 @@ export async function reconcileTaxDocuments(
     extractedData: { ais, form26as, form16, form16Employers },
     documentsProvided: provided,
     parseFailures,
+    ...(coverage && { coverage }),
     checks,
     mismatches,
     overallStatus,

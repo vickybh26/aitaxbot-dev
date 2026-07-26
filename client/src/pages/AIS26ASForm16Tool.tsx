@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import AuthModal from "@/components/AuthModal";
 import type { ITRFormResult } from "@shared/itrFormSelector";
+import { buildSummaryRows } from "@shared/reconcileSummaryRows";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -875,19 +876,11 @@ export default function AIS26ASForm16Tool() {
                       </tr>
                     </thead>
                     <tbody>
-                      {(
-                        [
-                          ["Gross Salary / Salary Income",  fmt(report.extractedData.ais.salaryIncome),           fmt(report.extractedData.form16.grossSalary),        "—"],
-                          ["Standard Deduction (u/s 16ia)", "—",                                                   fmt(report.extractedData.form16.standardDeduction),  "—"],
-                          ["Taxable Income",                 "—",                                                   fmt(report.extractedData.form16.taxableIncome),      "—"],
-                          ["TDS on Salary",                  "—",                                                   fmt(report.extractedData.form16.totalTaxDeducted),   fmt(report.extractedData.form26as.tdsSalary)],
-                          ["TDS on Non-Salary",              "—",                                                   "—",                                                  fmt(report.extractedData.form26as.tdsNonSalary)],
-                          ["Savings A/c Interest",           fmt(report.extractedData.ais.interestFromSavings),    "—",                                                  "—"],
-                          ["FD Interest",                    fmt(report.extractedData.ais.interestFromFD),         "—",                                                  "—"],
-                          ["Dividend Income",                fmt(report.extractedData.ais.dividendIncome),         "—",                                                  "—"],
-                          ["Advance Tax Paid",               "—",                                                   "—",                                                  fmt(report.extractedData.form26as.advanceTaxPaid)],
-                        ] as [string, string, string, string][]
-                      ).map(([label, ais, f16, f26], i) => (
+                      {/* Rows come from shared/reconcileSummaryRows so this table and
+                          the downloadable PDF can never drift in order or wording.
+                          Do not inline a local array here again. */}
+                      {buildSummaryRows(report.extractedData, fmt)
+                        .map(({ label, ais, form16: f16, form26as: f26 }, i) => (
                         <tr key={i} className={i % 2 === 1 ? "bg-gray-50/60" : ""}>
                           <td className="px-4 py-2.5 text-gray-700 text-sm">{label}</td>
                           <td className="px-4 py-2.5 text-right font-mono text-xs text-blue-700   bg-blue-50/30">{ais}</td>

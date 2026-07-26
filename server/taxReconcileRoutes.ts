@@ -167,17 +167,16 @@ function generatePDFReport(report: ReconciliationReport): Promise<Buffer> {
       doc.y = y + ROW_H + 2;
     }
 
-    const tableRows: [string, string, string, string][] = [
-      ["Gross Salary / Salary Income",  fmtRs(report.extractedData.ais.salaryIncome),          fmtRs(report.extractedData.form16.grossSalary),       "—"],
-      ["TDS on Salary",                 "—",                                                    fmtRs(report.extractedData.form16.totalTaxDeducted),   fmtRs(report.extractedData.form26as.tdsSalary)],
-      ["Taxable Income",                "—",                                                    fmtRs(report.extractedData.form16.taxableIncome),      "—"],
-      ["Standard Deduction",            "—",                                                    fmtRs(report.extractedData.form16.standardDeduction),  "—"],
-      ["Savings Interest (AIS)",        fmtRs(report.extractedData.ais.interestFromSavings),   "—",                                                   "—"],
-      ["FD Interest (AIS)",             fmtRs(report.extractedData.ais.interestFromFD),        "—",                                                   "—"],
-      ["Dividend Income (AIS)",         fmtRs(report.extractedData.ais.dividendIncome),        "—",                                                   "—"],
-      ["TDS Non-Salary (26AS)",         "—",                                                    "—",                                                   fmtRs(report.extractedData.form26as.tdsNonSalary)],
-      ["Advance Tax Paid (26AS)",       "—",                                                    "—",                                                   fmtRs(report.extractedData.form26as.advanceTaxPaid)],
-    ];
+    // Rows come from shared/reconcileSummaryRows — the same definition the
+    // on-screen report renders. Previously this array was maintained by hand
+    // alongside a second one in AIS26ASForm16Tool.tsx; they held identical
+    // data but had drifted in row order and labelling, so the PDF looked like
+    // a different report from the one the user had just been reading.
+    // Do not reintroduce a local array here.
+    const tableRows: [string, string, string, string][] = buildSummaryRows(
+      report.extractedData,
+      fmtRs, // PDFKit's standard fonts have no ₹ glyph, so this formatter uses "Rs."
+    ).map(r => [r.label, r.ais, r.form16, r.form26as] as [string, string, string, string]);
 
     tableRows.forEach((row, ri) => {
       const y = doc.y;
