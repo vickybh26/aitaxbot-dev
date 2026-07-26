@@ -159,6 +159,26 @@ export interface DocumentsProvided {
   form16: boolean;
 }
 
+/**
+ * Documents that were uploaded but came back with NOTHING extracted.
+ *
+ * This distinction is a safety requirement, not a nicety. Before this
+ * existed the engine could not tell "the AIS parsed fine and the taxpayer
+ * genuinely has no interest income" apart from "the AIS parse failed and we
+ * read nothing at all" — both surfaced as a wall of nulls, and a wall of
+ * nulls produces zero mismatches, which produced a confident
+ * "CLEAN — Ready to File ITR" verdict on a return that was in fact missing
+ * real income. That is the worst possible failure mode for this tool: it is
+ * worse than erroring out, because the user is actively reassured.
+ * Observed 2026-07-26 on a real AIS containing ~₹1.36L of interest,
+ * ₹200 dividend and ₹67,992 of equity sales, all reported as "N/A".
+ */
+export interface ParseFailures {
+  ais: boolean;
+  form26as: boolean;
+  form16: boolean;
+}
+
 export interface ReconciliationReport {
   extractedData: {
     ais: ExtractedAIS;
@@ -170,6 +190,8 @@ export interface ReconciliationReport {
   // backwards compatibility with reports generated before partial uploads were
   // allowed (absent = all three were required, so all three are present).
   documentsProvided?: DocumentsProvided;
+  /** Uploaded documents from which nothing could be extracted — see ParseFailures. */
+  parseFailures?: ParseFailures;
   checks: ReconciliationCheck[];
   mismatches: ReconciliationMismatch[];
   overallStatus: "CLEAN" | "NEEDS_ATTENTION" | "CRITICAL";
@@ -650,23 +672,34 @@ async function parseAISWithGemini(pdfBuffer: Buffer): Promise<Partial<ExtractedA
 It shows financial data reported to the IT department for FY 2025-26.
 
 Read EVERY page carefully. The document has sections:
-- Part B1: TDS/TCS (salary TDS-192, crypto VDA TDS-194S, etc.)
-- Part B2: SFT (dividends SFT-015, savings interest SFT-016(SB), FD interest SFT-016(FD), securities sale SFT-17-LS, mutual fund sale SFT-18-4MF, MF purchase SFT-18-Pur, purchase of time deposits SFT-005, cash deposits SFT-004, credit card payments SFT-006, purchase/sale of immovable property SFT-010/SFT-012, cash payment for goods/services SFT-013, cash withdrawal SFT-014)
+- Part B1: TDS/TCS (salary TDS-192, contract receipts TDS-194C, interest TDS-194A, crypto VDA TDS-194S, etc.)
+- Part B2: SFT — Specified Financial Transactions
 - Part B3: Tax payments (advance tax, self-assessment tax)
 - Part B7: Salary Annexure II
 
-Extract these values. Use null if not found. Return ONLY this JSON (no markdown, no text before/after):
+CRITICAL — MATCH ON THE DESCRIPTION TEXT, NOT ON EXACT CODES.
+The SFT information codes vary between AIS documents and suffixes differ
+(e.g. Term Deposit interest may appear as SFT-016(TD), SFT-016(FD) or plain
+SFT-016; listed-share sales appear as SFT-17-LES(M), SFT-17-LS(M), SFT-017
+or similar). Do NOT require an exact code match — identify each row by its
+"INFORMATION DESCRIPTION" wording and its section heading, then read the
+AMOUNT column. If a row's description says it is interest, treat it as
+interest regardless of the code suffix. Missing a real figure because the
+code didn't match exactly is the single worst failure mode here.
+
+Extract these values. Use null ONLY if that category genuinely has no rows
+in the document. Return ONLY this JSON (no markdown, no text before/after):
 {
-  "salaryIncome": <total salary from TDS-192 section AMOUNT column, number>,
-  "interestFromSavings": <sum of all SFT-016(SB) savings bank interest amounts, number>,
-  "interestFromFD": <sum of all SFT-016(FD) fixed deposit interest amounts, number>,
-  "dividendIncome": <sum of all SFT-015 dividend amounts, number>,
-  "securitiesTransactions": <total from SFT-17-LS(M) — sale of listed equity shares, number>,
-  "mutualFundTransactions": <total from SFT-18-4MF(M) — sale of mutual fund units, number>,
+  "salaryIncome": <total salary from TDS-192 / "Salary (TDS Annexure II)" AMOUNT column, number>,
+  "interestFromSavings": <sum of EVERY row whose description indicates savings-bank interest — heading "Interest from savings bank", description "Interest income ... Savings", typically SFT-016(SB). Sum across ALL banks. number>,
+  "interestFromFD": <sum of EVERY row whose description indicates term-deposit / fixed-deposit interest — heading "Interest from deposit", description "Interest income ... Term Deposit", typically SFT-016(TD) or SFT-016(FD). Sum across ALL banks. number>,
+  "dividendIncome": <sum of every row described as dividend income, typically SFT-015, number>,
+  "securitiesTransactions": <sum of SALES CONSIDERATION / AMOUNT for every row under a heading like "Sale of securities and units of mutual fund" describing sale of listed equity shares — codes vary (SFT-17-LES(M), SFT-17-LS(M), SFT-017). Use the total sale value, NOT the purchase value. number>,
+  "mutualFundTransactions": <total sale value of mutual fund units (descriptions mentioning mutual fund sale/redemption, e.g. SFT-18 variants). Exclude purchases. number>,
   "cryptoIncome": <total from TDS-194S / VDA / virtual digital asset section, number>,
   "lrsRemittance": <total LRS remittance from TCS-206CQ section, number>,
   "taxPaidSelfAssessment": <self-assessment tax paid in Part B3, number>,
-  "highValueTransactions": [{ "code": "<e.g. SFT-005>", "description": "<e.g. Purchase of time deposits>", "amount": <number> }, ...] — EVERY SFT entry in Part B2 that is NOT already captured above (i.e. not interest, dividend, securities sale, or MF sale) goes here, one entry per distinct SFT code+description found, amount summed if it appears more than once. This commonly includes SFT-005 (purchase of time deposits) which is easy to miss — do not skip it. Use [] if none found.
+  "highValueTransactions": [{ "code": "<the code exactly as printed, e.g. SFT-005>", "description": "<the description exactly as printed, e.g. Purchase of time deposits>", "amount": <number> }, ...] — EVERY Part B2 SFT entry NOT already captured above (i.e. not interest, dividend, securities sale, or MF sale). One entry per distinct code+description, amounts summed if repeated. Commonly includes purchase of time deposits (SFT-005), purchase of securities (SFT-17(Pur) / SFT-18(Pur)), cash deposits (SFT-004), credit card payments (SFT-006), immovable property (SFT-010/SFT-012), cash payments (SFT-013), cash withdrawals (SFT-014). These are easy to miss — do not skip them. Use [] if none found.
 }`;
 
   try {
@@ -1745,6 +1778,37 @@ export async function reconcileTaxDocuments(
     form16: { gross: form16.grossSalary, taxable: form16.taxableIncome, tds: form16.totalTaxDeducted },
   });
 
+  // ── Step 4.5: Detect documents that yielded nothing ──────────────────────
+  // A document that was uploaded but produced an all-null extract almost
+  // certainly failed to parse rather than being genuinely empty — a real AIS
+  // always carries at least one figure. Treat it as a parse failure so the
+  // verdict below can't come back "CLEAN" off the back of missing data.
+  const aisFieldsRead = [
+    ais.salaryIncome, ais.interestFromSavings, ais.interestFromFD,
+    ais.dividendIncome, ais.securitiesTransactions, ais.mutualFundTransactions,
+    ais.cryptoIncome, ais.lrsRemittance, ais.taxPaidSelfAssessment,
+  ].some(v => v != null) || (ais.highValueTransactions?.length ?? 0) > 0;
+
+  const f26asFieldsRead = [
+    form26as.tdsSalary, form26as.tdsNonSalary, form26as.advanceTaxPaid,
+    form26as.selfAssessmentTax, form26as.totalTdsCredits, form26as.tcsPaid,
+  ].some(v => v != null) || (form26as.nonSalarySections?.length ?? 0) > 0;
+
+  const f16FieldsRead = [
+    form16.grossSalary, form16.taxableIncome, form16.totalTaxDeducted,
+    form16.standardDeduction, form16.netSalary, form16.newRegime,
+  ].some(v => v != null);
+
+  const parseFailures: ParseFailures = {
+    ais: provided.ais && !aisFieldsRead,
+    form26as: provided.form26as && !f26asFieldsRead,
+    form16: provided.form16 && !f16FieldsRead,
+  };
+  const anyParseFailure = parseFailures.ais || parseFailures.form26as || parseFailures.form16;
+  if (anyParseFailure) {
+    console.error("[reconcileTaxDocuments] PARSE FAILURE — uploaded document(s) yielded no data:", parseFailures);
+  }
+
   // ── Step 5: Build reconciliation ─────────────────────────────────────────
   const checks = buildChecks(ais, form26as, form16, provided);
   if (multiEmployerFlags.employerCount > 1) {
@@ -1769,8 +1833,36 @@ export async function reconcileTaxDocuments(
   const recommendedITRForm = inferITRFormRecommendation(ais, form26as, form16);
 
   const mismatches = buildMismatches(ais, form26as, form16, checks, multiEmployerFlags);
+
+  // Surface parse failures as HIGH-severity issues. They must appear in the
+  // user-facing issue list, not just server logs — the user is the only one
+  // who can act on it (re-download the document, upload a different copy).
+  const failedDocNames = [
+    parseFailures.ais && "AIS",
+    parseFailures.form26as && "Form 26AS",
+    parseFailures.form16 && "Form 16",
+  ].filter(Boolean) as string[];
+
+  for (const docName of failedDocNames) {
+    mismatches.unshift({
+      id: `parse-fail-${docName.replace(/\s+/g, "-").toLowerCase()}`,
+      category: "Document Not Readable",
+      severity: "HIGH",
+      title: `${docName} could not be read — figures are missing, not zero`,
+      description: `You uploaded your ${docName}, but no data could be extracted from it. Every ${docName} figure shown as "N/A" in this report is UNKNOWN, not nil.`,
+      aisValue: null, form16Value: null, form26asValue: null, difference: null,
+      ruleExplanation: `A genuine ${docName} always contains at least one figure, so an empty extract means the file could not be read — it may be password-protected, a scanned image, an incomplete download, or the wrong document.`,
+      suggestedAction: `Do NOT treat this report as complete. Re-download your ${docName} from the income tax portal as a PDF and upload it again. If it still fails, check the figures manually before filing.`,
+    });
+  }
+
+  // determineOverallStatus only looks at mismatches, so unshifting the
+  // parse-failure issues above is what actually forces the verdict away
+  // from CLEAN — it can no longer report "Ready to File" on unread data.
   const overallStatus = determineOverallStatus(mismatches);
-  const summary = generateSummary(overallStatus, mismatches, form16, provided);
+  const summary = anyParseFailure
+    ? `⚠️ ${failedDocNames.join(" and ")} could not be read — this report is INCOMPLETE. Figures shown as "N/A" for ${failedDocNames.join(" / ")} are unknown, not zero. Re-upload before relying on this.`
+    : generateSummary(overallStatus, mismatches, form16, provided);
 
   // ── Step 6: AI insights ───────────────────────────────────────────────────
   const { insights, actionItems, itrImpact } = await generateAIInsights(
@@ -1815,6 +1907,7 @@ export async function reconcileTaxDocuments(
   return {
     extractedData: { ais, form26as, form16, form16Employers },
     documentsProvided: provided,
+    parseFailures,
     checks,
     mismatches,
     overallStatus,
