@@ -763,6 +763,26 @@ Read EVERY page carefully. The document has sections:
 - Part B3: Tax payments (advance tax, self-assessment tax)
 - Part B7: Salary Annexure II
 
+CRITICAL — DO NOT DOUBLE-COUNT. PART B1 AND PART B2 DESCRIBE THE SAME INCOME.
+The AIS reports the same money twice, from two different reporters:
+  • Part B1 carries the DEDUCTOR's view — e.g. "TDS-194A Interest other than
+    Interest on Securities", showing the gross amount on which TDS was cut.
+  • Part B2 carries the BANK's / registrar's SFT view of that same interest —
+    e.g. "SFT-016(SB) Savings" and "SFT-016(TD) Term Deposit".
+These are NOT two separate incomes. A taxpayer with ₹1,90,420 of deposit
+interest may show ₹1,49,039 under TDS-194A and ₹1,90,420 under SFT-016(TD);
+adding them reports ₹3,39,459 of income that does not exist and would make the
+taxpayer over-declare.
+
+RULE: for interest, dividend, and securities/mutual-fund sales, take the
+figure from the Part B2 SFT rows ONLY. Never add the Part B1 TDS row for the
+same kind of income on top.
+
+Part B1 rows only become the source when that income has NO Part B2 SFT
+counterpart at all — e.g. salary (192 / TDS Annexure II), contract receipts
+(194C), professional fees (194J), commission (194H), rent (194I). Those still
+belong in salaryIncome or otherIncomeItems as described below.
+
 CRITICAL — MATCH ON THE DESCRIPTION TEXT, NOT ON EXACT CODES.
 The SFT information codes vary between AIS documents and suffixes differ
 (e.g. Term Deposit interest may appear as SFT-016(TD), SFT-016(FD) or plain
@@ -777,9 +797,9 @@ Extract these values. Use null ONLY if that category genuinely has no rows
 in the document. Return ONLY this JSON (no markdown, no text before/after):
 {
   "salaryIncome": <total salary from TDS-192 / "Salary (TDS Annexure II)" AMOUNT column, number>,
-  "interestFromSavings": <sum of EVERY row whose description indicates savings-bank interest — heading "Interest from savings bank", description "Interest income ... Savings", typically SFT-016(SB). Sum across ALL banks. number>,
-  "interestFromFD": <sum of EVERY row whose description indicates term-deposit / fixed-deposit interest — heading "Interest from deposit", description "Interest income ... Term Deposit", typically SFT-016(TD) or SFT-016(FD). Sum across ALL banks. number>,
-  "dividendIncome": <sum of every row described as dividend income, typically SFT-015, number>,
+  "interestFromSavings": <Part B2 SFT ONLY. Sum of EVERY SFT row whose description indicates savings-bank interest — heading "Interest from savings bank", description "Interest income ... Savings", typically SFT-016(SB). Sum across ALL banks. number>,
+  "interestFromFD": <Part B2 SFT ONLY — never add TDS-194A from Part B1. Sum of EVERY SFT row whose description indicates term-deposit / fixed-deposit interest — heading "Interest from deposit", description "Interest income ... Term Deposit", typically SFT-016(TD) or SFT-016(FD). Sum across ALL banks. number>,
+  "dividendIncome": <Part B2 SFT ONLY. Sum of every SFT row described as dividend income, typically SFT-015. Do not add a Part B1 TDS-194 dividend row on top — it is the same dividend. number>,
   "securitiesTransactions": <sum of SALES CONSIDERATION / AMOUNT for every row under a heading like "Sale of securities and units of mutual fund" describing sale of listed equity shares — codes vary (SFT-17-LES(M), SFT-17-LS(M), SFT-017). Use the total sale value, NOT the purchase value. number>,
   "mutualFundTransactions": <total sale value of mutual fund units (descriptions mentioning mutual fund sale/redemption, e.g. SFT-18 variants). Exclude purchases. number>,
   "cryptoIncome": <total from TDS-194S / VDA / virtual digital asset section, number>,
@@ -1329,6 +1349,29 @@ function amountsAgree(declared: number, mapped: number): boolean {
  * documents, so keying off them reintroduces the exact bug this file has
  * already shipped once.
  */
+/**
+ * Part B1 TDS rows that restate income already reported under a Part B2 SFT
+ * row. Interest appears as both TDS-194A (deductor's view) and SFT-016
+ * (bank's view); dividends as both TDS-194 and SFT-015. Counting them as
+ * separate income inflates the return — so the parser deliberately ignores
+ * them, and coverage must not then report them as an unmapped section, or
+ * every reconcile would raise a false HIGH-severity issue.
+ */
+function isDuplicateOfSFT(code: string, description: string, ais: ExtractedAIS): boolean {
+  const c = code.toUpperCase().replace(/\s/g, "");
+  const d = description.toLowerCase();
+
+  const interestTDS = c.includes("194A") || (c.startsWith("TDS") && d.includes("interest"));
+  if (interestTDS) {
+    // Only a duplicate if we actually captured the SFT-side interest figure.
+    return (ais.interestFromSavings ?? 0) + (ais.interestFromFD ?? 0) > 0;
+  }
+  const dividendTDS = (c.includes("194") && d.includes("dividend")) || (c.startsWith("TDS") && d.includes("dividend"));
+  if (dividendTDS) return (ais.dividendIncome ?? 0) > 0;
+
+  return false;
+}
+
 function mappedAmountForSection(s: AISSectionTotal, ais: ExtractedAIS): number | null {
   const t = `${s.code} ${s.description} ${s.heading ?? ""}`.toLowerCase();
 
@@ -1389,6 +1432,17 @@ function buildCoverageReport(ais: ExtractedAIS): CoverageReport | null {
     const declared = group.reduce((sum, g) => sum + g.amount, 0);
     const head = group[0];
     const mapped = mappedAmountForSection({ ...head, amount: declared }, ais);
+
+    // A Part B1 TDS row restating income already taken from its Part B2 SFT
+    // counterpart is intentionally excluded from the totals, not missed.
+    if (mapped == null && isDuplicateOfSFT(head.code, head.description, ais)) {
+      items.push({
+        code: head.code, description: head.description, declaredAmount: declared, mappedAmount: declared,
+        status: "RECONCILED",
+        note: `${head.description || head.code}: ${fmt(declared)} — same income already counted from the SFT entry reported by the bank/registrar, so it is not added again.`,
+      });
+      continue;
+    }
 
     if (mapped == null) {
       items.push({
