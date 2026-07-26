@@ -10,6 +10,7 @@ import PDFDocument from "pdfkit";
 import { reconcileTaxDocuments, type ReconciliationReport } from "./taxReconcileService.js";
 import { authenticateFirebaseToken, type AuthenticatedRequest } from "./middleware/auth.js";
 import { logoWhiteBuffer, watermarkBuffer } from "./assets/logoAssets.js";
+import { fontRegular, fontBold } from "./assets/pdfFonts.js";
 
 // ─── Multer: memory storage, up to 5 PDFs (AIS + 26AS + up to 3 Form 16s), 10 MB each ──
 const upload = multer({
@@ -46,7 +47,7 @@ function fmt(n: number | null | undefined): string {
 // ─── PDF report generator using PDFKit ───────────────────────────────────────
 function generatePDFReport(report: ReconciliationReport): Promise<Buffer> {
   return new Promise<Buffer>((resolve) => {
-    const doc = new PDFDocument({ margin: 50, size: "A4", autoFirstPage: true });
+    const doc = new PDFDocument({ margin: 50, size: "A4", autoFirstPage: true, bufferPages: true });
     const chunks: Buffer[] = [];
     doc.on("data", (c: Buffer) => chunks.push(c));
     doc.on("end", () => resolve(Buffer.concat(chunks)));
@@ -62,16 +63,26 @@ function generatePDFReport(report: ReconciliationReport): Promise<Buffer> {
     const GRAY  = "#6B7280";
     const LGRAY = "#F3F4F6";
     const BLACK = "#111827";
+    const RULE  = "#E5E7EB";   // hairline dividers
+    const INK   = "#374151";   // body copy — softer than BLACK for long prose
 
-    // PDFKit's built-in Helvetica uses WinAnsi encoding — the Rs symbol
-    // (U+20B9) is not supported and renders as the superscript-1 glyph.
-    // Replace with "Rs." throughout the PDF.
+    // Embedded DejaVu subset. Registered under short names so every call site
+    // can use "S"/"SB" instead of Helvetica. This is what makes the rupee sign
+    // render — see server/assets/pdfFonts.ts for why it has to be embedded.
+    doc.registerFont("S", fontRegular());
+    doc.registerFont("SB", fontBold());
+    const FONT = "S";
+    const FONT_B = "SB";
+
+    // The embedded font carries U+20B9, so the rupee sign is preserved rather
+    // than downgraded to "Rs." as it was under Helvetica. Emoji still have no
+    // glyph in the subset and are mapped to plain-text equivalents.
     const pdfSafe = (s: string): string =>
-      s.replace(/₹/g, "Rs.").replace(/✓/g, "(OK)").replace(/✗/g, "(X)")
-       .replace(/✅/g, "(done)").replace(/⚠️?/g, "(!)").replace(/❌/g, "(X)");
+      s.replace(/✅/g, "\u2713").replace(/❌/g, "\u2717").replace(/⚠️?/g, "!")
+       .replace(/[\u{1F300}-\u{1FAFF}]/gu, "").trim();
 
     const fmtRs = (n: number | null | undefined): string =>
-      n == null ? "N/A" : "Rs." + n.toLocaleString("en-IN", { maximumFractionDigits: 0 });
+      n == null ? "N/A" : "\u20b9" + n.toLocaleString("en-IN", { maximumFractionDigits: 0 });
 
     const statusColor = report.overallStatus === "CLEAN" ? GREEN
       : report.overallStatus === "CRITICAL" ? RED : ORANGE;
@@ -101,48 +112,66 @@ function generatePDFReport(report: ReconciliationReport): Promise<Buffer> {
     doc.on("pageAdded", drawWatermark);
 
     // ── section header ───────────────────────────────────────────────────────
+    // Editorial-style heading: small caps-ish label over a hairline rule.
+    // The previous solid blue slabs stacked up into heavy bands that made the
+    // report look like a form dump rather than a document.
     const sectionHeader = (title: string) => {
-      ensureSpace(30);
-      doc.moveDown(0.5);
+      ensureSpace(34);
+      doc.moveDown(0.8);
       const y = doc.y;
-      doc.rect(M, y, CW, 20).fill(BLUE);
-      doc.fillColor("white").font("Helvetica-Bold").fontSize(11)
-         .text(title, M + 8, y + 5, { width: CW - 16, lineBreak: false });
-      doc.y = y + 24;
+      doc.fillColor(BLUE).font(FONT_B).fontSize(9.5)
+         .text(title.toUpperCase(), M, y, { width: CW, characterSpacing: 0.8, lineBreak: false });
+      const ry = y + 14;
+      doc.save().lineWidth(1.2).strokeColor(BLUE).opacity(0.85)
+         .moveTo(M, ry).lineTo(M + 44, ry).stroke().restore();
+      doc.save().lineWidth(0.6).strokeColor(RULE)
+         .moveTo(M + 44, ry).lineTo(M + CW, ry).stroke().restore();
+      doc.y = ry + 10;
     };
 
     // ────────────────────────────────────────────────────────────────────────
     // HEADER
     // ────────────────────────────────────────────────────────────────────────
-    doc.rect(0, 0, PAGE_W, 65).fill(BLUE);
+    doc.rect(0, 0, PAGE_W, 78).fill(BLUE);
+    // Thin lighter keyline under the banner — gives the masthead an edge
+    // instead of ending in a flat colour break.
+    doc.rect(0, 78, PAGE_W, 3).fill("#3B6BE8");
     // Logo (white silhouette — the full-colour blue mark would disappear
     // against this banner) at top-left, title/subtitle shifted right of it.
-    const LOGO_H = 30;
+    const LOGO_H = 34;
     const LOGO_W = LOGO_H * (328 / 200); // source asset aspect ratio
-    doc.image(logoWhiteBuffer(), M, 12, { height: LOGO_H, width: LOGO_W });
+    doc.image(logoWhiteBuffer(), M, 16, { height: LOGO_H, width: LOGO_W });
     const TEXT_X = M + LOGO_W + 12;
     const TEXT_W = CW - LOGO_W - 12;
-    doc.fillColor("white").font("Helvetica-Bold").fontSize(16)
-       .text("AiTaxBot - Tax Document Reconciliation Report", TEXT_X, 14, { width: TEXT_W });
-    doc.fillColor("white").font("Helvetica").fontSize(9)
+    doc.fillColor("white").font(FONT_B).fontSize(15)
+       .text("Tax Document Reconciliation", TEXT_X, 18, { width: TEXT_W, lineBreak: false });
+    doc.fillColor("#C7D6FF").font(FONT).fontSize(8.5)
+       .text("AIS  \u00b7  Form 26AS  \u00b7  Form 16", TEXT_X, 37, { width: TEXT_W, lineBreak: false });
+    doc.fillColor("#C7D6FF").font(FONT).fontSize(8.5)
        .text(
-         "AIS + Form 26AS + Form 16  |  FY 2025-26 / AY 2026-27  |  Generated: " +
+         "FY 2025-26 / AY 2026-27  \u00b7  Generated " +
          new Date().toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }),
-         TEXT_X, 40, { width: TEXT_W }
+         TEXT_X, 51, { width: TEXT_W, lineBreak: false }
        );
-    doc.y = 75;
+    doc.y = 96;
 
     // ────────────────────────────────────────────────────────────────────────
     // STATUS BOX
     // ────────────────────────────────────────────────────────────────────────
-    const sy = doc.y;
-    doc.rect(M, sy, CW, 50).fill(LGRAY);
-    doc.fillColor(statusColor).font("Helvetica-Bold").fontSize(13)
-       .text("Status: " + statusLabel, M + 10, sy + 8, { width: CW - 20, lineBreak: false });
     const summaryLine = pdfSafe((report.summary || "").replace(/\n/g, " "));
-    doc.fillColor(BLACK).font("Helvetica").fontSize(8)
-       .text(summaryLine, M + 10, sy + 28, { width: CW - 20, lineBreak: false });
-    doc.y = sy + 58;
+    const sy = doc.y;
+    // Measure first so the panel wraps the text instead of clipping it — the
+    // old fixed 50pt box with lineBreak:false truncated longer summaries,
+    // which is precisely where parse-failure warnings now live.
+    const sumH = doc.font(FONT).fontSize(8.5).heightOfString(summaryLine, { width: CW - 34 });
+    const boxH = Math.max(46, 26 + sumH + 10);
+    doc.roundedRect(M, sy, CW, boxH, 4).fill("#FAFBFC");
+    doc.rect(M, sy, 3.5, boxH).fill(statusColor);
+    doc.fillColor(statusColor).font(FONT_B).fontSize(11.5)
+       .text(statusLabel, M + 14, sy + 10, { width: CW - 28, lineBreak: false });
+    doc.fillColor(INK).font(FONT).fontSize(8.5)
+       .text(summaryLine, M + 14, sy + 26, { width: CW - 34 });
+    doc.y = sy + boxH + 12;
 
     // ────────────────────────────────────────────────────────────────────────
     // EXTRACTED DATA SUMMARY TABLE
@@ -153,17 +182,25 @@ function generatePDFReport(report: ReconciliationReport): Promise<Buffer> {
     const C0 = M, C1 = M + W0, C2 = M + W0 + W1, C3 = M + W0 + W1 + W2;
     const ROW_H = 17;
 
-    // header row
+    // Header row — light tint with a rule beneath, rather than a saturated
+    // blue band. Numeric columns are right-aligned from here down: currency
+    // that isn't decimal-aligned is the fastest way to make a financial table
+    // look amateur, and it makes magnitudes genuinely harder to compare.
     {
       const y = doc.y;
-      doc.rect(M, y, CW, ROW_H).fill(BLUE);
+      doc.rect(M, y, CW, ROW_H).fill("#EEF2FB");
       const hdr = ["Metric", "AIS", "Form 16", "26AS"];
       const xs  = [C0, C1, C2, C3];
       const ws  = [W0, W1, W2, W3];
       hdr.forEach((h, i) => {
-        doc.fillColor("white").font("Helvetica-Bold").fontSize(8.5)
-           .text(h, xs[i] + 4, y + 5, { width: ws[i] - 8, lineBreak: false });
+        doc.fillColor(BLUE).font(FONT_B).fontSize(7.5)
+           .text(h.toUpperCase(), xs[i] + 5, y + 5.5, {
+             width: ws[i] - 10, lineBreak: false, characterSpacing: 0.4,
+             align: i === 0 ? "left" : "right",
+           });
       });
+      doc.save().lineWidth(0.7).strokeColor("#C9D6F5")
+         .moveTo(M, y + ROW_H).lineTo(M + CW, y + ROW_H).stroke().restore();
       doc.y = y + ROW_H + 2;
     }
 
@@ -180,15 +217,23 @@ function generatePDFReport(report: ReconciliationReport): Promise<Buffer> {
 
     tableRows.forEach((row, ri) => {
       const y = doc.y;
-      if (ri % 2 === 0) doc.rect(M, y, CW, ROW_H).fill(LGRAY);
+      if (ri % 2 === 1) doc.rect(M, y, CW, ROW_H).fill("#FAFAFB");
       const xs = [C0, C1, C2, C3];
       const ws = [W0, W1, W2, W3];
       row.forEach((cell, ci) => {
-        doc.fillColor(BLACK).font("Helvetica").fontSize(8.5)
-           .text(cell, xs[ci] + 4, y + 5, { width: ws[ci] - 8, lineBreak: false });
+        const isLabel = ci === 0;
+        const isEmpty = cell === "\u2014" || cell === "N/A";
+        doc.fillColor(isLabel ? INK : isEmpty ? "#B6BCC6" : BLACK)
+           .font(isLabel ? FONT : FONT_B).fontSize(8.5)
+           .text(cell, xs[ci] + 5, y + 5, {
+             width: ws[ci] - 10, lineBreak: false, align: isLabel ? "left" : "right",
+           });
       });
       doc.y = y + ROW_H + 1;
     });
+    doc.save().lineWidth(0.7).strokeColor(RULE)
+       .moveTo(M, doc.y + 1).lineTo(M + CW, doc.y + 1).stroke().restore();
+    doc.y += 4;
 
     // employer info line
     const empParts = [
@@ -200,7 +245,7 @@ function generatePDFReport(report: ReconciliationReport): Promise<Buffer> {
     ].filter(Boolean);
     if (empParts.length) {
       doc.moveDown(0.3);
-      doc.fillColor(GRAY).font("Helvetica").fontSize(7.5)
+      doc.fillColor(GRAY).font(FONT).fontSize(7.5)
          .text(empParts.join("   |   "), M, doc.y, { width: CW });
     }
 
@@ -212,25 +257,25 @@ function generatePDFReport(report: ReconciliationReport): Promise<Buffer> {
 
       report.extractedData.form16Employers.forEach((emp, i) => {
         ensureSpace(16);
-        doc.fillColor(BLACK).font("Helvetica-Bold").fontSize(8.5)
+        doc.fillColor(BLACK).font(FONT_B).fontSize(8.5)
            .text(`Employer ${i + 1}: ${pdfSafe(emp.employerName || "Unknown")}`, M, doc.y, { continued: true, width: CW });
-        doc.font("Helvetica").fillColor(GRAY)
+        doc.font(FONT).fillColor(GRAY)
            .text(`   Gross: ${fmtRs(emp.grossSalary)}   TDS: ${fmtRs(emp.totalTaxDeducted)}   Regime: ${emp.newRegime == null ? "Unknown" : emp.newRegime ? "New" : "Old"}`);
         doc.moveDown(0.15);
       });
 
       doc.moveDown(0.2);
       if (report.multiEmployer.regimeConsistent && report.multiEmployer.estimatedTaxLiability != null) {
-        doc.fillColor(BLACK).font("Helvetica-Bold").fontSize(8.5)
+        doc.fillColor(BLACK).font(FONT_B).fontSize(8.5)
            .text(`Combined estimated tax liability: ${fmtRs(report.multiEmployer.estimatedTaxLiability)}`, M, doc.y, { width: CW });
-        doc.font("Helvetica").fillColor(GRAY).fontSize(8)
+        doc.font(FONT).fillColor(GRAY).fontSize(8)
            .text(`Credited via TDS + advance tax (26AS): ${fmtRs(report.multiEmployer.creditedTax)}`, M, doc.y, { width: CW });
         if (report.multiEmployer.estimatedShortfall != null && report.multiEmployer.estimatedShortfall > 1000) {
-          doc.fillColor(RED).font("Helvetica-Bold")
+          doc.fillColor(RED).font(FONT_B)
              .text(`Estimated shortfall: ${fmtRs(report.multiEmployer.estimatedShortfall)} — see Issues Found below`, M, doc.y, { width: CW });
         }
       } else if (!report.multiEmployer.regimeConsistent) {
-        doc.fillColor(ORANGE).font("Helvetica").fontSize(8.5)
+        doc.fillColor(ORANGE).font(FONT).fontSize(8.5)
            .text("Employers used different tax regimes — combined shortfall could not be estimated. See Issues Found below.", M, doc.y, { width: CW });
       }
       doc.moveDown(0.4);
@@ -242,21 +287,21 @@ function generatePDFReport(report: ReconciliationReport): Promise<Buffer> {
     if (report.recommendedITRForm) {
       const itr = report.recommendedITRForm;
       sectionHeader("Recommended ITR Form");
-      doc.fillColor(BLACK).font("Helvetica-Bold").fontSize(10)
+      doc.fillColor(BLACK).font(FONT_B).fontSize(10)
          .text(itr.formLabel, M, doc.y, { width: CW });
       doc.moveDown(0.15);
       itr.reasons.forEach((r) => {
         ensureSpace(14);
-        doc.font("Helvetica").fillColor(GRAY).fontSize(8)
+        doc.font(FONT).fillColor(GRAY).fontSize(8)
            .text(`- ${pdfSafe(r)}`, M, doc.y, { width: CW });
       });
       if (itr.blockers.length > 0) {
         doc.moveDown(0.15);
-        doc.font("Helvetica-Bold").fillColor(BLACK).fontSize(8)
+        doc.font(FONT_B).fillColor(BLACK).fontSize(8)
            .text("Why not the simpler form:", M, doc.y, { width: CW });
         itr.blockers.forEach((b) => {
           ensureSpace(14);
-          doc.font("Helvetica").fillColor(GRAY).fontSize(8)
+          doc.font(FONT).fillColor(GRAY).fontSize(8)
              .text(`- ${pdfSafe(b)}`, M, doc.y, { width: CW });
         });
       }
@@ -264,7 +309,7 @@ function generatePDFReport(report: ReconciliationReport): Promise<Buffer> {
         doc.moveDown(0.15);
         itr.warnings.forEach((w) => {
           ensureSpace(14);
-          doc.font("Helvetica-Oblique").fillColor(ORANGE).fontSize(7.5)
+          doc.font(FONT).fillColor(ORANGE).fontSize(7.5)
              .text(pdfSafe(w), M, doc.y, { width: CW });
         });
       }
@@ -282,9 +327,9 @@ function generatePDFReport(report: ReconciliationReport): Promise<Buffer> {
       const icon = (check.status === "MATCH" || check.status === "OK") ? "[OK]"
         : check.status === "MISMATCH" ? "[!!]" : "[?]";
       const label = `${icon} ${check.name}: `;
-      doc.fillColor(checkColor).font("Helvetica-Bold").fontSize(8.5)
+      doc.fillColor(checkColor).font(FONT_B).fontSize(8.5)
          .text(label, M, doc.y, { continued: true, width: CW });
-      doc.fillColor(BLACK).font("Helvetica").fontSize(8.5)
+      doc.fillColor(BLACK).font(FONT).fontSize(8.5)
          .text(pdfSafe(check.note), { width: CW - doc.widthOfString(label) });
       doc.moveDown(0.2);
     });
@@ -297,22 +342,22 @@ function generatePDFReport(report: ReconciliationReport): Promise<Buffer> {
       report.mismatches.forEach((m, i) => {
         ensureSpace(80);
         const mColor = m.severity === "HIGH" ? RED : m.severity === "MEDIUM" ? ORANGE : GRAY;
-        doc.fillColor(mColor).font("Helvetica-Bold").fontSize(9)
+        doc.fillColor(mColor).font(FONT_B).fontSize(9)
            .text(`${i + 1}. [${m.severity}] ${pdfSafe(m.title)}`, M, doc.y, { width: CW });
         doc.moveDown(0.15);
-        doc.fillColor(BLACK).font("Helvetica").fontSize(8.5)
+        doc.fillColor(BLACK).font(FONT).fontSize(8.5)
            .text(pdfSafe(m.description), M + 12, doc.y, { width: CW - 12 });
         doc.moveDown(0.1);
-        doc.fillColor(GRAY).font("Helvetica").fontSize(8)
+        doc.fillColor(GRAY).font(FONT).fontSize(8)
            .text("Rule: " + pdfSafe(m.ruleExplanation), M + 12, doc.y, { width: CW - 12 });
         doc.moveDown(0.1);
-        doc.fillColor(BLUE).font("Helvetica").fontSize(8)
+        doc.fillColor(BLUE).font(FONT).fontSize(8)
            .text("Action: " + pdfSafe(m.suggestedAction), M + 12, doc.y, { width: CW - 12 });
         doc.moveDown(0.5);
       });
     } else {
       doc.moveDown(0.3);
-      doc.fillColor(GREEN).font("Helvetica").fontSize(9)
+      doc.fillColor(GREEN).font(FONT).fontSize(9)
          .text("(OK) No significant mismatches found. Documents appear consistent.", M, doc.y, { width: CW });
       doc.moveDown(0.5);
     }
@@ -322,7 +367,7 @@ function generatePDFReport(report: ReconciliationReport): Promise<Buffer> {
     // ────────────────────────────────────────────────────────────────────────
     if (report.aiInsights) {
       sectionHeader("AI Analysis");
-      doc.fillColor(BLACK).font("Helvetica").fontSize(8.5)
+      doc.fillColor(BLACK).font(FONT).fontSize(8.5)
          .text(pdfSafe(report.aiInsights), M, doc.y, { width: CW });
       doc.moveDown(0.5);
     }
@@ -334,7 +379,7 @@ function generatePDFReport(report: ReconciliationReport): Promise<Buffer> {
       sectionHeader("Action Items Before Filing ITR");
       report.actionItems.forEach((item, i) => {
         ensureSpace(20);
-        doc.fillColor(BLACK).font("Helvetica").fontSize(8.5)
+        doc.fillColor(BLACK).font(FONT).fontSize(8.5)
            .text(`${i + 1}. ${pdfSafe(item)}`, M + 6, doc.y, { width: CW - 6 });
         doc.moveDown(0.2);
       });
@@ -345,7 +390,7 @@ function generatePDFReport(report: ReconciliationReport): Promise<Buffer> {
     // ────────────────────────────────────────────────────────────────────────
     if (report.itrImpact) {
       sectionHeader("ITR Filing Impact");
-      doc.fillColor(BLACK).font("Helvetica").fontSize(8.5)
+      doc.fillColor(BLACK).font(FONT).fontSize(8.5)
          .text(pdfSafe(report.itrImpact), M, doc.y, { width: CW });
       doc.moveDown(0.5);
     }
@@ -357,7 +402,7 @@ function generatePDFReport(report: ReconciliationReport): Promise<Buffer> {
     doc.moveDown(1);
     doc.moveTo(M, doc.y).lineTo(PAGE_W - M, doc.y).strokeColor(GRAY).lineWidth(0.5).stroke();
     doc.moveDown(0.4);
-    doc.fillColor(GRAY).font("Helvetica").fontSize(7.5)
+    doc.fillColor(GRAY).font(FONT).fontSize(7.5)
        .text(
          "Disclaimer: This report is for informational purposes only. Not a substitute for professional CA advice. " +
          "Always consult a qualified Chartered Accountant before filing your ITR.",
@@ -365,7 +410,23 @@ function generatePDFReport(report: ReconciliationReport): Promise<Buffer> {
        );
     doc.moveDown(0.3);
     doc.fillColor(GRAY).fontSize(7.5)
-       .text("www.aitaxbot.co.in  |  ITR Filing Deadline: July 31, 2026", { align: "center" });
+       .text("www.aitaxbot.co.in  \u00b7  ITR Filing Deadline: July 31, 2026", { align: "center" });
+
+    // ── Page numbers ────────────────────────────────────────────────────────
+    // Added last, once the total page count is known. A multi-page financial
+    // document without "Page x of y" looks unfinished, and a CA reviewing a
+    // printed copy has no way to tell whether a sheet is missing.
+    const range = doc.bufferedPageRange();
+    for (let i = 0; i < range.count; i++) {
+      doc.switchToPage(range.start + i);
+      const fy = doc.page.height - 32;
+      doc.save();
+      doc.fillColor("#9AA1AC").font(FONT).fontSize(7)
+         .text(`Page ${i + 1} of ${range.count}`, M, fy, { width: CW, align: "right", lineBreak: false });
+      doc.fillColor("#9AA1AC").font(FONT).fontSize(7)
+         .text("AiTaxBot \u00b7 Reconciliation Report", M, fy, { width: CW, align: "left", lineBreak: false });
+      doc.restore();
+    }
 
     doc.end();
   });
