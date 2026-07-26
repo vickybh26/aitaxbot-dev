@@ -329,10 +329,14 @@ export default function AIS26ASForm16Tool() {
       setProgress(20);
       setProgressLabel(
         filledForm16.length > 1
-          ? `Reading ${filledForm16.length} Form 16s + documents with Gemini AI…`
+          // Deliberately does not name the underlying model provider — the
+          // value here is AiTaxBot's tax-specific extraction and reconciliation
+          // logic, not the model itself. Naming it invites users to skip the
+          // product and paste documents into a general chatbot instead.
+          ? `Reading ${filledForm16.length} Form 16s + documents with AiTaxBot AI…`
           : uploadedCount === 1
-          ? "Reading your document with Gemini AI…"
-          : "Reading your documents with Gemini AI…"
+          ? "Reading your document with AiTaxBot AI…"
+          : "Reading your documents with AiTaxBot AI…"
       );
 
       const resp = await fetch("/api/tools/tax-reconcile", {
@@ -645,7 +649,7 @@ export default function AIS26ASForm16Tool() {
                   <div className="hidden md:block absolute top-5 left-[calc(16.7%+20px)] right-[calc(16.7%+20px)] h-px bg-gray-200" />
                   {[
                     { n: "1", title: "Upload your PDFs", desc: "AIS and Form 26AS from the Income Tax portal, plus Form 16 from each employer — changed jobs? Add up to 3.", color: "bg-blue-600" },
-                    { n: "2", title: "AI Reads & Extracts", desc: "Gemini AI parses every page of your uploaded documents and pulls every salary, TDS, and income figure — even one document gives you a summary", color: "bg-[#4685d8]" },
+                    { n: "2", title: "AI Reads & Extracts", desc: "AiTaxBot AI parses every page of your uploaded documents and pulls every salary, TDS, and income figure — even one document gives you a summary", color: "bg-[#4685d8]" },
                     { n: "3", title: "Get Your Report", desc: "Instant mismatches with severity ratings, Indian tax law explanations, and exact action steps", color: "bg-green-600" },
                   ].map((s) => (
                     <div key={s.n} className="flex-1 flex flex-col items-center text-center px-4 relative">

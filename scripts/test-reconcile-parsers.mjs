@@ -149,13 +149,24 @@ const CASES = [
       interestFromFD: 76885,
       dividendIncome: 100,
       securitiesTransactions: 1749261,
-      // The important one: this document reports MF sales as SFT-18-EMF(M),
-      // a code that appears NOWHERE in our prompt. It is captured only
-      // because the prompt matches on description text ("sale of unit of
-      // equity oriented mutual fund") rather than on the code. If this
-      // assertion starts failing, someone has reintroduced code-matching.
-      mutualFundTransactions: 55324,
     },
+    // MF sales get a FLOOR, not an exact figure, and deliberately so.
+    //
+    // This document reports them as SFT-18-EMF(M) — a code that appears
+    // nowhere in our prompt — split across two registrars (KFin ₹55,324 in
+    // six rows, CAMS ₹44,625) for a true total of ₹99,949. It is captured
+    // only because the prompt matches on description text rather than code.
+    //
+    // Three reads of this same file returned ₹99,949, ₹1,00,213 and a
+    // partial ₹55,324 (that last one had wrongly routed the CAMS rows into
+    // highValueTransactions). Since the AIS JSON is encrypted, PDF+LLM is
+    // our only ingestion path and this read variance cannot be engineered
+    // away — an exact assertion would flake on noise rather than catch bugs.
+    //
+    // The failure mode worth catching is the catastrophic one: the category
+    // being dropped entirely (0/null) or only half-captured (~55k). A floor
+    // of 95,000 catches both while tolerating ±few-hundred read jitter.
+    expectAtLeast: { mutualFundTransactions: 95000 },
   },
 ];
 
@@ -204,6 +215,18 @@ async function main() {
         console.log(`   ✅ ${field}: ${actual}`);
       } else {
         console.log(`   ❌ ${field}: got ${JSON.stringify(actual)}, expected ${expected}`);
+        failures++;
+      }
+    }
+
+    // Floor assertions — for fields where LLM read-variance makes an exact
+    // match flaky, but a collapse to zero/partial must still fail loudly.
+    for (const [field, floor] of Object.entries(c.expectAtLeast || {})) {
+      const actual = parsed[field];
+      if (typeof actual === "number" && actual >= floor) {
+        console.log(`   ✅ ${field}: ${actual} (>= ${floor})`);
+      } else {
+        console.log(`   ❌ ${field}: got ${JSON.stringify(actual)}, expected at least ${floor}`);
         failures++;
       }
     }

@@ -1130,8 +1130,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           configured: true,
           geminiAvailable: hasGemini,
           message: hasGemini
-            ? 'PDF processing ready: pdfplumber + Gemini AI'
-            : 'PDF processing ready: pdfplumber + regex fallback (set GOOGLE_API_KEY for AI extraction)',
+            ? 'PDF processing ready: AI extraction enabled'
+            : 'PDF processing ready: basic extraction (AI extraction not configured)',
           processingMethod: hasGemini ? 'gemini_ai' : 'regex_fallback'
         });
       } catch (error) {
