@@ -49,3 +49,8 @@ __pycache__/
 *.pyo
 
 
+
+# Real tax documents used as parser regression fixtures.
+# These contain PAN, masked Aadhaar, home addresses and bank account numbers.
+# They must NEVER be committed — see scripts/test-reconcile-parsers.mjs.
+test-fixtures/
