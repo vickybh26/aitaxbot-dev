@@ -140,6 +140,23 @@ const CASES = [
     // receipts had no named field and disappeared entirely from the report.
     expectOtherIncomeContains: 45500,
   },
+  {
+    file: "rohit-ais.pdf",
+    kind: "ais",
+    label: "AIS — novel SFT-18-EMF(M) code, large equity portfolio, no TDS section",
+    expect: {
+      interestFromSavings: 2347,
+      interestFromFD: 76885,
+      dividendIncome: 100,
+      securitiesTransactions: 1749261,
+      // The important one: this document reports MF sales as SFT-18-EMF(M),
+      // a code that appears NOWHERE in our prompt. It is captured only
+      // because the prompt matches on description text ("sale of unit of
+      // equity oriented mutual fund") rather than on the code. If this
+      // assertion starts failing, someone has reintroduced code-matching.
+      mutualFundTransactions: 55324,
+    },
+  },
 ];
 
 // ─── Runner ──────────────────────────────────────────────────────────────────
