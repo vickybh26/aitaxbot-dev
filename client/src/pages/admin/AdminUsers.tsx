@@ -18,8 +18,6 @@ import {
   Circle,
   Filter,
   AlertTriangle,
-  Bell,
-  BellRing,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -56,50 +54,6 @@ interface AdminUser {
 interface AdminUserDetail extends AdminUser {
   gender: string | null;
   notes: { id: string; text: string; createdAt: any; adminEmail: string }[];
-}
-
-// ─── Nudge helpers ──────────────────────────────────────────────────────────
-
-const NUDGE_COOLDOWN_DAYS = 7;
-
-function toMillis(v: any): number {
-  if (!v) return 0;
-  if (v._seconds) return v._seconds * 1000;
-  if (typeof v.toDate === "function") return v.toDate().getTime();
-  return new Date(v).getTime() || 0;
-}
-
-function nudgeCooldownDaysLeft(lastNudgedAt: any): number {
-  const ms = toMillis(lastNudgedAt);
-  if (!ms) return 0;
-  const elapsedDays = (Date.now() - ms) / (24 * 60 * 60 * 1000);
-  return Math.max(0, Math.ceil(NUDGE_COOLDOWN_DAYS - elapsedDays));
-}
-
-function useNudgeMutation() {
-  const { getIdToken } = useAuth();
-  const { toast } = useToast();
-  const qc = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (userId: string) => {
-      const token = await getIdToken();
-      const res = await fetch(`/api/admin/users/${userId}/nudge`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const body = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(body?.error || "Failed to send nudge");
-      return body;
-    },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["/api/admin/users"] });
-      toast({ title: "Nudge sent", description: "Reminder email delivered." });
-    },
-    onError: (err: Error) => {
-      toast({ title: "Couldn't send nudge", description: err.message, variant: "destructive" });
-    },
-  });
 }
 
 interface UsersResponse {
@@ -144,9 +98,6 @@ function UserRow({
     : user.createdAt
     ? new Date(user.createdAt._seconds ? user.createdAt._seconds * 1000 : user.createdAt).toLocaleDateString("en-IN")
     : "—";
-
-  const nudgeMutation = useNudgeMutation();
-  const cooldownDays = nudgeCooldownDaysLeft(user.lastNudgedAt);
 
   return (
     <tr
@@ -199,95 +150,19 @@ function UserRow({
             <CheckCircle2 className="w-3.5 h-3.5" /> Complete
           </span>
         ) : (
-          <div className="flex items-center gap-2">
-            <span className="flex items-center gap-1 text-slate-400 text-xs">
-              <Circle className="w-3.5 h-3.5" /> Incomplete
-            </span>
-            {canWrite && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (cooldownDays === 0 && !nudgeMutation.isPending) {
-                    nudgeMutation.mutate(user.id);
-                  }
-                }}
-                disabled={cooldownDays > 0 || nudgeMutation.isPending}
-                title={
-                  cooldownDays > 0
-                    ? `Already nudged — try again in ${cooldownDays}d`
-                    : "Email this user to complete their profile"
-                }
-                className={cn(
-                  "flex items-center gap-1 text-xs px-2 py-0.5 rounded-full border font-medium transition-colors",
-                  cooldownDays > 0
-                    ? "border-slate-200 text-slate-300 cursor-not-allowed"
-                    : "border-amber-200 text-amber-600 hover:bg-amber-50"
-                )}
-              >
-                {nudgeMutation.isPending ? (
-                  <>
-                    <span className="h-3 w-3 border-2 border-amber-300 border-t-amber-600 rounded-full animate-spin" />
-                    Sending…
-                  </>
-                ) : cooldownDays > 0 ? (
-                  <>
-                    <Bell className="w-3 h-3" /> Nudged {cooldownDays < NUDGE_COOLDOWN_DAYS ? `· ${cooldownDays}d left` : ""}
-                  </>
-                ) : (
-                  <>
-                    <BellRing className="w-3 h-3" /> Nudge
-                  </>
-                )}
-              </button>
-            )}
-          </div>
+          // Nudge button removed 2026-07-26. The profile-completion email
+          // promised three benefits — instant PDF downloads, personalised tips,
+          // saved history — none of which were real: isProfileComplete gated
+          // nothing anywhere in the codebase, so completing a profile changed
+          // nothing for the user. Zero recipients completed their profile.
+          // The status is still shown because it is useful admin context.
+          <span className="flex items-center gap-1 text-slate-400 text-xs">
+            <Circle className="w-3.5 h-3.5" /> Incomplete
+          </span>
         )}
       </td>
       <td className="px-4 py-3 text-xs text-slate-400">{joinedDate}</td>
     </tr>
-  );
-}
-
-// ─── Nudge Card (CRM Drawer) ─────────────────────────────────────────────────
-
-function NudgeCard({
-  userId,
-  lastNudgedAt,
-  canWrite,
-}: {
-  userId: string;
-  lastNudgedAt: any;
-  canWrite: boolean;
-}) {
-  const nudgeMutation = useNudgeMutation();
-  const cooldownDays = nudgeCooldownDaysLeft(lastNudgedAt);
-
-  return (
-    <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-      <div className="flex items-center gap-1.5 mb-1.5">
-        <Bell className="w-4 h-4 text-amber-500" />
-        <span className="text-sm font-semibold text-amber-800">Profile incomplete</span>
-      </div>
-      <p className="text-xs text-amber-700 mb-3">
-        {lastNudgedAt
-          ? cooldownDays > 0
-            ? `Nudged already — they can be nudged again in ${cooldownDays} day${cooldownDays === 1 ? "" : "s"}.`
-            : "Nudged before, but the cooldown has passed — safe to nudge again."
-          : "This user hasn't finished setting up their profile. Send a reminder email."}
-      </p>
-      {canWrite ? (
-        <Button
-          size="sm"
-          disabled={cooldownDays > 0 || nudgeMutation.isPending}
-          onClick={() => nudgeMutation.mutate(userId)}
-          className="bg-amber-500 hover:bg-amber-600 text-white disabled:bg-amber-200 disabled:text-amber-400"
-        >
-          {nudgeMutation.isPending ? "Sending…" : cooldownDays > 0 ? `Nudged · ${cooldownDays}d left` : "Send Nudge Email"}
-        </Button>
-      ) : (
-        <p className="text-xs text-amber-500 italic">Requires Manager access or higher to send.</p>
-      )}
-    </div>
   );
 }
 
@@ -447,11 +322,6 @@ function CRMDrawer({
                   </div>
                 ))}
               </div>
-
-              {/* Nudge — incomplete profile */}
-              {!user.isProfileComplete && (
-                <NudgeCard userId={user.id} lastNudgedAt={user.lastNudgedAt} canWrite={canWrite} />
-              )}
 
               {/* Tags */}
               <div>
