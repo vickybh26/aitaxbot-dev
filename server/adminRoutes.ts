@@ -17,6 +17,7 @@ import { Router } from "express";
 import { getFirestore, verifyFirebaseToken, admin } from "./firebase";
 import { COLLECTIONS } from "./firestoreHelper";
 import { TransactionalEmailsApi, TransactionalEmailsApiApiKeys } from "@getbrevo/brevo";
+import { createHmac, timingSafeEqual } from "crypto";
 
 const router = Router();
 
@@ -462,9 +463,20 @@ router.post("/users/:id/nudge", adminL2, async (req: any, res) => {
       return res.status(429).json({ error: `Already nudged recently — try again in ${daysLeft} day${daysLeft === 1 ? "" : "s"}` });
     }
 
+    // Honour opt-out. There is no marketing-consent field on user documents —
+    // the signup checkbox only accepts the Privacy Policy and Terms, and isn't
+    // persisted — so an explicit opt-out flag is the only consent signal we
+    // actually have. Anyone who has used the unsubscribe link in a previous
+    // nudge must never receive another one.
+    if (u.nudgeOptOut === true) {
+      return res.status(400).json({ error: "This user has opted out of profile reminder emails" });
+    }
+
     const missing: string[] = [];
     if (!u.firstName || !u.lastName) missing.push("your name");
     if (!u.mobile) missing.push("your mobile number");
+
+    const unsubUrl = `https://www.aitaxbot.co.in/api/email/unsubscribe?uid=${encodeURIComponent(req.params.id)}&t=${unsubToken(req.params.id)}`;
 
     await sendBrevoEmail({
       to: [{ email: u.email, name: u.firstName || "there" }],
@@ -474,7 +486,14 @@ router.post("/users/:id/nudge", adminL2, async (req: any, res) => {
         <html>
         <body style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:20px;color:#1e293b">
           <div style="text-align:center;margin-bottom:24px">
-            <img src="https://aitaxbot.co.in/logo.png" alt="AiTaxBot" style="height:40px" onerror="this.style.display='none'"/>
+            <!-- Was https://aitaxbot.co.in/logo.png, which does not exist: the
+                 apex host serves the SPA's index.html for unknown paths, so the
+                 request returned 200 with content-type text/html and every
+                 recipient saw a broken image. The onerror fallback never fired
+                 either — Gmail and Outlook strip inline JavaScript. This points
+                 at a real file on the www host that serves as image/png. -->
+            <img src="https://www.aitaxbot.co.in/apple-touch-icon.png" alt="AiTaxBot"
+                 width="44" height="44" style="height:44px;width:44px;border-radius:10px;display:inline-block"/>
           </div>
           <h2 style="font-size:20px;font-weight:700;margin-bottom:4px">Hi ${u.firstName || "there"}! 👋</h2>
           <p style="color:#475569;margin-top:8px;line-height:1.6">
@@ -496,9 +515,12 @@ router.post("/users/:id/nudge", adminL2, async (req: any, res) => {
             </a>
           </div>
           <hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0"/>
-          <p style="font-size:11px;color:#94a3b8;text-align:center">
+          <p style="font-size:11px;color:#94a3b8;text-align:center;line-height:1.7">
             AiTaxBot · aitaxbot.co.in · Free tax tools for India<br/>
-            <a href="https://aitaxbot.co.in/privacy-policy" style="color:#94a3b8">Privacy Policy</a>
+            You're receiving this because you created an AiTaxBot account.<br/>
+            <a href="https://www.aitaxbot.co.in/privacy-policy" style="color:#94a3b8">Privacy Policy</a>
+            &nbsp;·&nbsp;
+            <a href="${unsubUrl}" style="color:#94a3b8">Unsubscribe from these reminders</a>
           </p>
         </body>
         </html>
@@ -585,6 +607,30 @@ router.get("/tags", adminL3, async (_req: any, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 // CA DIRECTORY MANAGEMENT
 // ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Signed unsubscribe token.
+ *
+ * The unsubscribe link has to work from an email client with no session, so
+ * the user id travels in the URL. Signing it stops anyone from unsubscribing
+ * another user (or enumerating ids) by editing the query string — without a
+ * valid signature the endpoint refuses.
+ *
+ * Falls back to the Brevo key as signing material if no dedicated secret is
+ * set, purely so this cannot silently degrade to an unsigned link in an
+ * environment that hasn't been given EMAIL_TOKEN_SECRET yet.
+ */
+export function unsubToken(uid: string): string {
+  const secret = process.env.EMAIL_TOKEN_SECRET || process.env.BREVO_API_KEY || "aitaxbot-unsub";
+  return createHmac("sha256", secret).update(`unsub:${uid}`).digest("hex").slice(0, 32);
+}
+
+export function verifyUnsubToken(uid: string, token: string): boolean {
+  const expected = unsubToken(uid);
+  if (token.length !== expected.length) return false;
+  // Constant-time compare — avoids leaking the correct token through timing.
+  return timingSafeEqual(Buffer.from(expected), Buffer.from(token));
+}
 
 async function sendBrevoEmail(params: {
   to: { email: string; name: string }[];

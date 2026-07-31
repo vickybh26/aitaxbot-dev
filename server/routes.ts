@@ -8,7 +8,7 @@ import fs from "fs";
 import crypto from "crypto";
 import rateLimit from "express-rate-limit";
 import accountingRoutes from "./accountingRoutes";
-import adminRoutes from "./adminRoutes";
+import adminRoutes, { verifyUnsubToken } from "./adminRoutes";
 import whatsappRoutes from "./whatsapp/whatsappRoutes";
 import caRoutes from "./caRoutes";
 import leadRoutes from "./leadRoutes";
@@ -243,6 +243,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Mount admin routes
   app.use("/api/admin", adminRoutes);
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // GET /api/email/unsubscribe — one-click opt-out from profile reminder mail
+  //
+  // Deliberately public and mounted OUTSIDE /api/admin: the person clicking it
+  // is a recipient in their mail client with no session. The uid is therefore
+  // in the URL, signed with an HMAC so nobody can unsubscribe another user (or
+  // probe for valid ids) by editing the query string.
+  //
+  // Responds with a plain HTML page rather than JSON because it opens in a
+  // browser tab, and always confirms success once the signature is valid —
+  // an opt-out that appears to fail invites the user to mark the mail as spam.
+  // ─────────────────────────────────────────────────────────────────────────
+  app.get("/api/email/unsubscribe", async (req, res) => {
+    const page = (title: string, body: string, ok: boolean) => `<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${title} · AiTaxBot</title></head>
+<body style="font-family:Arial,Helvetica,sans-serif;max-width:520px;margin:60px auto;padding:24px;color:#1e293b;text-align:center">
+<img src="https://www.aitaxbot.co.in/apple-touch-icon.png" alt="AiTaxBot" width="48" height="48" style="border-radius:10px"/>
+<h2 style="font-size:20px;margin:20px 0 8px;color:${ok ? "#16a34a" : "#dc2626"}">${title}</h2>
+<p style="color:#475569;line-height:1.6;font-size:14px">${body}</p>
+<p style="margin-top:28px"><a href="https://www.aitaxbot.co.in" style="color:#2563eb;font-size:14px">Back to AiTaxBot</a></p>
+</body></html>`;
+
+    try {
+      const uid = String(req.query.uid || "");
+      const token = String(req.query.t || "");
+      if (!uid || !token || !verifyUnsubToken(uid, token)) {
+        return res.status(400).type("html").send(
+          page("Invalid unsubscribe link", "This link is not valid or has been altered. Please use the link exactly as it appears in the email, or contact admin@aitaxbot.co.in.", false)
+        );
+      }
+
+      const db = getFirestore();
+      const ref = db.collection("users").doc(uid);
+      const snap = await ref.get();
+      if (!snap.exists) {
+        // Still report success — the desired end state (no more mail) holds,
+        // and confirming or denying that an id exists would leak information.
+        return res.type("html").send(page("You're unsubscribed", "You will not receive any further profile reminder emails from AiTaxBot.", true));
+      }
+
+      await ref.update({ nudgeOptOut: true, nudgeOptOutAt: new Date() });
+      return res.type("html").send(
+        page("You're unsubscribed", "You will not receive any further profile reminder emails. This does not affect your account, and you'll still get essential mail such as password resets.", true)
+      );
+    } catch (err) {
+      console.error("[Email] Unsubscribe error:", err);
+      return res.status(500).type("html").send(
+        page("Something went wrong", "We couldn't process that just now. Please email admin@aitaxbot.co.in and we'll remove you manually.", false)
+      );
+    }
+  });
   app.use("/api/ca", caRoutes);
   app.use("/api/leads", leadRoutes);
   app.use("/api/tool-usage", toolUsageRoutes);
