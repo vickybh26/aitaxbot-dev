@@ -60,21 +60,26 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
 
   const isModal = !!onClose;
 
+  // ── Unit handling ──────────────────────────────────────────────────────────
+  // basicSalary / hraReceived / actualRentPaid are ALWAYS stored as ANNUAL
+  // figures. Monthly is a display concern only.
+  //
+  // This previously mixed two incompatible conventions: handleInputModeChange
+  // converted the stored state into the new unit, while getDisplayValues
+  // converted again on the way out. Switching to monthly therefore showed
+  // annual ÷ 144, and typing a monthly figure wrote it straight to the annual
+  // state while the field re-rendered it ÷ 12 — so entering 50,000 displayed
+  // 4,167 and the input appeared not to accept anything.
+  //
+  // One conversion, in one direction, at the display boundary. Do not
+  // reintroduce a conversion in the mode toggle.
+
+  const toAnnual = (displayValue: number) =>
+    inputMode === 'monthly' ? Math.round(displayValue * 12) : displayValue;
+
   const handleInputModeChange = (newMode: 'annual' | 'monthly') => {
     if (newMode === inputMode) return;
-
-    if (newMode === 'monthly') {
-      // Convert from annual to monthly
-      setBasicSalary(Math.round(basicSalary / 12));
-      setHraReceived(Math.round(hraReceived / 12));
-      setActualRentPaid(Math.round(actualRentPaid / 12));
-    } else {
-      // Convert from monthly to annual
-      setBasicSalary(Math.round(basicSalary * 12));
-      setHraReceived(Math.round(hraReceived * 12));
-      setActualRentPaid(Math.round(actualRentPaid * 12));
-    }
-
+    // State is canonical annual — only the presentation unit changes.
     setInputMode(newMode);
   };
 
@@ -93,20 +98,11 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
     };
   };
 
-  const getAnnualValues = () => {
-    if (inputMode === 'monthly') {
-      return {
-        annualBasic: basicSalary * 12,
-        annualHra: hraReceived * 12,
-        annualRent: actualRentPaid * 12,
-      };
-    }
-    return {
-      annualBasic: basicSalary,
-      annualHra: hraReceived,
-      annualRent: actualRentPaid,
-    };
-  };
+  const getAnnualValues = () => ({
+    annualBasic: basicSalary,
+    annualHra: hraReceived,
+    annualRent: actualRentPaid,
+  });
 
   const calculateHRA = () => {
     setIsCalculating(true);
@@ -339,12 +335,8 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
                         min={0}
                         value={displayBasic}
                         onChange={(e) => {
-                          const value = Math.max(0, parseFloat(e.target.value) || 0);
-                          if (inputMode === 'monthly') {
-                            setBasicSalary(value);
-                          } else {
-                            setBasicSalary(value);
-                          }
+                          const typed = Math.max(0, parseFloat(e.target.value) || 0);
+                          setBasicSalary(toAnnual(typed));
                         }}
                         placeholder="Enter basic salary"
                         className="text-lg"
@@ -361,8 +353,8 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
                         min={0}
                         value={displayHra}
                         onChange={(e) => {
-                          const value = Math.max(0, parseFloat(e.target.value) || 0);
-                          setHraReceived(value);
+                          const typed = Math.max(0, parseFloat(e.target.value) || 0);
+                          setHraReceived(toAnnual(typed));
                         }}
                         placeholder="Enter HRA received"
                         className="text-lg"
@@ -380,8 +372,8 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
                       min={0}
                       value={displayRent}
                       onChange={(e) => {
-                        const value = Math.max(0, parseFloat(e.target.value) || 0);
-                        setActualRentPaid(value);
+                        const typed = Math.max(0, parseFloat(e.target.value) || 0);
+                        setActualRentPaid(toAnnual(typed));
                       }}
                       placeholder="Enter actual rent paid"
                       className="text-lg"
