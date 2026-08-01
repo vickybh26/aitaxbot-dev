@@ -282,16 +282,25 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
       parseFloat(formData.otherIncome) || 0
     ].reduce((sum, val) => sum + val, 0);
 
-    // Standard deduction
+    // Standard deduction — allowed ONLY against income under the head
+    // "Salaries" (s.16(ia) of ITA 1961 / the equivalent under ITA 2025).
+    //
+    // This previously keyed off totalIncome, so anyone with no salary at all
+    // still received it: a freelancer with ₹10L of business income, or a
+    // trader with only capital gains, got ₹75,000 of deduction they are not
+    // entitled to and an understated tax liability. It is also capped at the
+    // salary figure itself, so a ₹30,000 salary gives ₹30,000 of deduction,
+    // not ₹75,000.
+    const salaryForStandardDeduction = parseFloat(formData.salaryIncome) || 0;
     let standardDeductionAmount = 0;
-    if (totalIncome > 0) {
+    if (salaryForStandardDeduction > 0) {
       if (regime === 'old') {
         standardDeductionAmount = 50000;
       } else {
         standardDeductionAmount = 75000;
       }
     }
-    const standardDeduction = Math.min(standardDeductionAmount, totalIncome);
+    const standardDeduction = Math.min(standardDeductionAmount, salaryForStandardDeduction);
 
     // Calculate HRA exemption
     const hraReceived = parseFloat(formData.hraReceived) || 0;

@@ -39,18 +39,35 @@ export default function SIPCalculator({ onClose }: SIPCalculatorProps = {}) {
     let maturityValue = 0;
     let currentMonthlyAmount = monthlyInvestment;
 
+    // Year-end series for the chart. Built from this same simulation rather
+    // than interpolated afterwards: the chart previously plotted
+    // (maturity / years) * year, a straight line that showed no compounding at
+    // all — the visual contradicted the headline number it sat next to. The
+    // invested line was also monthlyInvestment * 12 * year, which ignored
+    // step-up entirely and understated contributions whenever step-up was set.
+    const yearlyInvested: number[] = [];
+    const yearlyValue: number[] = [];
+    // Running balance: (balance + contribution) × (1 + r) each month. This is
+    // algebraically identical to the monthsRemaining compounding below, so the
+    // final chart point always lands on the stated maturity value.
+    let runningBalance = 0;
+
     // Calculate SIP with step-up
     for (let year = 1; year <= years; year++) {
       for (let month = 1; month <= 12; month++) {
         const monthsRemaining = (years - year) * 12 + (12 - month) + 1;
         totalInvestment += currentMonthlyAmount;
-        
+
         if (monthlyReturn > 0) {
           maturityValue += currentMonthlyAmount * Math.pow(1 + monthlyReturn, monthsRemaining);
+          runningBalance = (runningBalance + currentMonthlyAmount) * (1 + monthlyReturn);
         } else {
           maturityValue += currentMonthlyAmount;
+          runningBalance += currentMonthlyAmount;
         }
       }
+      yearlyInvested.push(totalInvestment);
+      yearlyValue.push(runningBalance);
       // Apply step-up at year end
       currentMonthlyAmount = currentMonthlyAmount * (1 + stepUp / 100);
     }
@@ -68,10 +85,10 @@ export default function SIPCalculator({ onClose }: SIPCalculatorProps = {}) {
     trackTool("SIP Calculator", `Maturity: ₹${Math.round(maturityValue).toLocaleString('en-IN')}`);
 
     // Update chart
-    updateChart(totalInvestment, maturityValue);
+    updateChart(yearlyInvested, yearlyValue);
   };
 
-  const updateChart = (investment: number, maturity: number) => {
+  const updateChart = (yearlyInvested: number[], yearlyValue: number[]) => {
     if (!chartRef.current) return;
 
     const ctx = chartRef.current.getContext('2d');
@@ -92,9 +109,10 @@ export default function SIPCalculator({ onClose }: SIPCalculatorProps = {}) {
 
       for (let year = 1; year <= years; year++) {
         labels.push(`Year ${year}`);
-        investmentData.push((monthlyInvestment * 12 * year));
-        // Simplified calculation for chart
-        valueData.push((maturity / years) * year);
+        // Actual year-end figures from the SIP simulation — including step-up
+        // and compounding. Do not substitute a linear interpolation here.
+        investmentData.push(Math.round(yearlyInvested[year - 1] ?? 0));
+        valueData.push(Math.round(yearlyValue[year - 1] ?? 0));
       }
 
       chartInstance.current = new Chart(ctx, {
