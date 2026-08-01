@@ -1444,7 +1444,24 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
               />
             </div>
           ) : result && !user ? (
-            <ResultAuthGate toolName="Income Tax Calculator" />
+            // Everyone sees the headline figure they came for — the tax payable
+            // under whichever regime is cheaper for them. Sign-in buys the
+            // slab-by-slab working, the regime comparison and the PDF.
+            // Previously this gated the entire result, and 82% of people who
+            // signed up never completed a calculation.
+            <ResultAuthGate
+              toolName="Income Tax Calculator"
+              headline={{
+                label: `Your tax under the ${result.recommendedRegime === 'new' ? 'New' : 'Old'} Regime`,
+                value: `₹${(result.recommendedRegime === 'new'
+                  ? result.newRegime.totalTax
+                  : result.oldRegime.totalTax
+                ).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`,
+                hint: result.savings > 0
+                  ? `That's ₹${result.savings.toLocaleString('en-IN', { maximumFractionDigits: 0 })} less than the ${result.recommendedRegime === 'new' ? 'Old' : 'New'} Regime`
+                  : undefined,
+              }}
+            />
           ) : result ? (
             <div className="space-y-6">
               {/* Recommendation Banner — DS Callout style */}
@@ -1789,7 +1806,24 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
 
         <TabsContent value="breakdown" className="space-y-6">
           {result && !user ? (
-            <ResultAuthGate toolName="Income Tax Calculator" />
+            // Everyone sees the headline figure they came for — the tax payable
+            // under whichever regime is cheaper for them. Sign-in buys the
+            // slab-by-slab working, the regime comparison and the PDF.
+            // Previously this gated the entire result, and 82% of people who
+            // signed up never completed a calculation.
+            <ResultAuthGate
+              toolName="Income Tax Calculator"
+              headline={{
+                label: `Your tax under the ${result.recommendedRegime === 'new' ? 'New' : 'Old'} Regime`,
+                value: `₹${(result.recommendedRegime === 'new'
+                  ? result.newRegime.totalTax
+                  : result.oldRegime.totalTax
+                ).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`,
+                hint: result.savings > 0
+                  ? `That's ₹${result.savings.toLocaleString('en-IN', { maximumFractionDigits: 0 })} less than the ${result.recommendedRegime === 'new' ? 'Old' : 'New'} Regime`
+                  : undefined,
+              }}
+            />
           ) : result ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Old Regime Breakdown */}

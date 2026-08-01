@@ -23,23 +23,53 @@ import AuthModal from "@/components/AuthModal";
 interface ResultAuthGateProps {
   /** Human-readable tool name shown in the CTA copy, e.g. "HRA Calculator" */
   toolName: string;
+  /**
+   * The single headline figure, shown to EVERYONE before the gate.
+   *
+   * Why this exists (2026-08-01): gating the entire result was costing us most
+   * of our users. Firestore showed 123 signups but only 22 people who ever
+   * completed a calculation — 82% created an account and never saw a number.
+   * Google AdSense separately rejected the site for "low value content", which
+   * is what a reviewer would conclude after entering figures and being shown a
+   * login wall instead of a result.
+   *
+   * So the visitor now always gets the answer they came for. Sign-in buys the
+   * detailed breakdown, regime comparison, saved history and PDF — real extra
+   * value rather than withholding the basic one. Omit for tools where a single
+   * number doesn't make sense; the gate then behaves as before.
+   */
+  headline?: { label: string; value: string; hint?: string };
 }
 
-export default function ResultAuthGate({ toolName }: ResultAuthGateProps) {
+export default function ResultAuthGate({ toolName, headline }: ResultAuthGateProps) {
   const [modalTab, setModalTab] = useState<"login" | "signup" | null>(null);
 
   return (
     <Card className="border-2 border-blue-100 bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-50">
-      <CardContent className="py-10 px-6 text-center">
+      {headline && (
+        <div className="px-6 pt-8 pb-6 text-center border-b border-blue-100">
+          <div className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">
+            {headline.label}
+          </div>
+          <div className="text-4xl sm:text-5xl font-bold text-slate-900 tabular-nums">
+            {headline.value}
+          </div>
+          {headline.hint && (
+            <div className="text-xs text-slate-500 mt-2">{headline.hint}</div>
+          )}
+        </div>
+      )}
+      <CardContent className={headline ? "py-8 px-6 text-center" : "py-10 px-6 text-center"}>
         <div className="mx-auto w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mb-4">
           <Lock className="h-5 w-5 text-white" />
         </div>
         <h3 className="text-lg font-bold text-slate-800 mb-1">
-          Sign in to see your result
+          {headline ? "See the full breakdown" : "Sign in to see your result"}
         </h3>
         <p className="text-sm text-slate-600 mb-6 max-w-sm mx-auto">
-          Your {toolName} result is ready. Sign in or create a free AiTaxBot
-          account to view it — your inputs stay right here, nothing resets.
+          {headline
+            ? `Sign in free to see how this was calculated — slab-by-slab breakdown, old vs new regime comparison, and a downloadable PDF. Your inputs stay right here, nothing resets.`
+            : `Your ${toolName} result is ready. Sign in or create a free AiTaxBot account to view it — your inputs stay right here, nothing resets.`}
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Button
