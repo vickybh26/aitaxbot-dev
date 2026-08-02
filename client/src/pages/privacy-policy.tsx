@@ -180,7 +180,10 @@ export default function PrivacyPolicy() {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">3. Data Retention</h2>
               <ul className="list-disc pl-6 mb-4 text-gray-700 space-y-2">
-                <li><strong>Calculator inputs:</strong> Never stored — cleared immediately on session end</li>
+                <li><strong>Calculator inputs &amp; results (signed out):</strong> Never stored — cleared immediately on session end</li>
+                <li><strong>Calculator inputs &amp; results (signed in):</strong> Your most recent result for each calculator is saved to your account so it is waiting for you on your dashboard next time. Each new calculation replaces the previous one for that calculator. You can clear any of them from your dashboard at any time, and all of them are erased when you delete your account.</li>
+                <li><strong>AIS / 26AS / Form 16 documents:</strong> Never stored. Your uploaded PDFs are processed in memory and discarded as soon as your report is produced — they are never written to disk or to our database.</li>
+                <li><strong>AIS / 26AS / Form 16 report summary (signed in):</strong> We save only the outcome of your most recent check — the status, how many items need attention, and the short action list. This lets your dashboard remind you of what is still outstanding before you file. It is replaced each time you run a new check, and erased when you delete your account.</li>
                 <li><strong>User accounts:</strong> Retained until you delete your account</li>
                 <li><strong>Download leads:</strong> Retained for 90 days, then archived or deleted</li>
                 <li><strong>CA profiles:</strong> Retained while active; deleted within 7 days of removal request</li>
@@ -188,6 +191,15 @@ export default function PrivacyPolicy() {
                 <li><strong>Tax computation PDFs:</strong> Auto-deleted from our servers within 60 seconds of generation</li>
                 <li><strong>Server access logs:</strong> Retained for 30 days for security monitoring</li>
               </ul>
+
+              <div className="bg-blue-50 border-l-4 border-blue-400 p-4 text-sm text-blue-900">
+                <p className="font-semibold mb-1">The difference between your documents and your results</p>
+                <p>
+                  We keep the <strong>figures we calculated for you</strong>, so that your dashboard is useful when
+                  you return. We do not keep the <strong>documents you uploaded</strong>. Your AIS, Form 26AS and
+                  Form 16 files exist only for the few seconds it takes to read them, and are never saved.
+                </p>
+              </div>
             </section>
 
             {/* 4. Cookies */}

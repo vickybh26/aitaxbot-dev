@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import ProfileCompletionModal from "@/components/ProfileCompletionModal";
+import SavedResultCards from "@/components/SavedResultCards";
 import {
   Calculator,
   FileText,
@@ -429,6 +430,12 @@ export default function Dashboard() {
             </div>
           )}
         </div>
+
+        {/* ── WHERE YOU LEFT OFF ──
+            Deliberately the first thing below the welcome banner: it's the only
+            section on this page that is about THIS user rather than about the
+            product. Renders nothing when there's nothing saved yet. */}
+        <SavedResultCards />
 
         {/* ── ITR DEADLINE COUNTDOWN ── */}
         {(() => {

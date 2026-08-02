@@ -137,7 +137,22 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
     setActiveTab("results");
     setIsCalculating(false);
     fetch('/api/stats/track-calculation', { method: 'POST' }).catch(() => {});
-    trackTool("HRA Calculator", `HRA exempt: ₹${hraResult.hraExemption.toLocaleString('en-IN')}`);
+    const rsHra = (n: number) => `₹${Math.round(n).toLocaleString('en-IN')}`;
+    trackTool("HRA Calculator", `HRA exempt: ${rsHra(hraResult.hraExemption)}`, {
+      toolKey: "hra",
+      route: "/calculators/hra",
+      kind: "calculator",
+      headline: {
+        label: "HRA exempt from tax",
+        value: rsHra(hraResult.hraExemption),
+        hint: `${cityType === 'metro' ? 'Metro' : 'Non-metro'} city`,
+      },
+      details: [
+        { label: "Taxable HRA", value: rsHra(hraResult.taxableHRA) },
+        { label: "Exempt share", value: `${Math.round(hraResult.exemptionPercentage)}%` },
+      ],
+      inputs: { cityType },
+    });
   };
 
   const generateRecommendations = (hraResult: HRAResult) => {

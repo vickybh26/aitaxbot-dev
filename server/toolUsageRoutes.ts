@@ -3,21 +3,28 @@
  *
  * POST /api/tool-usage        — log one tool-use event (authenticated)
  * GET  /api/tool-usage        — fetch last 50 events for the current user
+ *
+ * POST additionally upserts the user's "last result" card for the dashboard
+ * when the client sends a `saved` payload. Piggy-backing on this endpoint is
+ * deliberate: every calculator already calls it through useTrackToolUse(), so
+ * persistence arrives everywhere at once instead of needing a separate save
+ * call bolted onto nine different components (and forgotten in one of them).
  */
 
 import { Router } from "express";
 import { randomUUID } from "crypto";
 import { getFirestore } from "./firebase";
 import { COLLECTIONS } from "./firestoreHelper";
+import { saveLastResult, type SavedResultInput } from "./savedResults";
 import { authenticateFirebaseToken, type AuthenticatedRequest } from "./middleware/auth.js";
 
 const router = Router();
 
 // ─── POST /api/tool-usage ──────────────────────────────────────────────────
-// Body: { tool: string, route?: string, summary?: string }
+// Body: { tool: string, route?: string, summary?: string, saved?: SavedResultInput }
 router.post("/", authenticateFirebaseToken, async (req: AuthenticatedRequest, res) => {
   try {
-    const { tool, route, summary } = req.body;
+    const { tool, route, summary, saved } = req.body;
     if (!tool || typeof tool !== "string") {
       return res.status(400).json({ error: "tool name required" });
     }
@@ -34,6 +41,17 @@ router.post("/", authenticateFirebaseToken, async (req: AuthenticatedRequest, re
       summary: summary ? String(summary).slice(0, 300) : null,
       createdAt: now,
     });
+
+    // Upsert the dashboard card. saveLastResult() sanitises the payload and
+    // swallows its own errors, so a malformed or oversized `saved` object can
+    // never turn a successful calculation into a failed request.
+    if (saved && typeof saved === "object" && typeof saved.toolKey === "string") {
+      await saveLastResult(req.userId!, {
+        ...(saved as SavedResultInput),
+        route: saved.route || (route ? String(route) : ""),
+        toolName: saved.toolName || String(tool),
+      });
+    }
 
     return res.status(201).json({ success: true, id });
   } catch (err) {

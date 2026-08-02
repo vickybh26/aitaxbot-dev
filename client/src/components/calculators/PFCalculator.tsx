@@ -162,7 +162,17 @@ export default function PFCalculator() {
     });
     fetch('/api/stats/track-calculation', { method: 'POST' }).catch(() => {});
     const pfCorpus = yearlyGrowth[yearlyGrowth.length - 1]?.closingBalance || 0;
-    trackTool("PF Calculator", `Corpus: ₹${Math.round(pfCorpus).toLocaleString('en-IN')}`);
+    const rsPf = (n: number) => `₹${Math.round(n).toLocaleString('en-IN')}`;
+    trackTool("PF Calculator", `Corpus: ${rsPf(pfCorpus)}`, {
+      toolKey: "pf",
+      route: "/calculators/pf",
+      kind: "calculator",
+      headline: { label: "PF corpus at retirement", value: rsPf(pfCorpus) },
+      details: [
+        { label: "Your contribution", value: rsPf(totalEmployeeContrib) },
+        { label: "Interest earned", value: rsPf(totalInterest) },
+      ],
+    });
 
     setActiveTab("results");
     updateChart(yearlyGrowth);

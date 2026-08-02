@@ -123,7 +123,17 @@ export default function VehicleLoanCalculator() {
       flatInterest: flat.interest,
       flatTotal: flat.total,
     });
-    trackTool("Vehicle Loan Calculator", `EMI: ₹${Math.round(active.emi).toLocaleString('en-IN')}`);
+    const rsVl = (n: number) => `₹${Math.round(n).toLocaleString('en-IN')}`;
+    trackTool("Vehicle Loan Calculator", `EMI: ${rsVl(active.emi)}`, {
+      toolKey: "vehicle-loan",
+      route: "/calculators/vehicle-loan",
+      kind: "calculator",
+      headline: { label: "Monthly EMI", value: rsVl(active.emi) },
+      details: [
+        { label: "Total interest", value: rsVl(active.interest) },
+        { label: "Total payment", value: rsVl(active.total) },
+      ],
+    });
   };
 
   const d = DEFAULTS[vehicleType];

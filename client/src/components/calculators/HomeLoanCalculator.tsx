@@ -85,7 +85,17 @@ export default function HomeLoanCalculator() {
       annualTaxSaving30,
       annualTaxSaving20,
     });
-    trackTool("Home Loan Calculator", `EMI: ₹${Math.round(emi).toLocaleString('en-IN')}`);
+    const rsHl = (n: number) => `₹${Math.round(n).toLocaleString('en-IN')}`;
+    trackTool("Home Loan Calculator", `EMI: ${rsHl(emi)}`, {
+      toolKey: "home-loan",
+      route: "/calculators/home-loan",
+      kind: "calculator",
+      headline: { label: "Monthly EMI", value: rsHl(emi) },
+      details: [
+        { label: "Loan amount", value: rsHl(loanAmount) },
+        { label: "Total interest", value: rsHl(totalInterest) },
+      ],
+    });
   };
 
   const loanAmount = Math.max(0, propertyPrice - downPayment);

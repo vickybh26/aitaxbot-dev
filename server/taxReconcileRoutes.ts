@@ -11,6 +11,7 @@ import { reconcileTaxDocuments, type ReconciliationReport } from "./taxReconcile
 import { authenticateFirebaseToken, type AuthenticatedRequest } from "./middleware/auth.js";
 import { logoWhiteBuffer, watermarkBuffer } from "./assets/logoAssets.js";
 import { fontRegular, fontBold } from "./assets/pdfFonts.js";
+import { saveLastResult } from "./savedResults.js";
 import { buildSummaryRows, type SummaryRow } from "@shared/reconcileSummaryRows";
 
 // ─── Multer: memory storage, up to 5 PDFs (AIS + 26AS + up to 3 Form 16s), 10 MB each ──
@@ -485,6 +486,59 @@ export function registerTaxReconcileRoutes(app: Express): void {
         };
 
         const report = await reconcileTaxDocuments(aisBuf, form26asBuf, form16Bufs, passwords);
+
+        // Persist a summary card for the dashboard.
+        //
+        // What goes to Firestore: the status, how many issues were found, and
+        // the first few action items as plain sentences. What does NOT: the
+        // uploaded PDFs (already discarded — they only ever existed in memory
+        // via multer), the extracted figure set, or the AI narrative. The
+        // tool's promise that documents are not stored therefore still holds
+        // exactly as written.
+        //
+        // Awaited rather than fire-and-forget so a returning user never lands
+        // on the dashboard microseconds later and sees a stale card, but it
+        // cannot fail the request — saveLastResult() catches internally.
+
+        // Label and value are both derived from the SAME source (the mismatch
+        // count), with overallStatus only setting the tone. Deriving them
+        // independently allowed a self-contradicting card — "No issues found"
+        // sitting directly above "3 items to resolve" — whenever the status
+        // came back CLEAN but low-severity mismatches existed. On a tax tool
+        // that reads as a bug in the reconciliation itself.
+        const issueCount = report.mismatches.length;
+        const statusLabel =
+          issueCount === 0
+            ? "No issues found"
+            : report.overallStatus === "CRITICAL"
+            ? "Needs urgent attention"
+            : "Needs attention";
+
+        await saveLastResult(req.userId!, {
+          toolKey: "ais",
+          toolName: "AIS / 26AS / Form 16 Check",
+          route: "/tools/ais-26as-form16",
+          kind: "reconciliation",
+          headline: {
+            label: statusLabel,
+            value:
+              issueCount === 0
+                ? "Ready to file"
+                : `${issueCount} item${issueCount === 1 ? "" : "s"} to resolve`,
+            hint: `Checked ${[
+              report.documentsProvided?.ais && "AIS",
+              report.documentsProvided?.form26as && "26AS",
+              report.documentsProvided?.form16 && "Form 16",
+            ]
+              .filter(Boolean)
+              .join(" · ") || "your documents"}`,
+          },
+          details: report.actionItems.slice(0, 4).map((item) => ({
+            label: "",
+            value: item,
+          })),
+        });
+
         return res.json({ success: true, report });
       } catch (err) {
         console.error("[tax-reconcile] Error:", err);

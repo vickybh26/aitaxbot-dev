@@ -89,7 +89,17 @@ export default function NPSCalculator() {
       totalTaxSaving: tax80CCD1 + tax80CCD1B + tax80CCD2
     });
     fetch('/api/stats/track-calculation', { method: 'POST' }).catch(() => {});
-    trackTool("NPS Calculator", `Corpus: ₹${Math.round(totalCorpus).toLocaleString('en-IN')}`);
+    const rsNps = (n: number) => `₹${Math.round(n).toLocaleString('en-IN')}`;
+    trackTool("NPS Calculator", `Corpus: ${rsNps(totalCorpus)}`, {
+      toolKey: "nps",
+      route: "/calculators/nps",
+      kind: "calculator",
+      headline: { label: "Corpus at retirement", value: rsNps(totalCorpus) },
+      details: [
+        { label: "Monthly pension", value: rsNps(monthlyPension) },
+        { label: "Tax saved", value: rsNps(tax80CCD1 + tax80CCD1B + tax80CCD2) },
+      ],
+    });
   };
 
   useEffect(() => {

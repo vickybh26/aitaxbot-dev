@@ -13,6 +13,8 @@ import whatsappRoutes from "./whatsapp/whatsappRoutes";
 import caRoutes from "./caRoutes";
 import leadRoutes from "./leadRoutes";
 import toolUsageRoutes from "./toolUsageRoutes";
+import savedResultsRoutes from "./savedResultsRoutes";
+import { deleteAllSavedResults } from "./savedResults";
 import { registerTaxReconcileRoutes } from "./taxReconcileRoutes.js";
 import ragRoutes from "./ragRoutes";
 import { getFirestore, verifyFirebaseToken, admin } from "./firebase";
@@ -299,6 +301,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api/ca", caRoutes);
   app.use("/api/leads", leadRoutes);
   app.use("/api/tool-usage", toolUsageRoutes);
+  app.use("/api/saved-results", savedResultsRoutes);
   registerTaxReconcileRoutes(app);
 
   // Client debug logger endpoint
@@ -624,10 +627,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // verified Firebase ID token (req.userId), never from the request body or
   // params, so there's no way to point this at someone else's account.
   // Deletes: the Firestore user profile, profile change logs, saved tax
-  // calculation history, admin CRM notes about this user, and the actual
-  // Firebase Auth account (so the person can no longer sign back in — the
-  // admin-side delete at DELETE /api/admin/users/:id previously missed this
-  // last step and should be reconciled to match).
+  // calculation history, the "last result" dashboard cards, per-tool usage
+  // events, admin CRM notes about this user, and the actual Firebase Auth
+  // account (so the person can no longer sign back in — the admin-side delete
+  // at DELETE /api/admin/users/:id previously missed this last step and should
+  // be reconciled to match).
+  //
+  // IMPORTANT: any new per-user collection must be added here as well. Erasure
+  // that misses a collection is worse than no erasure feature, because we have
+  // told the user in the Privacy Policy that their data is gone.
   app.delete("/api/user/account", authenticateFirebaseToken, async (req: AuthenticatedRequest, res) => {
     const uid = req.userId!;
     try {
@@ -635,13 +643,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const logsSnap = await db.collection("userProfileLogs").where("userId", "==", uid).get();
       const calcSnap = await db.collection("taxCalculationHistory").where("userId", "==", uid).get();
+      const usageSnap = await db.collection("toolUsage").where("userId", "==", uid).get();
 
       const batch = db.batch();
       logsSnap.docs.forEach((d) => batch.delete(d.ref));
       calcSnap.docs.forEach((d) => batch.delete(d.ref));
+      usageSnap.docs.forEach((d) => batch.delete(d.ref));
       batch.delete(db.collection("crmNotes").doc(uid));
       batch.delete(db.collection("users").doc(uid));
       await batch.commit();
+
+      // Saved dashboard results — includes the reconciliation summary, which
+      // is the most sensitive thing we retain, so it goes in the same pass.
+      await deleteAllSavedResults(uid);
 
       // Remove the Firebase Auth account itself last, so a failure above
       // leaves the person still able to log in (fail-safe) rather than

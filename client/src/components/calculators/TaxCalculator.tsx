@@ -508,7 +508,39 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
     fetch('/api/stats/track-calculation', { method: 'POST' }).catch(() => {});
     const recLabel = recommendedRegime === 'new' ? 'New Regime' : 'Old Regime';
     const recTaxAmt = recommendedRegime === 'new' ? newRegimeResult.totalTax : oldRegimeResult.totalTax;
-    trackTool("Income Tax Calculator", `${recLabel}: ₹${Math.round(recTaxAmt).toLocaleString('en-IN')} tax`);
+    const rs = (n: number) => `₹${Math.round(n).toLocaleString('en-IN')}`;
+    // Third argument persists a "last result" card on the dashboard. Inputs are
+    // stored alongside the figures so reopening the calculator restores what
+    // the person typed rather than making them enter it all again next year.
+    trackTool(
+      "Income Tax Calculator",
+      `${recLabel}: ${rs(recTaxAmt)} tax`,
+      {
+        toolKey: "income-tax",
+        route: "/calculators/income-tax",
+        kind: "calculator",
+        headline: {
+          label: `Your tax · ${recLabel}`,
+          value: rs(recTaxAmt),
+          hint: savings > 0
+            ? `${rs(savings)} less than the ${recommendedRegime === 'new' ? 'Old' : 'New'} Regime`
+            : undefined,
+        },
+        details: [
+          { label: "Gross income", value: rs(oldRegimeResult.grossIncome) },
+          { label: "Old Regime tax", value: rs(oldRegimeResult.totalTax) },
+          { label: "New Regime tax", value: rs(newRegimeResult.totalTax) },
+        ],
+        inputs: {
+          ageGroup: formData.ageGroup,
+          salaryIncome: formData.salaryIncome,
+          housePropertyIncome: formData.housePropertyIncome,
+          businessIncome: formData.businessIncome,
+          capitalGainsIncome: formData.capitalGainsIncome,
+          otherIncome: formData.otherIncome,
+        },
+      }
+    );
 
     // Get AI advice via Firebase AI Logic (client-side Gemini) with server fallback
     setAiAdvice(null);

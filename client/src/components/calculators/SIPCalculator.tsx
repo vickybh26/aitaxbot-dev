@@ -82,7 +82,26 @@ export default function SIPCalculator({ onClose }: SIPCalculatorProps = {}) {
       wealthGain
     });
     fetch('/api/stats/track-calculation', { method: 'POST' }).catch(() => {});
-    trackTool("SIP Calculator", `Maturity: ₹${Math.round(maturityValue).toLocaleString('en-IN')}`);
+    const rs = (n: number) => `₹${Math.round(n).toLocaleString('en-IN')}`;
+    trackTool(
+      "SIP Calculator",
+      `Maturity: ${rs(maturityValue)}`,
+      {
+        toolKey: "sip",
+        route: "/calculators/sip",
+        kind: "calculator",
+        headline: {
+          label: `Maturity after ${years} years`,
+          value: rs(maturityValue),
+          hint: `${rs(monthlyInvestment)}/month at ${annualReturn}%`,
+        },
+        details: [
+          { label: "You invest", value: rs(totalInvestment) },
+          { label: "Returns", value: rs(totalReturns) },
+        ],
+        inputs: { monthlyInvestment, annualReturn, years, stepUp },
+      }
+    );
 
     // Update chart
     updateChart(yearlyInvested, yearlyValue);

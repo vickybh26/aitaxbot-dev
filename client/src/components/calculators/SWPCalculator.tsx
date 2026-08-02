@@ -88,7 +88,21 @@ export default function SWPCalculator({ onClose }: SWPCalculatorProps = {}) {
       yearlySnapshots: yearlySnapshots.slice(0, 10), // Show first 10 years
     });
     fetch('/api/stats/track-calculation', { method: 'POST' }).catch(() => {});
-    trackTool("SWP Calculator", `Monthly withdrawal: ₹${monthlyWithdrawal.toLocaleString('en-IN')}`);
+    const rsSwp = (n: number) => `₹${Math.round(n).toLocaleString('en-IN')}`;
+    trackTool("SWP Calculator", `Monthly withdrawal: ${rsSwp(monthlyWithdrawal)}`, {
+      toolKey: "swp",
+      route: "/calculators/swp",
+      kind: "calculator",
+      headline: {
+        label: "Monthly withdrawal",
+        value: rsSwp(monthlyWithdrawal),
+        hint: `Corpus lasts ${durationYears}y ${durationMonths}m`,
+      },
+      details: [
+        { label: "Total withdrawn", value: rsSwp(totalWithdrawals) },
+        { label: "Corpus left", value: rsSwp(Math.max(0, corpus)) },
+      ],
+    });
   };
 
   useEffect(() => {
