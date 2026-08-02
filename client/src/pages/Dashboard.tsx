@@ -298,8 +298,8 @@ export default function Dashboard() {
       value: statsLoading ? "..." : (stats?.clientsCount || 0).toString(),
       icon: Building2,
       change: stats?.clientsCount ? "Managed clients" : "Add your first client",
-      color: "text-purple-600",
-      bgColor: "bg-purple-50"
+      color: "text-persian-blue-700",
+      bgColor: "bg-persian-blue-50"
     },
     {
       title: "Total Revenue",
@@ -318,15 +318,15 @@ export default function Dashboard() {
       icon: Calculator,
       link: "/calculators/income-tax",
       color: "text-blue-600",
-      bgGradient: "from-blue-500 to-blue-600"
+      bgGradient: "from-blue-500 to-persian-blue-600"
     },
     {
       title: "AIS Reconciliation",
       description: "Verify your income across AIS, 26AS & Form 16 before filing",
       icon: Layers,
       link: "/tools/ais-26as-form16",
-      color: "text-indigo-600",
-      bgGradient: "from-indigo-500 to-indigo-600",
+      color: "text-persian-blue-700",
+      bgGradient: "from-persian-blue-600 to-persian-blue-700",
       badge: "New"
     },
     {
@@ -334,8 +334,8 @@ export default function Dashboard() {
       description: "34 CA-reviewed articles on ITR, HRA, capital gains & more",
       icon: BookOpen,
       link: "/blog",
-      color: "text-purple-600",
-      bgGradient: "from-purple-500 to-purple-600"
+      color: "text-persian-blue-700",
+      bgGradient: "from-persian-blue-600 to-persian-blue-700"
     },
     {
       title: "Find a CA",
@@ -393,7 +393,7 @@ export default function Dashboard() {
 
         {/* Welcome Banner */}
         <div className="mb-8">
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white mb-4 flex items-center justify-between gap-4 flex-wrap">
+          <div className="bg-gradient-to-r from-persian-blue-600 to-persian-blue-700 rounded-2xl p-6 text-white mb-4 flex items-center justify-between gap-4 flex-wrap">
             <div className="flex items-center gap-4">
               {user?.photoURL ? (
                 <img src={user.photoURL} alt="Avatar" className="w-14 h-14 rounded-full border-2 border-white/40" />
@@ -471,9 +471,9 @@ export default function Dashboard() {
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {[
-              { step: 1, title: "AIS Reconciliation", desc: "Verify your income matches AIS & Form 16", href: "/tools/ais-26as-form16", badge: "Start here", icon: Search, from: "from-indigo-500", to: "to-indigo-600" },
-              { step: 2, title: "Compare Regimes", desc: "Old vs New — find which saves you more", href: "/calculators/income-tax", badge: null, icon: Calculator, from: "from-blue-500", to: "to-blue-600" },
-              { step: 3, title: "Claim Deductions", desc: "HRA, 80C, NPS, home loan — don't miss any", href: "/calculators/hra", badge: null, icon: Target, from: "from-purple-500", to: "to-purple-600" },
+              { step: 1, title: "AIS Reconciliation", desc: "Verify your income matches AIS & Form 16", href: "/tools/ais-26as-form16", badge: "Start here", icon: Search, from: "from-persian-blue-600", to: "to-persian-blue-700" },
+              { step: 2, title: "Compare Regimes", desc: "Old vs New — find which saves you more", href: "/calculators/income-tax", badge: null, icon: Calculator, from: "from-blue-500", to: "to-persian-blue-600" },
+              { step: 3, title: "Claim Deductions", desc: "HRA, 80C, NPS, home loan — don't miss any", href: "/calculators/hra", badge: null, icon: Target, from: "from-persian-blue-600", to: "to-persian-blue-700" },
               { step: 4, title: "File ITR by Jul 31", desc: "Step-by-step guide for ITR-1 & ITR-4", href: "/blog/how-to-file-itr-1-online-fy-2025-26", badge: null, icon: FileText, from: "from-green-500", to: "to-green-600" },
             ].map(({ step, title, desc, href, badge, icon: Icon, from, to }) => (
               <Link key={step} href={href}>
@@ -483,7 +483,7 @@ export default function Dashboard() {
                       <Icon className="w-3.5 h-3.5 text-white" />
                     </div>
                     <span className="text-xs font-bold text-slate-400">Step {step}</span>
-                    {badge && <span className="ml-auto text-[10px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-1.5 py-0.5 rounded-full">{badge}</span>}
+                    {badge && <span className="ml-auto text-[10px] font-bold text-persian-blue-800 bg-persian-blue-50 border border-persian-blue-100 px-1.5 py-0.5 rounded-full">{badge}</span>}
                   </div>
                   <p className="text-sm font-bold text-slate-900 mb-1">{title}</p>
                   <p className="text-xs text-slate-500 leading-snug">{desc}</p>
@@ -530,7 +530,7 @@ export default function Dashboard() {
               },
               {
                 icon: Layers, label: "AIS Reconciliation", color: "indigo",
-                bg: "bg-indigo-50", iconColor: "text-indigo-600", border: "border-indigo-100",
+                bg: "bg-persian-blue-50", iconColor: "text-persian-blue-700", border: "border-persian-blue-100",
                 amount: "Avoid Notices", sub: "Match AIS · 26AS · Form 16",
                 taxSaved: "Spot mismatches before filing",
                 href: "/tools/ais-26as-form16", cta: "Run Free →", badge: "New"
@@ -541,7 +541,7 @@ export default function Dashboard() {
                   <div className={`w-9 h-9 rounded-xl ${bg} flex items-center justify-center`}>
                     <Icon className={`w-4.5 h-4.5 ${iconColor}`} />
                   </div>
-                  {badge && <span className="text-[10px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-1.5 py-0.5 rounded-full">{badge}</span>}
+                  {badge && <span className="text-[10px] font-bold text-persian-blue-800 bg-persian-blue-50 border border-persian-blue-100 px-1.5 py-0.5 rounded-full">{badge}</span>}
                 </div>
                 <div>
                   <p className="text-xs font-semibold text-slate-500 mb-0.5">{label}</p>
@@ -704,7 +704,7 @@ export default function Dashboard() {
                           <div className="flex items-center gap-2">
                             <CardTitle className="text-lg">{feature.title}</CardTitle>
                             {(feature as any).badge && (
-                              <span className="text-[10px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-1.5 py-0.5 rounded-full">{(feature as any).badge}</span>
+                              <span className="text-[10px] font-bold text-persian-blue-800 bg-persian-blue-50 border border-persian-blue-100 px-1.5 py-0.5 rounded-full">{(feature as any).badge}</span>
                             )}
                           </div>
                           <CardDescription className="mt-1">
@@ -806,8 +806,8 @@ export default function Dashboard() {
                       ${item.past        ? 'bg-green-500'  :
                         item.color === 'amber'  ? 'bg-amber-500'  :
                         item.color === 'blue'   ? 'bg-blue-600'   :
-                        item.color === 'purple' ? 'bg-purple-600' :
-                        item.color === 'indigo' ? 'bg-indigo-600' : 'bg-red-500'}`}>
+                        item.color === 'purple' ? 'bg-persian-blue-700' :
+                        item.color === 'indigo' ? 'bg-persian-blue-700' : 'bg-red-500'}`}>
                       {item.past ? '✓' : <Calendar className="w-4 h-4" />}
                     </div>
                     <div>

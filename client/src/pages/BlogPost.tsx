@@ -399,7 +399,7 @@ export default function BlogPost() {
 
               if (section.type === 'cta') {
                 sectionContent = (
-                  <Card key={index} className="p-8 mb-8 bg-gradient-to-r from-blue-600 to-green-600 text-white" data-testid="cta-section">
+                  <Card key={index} className="p-8 mb-8 bg-gradient-to-r from-persian-blue-600 to-green-600 text-white" data-testid="cta-section">
                     <div className="mb-6 text-white">
                       {section.content_md && renderMarkdown(section.content_md)}
                     </div>

@@ -137,7 +137,7 @@ export default function Profile() {
 
           {/* Header card */}
           <Card className="overflow-hidden">
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-8 text-white">
+            <div className="bg-gradient-to-r from-persian-blue-600 to-persian-blue-700 px-6 py-8 text-white">
               <div className="flex items-center gap-4">
                 {user?.photoURL ? (
                   <img src={user.photoURL} alt="Profile" className="w-16 h-16 rounded-full border-2 border-white/50" />

@@ -96,7 +96,7 @@ export default function CARegister() {
 
   if (submitted) {
     return (
-      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-6">
+      <div className="bg-gradient-to-br from-blue-50 to-persian-blue-50 flex items-center justify-center p-6">
         <div className="bg-white rounded-2xl shadow-lg p-10 max-w-md w-full text-center">
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <CheckCircle2 className="w-8 h-8 text-green-600" />
@@ -124,7 +124,7 @@ export default function CARegister() {
         />
       </Helmet>
 
-      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 py-12 px-4">
+      <div className="bg-gradient-to-br from-blue-50 to-persian-blue-50 py-12 px-4">
         <div className="max-w-2xl mx-auto">
 
           {/* Header */}
@@ -247,8 +247,8 @@ export default function CARegister() {
                     onClick={() => toggleLang(lang)}
                     className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-all ${
                       selectedLangs.includes(lang)
-                        ? "bg-indigo-600 text-white border-indigo-600"
-                        : "bg-white text-slate-600 border-slate-200 hover:border-indigo-400"
+                        ? "bg-persian-blue-700 text-white border-persian-blue-700"
+                        : "bg-white text-slate-600 border-slate-200 hover:border-persian-blue-400"
                     }`}
                   >
                     {lang}

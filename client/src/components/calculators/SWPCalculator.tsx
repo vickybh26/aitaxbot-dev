@@ -215,7 +215,7 @@ export default function SWPCalculator({ onClose }: SWPCalculatorProps = {}) {
               <div className="grid grid-cols-2 gap-3">
                 <Card className="bg-white p-4">
                   <div className="text-xs text-gray-500">Starting Withdrawal/mo</div>
-                  <div className="text-lg font-bold text-purple-600" data-testid="text-monthly-withdrawal">
+                  <div className="text-lg font-bold text-persian-blue-700" data-testid="text-monthly-withdrawal">
                     {formatCurrency(result.startingMonthlyWithdrawal)}
                   </div>
                 </Card>
@@ -274,7 +274,7 @@ export default function SWPCalculator({ onClose }: SWPCalculatorProps = {}) {
                   {result.yearlySnapshots.map((snap) => (
                     <tr key={snap.year} className="border-b border-gray-100">
                       <td className="py-1.5 text-gray-600">Yr {snap.year}</td>
-                      <td className="py-1.5 text-right font-medium text-purple-700">
+                      <td className="py-1.5 text-right font-medium text-persian-blue-800">
                         {formatCurrency(snap.withdrawal)}
                       </td>
                       <td className="py-1.5 text-right text-gray-600">

@@ -68,13 +68,13 @@ export default function About() {
                   <p className="text-gray-700">Calculate STCG and LTCG on equity, F&amp;O, and crypto trades. Understand your US stocks tax liability under DTAA.</p>
                 </div>
 
-                <div className="bg-purple-50 rounded-lg p-6">
-                  <h3 className="text-xl font-semibold text-purple-900 mb-3">🔍 Find a CA — Free Directory</h3>
+                <div className="bg-persian-blue-50 rounded-lg p-6">
+                  <h3 className="text-xl font-semibold text-persian-blue-900 mb-3">🔍 Find a CA — Free Directory</h3>
                   <p className="text-gray-700">Browse verified Chartered Accountants across India by city and specialisation. Send enquiries directly — no platform fee, ever.</p>
                 </div>
 
-                <div className="bg-indigo-50 rounded-lg p-6">
-                  <h3 className="text-xl font-semibold text-indigo-900 mb-3">📰 Tax Blog & Guides</h3>
+                <div className="bg-persian-blue-50 rounded-lg p-6">
+                  <h3 className="text-xl font-semibold text-persian-blue-900 mb-3">📰 Tax Blog & Guides</h3>
                   <p className="text-gray-700">Simplified explanations of ITR filing, ITA 2025 changes, HRA rules, capital gains, 80C deductions — written in plain English.</p>
                 </div>
               </div>
@@ -110,8 +110,8 @@ export default function About() {
                 </div>
 
                 <div className="flex items-start space-x-4">
-                  <div className="bg-purple-100 rounded-full p-2 mt-1 flex-shrink-0">
-                    <svg className="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                  <div className="bg-persian-blue-100 rounded-full p-2 mt-1 flex-shrink-0">
+                    <svg className="w-5 h-5 text-persian-blue-700" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                     </svg>
                   </div>
@@ -209,7 +209,7 @@ export default function About() {
             {/* Our Vision */}
             <section className="mb-10">
               <h2 className="text-2xl font-semibold text-gray-900 mb-6">Our Vision</h2>
-              <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-8">
+              <div className="bg-gradient-to-r from-blue-50 to-persian-blue-50 rounded-lg p-8">
                 <p className="text-lg text-gray-800 leading-relaxed">
                   To become India's most trusted free tax and finance platform — empowering every Indian taxpayer
                   to file with confidence, plan with clarity, and never overpay a rupee.

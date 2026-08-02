@@ -546,7 +546,7 @@ export default function PFCalculator() {
                       <div className="text-xs text-slate-600">Employer EPF</div>
                     </div>
                     <div className="text-center p-3 bg-white rounded-lg border">
-                      <div className="text-lg font-bold text-purple-600">{formatCurrency(result.totalVPF)}</div>
+                      <div className="text-lg font-bold text-persian-blue-700">{formatCurrency(result.totalVPF)}</div>
                       <div className="text-xs text-slate-600">VPF Amount</div>
                     </div>
                     <div className="text-center p-3 bg-white rounded-lg border">
@@ -588,7 +588,7 @@ export default function PFCalculator() {
                     {vpfPercent > 0 && (
                       <div className="flex justify-between">
                         <span className="text-sm">{`VPF (${vpfPercent}%):`}</span>
-                        <span className="font-medium text-purple-600">{formatCurrencyFull(result.vpfMonthly)}</span>
+                        <span className="font-medium text-persian-blue-700">{formatCurrencyFull(result.vpfMonthly)}</span>
                       </div>
                     )}
                     <Separator />
@@ -674,7 +674,7 @@ export default function PFCalculator() {
                           <td className="p-3 text-right text-slate-600">{formatCurrency(row.openingBalance)}</td>
                           <td className="p-3 text-right text-blue-600">{formatCurrency(row.employeeContribution)}</td>
                           <td className="p-3 text-right text-green-600">{formatCurrency(row.employerContribution)}</td>
-                          {vpfPercent > 0 && <td className="p-3 text-right text-purple-600">{formatCurrency(row.vpfContribution)}</td>}
+                          {vpfPercent > 0 && <td className="p-3 text-right text-persian-blue-700">{formatCurrency(row.vpfContribution)}</td>}
                           <td className="p-3 text-right text-amber-600">{formatCurrency(row.interest)}</td>
                           <td className="p-3 text-right font-bold text-persian-blue-700">{formatCurrency(row.closingBalance)}</td>
                         </tr>
@@ -686,7 +686,7 @@ export default function PFCalculator() {
                         <td className="p-3 text-right">-</td>
                         <td className="p-3 text-right text-blue-700">{formatCurrency(result.totalEmployeeContribution)}</td>
                         <td className="p-3 text-right text-green-700">{formatCurrency(result.totalEmployerContribution)}</td>
-                        {vpfPercent > 0 && <td className="p-3 text-right text-purple-700">{formatCurrency(result.totalVPF)}</td>}
+                        {vpfPercent > 0 && <td className="p-3 text-right text-persian-blue-800">{formatCurrency(result.totalVPF)}</td>}
                         <td className="p-3 text-right text-amber-700">{formatCurrency(result.totalInterestEarned)}</td>
                         <td className="p-3 text-right text-persian-blue-800">{formatCurrency(result.totalCorpus)}</td>
                       </tr>

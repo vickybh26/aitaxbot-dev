@@ -71,7 +71,7 @@ const TOOLS = [
   { icon: FileText,   name: "Rent Receipt Generator", desc: "Generate stamped, AO-ready rent receipts as PDFs instantly.",           href: "/tools/rent-receipt",      color: "text-orange-500",       bg: "bg-orange-50"        },
   { icon: Layers,     name: "AIS · 26AS · Form 16", desc: "AI spots mismatches across all three documents before notices.", href: "/tools/ais-26as-form16", color: "text-persian-blue-600", bg: "bg-persian-blue-50", badge: "New" },
   { icon: UserCheck,  name: "Find a Verified CA",     desc: "Free introductions — capital gains, NRI filing, notice response.",      href: "/find-ca",                 color: "text-green-600",        bg: "bg-green-50"         },
-  { icon: BookOpen,   name: "Tax Guides & Blog",      desc: "34 in-depth articles on ITR, HRA, capital gains, and IT Act 2025.",    href: "/blog",                    color: "text-indigo-600",       bg: "bg-indigo-50"        },
+  { icon: BookOpen,   name: "Tax Guides & Blog",      desc: "34 in-depth articles on ITR, HRA, capital gains, and IT Act 2025.",    href: "/blog",                    color: "text-persian-blue-700",       bg: "bg-persian-blue-50"        },
 ] as const;
 
 function slab(income: number, tiers: [number, number][]): number {

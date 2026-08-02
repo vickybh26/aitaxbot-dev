@@ -131,7 +131,7 @@ export default function TaxDownloadModal({
       <div className="relative z-10 w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
 
         {/* Gradient header */}
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 pt-6 pb-8">
+        <div className="bg-gradient-to-r from-persian-blue-600 to-persian-blue-700 px-6 pt-6 pb-8">
           <button
             onClick={handleClose}
             className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors"
@@ -341,18 +341,18 @@ export default function TaxDownloadModal({
                 </p>
               </div>
 
-              <div className="bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-100 rounded-xl p-5 space-y-3">
-                <div className="flex items-center gap-2 text-indigo-700 font-semibold">
+              <div className="bg-gradient-to-br from-persian-blue-50 to-blue-50 border border-persian-blue-100 rounded-xl p-5 space-y-3">
+                <div className="flex items-center gap-2 text-persian-blue-800 font-semibold">
                   <Sparkles className="h-4 w-4" />
                   <span className="text-sm">Create your free AiTaxBot account</span>
                 </div>
-                <ul className="text-sm text-indigo-700 space-y-1 list-none pl-0">
+                <ul className="text-sm text-persian-blue-800 space-y-1 list-none pl-0">
                   <li className="flex items-center gap-2">✓ Save & revisit all your calculations</li>
                   <li className="flex items-center gap-2">✓ Get personalised tax-saving tips</li>
                   <li className="flex items-center gap-2">✓ Download PDFs directly — no form needed</li>
                 </ul>
                 <a href={signUpUrl}>
-                  <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">
+                  <Button className="w-full bg-persian-blue-700 hover:bg-persian-blue-800 text-white font-semibold">
                     Create Free Account
                     <ArrowRight className="h-4 w-4 ml-2" />
                   </Button>

@@ -199,8 +199,8 @@ export default function Header({ showModal }: HeaderProps = {}) {
                       {t("nav.profile")}
                     </Link>
                     {adminLevel !== null && (
-                      <Link href="/admin" onClick={() => setUserOpen(false)} className={`${dropItem} text-indigo-600`} data-testid="link-header-admin">
-                        <Shield className="w-4 h-4 text-indigo-400" />
+                      <Link href="/admin" onClick={() => setUserOpen(false)} className={`${dropItem} text-persian-blue-700`} data-testid="link-header-admin">
+                        <Shield className="w-4 h-4 text-persian-blue-400" />
                         {t("nav.adminPanel")}
                       </Link>
                     )}
@@ -290,7 +290,7 @@ export default function Header({ showModal }: HeaderProps = {}) {
                     <User className="w-4 h-4" />{t("nav.profile")}
                   </Link>
                   {adminLevel !== null && (
-                    <Link href="/admin" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 py-2 text-sm text-indigo-600">
+                    <Link href="/admin" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 py-2 text-sm text-persian-blue-700">
                       <Shield className="w-4 h-4" />{t("nav.adminPanel")}
                     </Link>
                   )}

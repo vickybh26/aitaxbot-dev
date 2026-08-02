@@ -1728,46 +1728,46 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
           {result && user && (
             <div className="mt-6">
               {aiLoading ? (
-                <Card className="p-5 border-2 border-purple-100 bg-gradient-to-r from-purple-50/70 to-indigo-50/70 backdrop-blur-md shadow-sm transition-all duration-300">
-                  <div className="flex items-center gap-3 text-purple-700">
+                <Card className="p-5 border-2 border-persian-blue-100 bg-gradient-to-r from-persian-blue-50/70 to-persian-blue-50/70 backdrop-blur-md shadow-sm transition-all duration-300">
+                  <div className="flex items-center gap-3 text-persian-blue-800">
                     <Sparkles className="w-5 h-5 animate-pulse" />
                     <span className="font-semibold">AI Tax Advisor is analysing your profile…</span>
                     <Loader2 className="w-4 h-4 animate-spin ml-auto" />
                   </div>
                 </Card>
               ) : aiAdvice && aiAdvice.tips?.length > 0 ? (
-                <Card className="p-5 border-2 border-purple-100 bg-gradient-to-br from-purple-50/70 to-indigo-50/70 backdrop-blur-md shadow-sm transition-all duration-300">
+                <Card className="p-5 border-2 border-persian-blue-100 bg-gradient-to-br from-persian-blue-50/70 to-persian-blue-50/70 backdrop-blur-md shadow-sm transition-all duration-300">
                   {/* Header */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-2">
-                      <div className="bg-purple-600 rounded-lg p-1.5">
+                      <div className="bg-persian-blue-700 rounded-lg p-1.5">
                         <Sparkles className="w-4 h-4 text-white" />
                       </div>
                       <div>
-                        <h3 className="font-bold text-purple-900 text-sm">AI Tax Advisor</h3>
-                        <p className="text-purple-600 text-xs">AI Powered • Personalised for you</p>
+                        <h3 className="font-bold text-persian-blue-900 text-sm">AI Tax Advisor</h3>
+                        <p className="text-persian-blue-700 text-xs">AI Powered • Personalised for you</p>
                       </div>
                     </div>
                     {aiAdvice.maxPossibleSaving > 0 && (
                       <div className="text-right">
-                        <div className="text-xs text-purple-600">Potential extra savings</div>
+                        <div className="text-xs text-persian-blue-700">Potential extra savings</div>
                         <div className="text-lg font-bold text-green-600">₹{aiAdvice.maxPossibleSaving.toLocaleString('en-IN')}</div>
                       </div>
                     )}
                   </div>
 
                   {/* Summary */}
-                  <div className="bg-white/70 rounded-lg p-3 mb-4 border border-purple-100">
+                  <div className="bg-white/70 rounded-lg p-3 mb-4 border border-persian-blue-100">
                     <p className="text-sm text-slate-700 italic">"{aiAdvice.summary}"</p>
                   </div>
 
                   {/* Savings score */}
                   <div className="mb-4">
-                    <div className="flex justify-between text-xs text-purple-700 mb-1">
+                    <div className="flex justify-between text-xs text-persian-blue-800 mb-1">
                       <span>Tax Optimisation Score</span>
                       <span className="font-bold">{aiAdvice.savingsScore}/100</span>
                     </div>
-                    <div className="h-2 bg-purple-100 rounded-full overflow-hidden">
+                    <div className="h-2 bg-persian-blue-100 rounded-full overflow-hidden">
                       <div
                         className={`h-full rounded-full transition-all duration-700 ${aiAdvice.savingsScore >= 80 ? 'bg-green-500' : aiAdvice.savingsScore >= 50 ? 'bg-amber-500' : 'bg-red-500'}`}
                         style={{ width: `${aiAdvice.savingsScore}%` }}
@@ -1790,7 +1790,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                               <p className="text-sm font-semibold text-slate-800">{tip.title}</p>
                               <div className="flex items-center gap-1.5 shrink-0">
                                 {tip.section && (
-                                  <span className="text-xs bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded font-medium">{tip.section}</span>
+                                  <span className="text-xs bg-persian-blue-100 text-persian-blue-800 px-1.5 py-0.5 rounded font-medium">{tip.section}</span>
                                 )}
                                 {tip.potentialSaving && tip.potentialSaving > 0 && (
                                   <span className="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-bold">Save ₹{tip.potentialSaving.toLocaleString('en-IN')}</span>
@@ -1804,7 +1804,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                     ))}
                   </div>
 
-                  <p className="text-xs text-purple-500 mt-3 text-center">
+                  <p className="text-xs text-persian-blue-600 mt-3 text-center">
                     💡 Complete your profile for more personalised AI recommendations
                   </p>
                 </Card>

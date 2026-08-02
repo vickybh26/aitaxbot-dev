@@ -451,7 +451,7 @@ export default function AIS26ASForm16Tool() {
       <div>
 
         {/* ── Hero ───────────────────────────────────────────────────────── */}
-        <div className="bg-gradient-to-br from-blue-700 via-blue-800 to-indigo-900 text-white">
+        <div className="bg-gradient-to-br from-persian-blue-700 via-persian-blue-800 to-persian-blue-900 text-white">
           <div className="max-w-4xl mx-auto px-6 py-10 text-center">
             <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
               <span className="inline-flex items-center gap-1.5 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">
@@ -1005,15 +1005,15 @@ export default function AIS26ASForm16Tool() {
 
               {/* ── AI Analysis ───────────────────────────────────────────── */}
               {report.aiInsights && (
-                <div className="rounded-2xl p-[2px] bg-gradient-to-br from-indigo-500 to-blue-600">
-                  <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-[14px] p-5">
+                <div className="rounded-2xl p-[2px] bg-gradient-to-br from-persian-blue-600 to-persian-blue-600">
+                  <div className="bg-gradient-to-br from-persian-blue-50 to-blue-50 rounded-[14px] p-5">
                     <div className="flex items-center gap-2.5 mb-3">
-                      <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <div className="w-8 h-8 bg-persian-blue-700 rounded-lg flex items-center justify-center flex-shrink-0">
                         <Zap className="w-4 h-4 text-white" />
                       </div>
-                      <h3 className="font-bold text-indigo-900">AI Analysis by AiTaxBot</h3>
+                      <h3 className="font-bold text-persian-blue-900">AI Analysis by AiTaxBot</h3>
                     </div>
-                    <p className="text-sm text-indigo-900/80 whitespace-pre-line leading-relaxed">
+                    <p className="text-sm text-persian-blue-900/80 whitespace-pre-line leading-relaxed">
                       {report.aiInsights}
                     </p>
                   </div>

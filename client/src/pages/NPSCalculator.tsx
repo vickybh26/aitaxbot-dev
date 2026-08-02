@@ -157,8 +157,8 @@ export default function NPSCalculatorPage() {
                 <div className="text-sm font-semibold text-slate-700 mb-2">Extra ₹50,000 deduction</div>
                 <p className="text-sm text-slate-600"><strong>Over and above the ₹1.5L 80C limit.</strong> Any Indian resident can claim this. At 30% slab = ₹15,000 tax saved every year. Don't miss this.</p>
               </div>
-              <div className="bg-purple-50 border border-purple-100 p-5 rounded-xl">
-                <div className="text-2xl font-bold text-purple-700 mb-1">80CCD(2)</div>
+              <div className="bg-persian-blue-50 border border-persian-blue-100 p-5 rounded-xl">
+                <div className="text-2xl font-bold text-persian-blue-800 mb-1">80CCD(2)</div>
                 <div className="text-sm font-semibold text-slate-700 mb-2">Employer's contribution</div>
                 <p className="text-sm text-slate-600">Up to 10% of salary for private sector (14% for govt). <strong>No upper limit in rupee terms.</strong> Fully deductible and not part of 80C.</p>
               </div>
@@ -179,7 +179,7 @@ export default function NPSCalculatorPage() {
                   <div className="border-t border-slate-300 my-2"></div>
                   <div className="flex justify-between"><span>Total Corpus at 60:</span><span className="font-bold text-blue-700">~₹2.28 Cr</span></div>
                   <div className="flex justify-between"><span>Tax-Free Lump Sum (60%):</span><span className="font-bold text-green-700">~₹1.37 Cr</span></div>
-                  <div className="flex justify-between"><span>Monthly Pension (est.):</span><span className="font-bold text-purple-700">~₹45,600/mo</span></div>
+                  <div className="flex justify-between"><span>Monthly Pension (est.):</span><span className="font-bold text-persian-blue-800">~₹45,600/mo</span></div>
                   <div className="flex justify-between"><span>Annual Tax Saving:</span><span className="font-bold text-orange-700">~₹60,000+</span></div>
                 </div>
               </div>
@@ -195,7 +195,7 @@ export default function NPSCalculatorPage() {
                   <div className="border-t border-slate-300 my-2"></div>
                   <div className="flex justify-between"><span>Total Corpus at 60:</span><span className="font-bold text-blue-700">~₹1.33 Cr</span></div>
                   <div className="flex justify-between"><span>Tax-Free Lump Sum (60%):</span><span className="font-bold text-green-700">~₹80 L</span></div>
-                  <div className="flex justify-between"><span>Monthly Pension (est.):</span><span className="font-bold text-purple-700">~₹26,600/mo</span></div>
+                  <div className="flex justify-between"><span>Monthly Pension (est.):</span><span className="font-bold text-persian-blue-800">~₹26,600/mo</span></div>
                   <div className="flex justify-between"><span>80CCD(1B) Saving alone:</span><span className="font-bold text-orange-700">₹15,000/yr</span></div>
                 </div>
               </div>
@@ -256,7 +256,7 @@ export default function NPSCalculatorPage() {
                 <thead>
                   <tr className="bg-slate-100">
                     <th className="border border-slate-200 p-3 text-left font-semibold">Feature</th>
-                    <th className="border border-slate-200 p-3 text-center font-semibold text-indigo-700">NPS</th>
+                    <th className="border border-slate-200 p-3 text-center font-semibold text-persian-blue-800">NPS</th>
                     <th className="border border-slate-200 p-3 text-center font-semibold text-green-700">PPF</th>
                     <th className="border border-slate-200 p-3 text-center font-semibold text-blue-700">EPF</th>
                   </tr>
@@ -312,13 +312,13 @@ export default function NPSCalculatorPage() {
             <div className="overflow-x-auto mb-3">
               <table className="w-full border-collapse text-sm">
                 <thead>
-                  <tr className="bg-indigo-700 text-white">
-                    <th className="border border-indigo-600 p-3 text-left font-semibold">Monthly Contribution</th>
-                    <th className="border border-indigo-600 p-3 text-center font-semibold">10 Years</th>
-                    <th className="border border-indigo-600 p-3 text-center font-semibold">15 Years</th>
-                    <th className="border border-indigo-600 p-3 text-center font-semibold">20 Years</th>
-                    <th className="border border-indigo-600 p-3 text-center font-semibold">25 Years</th>
-                    <th className="border border-indigo-600 p-3 text-center font-semibold">30 Years</th>
+                  <tr className="bg-persian-blue-800 text-white">
+                    <th className="border border-persian-blue-700 p-3 text-left font-semibold">Monthly Contribution</th>
+                    <th className="border border-persian-blue-700 p-3 text-center font-semibold">10 Years</th>
+                    <th className="border border-persian-blue-700 p-3 text-center font-semibold">15 Years</th>
+                    <th className="border border-persian-blue-700 p-3 text-center font-semibold">20 Years</th>
+                    <th className="border border-persian-blue-700 p-3 text-center font-semibold">25 Years</th>
+                    <th className="border border-persian-blue-700 p-3 text-center font-semibold">30 Years</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -336,7 +336,7 @@ export default function NPSCalculatorPage() {
                     <td className="border border-slate-200 p-3 text-center text-slate-700">₹20.90 L</td>
                     <td className="border border-slate-200 p-3 text-center text-slate-700">₹38.28 L</td>
                     <td className="border border-slate-200 p-3 text-center text-blue-700 font-semibold">₹66.89 L</td>
-                    <td className="border border-slate-200 p-3 text-center text-purple-700 font-semibold">₹1.14 Cr</td>
+                    <td className="border border-slate-200 p-3 text-center text-persian-blue-800 font-semibold">₹1.14 Cr</td>
                   </tr>
                   <tr>
                     <td className="border border-slate-200 p-3 font-semibold text-slate-800">₹10,000/month</td>
@@ -366,10 +366,10 @@ export default function NPSCalculatorPage() {
               eNPS is the fastest route — takes 15 minutes and is completely free.
             </p>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-3">
-              <a href="https://enps.nsdl.com" target="_blank" rel="noopener noreferrer" className="block p-4 bg-white border border-slate-200 rounded-lg hover:border-indigo-400 hover:shadow-md transition-all group">
-                <div className="font-bold text-slate-900 mb-1 group-hover:text-indigo-700">eNPS (NSDL)</div>
+              <a href="https://enps.nsdl.com" target="_blank" rel="noopener noreferrer" className="block p-4 bg-white border border-slate-200 rounded-lg hover:border-persian-blue-400 hover:shadow-md transition-all group">
+                <div className="font-bold text-slate-900 mb-1 group-hover:text-persian-blue-800">eNPS (NSDL)</div>
                 <p className="text-xs text-slate-600 mb-3">Official government NPS portal. Directly under PFRDA. Aadhaar-based KYC. Zero charges. Best for self-employed & unorganised sector.</p>
-                <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded font-medium">Open Online →</span>
+                <span className="text-xs bg-persian-blue-100 text-persian-blue-800 px-2 py-1 rounded font-medium">Open Online →</span>
               </a>
               <a href="https://www.sbi.co.in/web/personal-banking/investments-and-insurance/nps" target="_blank" rel="noopener noreferrer" className="block p-4 bg-white border border-slate-200 rounded-lg hover:border-blue-400 hover:shadow-md transition-all group">
                 <div className="font-bold text-slate-900 mb-1 group-hover:text-blue-700">SBI NPS</div>
@@ -439,9 +439,9 @@ export default function NPSCalculatorPage() {
                 </div>
               </Link>
               <Link href="/calculators">
-                <div className="p-4 bg-indigo-50 rounded-lg border border-indigo-200 hover:shadow transition-all">
-                  <h3 className="font-semibold text-indigo-700 mb-1">All Calculators</h3>
-                  <p className="text-sm text-indigo-600">View complete suite of financial tools</p>
+                <div className="p-4 bg-persian-blue-50 rounded-lg border border-persian-blue-200 hover:shadow transition-all">
+                  <h3 className="font-semibold text-persian-blue-800 mb-1">All Calculators</h3>
+                  <p className="text-sm text-persian-blue-700">View complete suite of financial tools</p>
                 </div>
               </Link>
             </div>

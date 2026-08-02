@@ -51,7 +51,7 @@ const DEFAULTS = {
     rate: 9.25,
     label: "Four-Wheeler",
     emoji: "🚗",
-    color: "from-blue-600 to-indigo-600",
+    color: "from-persian-blue-600 to-persian-blue-700",
     accent: "blue",
     typical: "Typical range: ₹5,00,000 – ₹40,00,000 (hatchback to SUV)",
     rateNote: "Car loan rates: 8.5–12% p.a. Top PSU banks start at 8.35%",

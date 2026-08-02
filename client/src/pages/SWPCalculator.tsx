@@ -224,7 +224,7 @@ export default function SWPCalculatorPage() {
                   <div className="flex justify-between"><span>Corpus Lasts:</span><span className="font-bold text-blue-700">~28 years</span></div>
                   <div className="flex justify-between"><span>Total Withdrawn:</span><span className="font-bold text-green-700">~₹1.34 Cr</span></div>
                   <div className="flex justify-between"><span>Tax on Gains:</span><span className="font-bold text-orange-700">~₹8-10 L only</span></div>
-                  <div className="flex justify-between"><span>LTCG Tax Rate:</span><span className="font-bold text-purple-700">10% (equity, 1+ yr)</span></div>
+                  <div className="flex justify-between"><span>LTCG Tax Rate:</span><span className="font-bold text-persian-blue-800">10% (equity, 1+ yr)</span></div>
                 </div>
               </div>
 
@@ -240,7 +240,7 @@ export default function SWPCalculatorPage() {
                   <div className="flex justify-between"><span>Corpus Lasts:</span><span className="font-bold text-blue-700">~27 years +</span></div>
                   <div className="flex justify-between"><span>Corpus Grows Till:</span><span className="font-bold text-green-700">~Year 20</span></div>
                   <div className="flex justify-between"><span>Peak Corpus Value:</span><span className="font-bold text-orange-700">~₹62 L (Year 20)</span></div>
-                  <div className="flex justify-between"><span>Advantage:</span><span className="font-bold text-purple-700">Corpus grows initially!</span></div>
+                  <div className="flex justify-between"><span>Advantage:</span><span className="font-bold text-persian-blue-800">Corpus grows initially!</span></div>
                 </div>
               </div>
 
@@ -300,7 +300,7 @@ export default function SWPCalculatorPage() {
                 <thead>
                   <tr className="bg-slate-100">
                     <th className="border border-slate-200 p-3 text-left font-semibold">Factor</th>
-                    <th className="border border-slate-200 p-3 text-center font-semibold text-purple-700">SWP</th>
+                    <th className="border border-slate-200 p-3 text-center font-semibold text-persian-blue-800">SWP</th>
                     <th className="border border-slate-200 p-3 text-center font-semibold text-orange-700">FD Interest</th>
                     <th className="border border-slate-200 p-3 text-center font-semibold text-blue-700">Dividend</th>
                   </tr>
@@ -362,13 +362,13 @@ export default function SWPCalculatorPage() {
             <div className="overflow-x-auto mb-3">
               <table className="w-full border-collapse text-sm">
                 <thead>
-                  <tr className="bg-purple-700 text-white">
-                    <th className="border border-purple-600 p-3 text-left font-semibold">Corpus</th>
-                    <th className="border border-purple-600 p-3 text-center font-semibold">₹20K/mo</th>
-                    <th className="border border-purple-600 p-3 text-center font-semibold">₹30K/mo</th>
-                    <th className="border border-purple-600 p-3 text-center font-semibold">₹40K/mo</th>
-                    <th className="border border-purple-600 p-3 text-center font-semibold">₹50K/mo</th>
-                    <th className="border border-purple-600 p-3 text-center font-semibold">₹75K/mo</th>
+                  <tr className="bg-persian-blue-800 text-white">
+                    <th className="border border-persian-blue-700 p-3 text-left font-semibold">Corpus</th>
+                    <th className="border border-persian-blue-700 p-3 text-center font-semibold">₹20K/mo</th>
+                    <th className="border border-persian-blue-700 p-3 text-center font-semibold">₹30K/mo</th>
+                    <th className="border border-persian-blue-700 p-3 text-center font-semibold">₹40K/mo</th>
+                    <th className="border border-persian-blue-700 p-3 text-center font-semibold">₹50K/mo</th>
+                    <th className="border border-persian-blue-700 p-3 text-center font-semibold">₹75K/mo</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -465,8 +465,8 @@ export default function SWPCalculatorPage() {
                 </tbody>
               </table>
             </div>
-            <div className="bg-purple-50 border border-purple-100 rounded-lg p-4 mb-8">
-              <p className="text-sm text-purple-900">
+            <div className="bg-persian-blue-50 border border-persian-blue-100 rounded-lg p-4 mb-8">
+              <p className="text-sm text-persian-blue-900">
                 <strong>Planning tip:</strong> Start your SIP today, accumulate the corpus, then switch to SWP at retirement.
                 A ₹5,000/month SIP for 25 years at 12% p.a. builds ₹94.88L — enough to fund ₹75,000/month SWP for retirement.
                 Use our <Link href="/calculators/sip" className="underline font-medium">SIP Calculator</Link> to plan your accumulation phase.
@@ -511,7 +511,7 @@ export default function SWPCalculatorPage() {
                 </div>
               </Link>
               <Link href="/calculators/nps">
-                <div className="p-4 bg-white rounded-lg border hover:border-indigo-300 hover:shadow transition-all">
+                <div className="p-4 bg-white rounded-lg border hover:border-persian-blue-300 hover:shadow transition-all">
                   <h3 className="font-semibold text-slate-900 mb-1">NPS Calculator</h3>
                   <p className="text-sm text-slate-600">Calculate NPS corpus and tax-free lump sum at retirement</p>
                 </div>
@@ -523,9 +523,9 @@ export default function SWPCalculatorPage() {
                 </div>
               </Link>
               <Link href="/calculators">
-                <div className="p-4 bg-purple-50 rounded-lg border border-purple-200 hover:shadow transition-all">
-                  <h3 className="font-semibold text-purple-700 mb-1">All Calculators</h3>
-                  <p className="text-sm text-purple-600">View complete suite of financial tools</p>
+                <div className="p-4 bg-persian-blue-50 rounded-lg border border-persian-blue-200 hover:shadow transition-all">
+                  <h3 className="font-semibold text-persian-blue-800 mb-1">All Calculators</h3>
+                  <p className="text-sm text-persian-blue-700">View complete suite of financial tools</p>
                 </div>
               </Link>
             </div>

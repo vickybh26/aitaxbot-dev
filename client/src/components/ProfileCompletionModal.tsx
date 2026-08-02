@@ -76,7 +76,7 @@ export default function ProfileCompletionModal({ onClose }: Props) {
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg relative animate-in fade-in zoom-in-95 duration-200">
 
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-t-2xl px-6 py-5 text-white">
+        <div className="bg-gradient-to-r from-persian-blue-600 to-persian-blue-700 rounded-t-2xl px-6 py-5 text-white">
           <button onClick={onClose} className="absolute top-4 right-4 text-white/70 hover:text-white">
             <X className="w-5 h-5" />
           </button>

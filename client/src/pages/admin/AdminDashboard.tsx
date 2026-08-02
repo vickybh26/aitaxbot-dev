@@ -169,7 +169,7 @@ export default function AdminDashboard() {
             value={(stats?.returningUsers ?? 0).toLocaleString("en-IN")}
             sub={`${stats?.returningUserRate ?? 0}% of ${(stats?.activeUsers ?? 0).toLocaleString("en-IN")} active users`}
             icon={UserCheck}
-            color="bg-indigo-600"
+            color="bg-persian-blue-700"
           />
         </div>
 

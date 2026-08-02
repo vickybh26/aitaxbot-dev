@@ -130,8 +130,8 @@ export default function Contact() {
                 </div>
 
                 <div className="flex items-start space-x-4">
-                  <div className="bg-purple-100 rounded-full p-3 mt-1">
-                    <MapPin className="w-5 h-5 text-purple-600" />
+                  <div className="bg-persian-blue-100 rounded-full p-3 mt-1">
+                    <MapPin className="w-5 h-5 text-persian-blue-700" />
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">Location</h3>

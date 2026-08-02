@@ -101,7 +101,7 @@ export default function SalesRegister({ firmId }: { firmId: string }) {
             <CardTitle className="text-sm font-medium text-gray-600">Total Invoices</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-purple-600">{totalInvoices}</div>
+            <div className="text-2xl font-bold text-persian-blue-700">{totalInvoices}</div>
           </CardContent>
         </Card>
       </div>

@@ -105,18 +105,18 @@ export default function NRICorner() {
       </Helmet>
 
       {/* Hero */}
-      <section className="bg-gradient-to-r from-indigo-600 to-purple-700 text-white py-16 px-6">
+      <section className="bg-gradient-to-r from-persian-blue-700 to-persian-blue-800 text-white py-16 px-6">
         <div className="max-w-6xl mx-auto">
-          <nav className="flex items-center gap-2 text-indigo-200 text-sm mb-6">
+          <nav className="flex items-center gap-2 text-persian-blue-200 text-sm mb-6">
             <Link href="/" className="hover:text-white transition-colors">Home</Link>
             <ChevronRight className="h-4 w-4" />
             <span className="text-white font-medium">NRI Corner</span>
           </nav>
           <div className="flex items-center gap-3 mb-4">
-            <Globe className="h-10 w-10 text-indigo-200" />
+            <Globe className="h-10 w-10 text-persian-blue-200" />
             <h1 className="text-4xl md:text-5xl font-bold">NRI Tax Corner</h1>
           </div>
-          <p className="text-xl text-indigo-100 max-w-3xl mb-6">
+          <p className="text-xl text-persian-blue-100 max-w-3xl mb-6">
             Tax tools and guides built specifically for Non-Resident Indians. Whether you're in the US, UK, UAE, Canada or anywhere in the world — manage your Indian taxes confidently.
           </p>
           <div className="flex flex-wrap gap-3">
@@ -151,7 +151,7 @@ export default function NRICorner() {
                       </div>
                       <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${c.badge}`}>{tool.badge}</span>
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-indigo-700 transition-colors">{tool.title}</h3>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-persian-blue-800 transition-colors">{tool.title}</h3>
                     <p className="text-gray-600 text-sm mb-4 leading-relaxed">{tool.description}</p>
                     <ul className="space-y-1.5 mb-5">
                       {tool.features.map((f, i) => (
@@ -235,7 +235,7 @@ export default function NRICorner() {
               { title: "NPS Calculator", link: "/calculators/nps", icon: "🏦" },
             ].map((item) => (
               <Link key={item.link} href={item.link}>
-                <div className="bg-white border border-slate-200 rounded-xl p-4 text-center hover:border-indigo-300 hover:shadow-md transition-all cursor-pointer">
+                <div className="bg-white border border-slate-200 rounded-xl p-4 text-center hover:border-persian-blue-300 hover:shadow-md transition-all cursor-pointer">
                   <div className="text-2xl mb-2">{item.icon}</div>
                   <p className="text-sm font-medium text-gray-800">{item.title}</p>
                 </div>

@@ -258,7 +258,7 @@ export default function SIPCalculator({ onClose }: SIPCalculatorProps = {}) {
               </Card>
               <Card className="bg-white p-4">
                 <div className="text-sm text-gray-600">Wealth Gain</div>
-                <div className="text-lg font-bold text-purple-600" data-testid="text-wealth-gain">
+                <div className="text-lg font-bold text-persian-blue-700" data-testid="text-wealth-gain">
                   {result.wealthGain.toFixed(1)}x
                 </div>
               </Card>

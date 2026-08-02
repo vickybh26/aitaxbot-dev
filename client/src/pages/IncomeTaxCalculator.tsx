@@ -299,7 +299,7 @@ export default function IncomeTaxCalculatorPage() {
               {/* Example 4: Old vs New Regime Breakeven */}
               <div className="bg-slate-50 border rounded-xl p-6">
                 <h3 className="font-bold text-slate-900 mb-3 flex items-center gap-2">
-                  <span className="bg-purple-700 text-white text-xs font-bold px-2 py-1 rounded">EXAMPLE 4</span>
+                  <span className="bg-persian-blue-800 text-white text-xs font-bold px-2 py-1 rounded">EXAMPLE 4</span>
                   Old vs New Regime — Breakeven Analysis
                 </h3>
                 <p className="text-sm text-slate-600 mb-4">Income ₹15L: Which regime saves more tax?</p>
@@ -309,9 +309,9 @@ export default function IncomeTaxCalculatorPage() {
                   <div className="flex justify-between"><span>Std deduction</span><span className="font-semibold">₹50,000 | ₹75,000</span></div>
                   <div className="flex justify-between"><span>80C + HRA</span><span className="font-semibold">₹2,00,000 | Nil</span></div>
                   <div className="flex justify-between"><span>Taxable income</span><span className="font-semibold">₹12,50,000 | ₹14,25,000</span></div>
-                  <div className="flex justify-between border-t pt-1 mt-1"><span className="text-purple-800 font-bold">Tax + cess</span><span className="font-bold text-purple-700 text-base">₹1,56,000 | ₹1,96,365</span></div>
+                  <div className="flex justify-between border-t pt-1 mt-1"><span className="text-persian-blue-800 font-bold">Tax + cess</span><span className="font-bold text-persian-blue-800 text-base">₹1,56,000 | ₹1,96,365</span></div>
                 </div>
-                <p className="text-xs text-purple-700 mt-3 bg-purple-100 rounded p-2">
+                <p className="text-xs text-persian-blue-800 mt-3 bg-persian-blue-100 rounded p-2">
                   ✔ Old Regime wins by ₹40,365 here. But if deductions are less than ~₹3.75L at this income, New Regime wins. Use the calculator to compare your actual scenario.
                 </p>
               </div>
@@ -464,7 +464,7 @@ export default function IncomeTaxCalculatorPage() {
                 </div>
               </Link>
               <Link href="/calculators/nps">
-                <div className="p-4 bg-white rounded-lg border hover:border-indigo-300 hover:shadow transition-all">
+                <div className="p-4 bg-white rounded-lg border hover:border-persian-blue-300 hover:shadow transition-all">
                   <h3 className="font-semibold text-slate-900 mb-1">NPS Calculator</h3>
                   <p className="text-sm text-slate-600">Calculate 80CCD(1B) ₹50,000 extra deduction & retirement corpus</p>
                 </div>

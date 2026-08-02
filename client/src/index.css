@@ -10,35 +10,55 @@
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 222.2 47.4% 11.2%;
+    --primary: 214 52% 25%;
     --primary-foreground: 210 40% 98%;
     --secondary: 210 40% 96%;
     --secondary-foreground: 222.2 84% 4.9%;
-    --muted: 210 40% 96%;
+    --muted: 210 17% 95%;
     --muted-foreground: 215.4 16.3% 46.9%;
     --accent: 210 40% 96%;
     --accent-foreground: 222.2 84% 4.9%;
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 74% 51%;
     --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-    --radius: 0.75rem;
+    --border: 214 14% 91%;
+    --input: 214 14% 91%;
+    --ring: 214 52% 25%;
+    --radius: 0.5rem;
 
-    /* Modern Color Palette - Clean and Minimal */
-    --primary-blue: 217 91% 60%;
-    --primary-blue-light: 217 91% 95%;
-    --primary-blue-dark: 217 91% 45%;
-    
-    --success-green: 142 76% 36%;
-    --success-green-light: 142 76% 95%;
-    
+    /* ───────────────────────────────────────────────────────────────────
+       AiTaxBot palette — "Trust Navy + Profit Green" (2026-07 redesign)
+       Direction chosen from the ui-ux-pro-max fintech/tax database.
+       Rationale: the previous blue→purple gradient reads as generic "AI
+       startup"; the design rules explicitly flag AI purple/pink gradients
+       as an anti-pattern for finance/tax products, where users are handing
+       over salary and PAN data and need institutional trust cues instead.
+       Navy carries authority; green is reserved for money-positive
+       outcomes (tax saved, refund due) so colour itself signals result.
+       Full spec: design-system/aitaxbot/MASTER.md
+       ─────────────────────────────────────────────────────────────────── */
+
+    /* Navy — primary brand + structure */
+    --primary-blue: 214 52% 25%;        /* #1E3A5F authority navy */
+    --primary-blue-light: 214 52% 96%;
+    --primary-blue-dark: 214 58% 17%;
+
+    /* Interactive blue — links, focus, secondary actions */
+    --interactive-blue: 221 83% 53%;    /* #2563EB */
+    --interactive-blue-light: 221 83% 96%;
+
+    /* Green — reserved for money-positive results ONLY (saved / refund) */
+    --success-green: 161 94% 30%;       /* #059669 profit green */
+    --success-green-light: 161 60% 95%;
+
     --warning-orange: 25 95% 53%;
     --warning-orange-light: 25 95% 95%;
-    
-    --accent-purple: 262 83% 58%;
-    --accent-purple-light: 262 83% 95%;
-    
+
+    /* Legacy alias — purple is retired; mapped to navy so any component
+       still referencing --accent-purple degrades to brand navy instead of
+       reintroducing the old gradient. Remove references over time. */
+    --accent-purple: 214 52% 25%;
+    --accent-purple-light: 214 52% 96%;
+
     --neutral-50: 210 20% 98%;
     --neutral-100: 210 20% 96%;
     --neutral-200: 210 16% 93%;
@@ -50,17 +70,21 @@
     --neutral-800: 210 15% 20%;
     --neutral-900: 210 18% 12%;
     
-    /* Persian Blue Palette */
-    --persian-blue-50: 214 65% 96%;
-    --persian-blue-100: 214 65% 90%;
-    --persian-blue-200: 214 65% 80%;
-    --persian-blue-300: 214 65% 70%;
-    --persian-blue-400: 214 65% 60%;
-    --persian-blue-500: 214 65% 56%;
-    --persian-blue-600: 214 65% 56%;
-    --persian-blue-700: 214 65% 46%;
-    --persian-blue-800: 214 65% 36%;
-    --persian-blue-900: 214 65% 26%;
+    /* Navy scale — retuned from the old "persian blue" scale.
+       Variable names kept intentionally: they're referenced across ~30
+       components and the Tailwind config, so retuning values here shifts
+       the whole site's palette without a risky rename sweep. Treat the
+       name as legacy; the values are the navy ramp. */
+    --persian-blue-50: 214 52% 96%;
+    --persian-blue-100: 214 52% 90%;
+    --persian-blue-200: 214 52% 80%;
+    --persian-blue-300: 214 48% 65%;
+    --persian-blue-400: 214 45% 50%;
+    --persian-blue-500: 214 50% 38%;
+    --persian-blue-600: 214 52% 30%;
+    --persian-blue-700: 214 52% 25%;
+    --persian-blue-800: 214 54% 19%;
+    --persian-blue-900: 214 58% 13%;
   }
 }
 
@@ -70,12 +94,46 @@
   }
   body {
     @apply bg-white;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, 'Helvetica Neue', Arial, sans-serif;
+    /* IBM Plex Sans — chosen for finance/tax context: it reads as
+       institutional rather than consumer-startup, and its tabular figures
+       keep rupee columns aligned in result tables. Inter kept as the first
+       fallback so nothing reflows badly if Plex fails to load. */
+    font-family: 'IBM Plex Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, 'Helvetica Neue', Arial, sans-serif;
     color: hsl(var(--neutral-800));
   }
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    font-family: 'IBM Plex Sans', 'Inter', sans-serif;
     letter-spacing: -0.02em;
+    font-weight: 600;
+  }
+
+  /* Money figures: tabular numerals stop digits from jittering as values
+     update live while the user types into a calculator. */
+  .tabular-figures,
+  .money {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+  }
+
+  /* Accessibility: never remove focus rings — keyboard users need them.
+     A visible ring on the brand navy meets 3:1 against both white cards
+     and the light navy tints used for section backgrounds. */
+  :where(a, button, input, select, textarea, [tabindex]):focus-visible {
+    outline: 2px solid hsl(var(--interactive-blue));
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Respect users who've asked their OS to reduce motion. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 

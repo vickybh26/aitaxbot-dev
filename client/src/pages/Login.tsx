@@ -139,7 +139,7 @@ export default function Login() {
           <div className="text-center mb-12">
             <div className="flex items-center justify-center gap-2 mb-4">
               <Calculator className="h-10 w-10 text-blue-600" />
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-persian-blue-600 to-green-600 bg-clip-text text-transparent">
                 AiTaxBot
               </h1>
             </div>
@@ -177,7 +177,7 @@ export default function Login() {
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <TrendingUp className="h-6 w-6 text-purple-600 mt-1" />
+                  <TrendingUp className="h-6 w-6 text-persian-blue-700 mt-1" />
                   <div>
                     <h3 className="font-semibold text-gray-900 dark:text-white">Market Data & Analytics</h3>
                     <p className="text-gray-600 dark:text-gray-300">

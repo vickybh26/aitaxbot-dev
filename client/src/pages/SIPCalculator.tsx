@@ -172,7 +172,7 @@ export default function SIPCalculatorPage() {
                   <div className="border-t border-slate-300 my-2"></div>
                   <div className="flex justify-between"><span>Total Invested:</span><span className="font-bold text-blue-700">₹12,00,000</span></div>
                   <div className="flex justify-between"><span>Capital Gains:</span><span className="font-bold text-green-700">₹36,00,000</span></div>
-                  <div className="flex justify-between"><span>Final Corpus:</span><span className="font-bold text-purple-700">₹48,00,000</span></div>
+                  <div className="flex justify-between"><span>Final Corpus:</span><span className="font-bold text-persian-blue-800">₹48,00,000</span></div>
                   <div className="flex justify-between"><span>LTCG Tax @ 12.5% (if redeemed in 1 yr):</span><span className="font-bold text-orange-700">~₹4,34,000</span></div>
                   <div className="flex justify-between"><span className="text-xs">Tax with 3-year spread:</span><span className="font-bold text-green-700 text-xs">₹0 tax</span></div>
                 </div>
@@ -188,7 +188,7 @@ export default function SIPCalculatorPage() {
                   <div className="border-t border-slate-300 my-2"></div>
                   <div className="flex justify-between"><span>Total Invested:</span><span className="font-bold text-blue-700">₹12,34,000</span></div>
                   <div className="flex justify-between"><span>Capital Gains:</span><span className="font-bold text-green-700">₹25,66,000</span></div>
-                  <div className="flex justify-between"><span>Final Corpus:</span><span className="font-bold text-purple-700">₹38,00,000</span></div>
+                  <div className="flex justify-between"><span>Final Corpus:</span><span className="font-bold text-persian-blue-800">₹38,00,000</span></div>
                   <div className="flex justify-between"><span>Benefit vs Regular:</span><span className="font-bold text-orange-700">+₹2L growth</span></div>
                 </div>
               </div>
@@ -261,9 +261,9 @@ export default function SIPCalculatorPage() {
                   <div className="flex justify-between"><span>Best for:</span><span className="font-semibold">First-time SIP investors</span></div>
                 </div>
               </div>
-              <div className="p-4 bg-purple-50 border border-purple-100 rounded-lg">
+              <div className="p-4 bg-persian-blue-50 border border-persian-blue-100 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="bg-purple-700 text-white text-xs font-bold px-2 py-0.5 rounded">MEDIUM RISK</span>
+                  <span className="bg-persian-blue-800 text-white text-xs font-bold px-2 py-0.5 rounded">MEDIUM RISK</span>
                   <h3 className="font-bold text-slate-900">Flexi Cap Funds</h3>
                 </div>
                 <p className="text-sm text-slate-700 mb-2">Fund manager allocates freely across large, mid and small caps based on market conditions. Best balance of growth potential and risk management.</p>
@@ -316,10 +316,10 @@ export default function SIPCalculatorPage() {
                 <p className="text-xs text-slate-600 mb-3">Zero commission direct plans. Linked to Zerodha Demat. Best if you also trade stocks/ETFs alongside SIP.</p>
                 <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded font-medium">Start SIP →</span>
               </a>
-              <a href="https://kuvera.in" target="_blank" rel="noopener noreferrer" className="block p-4 bg-white border border-slate-200 rounded-lg hover:border-indigo-400 hover:shadow-md transition-all group">
-                <div className="font-bold text-slate-900 mb-1 group-hover:text-indigo-700">Kuvera</div>
+              <a href="https://kuvera.in" target="_blank" rel="noopener noreferrer" className="block p-4 bg-white border border-slate-200 rounded-lg hover:border-persian-blue-400 hover:shadow-md transition-all group">
+                <div className="font-bold text-slate-900 mb-1 group-hover:text-persian-blue-800">Kuvera</div>
                 <p className="text-xs text-slate-600 mb-3">Fully free direct-plan platform with goal-based investing tools. Ideal for long-term systematic investors.</p>
-                <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded font-medium">Start SIP →</span>
+                <span className="text-xs bg-persian-blue-100 text-persian-blue-800 px-2 py-1 rounded font-medium">Start SIP →</span>
               </a>
               <a href="https://www.etmoney.com" target="_blank" rel="noopener noreferrer" className="block p-4 bg-white border border-slate-200 rounded-lg hover:border-orange-400 hover:shadow-md transition-all group">
                 <div className="font-bold text-slate-900 mb-1 group-hover:text-orange-700">ET Money</div>
@@ -421,7 +421,7 @@ export default function SIPCalculatorPage() {
                     <td className="border border-slate-200 p-3 text-center text-slate-700">₹11.62 L</td>
                     <td className="border border-slate-200 p-3 text-center text-slate-700">₹25.23 L</td>
                     <td className="border border-slate-200 p-3 text-center text-blue-700 font-semibold">₹49.96 L</td>
-                    <td className="border border-slate-200 p-3 text-center text-purple-700 font-semibold">₹94.88 L</td>
+                    <td className="border border-slate-200 p-3 text-center text-persian-blue-800 font-semibold">₹94.88 L</td>
                   </tr>
                   <tr className="bg-slate-50">
                     <td className="border border-slate-200 p-3 font-semibold text-slate-800">₹10,000/month</td>
@@ -453,11 +453,11 @@ export default function SIPCalculatorPage() {
             <div className="overflow-x-auto mb-3">
               <table className="w-full border-collapse text-sm">
                 <thead>
-                  <tr className="bg-indigo-700 text-white">
-                    <th className="border border-indigo-600 p-3 text-left font-semibold">Time Horizon</th>
-                    <th className="border border-indigo-600 p-3 text-center font-semibold">Monthly SIP Needed</th>
-                    <th className="border border-indigo-600 p-3 text-center font-semibold">Total Invested</th>
-                    <th className="border border-indigo-600 p-3 text-center font-semibold">Total Gains</th>
+                  <tr className="bg-persian-blue-800 text-white">
+                    <th className="border border-persian-blue-700 p-3 text-left font-semibold">Time Horizon</th>
+                    <th className="border border-persian-blue-700 p-3 text-center font-semibold">Monthly SIP Needed</th>
+                    <th className="border border-persian-blue-700 p-3 text-center font-semibold">Total Invested</th>
+                    <th className="border border-persian-blue-700 p-3 text-center font-semibold">Total Gains</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -487,15 +487,15 @@ export default function SIPCalculatorPage() {
                   </tr>
                   <tr>
                     <td className="border border-slate-200 p-3 font-semibold text-slate-800">30 Years</td>
-                    <td className="border border-slate-200 p-3 text-center text-purple-700 font-bold">₹2,833/month</td>
+                    <td className="border border-slate-200 p-3 text-center text-persian-blue-800 font-bold">₹2,833/month</td>
                     <td className="border border-slate-200 p-3 text-center text-slate-700">₹10.20 L</td>
                     <td className="border border-slate-200 p-3 text-center text-slate-700">₹89.80 L</td>
                   </tr>
                 </tbody>
               </table>
             </div>
-            <div className="bg-indigo-50 border border-indigo-100 rounded-lg p-4 mb-8">
-              <p className="text-sm text-indigo-900">
+            <div className="bg-persian-blue-50 border border-persian-blue-100 rounded-lg p-4 mb-8">
+              <p className="text-sm text-persian-blue-900">
                 <strong>Key insight:</strong> Starting 10 years earlier reduces your required monthly SIP by 83% — from ₹43,041 to ₹5,270.
                 In other words, time in the market is worth 4× more than the amount you invest. The best time to start a SIP was yesterday. The second best time is today.
               </p>
@@ -533,13 +533,13 @@ export default function SIPCalculatorPage() {
             </p>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <Link href="/calculators/swp">
-                <div className="p-4 bg-white rounded-lg border hover:border-purple-300 hover:shadow transition-all">
+                <div className="p-4 bg-white rounded-lg border hover:border-persian-blue-300 hover:shadow transition-all">
                   <h3 className="font-semibold text-slate-900 mb-1">SWP Calculator</h3>
                   <p className="text-sm text-slate-600">Plan systematic withdrawals from your SIP corpus in retirement</p>
                 </div>
               </Link>
               <Link href="/calculators/nps">
-                <div className="p-4 bg-white rounded-lg border hover:border-indigo-300 hover:shadow transition-all">
+                <div className="p-4 bg-white rounded-lg border hover:border-persian-blue-300 hover:shadow transition-all">
                   <h3 className="font-semibold text-slate-900 mb-1">NPS Calculator</h3>
                   <p className="text-sm text-slate-600">Calculate NPS corpus, pension and ₹50,000 extra tax saving</p>
                 </div>

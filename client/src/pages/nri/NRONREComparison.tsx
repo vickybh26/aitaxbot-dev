@@ -285,8 +285,8 @@ export default function NRONREComparison() {
 
             {/* FCNR Card */}
             <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
-              <div className="bg-purple-50 px-6 py-4 border-b border-purple-200">
-                <h3 className="text-xl font-bold text-purple-700 flex items-center gap-2">
+              <div className="bg-persian-blue-50 px-6 py-4 border-b border-persian-blue-200">
+                <h3 className="text-xl font-bold text-persian-blue-800 flex items-center gap-2">
                   <Globe size={24} />
                   FCNR Account
                 </h3>
@@ -457,7 +457,7 @@ export default function NRONREComparison() {
                 title: "Repatriation Planner",
                 description: "Plan your fund repatriation strategy and limits",
                 link: "/nri/repatriation-planner",
-                icon: <Globe className="text-purple-600" size={32} />,
+                icon: <Globe className="text-persian-blue-700" size={32} />,
               },
               {
                 title: "Income Tax Calculator",

@@ -306,7 +306,7 @@ export default function VehicleLoanCalculatorPage() {
                 </div>
               </Link>
               <Link href="/calculators/sip">
-                <div className="p-4 bg-white rounded-lg border hover:border-purple-300 hover:shadow transition-all">
+                <div className="p-4 bg-white rounded-lg border hover:border-persian-blue-300 hover:shadow transition-all">
                   <h3 className="font-semibold text-slate-900 mb-1">SIP Calculator</h3>
                   <p className="text-sm text-slate-600">Invest the money you save with a shorter loan tenure</p>
                 </div>

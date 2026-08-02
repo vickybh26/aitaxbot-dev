@@ -173,7 +173,7 @@ function RateStatus({ rate, fetching }: { rate: number | null; fetching: boolean
 // ─── Quick-start empty state ──────────────────────────────────────────────────
 
 const INCOME_TYPES = [
-  { id: "us-stocks" as Tab, icon: TrendingUp, label: "US Stocks & ETFs", desc: "AAPL, TSLA, VOO…", color: "text-indigo-600 bg-indigo-50 border-indigo-200" },
+  { id: "us-stocks" as Tab, icon: TrendingUp, label: "US Stocks & ETFs", desc: "AAPL, TSLA, VOO…", color: "text-persian-blue-700 bg-persian-blue-50 border-persian-blue-200" },
   { id: "us-dividends" as Tab, icon: DollarSign, label: "US Dividends", desc: "DTAA credit, Form 67", color: "text-cyan-600 bg-cyan-50 border-cyan-200" },
   { id: "indian-fo" as Tab, icon: BarChart2, label: "Indian F&O", desc: "Nifty, Bank Nifty…", color: "text-amber-600 bg-amber-50 border-amber-200" },
   { id: "us-fo" as Tab, icon: Globe, label: "US F&O / Options", desc: "SPY calls, QQQ puts…", color: "text-emerald-600 bg-emerald-50 border-emerald-200" },
@@ -184,8 +184,8 @@ function QuickStart({ onSelect }: { onSelect: (tab: Tab) => void }) {
   return (
     <div className="py-10 px-4 text-center space-y-6">
       <div>
-        <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-3">
-          <Zap className="w-7 h-7 text-indigo-500" />
+        <div className="w-14 h-14 bg-persian-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-3">
+          <Zap className="w-7 h-7 text-persian-blue-600" />
         </div>
         <h3 className="text-lg font-bold text-slate-800">What did you trade this year?</h3>
         <p className="text-sm text-slate-500 mt-1">Pick a category to get started. You can add more later.</p>
@@ -382,15 +382,15 @@ function USStocksTab({ trades, setTrades, slabRate }: {
       })}
 
       <Button variant="outline" size="sm" onClick={addTrade}
-        className="border-2 border-dashed border-slate-200 text-slate-500 hover:border-indigo-300 hover:text-indigo-600 w-full h-11 transition-colors">
+        className="border-2 border-dashed border-slate-200 text-slate-500 hover:border-persian-blue-300 hover:text-persian-blue-700 w-full h-11 transition-colors">
         <Plus className="w-4 h-4 mr-2" /> Add Trade
       </Button>
 
       {trades.length > 0 && (
-        <div className={`rounded-xl p-4 flex justify-between items-center ${totalGain >= 0 ? "bg-indigo-50 border border-indigo-100" : "bg-slate-50 border border-slate-200"}`}>
+        <div className={`rounded-xl p-4 flex justify-between items-center ${totalGain >= 0 ? "bg-persian-blue-50 border border-persian-blue-100" : "bg-slate-50 border border-slate-200"}`}>
           <div>
             <div className="text-xs text-slate-500">Total gain across {trades.length} trade{trades.length > 1 ? "s" : ""}</div>
-            <div className={`text-lg font-bold ${totalGain >= 0 ? "text-indigo-700" : "text-red-600"}`}>{fmt(totalGain)}</div>
+            <div className={`text-lg font-bold ${totalGain >= 0 ? "text-persian-blue-800" : "text-red-600"}`}>{fmt(totalGain)}</div>
           </div>
           <div className="text-right">
             <div className="text-xs text-slate-500">Estimated tax (incl. 4% cess)</div>
@@ -938,8 +938,8 @@ function SummaryTab({ usStocks, usDividends, indianFO, usFO, forex, slabRate }: 
   const itrForm = hasF_O ? "ITR-3" : "ITR-2";
 
   const bars = [
-    { label: "US Stocks LTCG (12.5%)", income: ltcgGain, tax: usStockResults.filter(r => r?.isLTCG).reduce((s, r) => s + (r?.tax ?? 0), 0), color: "bg-indigo-500" },
-    { label: "US Stocks STCG (slab)", income: stcgGain, tax: usStockResults.filter(r => !r?.isLTCG && r).reduce((s, r) => s + (r?.tax ?? 0), 0), color: "bg-indigo-300" },
+    { label: "US Stocks LTCG (12.5%)", income: ltcgGain, tax: usStockResults.filter(r => r?.isLTCG).reduce((s, r) => s + (r?.tax ?? 0), 0), color: "bg-persian-blue-600" },
+    { label: "US Stocks STCG (slab)", income: stcgGain, tax: usStockResults.filter(r => !r?.isLTCG && r).reduce((s, r) => s + (r?.tax ?? 0), 0), color: "bg-persian-blue-300" },
     { label: "US Dividends", income: totalDividendINR, tax: dividendTax, color: "bg-cyan-500" },
     { label: "Indian F&O", income: foProfit, tax: foTax, color: "bg-amber-500" },
     { label: "US F&O / Options", income: usFOProfit, tax: usFOTax, color: "bg-emerald-500" },
@@ -1028,7 +1028,7 @@ function SummaryTab({ usStocks, usDividends, indianFO, usFO, forex, slabRate }: 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 const TABS: { id: Tab; label: string; icon: React.ReactNode; short: string; color: string }[] = [
-  { id: "us-stocks", label: "US Stocks & ETFs", icon: <TrendingUp className="w-4 h-4" />, short: "US Stocks", color: "text-indigo-600 border-indigo-500" },
+  { id: "us-stocks", label: "US Stocks & ETFs", icon: <TrendingUp className="w-4 h-4" />, short: "US Stocks", color: "text-persian-blue-700 border-persian-blue-600" },
   { id: "us-dividends", label: "US Dividends", icon: <DollarSign className="w-4 h-4" />, short: "Dividends", color: "text-cyan-600 border-cyan-500" },
   { id: "indian-fo", label: "Indian F&O", icon: <BarChart2 className="w-4 h-4" />, short: "India F&O", color: "text-amber-600 border-amber-500" },
   { id: "us-fo", label: "US F&O / Options", icon: <Globe className="w-4 h-4" />, short: "US F&O", color: "text-emerald-600 border-emerald-500" },

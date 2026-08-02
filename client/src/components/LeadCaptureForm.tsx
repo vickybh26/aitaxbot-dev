@@ -85,7 +85,7 @@ export default function LeadCaptureForm({ source, summaryText }: Props) {
   }
 
   return (
-    <div className="mt-6 relative bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-50 border border-blue-100 rounded-2xl p-5">
+    <div className="mt-6 relative bg-gradient-to-br from-blue-50 via-persian-blue-50 to-blue-50 border border-blue-100 rounded-2xl p-5">
       {/* Dismiss */}
       <button
         onClick={() => setDismissed(true)}

@@ -289,8 +289,8 @@ export default function HRACalculatorPage() {
                   <div className="flex justify-between"><span>Owns flat in: Pune (rented out)</span><span className="font-semibold">Section 24(b)</span></div>
                   <div className="flex justify-between"><span>Home loan interest:</span><span className="font-semibold">₹2,00,000</span></div>
                   <div className="border-t border-slate-300 my-2"></div>
-                  <div className="flex justify-between"><span className="font-bold text-purple-700">HRA exemption:</span><span className="font-bold text-purple-700">₹X (formula)</span></div>
-                  <div className="flex justify-between"><span className="font-bold text-purple-700">Home loan deduction:</span><span className="font-bold text-purple-700">₹2,00,000</span></div>
+                  <div className="flex justify-between"><span className="font-bold text-persian-blue-800">HRA exemption:</span><span className="font-bold text-persian-blue-800">₹X (formula)</span></div>
+                  <div className="flex justify-between"><span className="font-bold text-persian-blue-800">Home loan deduction:</span><span className="font-bold text-persian-blue-800">₹2,00,000</span></div>
                 </div>
               </div>
 
@@ -422,7 +422,7 @@ export default function HRACalculatorPage() {
                 </div>
               </Link>
               <Link href="/calculators/nps">
-                <div className="p-4 bg-white rounded-lg border hover:border-indigo-300 hover:shadow transition-all">
+                <div className="p-4 bg-white rounded-lg border hover:border-persian-blue-300 hover:shadow transition-all">
                   <h3 className="font-semibold text-slate-900 mb-1">NPS Calculator</h3>
                   <p className="text-sm text-slate-600">Calculate retirement corpus with ₹50,000 extra deduction</p>
                 </div>

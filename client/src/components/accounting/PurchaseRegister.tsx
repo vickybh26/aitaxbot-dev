@@ -278,7 +278,7 @@ export default function PurchaseRegister({ firmId }: { firmId: string }) {
             <CardTitle className="text-sm font-medium text-gray-600">Total Entries</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-purple-600">{totalEntries}</div>
+            <div className="text-2xl font-bold text-persian-blue-700">{totalEntries}</div>
           </CardContent>
         </Card>
       </div>

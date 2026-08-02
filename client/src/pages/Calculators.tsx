@@ -93,8 +93,8 @@ const investmentCalculators: CalcDef[] = [
     description: 'Plan regular monthly income from mutual fund investments for retirement. Track corpus sustainability over your horizon.',
     icon: Wallet,
     link: '/calculators/swp',
-    color: 'text-purple-600',
-    bg: 'bg-purple-50',
+    color: 'text-persian-blue-700',
+    bg: 'bg-persian-blue-50',
     features: [
       'Regular withdrawal planning',
       'Remaining corpus tracking',
@@ -121,8 +121,8 @@ const investmentCalculators: CalcDef[] = [
     description: 'Calculate EPF, VPF & PPF contributions with employer split breakdown and year-wise retirement corpus projection at 8.25% interest.',
     icon: Shield,
     link: '/calculators/pf',
-    color: 'text-indigo-600',
-    bg: 'bg-indigo-50',
+    color: 'text-persian-blue-700',
+    bg: 'bg-persian-blue-50',
     features: [
       'Employee-employer split breakdown',
       'VPF contribution planning',

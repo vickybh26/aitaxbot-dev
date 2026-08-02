@@ -93,7 +93,7 @@ export default function HomeLoanCalculator() {
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6">
+      <div className="bg-gradient-to-r from-persian-blue-600 to-persian-blue-700 p-6">
         <h2 className="text-xl font-bold text-white">Home Loan Affordability Calculator</h2>
         <p className="text-blue-100 text-sm mt-1">Know your eligibility, EMI and tax benefits — before you visit the bank</p>
       </div>

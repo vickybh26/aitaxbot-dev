@@ -732,8 +732,8 @@ export default function NRIIncomeTaxCalculator() {
           </div>
 
           {/* Example 2 */}
-          <div className="bg-purple-50 rounded-lg p-6 border-l-4 border-purple-500">
-            <h3 className="text-xl font-bold text-purple-900 mb-4">Example 2: UK-based NRI with Property Sale</h3>
+          <div className="bg-persian-blue-50 rounded-lg p-6 border-l-4 border-persian-blue-600">
+            <h3 className="text-xl font-bold text-persian-blue-900 mb-4">Example 2: UK-based NRI with Property Sale</h3>
             <div className="space-y-2 text-gray-800 mb-4">
               <p>
                 <strong>Property Sale:</strong>
@@ -755,7 +755,7 @@ export default function NRIIncomeTaxCalculator() {
               </ul>
             </div>
             <div className="bg-white p-3 rounded">
-              <p className="text-purple-900 font-semibold">File ITR to claim refund of excess TDS</p>
+              <p className="text-persian-blue-900 font-semibold">File ITR to claim refund of excess TDS</p>
             </div>
           </div>
         </div>

@@ -301,9 +301,9 @@ export default function RepatriationPlanner() {
               </div>
 
               {/* Timeline */}
-              <div className="bg-purple-50 p-6 rounded-lg border border-purple-200">
-                <h4 className="font-bold text-purple-900 mb-3">Estimated Timeline</h4>
-                <p className="text-purple-800">
+              <div className="bg-persian-blue-50 p-6 rounded-lg border border-persian-blue-200">
+                <h4 className="font-bold text-persian-blue-900 mb-3">Estimated Timeline</h4>
+                <p className="text-persian-blue-800">
                   {calculator.sourceAccount === "nro"
                     ? "3–7 working days after forms are submitted to bank"
                     : "3–7 working days for SWIFT transfer"}
@@ -405,28 +405,28 @@ export default function RepatriationPlanner() {
             </div>
 
             {/* FCNR Account */}
-            <div className="bg-purple-50 border-2 border-purple-300 rounded-lg p-8">
-              <h3 className="text-2xl font-bold text-purple-900 mb-4">FCNR Account</h3>
-              <p className="text-sm font-semibold text-purple-700 mb-6">Freely Repatriable</p>
+            <div className="bg-persian-blue-50 border-2 border-persian-blue-300 rounded-lg p-8">
+              <h3 className="text-2xl font-bold text-persian-blue-900 mb-4">FCNR Account</h3>
+              <p className="text-sm font-semibold text-persian-blue-800 mb-6">Freely Repatriable</p>
               <ul className="space-y-3 text-gray-800">
                 <li className="flex items-start gap-3">
-                  <CheckCircle size={20} className="text-purple-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle size={20} className="text-persian-blue-700 flex-shrink-0 mt-0.5" />
                   <span>Funds in foreign currency — seamless repatriation</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle size={20} className="text-purple-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle size={20} className="text-persian-blue-700 flex-shrink-0 mt-0.5" />
                   <span>Principal and interest freely transferable</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle size={20} className="text-purple-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle size={20} className="text-persian-blue-700 flex-shrink-0 mt-0.5" />
                   <span>No forms, no CA required</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle size={20} className="text-purple-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle size={20} className="text-persian-blue-700 flex-shrink-0 mt-0.5" />
                   <span>Repatriate on maturity or anytime</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle size={20} className="text-purple-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle size={20} className="text-persian-blue-700 flex-shrink-0 mt-0.5" />
                   <span>No exchange rate risk (already in foreign currency)</span>
                 </li>
               </ul>

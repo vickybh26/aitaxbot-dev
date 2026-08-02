@@ -45,7 +45,7 @@ export default function ResultAuthGate({ toolName, headline }: ResultAuthGatePro
   const [modalTab, setModalTab] = useState<"login" | "signup" | null>(null);
 
   return (
-    <Card className="border-2 border-blue-100 bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-50">
+    <Card className="border-2 border-blue-100 bg-gradient-to-br from-blue-50 via-persian-blue-50 to-blue-50">
       {headline && (
         <div className="px-6 pt-8 pb-6 text-center border-b border-blue-100">
           <div className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">

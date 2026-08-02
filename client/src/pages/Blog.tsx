@@ -109,7 +109,7 @@ const CATEGORY_STYLES: Record<Category, { banner: string; badge: string; icon: J
     icon: <Landmark className="h-4 w-4" />,
   },
   "Retirement": {
-    banner: "bg-gradient-to-br from-violet-500 to-purple-700",
+    banner: "bg-gradient-to-br from-violet-500 to-persian-blue-800",
     badge: "bg-violet-50 text-violet-700",
     icon: <PiggyBank className="h-4 w-4" />,
   },

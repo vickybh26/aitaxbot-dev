@@ -318,7 +318,7 @@ export default function NPSCalculator() {
 
           {/* Main Result Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Card className="p-4 bg-gradient-to-br from-blue-600 to-blue-700 text-white">
+            <Card className="p-4 bg-gradient-to-br from-persian-blue-600 to-persian-blue-700 text-white">
               <p className="text-xs text-blue-100 mb-1">Total Corpus at {retirementAge}</p>
               <p className="text-xl font-bold">{formatCurrency(result.totalCorpus)}</p>
             </Card>
@@ -326,8 +326,8 @@ export default function NPSCalculator() {
               <p className="text-xs text-green-100 mb-1">Lump Sum (60%, Tax-Free)</p>
               <p className="text-xl font-bold">{formatCurrency(result.lumpSum)}</p>
             </Card>
-            <Card className="p-4 bg-gradient-to-br from-purple-500 to-purple-600 text-white">
-              <p className="text-xs text-purple-100 mb-1">Monthly Pension (Est.)</p>
+            <Card className="p-4 bg-gradient-to-br from-persian-blue-600 to-persian-blue-700 text-white">
+              <p className="text-xs text-persian-blue-100 mb-1">Monthly Pension (Est.)</p>
               <p className="text-xl font-bold">{formatCurrency(result.monthlyPension)}</p>
             </Card>
             <Card className="p-4 bg-gradient-to-br from-orange-500 to-orange-600 text-white">
@@ -361,7 +361,7 @@ export default function NPSCalculator() {
                 </div>
                 <div className="flex justify-between items-center py-2">
                   <span className="text-slate-600">Annuity Corpus (40%)</span>
-                  <span className="font-semibold text-purple-600">{formatCurrency(result.annuityCorpus)}</span>
+                  <span className="font-semibold text-persian-blue-700">{formatCurrency(result.annuityCorpus)}</span>
                 </div>
               </div>
             </Card>
@@ -394,9 +394,9 @@ export default function NPSCalculator() {
                   <p className="text-xs text-slate-500 mt-1">Additional ₹50,000 over & above 80C</p>
                 </div>
               )}
-              <div className="bg-purple-50 p-4 rounded-lg">
+              <div className="bg-persian-blue-50 p-4 rounded-lg">
                 <p className="text-xs text-slate-500 mb-1">80CCD(2) — Employer contribution</p>
-                <p className="text-xl font-bold text-purple-700">{formatCurrency(result.taxSaving80CCD2)}</p>
+                <p className="text-xl font-bold text-persian-blue-800">{formatCurrency(result.taxSaving80CCD2)}</p>
                 <p className="text-xs text-slate-500 mt-1">
                   {regime === 'new'
                     ? 'Available in New Regime — up to 14% of salary for ALL employers (S.124(2), ITA 2025)'

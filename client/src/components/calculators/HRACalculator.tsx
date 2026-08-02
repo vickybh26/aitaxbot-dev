@@ -537,12 +537,12 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
                           <p className="text-2xl font-bold text-blue-600">₹{result.calculationBreakdown.rule1.toLocaleString()}</p>
                         </div>
 
-                        <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
+                        <div className="p-4 bg-persian-blue-50 rounded-lg border border-persian-blue-200">
                           <p className="text-sm font-medium text-gray-700 mb-2">Rule 2: Rent - 10% of Basic Salary</p>
                           <p className="text-sm text-gray-600 mb-2">
                             ₹{result.actualRentPaid.toLocaleString()} - ₹{(result.basicSalary * 0.10).toLocaleString()}
                           </p>
-                          <p className="text-2xl font-bold text-purple-600">₹{result.calculationBreakdown.rule2.toLocaleString()}</p>
+                          <p className="text-2xl font-bold text-persian-blue-700">₹{result.calculationBreakdown.rule2.toLocaleString()}</p>
                         </div>
 
                         <div className="p-4 bg-orange-50 rounded-lg border border-orange-200">
@@ -615,7 +615,7 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
                               : rec.type === 'warning'
                               ? 'border-l-red-500 bg-red-50'
                               : rec.type === 'investment'
-                              ? 'border-l-purple-500 bg-purple-50'
+                              ? 'border-l-persian-blue-600 bg-persian-blue-50'
                               : 'border-l-green-500 bg-green-50'
                           }`}
                         >

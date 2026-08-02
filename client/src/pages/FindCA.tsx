@@ -124,7 +124,7 @@ export default function FindCA() {
 
       <div>
         {/* Hero */}
-        <div className="bg-gradient-to-br from-blue-700 via-blue-800 to-[#3a6fc4] text-white py-14 px-4">
+        <div className="bg-gradient-to-br from-persian-blue-700 via-persian-blue-800 to-[#3a6fc4] text-white py-14 px-4">
           <div className="max-w-3xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 bg-white/20 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
               <Shield className="w-4 h-4" />
@@ -288,7 +288,7 @@ export default function FindCA() {
 
           {/* CTA for CAs */}
           {!loading && (
-            <div className="mt-12 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-2xl p-6 text-center">
+            <div className="mt-12 bg-gradient-to-r from-blue-50 to-persian-blue-50 border border-blue-100 rounded-2xl p-6 text-center">
               <h3 className="font-semibold text-slate-800 mb-1">Are you a Chartered Accountant?</h3>
               <p className="text-sm text-slate-500 mb-4">
                 List your profile for free. Users looking for CA help during ITR filing season will
