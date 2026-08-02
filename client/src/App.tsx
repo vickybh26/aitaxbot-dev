@@ -42,6 +42,7 @@ const NRONREComparison = lazy(() => import("@/pages/nri/NRONREComparison"));
 const NRIIncomeTaxCalculator = lazy(() => import("@/pages/nri/NRIIncomeTaxCalculator"));
 const RepatriationPlanner = lazy(() => import("@/pages/nri/RepatriationPlanner"));
 const RentReceiptGenerator = lazy(() => import("@/pages/RentReceiptGenerator"));
+const Tools = lazy(() => import("@/pages/Tools"));
 const AIS26ASForm16Tool = lazy(() => import("@/pages/AIS26ASForm16Tool"));
 const FindCA = lazy(() => import("@/pages/FindCA"));
 const CARegister = lazy(() => import("@/pages/CARegister"));
@@ -196,6 +197,9 @@ function Router() {
           <Route path="/nri/nro-nre-comparison" component={NRONREComparison} />
           <Route path="/nri/income-tax-calculator" component={NRIIncomeTaxCalculator} />
           <Route path="/nri/repatriation-planner" component={RepatriationPlanner} />
+          {/* Index page must be declared before the nested /tools/* routes so
+              wouter matches the exact path rather than falling through. */}
+          <Route path="/tools" component={Tools} />
           <Route path="/tools/rent-receipt" component={RentReceiptGenerator} />
           <Route path="/tools/ais-26as-form16" component={AIS26ASForm16Tool} />
           <Route path="/find-ca" component={FindCA} />
