@@ -364,7 +364,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                 <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Latest from AiTaxBot</h2>
               </div>
               <Link href="/blog" className="hidden sm:flex items-center gap-1.5 text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">
-                View all 34 guides <ArrowRight className="h-4 w-4" />
+                View all {blogPosts.length} guides <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -383,7 +383,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
               ))}
             </div>
             <div className="mt-6 text-center sm:hidden">
-              <Link href="/blog" className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600">View all 34 guides <ArrowRight className="h-4 w-4" /></Link>
+              <Link href="/blog" className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600">View all {blogPosts.length} guides <ArrowRight className="h-4 w-4" /></Link>
             </div>
           </div>
         </section>

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import ProfileCompletionModal from "@/components/ProfileCompletionModal";
 import SavedResultCards from "@/components/SavedResultCards";
+import { blogPosts } from "@/data/blogPosts";
 import {
   Calculator,
   FileText,
@@ -332,7 +333,7 @@ export default function Dashboard() {
     },
     {
       title: "Tax Blog & Guides",
-      description: "34 CA-reviewed articles on ITR, HRA, capital gains & more",
+      description: `${blogPosts.length} CA-reviewed articles on ITR, HRA, capital gains & more`,
       icon: BookOpen,
       link: "/blog",
       color: "text-persian-blue-700",
