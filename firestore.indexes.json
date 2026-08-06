@@ -33,6 +33,14 @@
       ]
     },
     {
+      "collectionGroup": "taxProfiles",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "assessmentYear", "order": "ASCENDING" }
+      ]
+    },
+    {
       "collectionGroup": "taxCalculationHistory",
       "queryScope": "COLLECTION",
       "fields": [

@@ -50,14 +50,14 @@ export default function HomeLoanCalculatorPage() {
   const calculatorSchema = generateCalculatorSchema({
     name: "Home Loan Affordability Calculator India",
     description: "Free Home Loan Calculator India FY 2026-27. Check eligibility, calculate EMI, total interest and annual tax savings under Section 24 and Section 80C.",
-    url: "https://aitaxbot.co.in/calculators/home-loan",
+    url: "https://www.aitaxbot.co.in/calculators/home-loan",
     applicationCategory: "FinanceApplication"
   });
 
   const breadcrumbSchema = generateBreadcrumbSchema([
-    { name: "Home", url: "https://aitaxbot.co.in/" },
-    { name: "Calculators", url: "https://aitaxbot.co.in/calculators" },
-    { name: "Home Loan Calculator", url: "https://aitaxbot.co.in/calculators/home-loan" }
+    { name: "Home", url: "https://www.aitaxbot.co.in/" },
+    { name: "Calculators", url: "https://www.aitaxbot.co.in/calculators" },
+    { name: "Home Loan Calculator", url: "https://www.aitaxbot.co.in/calculators/home-loan" }
   ]);
 
   const organizationSchema = generateOrganizationSchema();
@@ -68,11 +68,11 @@ export default function HomeLoanCalculatorPage() {
         <title>Home Loan Calculator India FY 2026-27 — Eligibility, EMI & Tax Benefit | AiTaxBot</title>
         <meta name="description" content="Free Home Loan Affordability Calculator India. Check how much loan you can get on your salary, calculate EMI, total interest and Section 24 + 80C tax savings. CA verified." />
         <meta name="keywords" content="home loan calculator, home loan eligibility calculator, EMI calculator, housing loan calculator India, Section 24 tax benefit, home loan tax saving, affordability calculator" />
-        <link rel="canonical" href="https://aitaxbot.co.in/calculators/home-loan" />
+        <link rel="canonical" href="https://www.aitaxbot.co.in/calculators/home-loan" />
         <meta property="og:title" content="Home Loan Calculator India — Eligibility, EMI & Tax Benefits FY 2026-27" />
         <meta property="og:description" content="Know exactly how much home loan you qualify for, your monthly EMI, total interest and annual tax savings under Section 24 and 80C." />
-        <meta property="og:url" content="https://aitaxbot.co.in/calculators/home-loan" />
-        <meta property="og:image" content="https://aitaxbot.co.in/images/aitaxbot-logo.png" />
+        <meta property="og:url" content="https://www.aitaxbot.co.in/calculators/home-loan" />
+        <meta property="og:image" content="https://www.aitaxbot.co.in/images/aitaxbot-logo.png" />
         <meta property="og:type" content="website" />
         <script type="application/ld+json">{JSON.stringify(calculatorSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>

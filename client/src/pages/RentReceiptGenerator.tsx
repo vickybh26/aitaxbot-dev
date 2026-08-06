@@ -216,7 +216,7 @@ export default function RentReceiptGenerator() {
         <title>Free Rent Receipt Generator India — Download & Email PDF | AiTaxBot</title>
         <meta name="description" content="Generate professional rent receipts instantly. Download as PDF or email to yourself. Includes landlord PAN, revenue stamp reminder, and HRA exemption link. Free with a quick sign-in." />
         <meta name="keywords" content="rent receipt generator India, rent receipt PDF, HRA rent receipt, landlord tenant receipt, free rent receipt" />
-        <link rel="canonical" href="https://aitaxbot.co.in/tools/rent-receipt" />
+        <link rel="canonical" href="https://www.aitaxbot.co.in/tools/rent-receipt" />
       </Helmet>
 
       <div>

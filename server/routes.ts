@@ -2074,6 +2074,102 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ==========================================
+  // PERSONAL DASHBOARD STATS
+  // ==========================================
+  //
+  // The personal dashboard used to render its headline cards from
+  // /api/accounting/dashboard/stats. That endpoint belongs to the accounting
+  // module: it walks firms → invoices → clients → revenue, so a user who
+  // isn't running a CA practice saw 0 / 0 / ₹0 forever. Worse, its
+  // `taxCalculations` figure counted the `taxProfiles` collection, and
+  // nothing in this codebase has ever called createTaxProfile() — so that
+  // card read 0 even for users with hundreds of calculations sitting in
+  // `toolUsage` directly below it on the same screen.
+  //
+  // This endpoint reads the collections that are actually written to:
+  //   toolUsage             — one doc per calculator run (useTrackToolUse)
+  //   taxCalculationHistory — explicit "Save Calculation" from the tax tool
+  //   savedResults          — one "last result" card per tool
+  // Accounting figures are still returned, but as a nested object that is
+  // null when the user has no firms, so the client can omit that row rather
+  // than render a wall of zeroes.
+  app.get("/api/dashboard/stats", authenticateFirebaseToken, async (req: AuthenticatedRequest, res) => {
+    const userId = req.userId!;
+    try {
+      const db = getFirestore();
+
+      const [usageSnap, savedCalcs, savedResultsSnap, firms] = await Promise.all([
+        db.collection(COLLECTIONS.TOOL_USAGE).where("userId", "==", userId).limit(1000).get(),
+        storage.getTaxCalculationHistory(userId).catch((e) => {
+          console.error(`[Dashboard] taxCalculationHistory failed for ${userId} — requestId=${(req as any).requestId}`, e);
+          return [];
+        }),
+        db.collection("savedResults").where("userId", "==", userId).get(),
+        storage.getFirms(userId).catch((e) => {
+          console.error(`[Dashboard] getFirms failed for ${userId} — requestId=${(req as any).requestId}`, e);
+          return [];
+        }),
+      ]);
+
+      // Distinct tools + distinct active days, derived from the same scan.
+      const tools = new Set<string>();
+      const days = new Set<string>();
+      let lastActivityAt: string | null = null;
+
+      usageSnap.docs.forEach((d) => {
+        const data = d.data() as any;
+        if (data.tool) tools.add(String(data.tool));
+        const raw = data.createdAt;
+        const dt = raw?.toDate ? raw.toDate() : new Date(raw);
+        if (!isNaN(dt.getTime())) {
+          days.add(dt.toISOString().slice(0, 10));
+          const iso = dt.toISOString();
+          if (!lastActivityAt || iso > lastActivityAt) lastActivityAt = iso;
+        }
+      });
+
+      // Accounting block — only computed when the user actually has firms, so
+      // the common case costs zero extra Firestore reads.
+      let accounting: Record<string, any> | null = null;
+      if (firms.length > 0) {
+        const firmIds = firms.map((f) => f.id);
+        const [invoiceArrays, clientArrays] = await Promise.all([
+          Promise.all(firmIds.map((id) => storage.getInvoices(id))),
+          Promise.all(firmIds.map((id) => storage.getClients(id))),
+        ]);
+        const allInvoices = invoiceArrays.flat();
+        let totalRevenue = 0;
+        let paidInvoices = 0;
+        for (const inv of allInvoices) {
+          totalRevenue += parseFloat((inv.grandTotal as string) || "0");
+          if (inv.paymentStatus === "paid") paidInvoices++;
+        }
+        accounting = {
+          firmsCount: firms.length,
+          invoicesCount: allInvoices.length,
+          clientsCount: clientArrays.flat().length,
+          totalRevenue: totalRevenue.toFixed(2),
+          paidInvoices,
+          unpaidInvoices: allInvoices.length - paidInvoices,
+        };
+      }
+
+      res.json({
+        calculationsRun: usageSnap.size,
+        toolsUsed: tools.size,
+        savedCalculations: savedCalcs.length,
+        savedResults: savedResultsSnap.size,
+        activeDays: days.size,
+        lastActivityAt,
+        accounting,
+      });
+    } catch (error) {
+      console.error(`Error building dashboard stats for ${userId}:`, error);
+      res.status(500).json({ error: "Failed to load dashboard statistics" });
+    }
+  });
+
+  // ==========================================
   // TAX CALCULATION HISTORY ENDPOINTS
   // ==========================================
 

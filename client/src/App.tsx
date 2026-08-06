@@ -173,6 +173,10 @@ function Router() {
         <Switch>
           <Route path="/" component={(props) => <Landing {...props} activeModal={activeModal} setActiveModal={setActiveModal} />} />
           <Route path="/login" component={Login} />
+          {/* /signup is the conventional URL and was previously a 404 — sign-up
+              only existed as /login?tab=signup. Login reads the pathname and
+              opens the correct tab. */}
+          <Route path="/signup" component={Login} />
           <Route path="/dashboard">
             {() => <ProtectedRoute component={Dashboard} />}
           </Route>

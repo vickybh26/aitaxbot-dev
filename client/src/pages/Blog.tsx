@@ -179,12 +179,12 @@ export default function Blog() {
           content="In-depth guides on Indian taxation, ITR filing, tax saving, capital gains, GST, SIP, and the new Income Tax Act 2025. CA-verified articles updated for FY 2026-27 & Tax Year 2026-27."
         />
         <meta name="keywords" content="income tax blog India, tax saving tips, IT act 2025, capital gains tax, GST guide, SIP calculator, AiTaxBot blog" />
-        <link rel="canonical" href="https://aitaxbot.co.in/blog" />
+        <link rel="canonical" href="https://www.aitaxbot.co.in/blog" />
         <meta property="og:title" content="AiTaxBot Blog — Tax & Finance Insights for India" />
         <meta property="og:description" content="CA-verified guides on income tax, investments, GST, and the new Income Tax Act 2025. Trusted by Indian taxpayers." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://aitaxbot.co.in/blog" />
-        <meta property="og:image" content="https://aitaxbot.co.in/images/aitaxbot-logo.png" />
+        <meta property="og:url" content="https://www.aitaxbot.co.in/blog" />
+        <meta property="og:image" content="https://www.aitaxbot.co.in/images/aitaxbot-logo.png" />
       </Helmet>
 
       <div className="bg-slate-50">

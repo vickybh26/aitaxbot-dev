@@ -37,23 +37,33 @@ import {
 } from "lucide-react";
 import jsPDF from 'jspdf';
 
+/**
+ * Personal dashboard stats — served by GET /api/dashboard/stats.
+ *
+ * This deliberately does NOT come from /api/accounting/dashboard/stats any
+ * more. That endpoint belongs to the accounting module (firms → invoices →
+ * clients → revenue), so every user who isn't running a CA practice saw a row
+ * of zeroes, and its `taxCalculations` field counted the `taxProfiles`
+ * collection — which nothing in the codebase has ever written to.
+ *
+ * `accounting` is null unless the user actually has firms, so the accounting
+ * row is omitted rather than rendered as 0 / 0 / ₹0.
+ */
 interface DashboardStats {
-  firmsCount: number;
-  invoicesCount: number;
-  clientsCount: number;
-  totalRevenue: string;
-  paidInvoices: number;
-  unpaidInvoices: number;
-  taxCalculations: number;
-}
-
-interface DashboardActivity {
-  type: string;
-  title: string;
-  description: string;
-  time: string;
-  icon: string;
-  color: string;
+  calculationsRun: number;
+  toolsUsed: number;
+  savedCalculations: number;
+  savedResults: number;
+  activeDays: number;
+  lastActivityAt: string | null;
+  accounting: {
+    firmsCount: number;
+    invoicesCount: number;
+    clientsCount: number;
+    totalRevenue: string;
+    paidInvoices: number;
+    unpaidInvoices: number;
+  } | null;
 }
 
 interface ToolUsageEvent {
@@ -102,13 +112,15 @@ export default function Dashboard() {
 
   // Fetch dashboard statistics
   const { data: stats, isLoading: statsLoading } = useQuery<DashboardStats>({
-    queryKey: ['/api/accounting/dashboard/stats'],
+    queryKey: ['/api/dashboard/stats'],
+    enabled: !!user,
   });
 
-  // Fetch recent activities
-  const { data: activities = [], isLoading: activitiesLoading } = useQuery<DashboardActivity[]>({
-    queryKey: ['/api/accounting/dashboard/activities'],
-  });
+  // NOTE: the old /api/accounting/dashboard/activities query used to live here.
+  // Nothing on this page ever rendered its result — it only emits invoice and
+  // firm events, so it was empty for every non-accounting user — yet it fired a
+  // firms→invoices→clients fan-out against Firestore on every dashboard load.
+  // Recent activity is shown from /api/tool-usage below instead.
 
   // Fetch recent calculator activity
   const { data: toolUsageEvents = [], isLoading: toolUsageLoading } = useQuery<ToolUsageEvent[]>({
@@ -278,40 +290,105 @@ export default function Dashboard() {
     return Math.ceil(diff / (1000 * 60 * 60 * 24));
   };
 
+  // Helper to format time ago.
+  // Declared ABOVE quickStats deliberately: quickStats is a plain const array
+  // evaluated during render, and it calls getTimeAgo. Leaving this below it
+  // would put the call in the temporal dead zone and throw at runtime.
+  const getTimeAgo = (timestamp: string) => {
+    const now = new Date().getTime();
+    const then = new Date(timestamp).getTime();
+    const diff = now - then;
+
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+
+    if (minutes < 60) return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
+    if (hours < 24) return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
+    return `${days} day${days !== 1 ? 's' : ''} ago`;
+  };
+
+  // Headline cards describe THIS user's activity on the tax tools — the thing
+  // the rest of the page is about. Previously three of the four were accounting
+  // figures (invoices / clients / revenue) which are zero for anyone not running
+  // a CA practice, and the fourth counted an empty collection. The accounting
+  // row below is rendered separately, and only when the user has firms.
+  //
+  // COLOUR: these use the token utilities defined in index.css
+  // (.text-primary / .bg-primary-light / .text-success / .bg-success-light /
+  // .bg-persian-blue-*), all of which resolve through CSS variables. That keeps
+  // the cards on whatever palette the design system settles on rather than
+  // pinning them to raw Tailwind blue/green/orange.
+  //
+  // Green is reserved for money-positive outcomes and genuine success states —
+  // so it appears on Total Revenue and on the "paid invoices" note, and nowhere
+  // else. A count of saved calculations is neither, so it stays navy.
   const quickStats = [
     {
-      title: "Tax Calculations",
-      value: statsLoading ? "..." : (stats?.taxCalculations || 0).toString(),
+      title: "Calculations Run",
+      value: statsLoading ? "..." : (stats?.calculationsRun ?? 0).toString(),
       icon: Calculator,
-      change: stats?.taxCalculations ? "Completed" : "Get started",
-      color: "text-blue-600",
-      bgColor: "bg-blue-50"
+      change: stats?.calculationsRun ? `Across ${stats.toolsUsed} tool${stats.toolsUsed === 1 ? '' : 's'}` : "Get started",
+      color: "text-primary",
+      bgColor: "bg-primary-light"
     },
     {
-      title: "Invoices Generated",
-      value: statsLoading ? "..." : (stats?.invoicesCount || 0).toString(),
+      title: "Saved Calculations",
+      value: statsLoading ? "..." : (stats?.savedCalculations ?? 0).toString(),
       icon: FileText,
-      change: stats?.paidInvoices ? `${stats.paidInvoices} paid, ${stats.unpaidInvoices} pending` : "No invoices yet",
-      color: "text-green-600",
-      bgColor: "bg-green-50"
+      change: stats?.savedCalculations ? "Stored for 30 days" : "Nothing saved yet",
+      color: "text-persian-blue-600",
+      bgColor: "bg-persian-blue-50"
     },
     {
-      title: "Total Clients",
-      value: statsLoading ? "..." : (stats?.clientsCount || 0).toString(),
-      icon: Building2,
-      change: stats?.clientsCount ? "Managed clients" : "Add your first client",
+      title: "Results Kept",
+      value: statsLoading ? "..." : (stats?.savedResults ?? 0).toString(),
+      icon: Layers,
+      change: stats?.savedResults ? "Waiting on your dashboard" : "Run a tool to save one",
       color: "text-persian-blue-700",
       bgColor: "bg-persian-blue-50"
     },
     {
-      title: "Total Revenue",
-      value: statsLoading ? "..." : (stats?.totalRevenue ? `₹${parseFloat(stats.totalRevenue).toLocaleString('en-IN', { maximumFractionDigits: 0 })}` : "₹0"),
-      icon: DollarSign,
-      change: stats?.invoicesCount ? `From ${stats.invoicesCount} invoices` : "No revenue yet",
-      color: "text-orange-600",
-      bgColor: "bg-orange-50"
+      title: "Active Days",
+      value: statsLoading ? "..." : (stats?.activeDays ?? 0).toString(),
+      icon: Activity,
+      change: stats?.lastActivityAt ? `Last active ${getTimeAgo(stats.lastActivityAt)}` : "No activity yet",
+      color: "text-slate-600",
+      bgColor: "bg-slate-100"
     }
   ];
+
+  // Accounting figures only make sense once the user has registered a firm.
+  const accountingStats = stats?.accounting ? [
+    {
+      title: "Invoices Generated",
+      value: stats.accounting.invoicesCount.toString(),
+      icon: FileText,
+      change: stats.accounting.paidInvoices
+        ? `${stats.accounting.paidInvoices} paid, ${stats.accounting.unpaidInvoices} pending`
+        : "No invoices yet",
+      color: "text-slate-600",
+      bgColor: "bg-slate-100"
+    },
+    {
+      title: "Total Clients",
+      value: stats.accounting.clientsCount.toString(),
+      icon: Building2,
+      change: stats.accounting.clientsCount ? "Managed clients" : "Add your first client",
+      color: "text-primary",
+      bgColor: "bg-primary-light"
+    },
+    {
+      // The one genuinely money-positive figure on this page — the only place
+      // green is earned under the redesign's colour rule.
+      title: "Total Revenue",
+      value: `₹${parseFloat(stats.accounting.totalRevenue).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`,
+      icon: DollarSign,
+      change: stats.accounting.invoicesCount ? `From ${stats.accounting.invoicesCount} invoices` : "No revenue yet",
+      color: "text-success",
+      bgColor: "bg-success-light"
+    }
+  ] : [];
 
   const features = [
     {
@@ -349,40 +426,13 @@ export default function Dashboard() {
     }
   ];
 
-  // Helper to format time ago
-  const getTimeAgo = (timestamp: string) => {
-    const now = new Date().getTime();
-    const then = new Date(timestamp).getTime();
-    const diff = now - then;
-    
-    const minutes = Math.floor(diff / 60000);
-    const hours = Math.floor(diff / 3600000);
-    const days = Math.floor(diff / 86400000);
-    
-    if (minutes < 60) return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
-    if (hours < 24) return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
-    return `${days} day${days !== 1 ? 's' : ''} ago`;
-  };
-
-  // Helper to get icon component
-  const getIconComponent = (iconName: string) => {
-    const icons: any = {
-      FileText,
-      Building2,
-      Calculator,
-      TrendingUp,
-      User
-    };
-    return icons[iconName] || FileText;
-  };
-
   return (
     <>
       <Helmet>
         <title>My Dashboard - AiTaxBot Personal Finance Hub</title>
         <meta name="description" content="Access your personal tax calculations, manage invoices, track clients, and view financial analytics. Comprehensive dashboard for Indian tax and financial management." />
         <meta name="keywords" content="tax dashboard, personal finance, invoice management, client tracking, tax analytics" />
-        <link rel="canonical" href="https://aitaxbot.co.in/dashboard" />
+        <link rel="canonical" href="https://www.aitaxbot.co.in/dashboard" />
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
 
@@ -579,14 +629,43 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">{stat.title}</p>
-                  <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                  <p className="text-xs text-gray-500 mt-1">{stat.change}</p>
+                  <p className="text-sm text-slate-600 mb-1">{stat.title}</p>
+                  {/* tabular-figures: the redesign uses IBM Plex's tabular
+                      numerals so figures don't jitter or misalign between cards */}
+                  <p className="text-2xl font-bold text-slate-900 tabular-figures">{stat.value}</p>
+                  <p className="text-xs text-slate-500 mt-1">{stat.change}</p>
                 </div>
               </CardContent>
             </Card>
           ))}
         </div>
+
+        {/* Accounting stats — rendered only for users who have registered a
+            firm. Everyone else previously saw these three cards permanently
+            reading 0 / 0 / ₹0, which read as "the dashboard is broken". */}
+        {accountingStats.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-lg font-bold text-slate-900 mb-4">Your Practice</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {accountingStats.map((stat, index) => (
+                <Card key={index} className="hover:shadow-lg transition-shadow" data-testid={`stat-${stat.title.toLowerCase().replace(/\s+/g, '-')}`}>
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className={`p-3 rounded-lg ${stat.bgColor}`}>
+                        <stat.icon className={`h-6 w-6 ${stat.color}`} />
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-sm text-slate-600 mb-1">{stat.title}</p>
+                      <p className="text-2xl font-bold text-slate-900 tabular-figures">{stat.value}</p>
+                      <p className="text-xs text-slate-500 mt-1">{stat.change}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
 
 
         {/* Saved Tax Calculations */}

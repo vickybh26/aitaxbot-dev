@@ -71,6 +71,9 @@ export default function AuthModal({ open, onOpenChange, defaultTab = "login", to
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     try {
+      // No destination argument on purpose: if the popup is blocked and this
+      // falls back to a redirect, we want the user returned to THIS page — the
+      // calculator they were using — not sent off to the dashboard.
       await signInWithGoogle();
       toast({ title: "Success", description: "Signed in with Google successfully!" });
       onOpenChange(false);

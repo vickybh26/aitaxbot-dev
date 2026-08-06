@@ -13,7 +13,7 @@ import { sanitizeAuthError } from "@/lib/errorHandler";
 import { Calculator, TrendingUp, FileText } from "lucide-react";
 
 export default function Login() {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const searchString = useSearch();
   const { toast } = useToast();
   const { isAuthenticated, loading } = useAuth();
@@ -42,6 +42,14 @@ export default function Login() {
     return '/dashboard';
   }, [searchString]);
 
+  // This page serves both /login and /signup. Sign-up previously existed only
+  // as /login?tab=signup, so any ad, email or external link pointing at the
+  // conventional /signup URL hit the 404 page.
+  const defaultTab = useMemo(() => {
+    if (location === '/signup') return 'signup';
+    return new URLSearchParams(searchString).get('tab') === 'signup' ? 'signup' : 'login';
+  }, [location, searchString]);
+
   // Redirect if already authenticated
   useEffect(() => {
     if (!loading && isAuthenticated) {
@@ -52,7 +60,9 @@ export default function Login() {
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     try {
-      await signInWithGoogle();
+      // Pass returnUrl explicitly: if the popup is blocked this falls back to a
+      // full-page redirect, and the query string we read it from won't survive.
+      await signInWithGoogle(returnUrl);
       toast({ title: "Success", description: "Signed in with Google successfully!" });
       // Auth state will update automatically via onAuthStateChanged
       // The useEffect watching isAuthenticated will handle the redirect
@@ -74,10 +84,10 @@ export default function Login() {
     try {
       await signInWithEmail(loginEmail, loginPassword);
       toast({ title: "Success", description: "Logged in successfully!" });
-      // Small delay to ensure auth state propagates
-      setTimeout(() => {
-        setLocation(returnUrl);
-      }, 500);
+      // Navigation is handled by the isAuthenticated effect above, which fires
+      // when onAuthStateChanged resolves. The old setTimeout(…, 500) raced that
+      // effect and could navigate twice — and guessed at a delay that is not
+      // guaranteed to be long enough on a slow connection.
     } catch (error: any) {
       toast({ 
         title: "Error", 
@@ -98,10 +108,7 @@ export default function Login() {
     try {
       await signUpWithEmail(signupEmail, signupPassword);
       toast({ title: "Success", description: "Account created successfully!" });
-      // Small delay to ensure auth state propagates
-      setTimeout(() => {
-        setLocation(returnUrl);
-      }, 500);
+      // See handleEmailLogin — the isAuthenticated effect performs the redirect.
     } catch (error: any) {
       toast({ 
         title: "Error", 
@@ -127,7 +134,7 @@ export default function Login() {
   return (
     <>
       <Helmet>
-        <title>Login - AiTaxBot Tax Calculator & Financial Tools</title>
+        <title>{defaultTab === 'signup' ? 'Create a Free Account' : 'Login'} - AiTaxBot Tax Calculator &amp; Financial Tools</title>
         <meta name="description" content="Sign in to AiTaxBot to access tax calculators, invoice management, and financial tools. Create an account for free." />
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
@@ -190,7 +197,7 @@ export default function Login() {
 
             {/* Login/Signup Section */}
             <Card className="p-6">
-              <Tabs defaultValue={new URLSearchParams(searchString).get('tab') === 'signup' ? 'signup' : 'login'} className="w-full">
+              <Tabs defaultValue={defaultTab} className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="login">Login</TabsTrigger>
                   <TabsTrigger value="signup">Sign Up</TabsTrigger>

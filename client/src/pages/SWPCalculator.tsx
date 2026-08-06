@@ -50,14 +50,14 @@ export default function SWPCalculatorPage() {
   const calculatorSchema = generateCalculatorSchema({
     name: "SWP Calculator - Systematic Withdrawal Plan",
     description: "Free SWP Calculator India FY 2026-27. Calculate how long your retirement corpus lasts with systematic monthly withdrawals. Plan tax-efficient retirement income through SWP.",
-    url: "https://aitaxbot.co.in/calculators/swp",
+    url: "https://www.aitaxbot.co.in/calculators/swp",
     applicationCategory: "FinanceApplication"
   });
 
   const breadcrumbSchema = generateBreadcrumbSchema([
-    { name: "Home", url: "https://aitaxbot.co.in/" },
-    { name: "Calculators", url: "https://aitaxbot.co.in/calculators" },
-    { name: "SWP Calculator", url: "https://aitaxbot.co.in/calculators/swp" }
+    { name: "Home", url: "https://www.aitaxbot.co.in/" },
+    { name: "Calculators", url: "https://www.aitaxbot.co.in/calculators" },
+    { name: "SWP Calculator", url: "https://www.aitaxbot.co.in/calculators/swp" }
   ]);
 
   const organizationSchema = generateOrganizationSchema();
@@ -68,11 +68,11 @@ export default function SWPCalculatorPage() {
         <title>SWP Calculator India FY 2026-27 - Retirement Income Planning | AiTaxBot</title>
         <meta name="description" content="Free SWP Calculator India FY 2026-27. Calculate systematic withdrawals, corpus sustainability, and tax-efficient retirement income planning. See how long your corpus lasts with monthly SWP withdrawals." />
         <meta name="keywords" content="SWP calculator, systematic withdrawal plan, retirement income planning, mutual fund withdrawal, monthly pension calculator, corpus calculator, tax-efficient withdrawal, SWP LTCG tax, retirement planning India" />
-        <link rel="canonical" href="https://aitaxbot.co.in/calculators/swp" />
+        <link rel="canonical" href="https://www.aitaxbot.co.in/calculators/swp" />
         <meta property="og:title" content="SWP Calculator India FY 2026-27 - Retirement Income Planning | AiTaxBot" />
         <meta property="og:description" content="Calculate systematic withdrawals and corpus longevity. Plan tax-efficient retirement income with SWP. See LTCG tax benefits vs FD interest." />
-        <meta property="og:url" content="https://aitaxbot.co.in/calculators/swp" />
-        <meta property="og:image" content="https://aitaxbot.co.in/images/aitaxbot-logo.png" />
+        <meta property="og:url" content="https://www.aitaxbot.co.in/calculators/swp" />
+        <meta property="og:image" content="https://www.aitaxbot.co.in/images/aitaxbot-logo.png" />
         <meta property="og:type" content="website" />
         <script type="application/ld+json">{JSON.stringify(calculatorSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>

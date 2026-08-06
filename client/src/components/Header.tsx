@@ -143,6 +143,12 @@ export default function Header({ showModal }: HeaderProps = {}) {
                   <Link href="/accounting" onClick={() => { trackButtonClick("Accounting", "Header More"); setMoreOpen(false); }} className={dropItem}>
                     Accounting
                   </Link>
+                  {/* Supply-side entry point for the CA directory. Without this,
+                      /ca/register was only reachable from inside /find-ca — a
+                      page no Chartered Accountant has any reason to visit. */}
+                  <Link href="/ca/register" onClick={() => { trackButtonClick("List Your Practice", "Header More"); setMoreOpen(false); }} className={dropItem}>
+                    For CAs — List Your Practice
+                  </Link>
                   <Link href="/about" onClick={() => { trackButtonClick("About", "Header More"); setMoreOpen(false); }} className={dropItem}>
                     About
                   </Link>
@@ -272,6 +278,9 @@ export default function Header({ showModal }: HeaderProps = {}) {
             <Link href="/blog" onClick={() => setMobileMenuOpen(false)} className="py-2.5 text-sm font-medium text-slate-700 block">Blog</Link>
             <Link href="/find-ca" onClick={() => { trackButtonClick("Find a CA", "Mobile Header"); setMobileMenuOpen(false); }} className="flex items-center gap-2 py-2.5 text-sm font-medium text-blue-600">
               <UserCheck className="w-4 h-4" />Find a CA
+            </Link>
+            <Link href="/ca/register" onClick={() => { trackButtonClick("List Your Practice", "Mobile Header"); setMobileMenuOpen(false); }} className="py-2.5 text-sm font-medium text-slate-700 block">
+              For CAs — List Your Practice
             </Link>
             <Link href="/about" onClick={() => setMobileMenuOpen(false)} className="py-2.5 text-sm font-medium text-slate-700 block">About</Link>
             <Link href="/contact" onClick={() => setMobileMenuOpen(false)} className="py-2.5 text-sm font-medium text-slate-700 block">Contact</Link>

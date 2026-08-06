@@ -56,21 +56,77 @@ export function sanitizeAuthError(error: unknown): string {
     
     // Rate limiting
     'auth/too-many-requests': 'Too many failed attempts. Please try again later',
-    
+
+    // App Check — Firebase Authentication has App Check enforcement enabled, so
+    // signUp / signInWithPassword return 401 when the browser cannot obtain a
+    // reCAPTCHA v3 token. That happens for real users behind uBlock Origin,
+    // Brave shields, strict privacy modes and some corporate proxies, all of
+    // which block www.google.com/recaptcha. Without these entries the person
+    // saw only "An error occurred during sign-in" and had no way to act on it.
+    'auth/firebase-app-check-token-is-invalid':
+      'Sign-in is being blocked by a browser privacy setting or extension. Please disable your ad/privacy blocker for aitaxbot.co.in, or try a different browser.',
+    'auth/missing-app-credential':
+      'Sign-in is being blocked by a browser privacy setting or extension. Please disable your ad/privacy blocker for aitaxbot.co.in, or try a different browser.',
+
     // Other errors
     'auth/internal-error': 'An internal error occurred. Please try again',
   };
 
   // Return sanitized message based on error code
   if (errorCode && errorMessages[errorCode]) {
+    reportAuthFailure(errorCode);
     return errorMessages[errorCode];
+  }
+
+  // Firebase does not always surface a stable code for App Check rejections —
+  // some builds only put "App Check" in the message. Catch that shape too
+  // rather than falling through to the generic string.
+  if (typeof firebaseError.message === 'string' && /app\s*check/i.test(firebaseError.message)) {
+    reportAuthFailure('app-check-message-match');
+    return 'Sign-in is being blocked by a browser privacy setting or extension. Please disable your ad/privacy blocker for aitaxbot.co.in, or try a different browser.';
   }
 
   // For unknown errors, return a generic message
   // NEVER return the raw error message as it might contain sensitive data
   console.error('[Auth Error]', errorCode || 'unknown', firebaseError);
-  
+  reportAuthFailure(errorCode || 'unknown');
+
   return 'An error occurred during sign-in. Please try again';
+}
+
+/**
+ * Fire-and-forget telemetry for auth failures.
+ *
+ * Only the error CODE is sent — never the message, email, or any part of the
+ * credential. Without this there was no way to tell how many sign-ups were
+ * being lost to App Check versus genuinely wrong passwords, which is exactly
+ * the question that matters when sign-ups fall off a cliff.
+ */
+function reportAuthFailure(code: string) {
+  // Codes that represent ordinary user error carry no diagnostic value and
+  // would drown out the ones that do.
+  const NOT_WORTH_REPORTING = new Set([
+    'auth/invalid-email',
+    'auth/user-not-found',
+    'auth/wrong-password',
+    'auth/invalid-credential',
+    'auth/email-already-in-use',
+    'auth/weak-password',
+    'auth/popup-closed-by-user',
+    'auth/cancelled-popup-request',
+  ]);
+  if (NOT_WORTH_REPORTING.has(code)) return;
+
+  try {
+    void fetch('/api/logs/client', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ kind: 'auth-failure', code, path: window.location.pathname }),
+      keepalive: true,
+    }).catch(() => { /* telemetry must never break sign-in */ });
+  } catch {
+    /* no-op */
+  }
 }
 
 /**

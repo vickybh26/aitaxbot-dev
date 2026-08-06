@@ -50,14 +50,14 @@ export default function NPSCalculatorPage() {
   const calculatorSchema = generateCalculatorSchema({
     name: "NPS Calculator - National Pension System",
     description: "Free NPS Calculator India FY 2026-27. Calculate NPS corpus, lump sum, monthly pension and tax savings under Section 80CCD(1), 80CCD(1B) and 80CCD(2).",
-    url: "https://aitaxbot.co.in/calculators/nps",
+    url: "https://www.aitaxbot.co.in/calculators/nps",
     applicationCategory: "FinanceApplication"
   });
 
   const breadcrumbSchema = generateBreadcrumbSchema([
-    { name: "Home", url: "https://aitaxbot.co.in/" },
-    { name: "Calculators", url: "https://aitaxbot.co.in/calculators" },
-    { name: "NPS Calculator", url: "https://aitaxbot.co.in/calculators/nps" }
+    { name: "Home", url: "https://www.aitaxbot.co.in/" },
+    { name: "Calculators", url: "https://www.aitaxbot.co.in/calculators" },
+    { name: "NPS Calculator", url: "https://www.aitaxbot.co.in/calculators/nps" }
   ]);
 
   const organizationSchema = generateOrganizationSchema();
@@ -68,11 +68,11 @@ export default function NPSCalculatorPage() {
         <title>NPS Calculator India FY 2026-27 - Pension Corpus & Tax Saving | AiTaxBot</title>
         <meta name="description" content="Free NPS Calculator India. Calculate National Pension System corpus, monthly pension, lump sum and tax savings under 80CCD(1), 80CCD(1B) +₹50,000 extra deduction. CA verified." />
         <meta name="keywords" content="NPS calculator, National Pension System calculator, NPS tax benefit, 80CCD 1B, NPS corpus calculator, NPS pension calculator, NPS tax saving India, PRAN calculator" />
-        <link rel="canonical" href="https://aitaxbot.co.in/calculators/nps" />
+        <link rel="canonical" href="https://www.aitaxbot.co.in/calculators/nps" />
         <meta property="og:title" content="NPS Calculator India FY 2026-27 - Corpus, Pension & ₹50,000 Extra Tax Saving" />
         <meta property="og:description" content="Calculate your NPS retirement corpus, monthly pension and extra ₹50,000 tax saving under Section 80CCD(1B). CA verified, updated for FY 2026-27." />
-        <meta property="og:url" content="https://aitaxbot.co.in/calculators/nps" />
-        <meta property="og:image" content="https://aitaxbot.co.in/images/aitaxbot-logo.png" />
+        <meta property="og:url" content="https://www.aitaxbot.co.in/calculators/nps" />
+        <meta property="og:image" content="https://www.aitaxbot.co.in/images/aitaxbot-logo.png" />
         <meta property="og:type" content="website" />
         <script type="application/ld+json">{JSON.stringify(calculatorSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>

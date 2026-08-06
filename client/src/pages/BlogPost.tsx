@@ -238,13 +238,13 @@ export default function BlogPost() {
         <meta property="og:title" content={post.ogTitle} />
         <meta property="og:description" content={post.ogDescription} />
         <meta property="og:type" content="article" />
-        <meta property="og:url" content={`https://aitaxbot.co.in/blog/${post.slug}`} />
+        <meta property="og:url" content={`https://www.aitaxbot.co.in/blog/${post.slug}`} />
         
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={post.ogTitle} />
         <meta name="twitter:description" content={post.ogDescription} />
         
-        <link rel="canonical" href={`https://aitaxbot.co.in/blog/${post.slug}`} />
+        <link rel="canonical" href={`https://www.aitaxbot.co.in/blog/${post.slug}`} />
         
         <script type="application/ld+json">
           {JSON.stringify(post.schema)}

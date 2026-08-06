@@ -68,10 +68,10 @@ export default function HRACalculatorPage() {
         <title>HRA Calculator India FY 2026-27 - House Rent Allowance Exemption | AiTaxBot</title>
         <meta name="description" content="Free HRA Calculator for FY 2026-27. Calculate House Rent Allowance exemption under Section 10(13A) for metro & non-metro cities. Compute 3-part formula: actual HRA, rent minus 10% basic, 50%/40% basic. CA verified." />
         <meta name="keywords" content="HRA calculator, house rent allowance, section 10 13a, HRA exemption, HRA deduction, metro HRA, non-metro HRA, rent calculator India, Section 10(13A)" />
-        <link rel="canonical" href="https://aitaxbot.co.in/calculators/hra" />
+        <link rel="canonical" href="https://www.aitaxbot.co.in/calculators/hra" />
         <meta property="og:title" content="HRA Calculator India FY 2026-27 - House Rent Allowance Exemption | AiTaxBot" />
         <meta property="og:description" content="Free HRA Calculator FY 2026-27. Compute House Rent Allowance exemption under Section 10(13A) for metro & non-metro cities using the 3-part minimum formula." />
-        <meta property="og:url" content="https://aitaxbot.co.in/calculators/hra" />
+        <meta property="og:url" content="https://www.aitaxbot.co.in/calculators/hra" />
         <meta property="og:image" content="https://www.aitaxbot.co.in/apple-touch-icon.png" />
         <meta property="og:type" content="website" />
         <script type="application/ld+json">{JSON.stringify(calculatorSchema)}</script>

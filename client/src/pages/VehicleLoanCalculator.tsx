@@ -54,14 +54,14 @@ export default function VehicleLoanCalculatorPage() {
   const calculatorSchema = generateCalculatorSchema({
     name: "Vehicle Loan EMI Calculator — Two-Wheeler & Car Loan",
     description: "Free vehicle loan EMI calculator for India. Calculate two-wheeler and four-wheeler loan EMI, total interest and on-road cost. Compare tenures instantly.",
-    url: "https://aitaxbot.co.in/calculators/vehicle-loan",
+    url: "https://www.aitaxbot.co.in/calculators/vehicle-loan",
     applicationCategory: "FinanceApplication"
   });
 
   const breadcrumbSchema = generateBreadcrumbSchema([
-    { name: "Home", url: "https://aitaxbot.co.in/" },
-    { name: "Calculators", url: "https://aitaxbot.co.in/calculators" },
-    { name: "Vehicle Loan Calculator", url: "https://aitaxbot.co.in/calculators/vehicle-loan" }
+    { name: "Home", url: "https://www.aitaxbot.co.in/" },
+    { name: "Calculators", url: "https://www.aitaxbot.co.in/calculators" },
+    { name: "Vehicle Loan Calculator", url: "https://www.aitaxbot.co.in/calculators/vehicle-loan" }
   ]);
 
   const organizationSchema = generateOrganizationSchema();
@@ -72,11 +72,11 @@ export default function VehicleLoanCalculatorPage() {
         <title>Vehicle Loan EMI Calculator India 2026 — Two-Wheeler & Car Loan | AiTaxBot</title>
         <meta name="description" content="Free vehicle loan EMI calculator for India. Compare flat rate vs reducing balance interest — see the hidden cost difference. Calculate two-wheeler and car loan EMI, total interest and cost breakdown." />
         <meta name="keywords" content="vehicle loan calculator, car loan EMI calculator, two wheeler loan EMI calculator, bike loan calculator India, flat rate vs reducing balance, vehicle loan interest rate, auto loan calculator, car loan interest calculator 2026" />
-        <link rel="canonical" href="https://aitaxbot.co.in/calculators/vehicle-loan" />
+        <link rel="canonical" href="https://www.aitaxbot.co.in/calculators/vehicle-loan" />
         <meta property="og:title" content="Vehicle Loan EMI Calculator India — Two-Wheeler & Car Loan 2026" />
         <meta property="og:description" content="Calculate your two-wheeler or car loan EMI, total interest and cost breakdown. Switch between bike and car with pre-filled defaults." />
-        <meta property="og:url" content="https://aitaxbot.co.in/calculators/vehicle-loan" />
-        <meta property="og:image" content="https://aitaxbot.co.in/images/aitaxbot-logo.png" />
+        <meta property="og:url" content="https://www.aitaxbot.co.in/calculators/vehicle-loan" />
+        <meta property="og:image" content="https://www.aitaxbot.co.in/images/aitaxbot-logo.png" />
         <meta property="og:type" content="website" />
         <script type="application/ld+json">{JSON.stringify(calculatorSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>

@@ -76,10 +76,10 @@ export default function TradingTaxCalculatorPage() {
         <title>US Stock & F&O Trading Tax Calculator India FY 2025-26 | AiTaxBot</title>
         <meta name="description" content="Free trading tax calculator for Indian investors. Calculate capital gains tax on US stocks (INDmoney/Vested) with automatic USD/INR conversion, F&O business income tax, US dividend DTAA credit, and ITR form selector. CA verified." />
         <meta name="keywords" content="US stock tax India, trading tax calculator, F&O tax calculator, INDmoney tax, Vested tax India, LTCG US stocks, STCG US stocks, forex trading tax India, dividend DTAA India, Schedule FA, ITR-3 F&O, capital gains tax India 2025" />
-        <link rel="canonical" href="https://aitaxbot.co.in/calculators/trading-tax" />
+        <link rel="canonical" href="https://www.aitaxbot.co.in/calculators/trading-tax" />
         <meta property="og:title" content="US Stock & F&O Trading Tax Calculator India FY 2025-26 | AiTaxBot" />
         <meta property="og:description" content="Calculate tax on US stocks, F&O, dividends & forex trading. Auto USD/INR rate fetch, DTAA credit, Schedule FA guide, ITR form selector. Free, CA verified." />
-        <meta property="og:url" content="https://aitaxbot.co.in/calculators/trading-tax" />
+        <meta property="og:url" content="https://www.aitaxbot.co.in/calculators/trading-tax" />
         <meta property="og:image" content="https://www.aitaxbot.co.in/apple-touch-icon.png" />
         <meta property="og:type" content="website" />
         <script type="application/ld+json">{JSON.stringify(calculatorSchema)}</script>

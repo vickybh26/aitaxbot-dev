@@ -26,10 +26,23 @@ router.get("/dashboard/stats", authenticateFirebaseToken, async (req: Authentica
     const firmIds = firms.map((f) => f.id);
 
     // Step 2: fetch invoices + clients for ALL firms in parallel (batch, not serial loop)
-    const [allInvoicesArrays, allClientsArrays, taxProfiles] = await Promise.all([
+    //
+    // `taxCalculations` previously counted storage.getUserTaxProfiles(), i.e. the
+    // `taxProfiles` collection — but createTaxProfile() is never called anywhere
+    // in this codebase, so that collection is always empty and the figure was a
+    // hardcoded 0 in disguise. It now counts taxCalculationHistory, which is what
+    // POST /api/tax-calculations actually writes.
+    //
+    // The failure is logged rather than swallowed: the old `.catch(() => [])`
+    // turned a missing-index error into a silent zero, which is precisely why
+    // this went unnoticed for months.
+    const [allInvoicesArrays, allClientsArrays, savedCalculations] = await Promise.all([
       Promise.all(firmIds.map((id) => storage.getInvoices(id))),
       Promise.all(firmIds.map((id) => storage.getClients(id))),
-      storage.getUserTaxProfiles(userId).catch(() => []),
+      storage.getTaxCalculationHistory(userId).catch((e) => {
+        console.error(`[Accounting] taxCalculationHistory failed for ${userId}:`, e);
+        return [];
+      }),
     ]);
 
     const allInvoices = allInvoicesArrays.flat();
@@ -49,7 +62,7 @@ router.get("/dashboard/stats", authenticateFirebaseToken, async (req: Authentica
       totalRevenue: totalRevenue.toFixed(2),
       paidInvoices,
       unpaidInvoices: allInvoices.length - paidInvoices,
-      taxCalculations: taxProfiles.length,
+      taxCalculations: savedCalculations.length,
     });
   } catch (error: any) {
     console.error("Error fetching dashboard stats:", error);

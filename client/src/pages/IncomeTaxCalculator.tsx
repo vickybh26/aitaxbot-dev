@@ -80,14 +80,14 @@ export default function IncomeTaxCalculatorPage() {
   const calculatorSchema = generateCalculatorSchema({
     name: "Income Tax Calculator FY 2026-27 (AY 2027-28)",
     description: "Free Income Tax Calculator for FY 2026-27 (AY 2027-28). Compare Old vs New tax regime, calculate Section 87A rebate and marginal relief.",
-    url: "https://aitaxbot.co.in/calculators/income-tax",
+    url: "https://www.aitaxbot.co.in/calculators/income-tax",
     applicationCategory: "FinanceApplication"
   });
 
   const breadcrumbSchema = generateBreadcrumbSchema([
-    { name: "Home", url: "https://aitaxbot.co.in/" },
-    { name: "Calculators", url: "https://aitaxbot.co.in/calculators" },
-    { name: "Income Tax Calculator", url: "https://aitaxbot.co.in/calculators/income-tax" }
+    { name: "Home", url: "https://www.aitaxbot.co.in/" },
+    { name: "Calculators", url: "https://www.aitaxbot.co.in/calculators" },
+    { name: "Income Tax Calculator", url: "https://www.aitaxbot.co.in/calculators/income-tax" }
   ]);
 
   const organizationSchema = generateOrganizationSchema();
@@ -98,11 +98,11 @@ export default function IncomeTaxCalculatorPage() {
         <title>Income Tax Calculator India FY 2026-27 (AY 2027-28) — New vs Old Regime | AiTaxBot</title>
         <meta name="description" content="Free Income Tax Calculator for FY 2026-27 (AY 2027-28). Compare Old vs New regime, Section 87A rebate & marginal relief. Latest tax slabs & deductions." />
         <meta name="keywords" content="income tax calculator, tax calculator India, FY 2026-27, AY 2027-28, old vs new regime, section 87a rebate, marginal relief, tax calculation, income tax slab" />
-        <link rel="canonical" href="https://aitaxbot.co.in/calculators/income-tax" />
+        <link rel="canonical" href="https://www.aitaxbot.co.in/calculators/income-tax" />
         <meta property="og:title" content="Income Tax Calculator India FY 2026-27 (AY 2027-28) — New vs Old Regime | AiTaxBot" />
         <meta property="og:description" content="Free Income Tax Calculator for FY 2026-27 (AY 2027-28). Compare Old vs New regime, Section 87A rebate & marginal relief." />
-        <meta property="og:url" content="https://aitaxbot.co.in/calculators/income-tax" />
-        <meta property="og:image" content="https://aitaxbot.co.in/images/aitaxbot-logo.png" />
+        <meta property="og:url" content="https://www.aitaxbot.co.in/calculators/income-tax" />
+        <meta property="og:image" content="https://www.aitaxbot.co.in/images/aitaxbot-logo.png" />
         <meta property="og:type" content="website" />
         <script type="application/ld+json">{JSON.stringify(calculatorSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>

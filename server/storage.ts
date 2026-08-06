@@ -376,12 +376,24 @@ export class FirestoreStorage implements IStorage {
   }
 
   async getUserTaxProfiles(userId: string): Promise<TaxProfile[]> {
+    // Equality filter only, then sort in memory — the same pattern used
+    // throughout this codebase to avoid composite indexes.
+    //
+    // This previously chained .orderBy('assessmentYear') (ASC) onto the
+    // .where('userId'), which needs a `userId ASC + assessmentYear ASC`
+    // composite index. firestore.indexes.json only declares the DESC variant,
+    // which does not serve an ASC sort, so this threw a missing-index error
+    // every time it ran. The caller swallowed it with `.catch(() => [])`, so
+    // the dashboard just showed 0 and nobody noticed.
     const snapshot = await this.db.collection('taxProfiles')
       .where('userId', '==', userId)
-      .orderBy('assessmentYear')
       .get();
-    
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as unknown as TaxProfile));
+
+    return snapshot.docs
+      .map(doc => ({ id: doc.id, ...doc.data() } as unknown as TaxProfile))
+      .sort((a: any, b: any) =>
+        String(a.assessmentYear ?? '').localeCompare(String(b.assessmentYear ?? ''))
+      );
   }
 
   // ==========================================

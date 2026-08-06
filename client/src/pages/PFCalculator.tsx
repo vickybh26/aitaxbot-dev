@@ -54,14 +54,14 @@ export default function PFCalculatorPage() {
   const calculatorSchema = generateCalculatorSchema({
     name: "PF Calculator - EPF VPF PPF",
     description: "Free PF Calculator India FY 2026-27. Calculate EPF, VPF and PPF corpus with employer contribution split, 8.25% interest growth, withdrawal rules, and retirement planning.",
-    url: "https://aitaxbot.co.in/calculators/pf",
+    url: "https://www.aitaxbot.co.in/calculators/pf",
     applicationCategory: "FinanceApplication"
   });
 
   const breadcrumbSchema = generateBreadcrumbSchema([
-    { name: "Home", url: "https://aitaxbot.co.in/" },
-    { name: "Calculators", url: "https://aitaxbot.co.in/calculators" },
-    { name: "PF Calculator", url: "https://aitaxbot.co.in/calculators/pf" }
+    { name: "Home", url: "https://www.aitaxbot.co.in/" },
+    { name: "Calculators", url: "https://www.aitaxbot.co.in/calculators" },
+    { name: "PF Calculator", url: "https://www.aitaxbot.co.in/calculators/pf" }
   ]);
 
   const organizationSchema = generateOrganizationSchema();
@@ -72,11 +72,11 @@ export default function PFCalculatorPage() {
         <title>PF Calculator India FY 2026-27 - EPF VPF PPF Corpus | AiTaxBot</title>
         <meta name="description" content="Free PF Calculator India FY 2026-27. Calculate EPF, VPF and PPF corpus with employer split, 8.25% tax-free interest, withdrawal guide, and retirement planning. CA verified." />
         <meta name="keywords" content="PF calculator, EPF calculator, VPF calculator, PPF calculator, provident fund calculator, EPF interest rate 2026-27, PF withdrawal rules, employee pension scheme, PF tax rules" />
-        <link rel="canonical" href="https://aitaxbot.co.in/calculators/pf" />
+        <link rel="canonical" href="https://www.aitaxbot.co.in/calculators/pf" />
         <meta property="og:title" content="PF Calculator India FY 2026-27 - EPF VPF PPF Corpus & Withdrawal Guide" />
         <meta property="og:description" content="Calculate your EPF, VPF, and PPF retirement corpus with employer contribution breakdown, tax implications, and complete withdrawal rules. Updated for FY 2026-27." />
-        <meta property="og:url" content="https://aitaxbot.co.in/calculators/pf" />
-        <meta property="og:image" content="https://aitaxbot.co.in/images/aitaxbot-logo.png" />
+        <meta property="og:url" content="https://www.aitaxbot.co.in/calculators/pf" />
+        <meta property="og:image" content="https://www.aitaxbot.co.in/images/aitaxbot-logo.png" />
         <meta property="og:type" content="website" />
         <script type="application/ld+json">{JSON.stringify(calculatorSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>

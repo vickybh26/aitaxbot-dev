@@ -24,6 +24,16 @@ export default function Footer() {
     ["Tax Guides", "/blog"],
   ];
 
+  // Supply side of the CA directory. Until now /ca/register was linked from
+  // exactly two places, both inside /find-ca — a page built for taxpayers, so
+  // no Chartered Accountant ever reached the registration form. The directory
+  // sat on a single profile for two months as a result.
+  const forCAs: [string, string][] = [
+    ["List Your Practice", "/ca/register"],
+    ["My CA Profile", "/ca/my-profile"],
+    ["Browse the Directory", "/find-ca"],
+  ];
+
   const company: [string, string][] = [
     ["About Us", "/about"],
     ["Contact", "/contact"],
@@ -48,7 +58,7 @@ export default function Footer() {
       {/* Footer */}
       <footer className="bg-slate-900 text-white pt-12 pb-8 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 mb-10">
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 mb-10">
 
             {/* Brand column */}
             <div>
@@ -121,6 +131,25 @@ export default function Footer() {
                   </li>
                 ))}
               </ul>
+            </div>
+
+            {/* For CAs column — the supply-side entry point for the directory */}
+            <div>
+              <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">
+                For CAs
+              </h4>
+              <ul className="space-y-2.5">
+                {forCAs.map(([name, href]) => (
+                  <li key={href}>
+                    <Link href={href} className="text-sm text-slate-400 hover:text-white transition-colors">
+                      {name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-3 text-xs text-slate-500 leading-relaxed">
+                Free listing. No platform fee, no commission.
+              </p>
             </div>
 
             {/* Company column */}

@@ -50,14 +50,14 @@ export default function SIPCalculatorPage() {
   const calculatorSchema = generateCalculatorSchema({
     name: "SIP Calculator - Systematic Investment Plan",
     description: "Free SIP Calculator India FY 2026-27. Calculate Systematic Investment Plan mutual fund returns with compounding. Plan monthly SIP investments for wealth creation with tax planning.",
-    url: "https://aitaxbot.co.in/calculators/sip",
+    url: "https://www.aitaxbot.co.in/calculators/sip",
     applicationCategory: "FinanceApplication"
   });
 
   const breadcrumbSchema = generateBreadcrumbSchema([
-    { name: "Home", url: "https://aitaxbot.co.in/" },
-    { name: "Calculators", url: "https://aitaxbot.co.in/calculators" },
-    { name: "SIP Calculator", url: "https://aitaxbot.co.in/calculators/sip" }
+    { name: "Home", url: "https://www.aitaxbot.co.in/" },
+    { name: "Calculators", url: "https://www.aitaxbot.co.in/calculators" },
+    { name: "SIP Calculator", url: "https://www.aitaxbot.co.in/calculators/sip" }
   ]);
 
   const organizationSchema = generateOrganizationSchema();
@@ -68,11 +68,11 @@ export default function SIPCalculatorPage() {
         <title>SIP Calculator India FY 2026-27 - Mutual Fund Returns & Tax Planning | AiTaxBot</title>
         <meta name="description" content="Free SIP Calculator India FY 2026-27. Calculate Systematic Investment Plan mutual fund returns with LTCG tax planning. Rupee cost averaging, step-up SIP, and wealth creation calculator." />
         <meta name="keywords" content="SIP calculator, systematic investment plan, mutual fund calculator, SIP returns, rupee cost averaging, step-up SIP, LTCG tax on SIP, wealth creation, SIP vs lump sum, investment planning India" />
-        <link rel="canonical" href="https://aitaxbot.co.in/calculators/sip" />
+        <link rel="canonical" href="https://www.aitaxbot.co.in/calculators/sip" />
         <meta property="og:title" content="SIP Calculator India FY 2026-27 - Mutual Fund Returns & Tax Planning" />
         <meta property="og:description" content="Calculate your Systematic Investment Plan returns with LTCG tax planning, rupee cost averaging, and step-up SIP strategies. Free SIP calculator for FY 2026-27." />
-        <meta property="og:url" content="https://aitaxbot.co.in/calculators/sip" />
-        <meta property="og:image" content="https://aitaxbot.co.in/images/aitaxbot-logo.png" />
+        <meta property="og:url" content="https://www.aitaxbot.co.in/calculators/sip" />
+        <meta property="og:image" content="https://www.aitaxbot.co.in/images/aitaxbot-logo.png" />
         <meta property="og:type" content="website" />
         <script type="application/ld+json">{JSON.stringify(calculatorSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>

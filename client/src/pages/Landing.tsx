@@ -234,12 +234,12 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
         <title>AiTaxBot - Income Tax Calculator India FY 2026-27 | AY 2027-28</title>
         <meta name="description" content="AI-powered tax calculator for India. Compare old vs new regime, ₹12L tax-free under Section 87A. Free SIP, SWP, HRA, PF calculators. CA-reviewed. FY 2026-27 & AY 2027-28 ready." />
         <meta name="keywords" content="income tax calculator, tax calculator India, new tax regime, old tax regime, SIP calculator, HRA calculator, AY 2027-28, Income Tax Act 2025" />
-        <link rel="canonical" href="https://aitaxbot.co.in/" />
+        <link rel="canonical" href="https://www.aitaxbot.co.in/" />
         <meta property="og:title" content="AiTaxBot - Income Tax Calculator India FY 2026-27 | AY 2027-28" />
         <meta property="og:description" content="AI-powered income tax calculator with ₹12L tax-free limit. CA-reviewed calculators for salaried, freelancers & investors. Income Tax Act 2025 ready." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://aitaxbot.co.in/" />
-        <meta property="og:image" content="https://aitaxbot.co.in/images/aitaxbot-logo.png" />
+        <meta property="og:url" content="https://www.aitaxbot.co.in/" />
+        <meta property="og:image" content="https://www.aitaxbot.co.in/images/aitaxbot-logo.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <script type="application/ld+json">{JSON.stringify(generateHomePageSchema())}</script>
       </Helmet>

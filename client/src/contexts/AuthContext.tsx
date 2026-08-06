@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, useRef, type ReactNode } from "react";
-import { onAuthStateChanged, type User, logout, completeGoogleRedirectSignIn } from "@/lib/firebase";
+import { useLocation } from "wouter";
+import { onAuthStateChanged, type User, logout, completeGoogleRedirectSignIn, consumeAuthRedirectDest } from "@/lib/firebase";
 import { auth } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
 
@@ -56,6 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
   const lastActivityRef = useRef<number>(Date.now());
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
   const syncUserProfile = async (firebaseUser: User) => {
     try {
@@ -188,6 +190,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .then((result) => {
         if (result?.user) {
           toast({ title: "Success", description: "Signed in with Google successfully!" });
+
+          // Restore the destination the user was headed for before the
+          // redirect. Without this every popup-blocked Google sign-in landed
+          // on "/" — losing the returnUrl, and losing the calculator the user
+          // was half-way through. consumeAuthRedirectDest() only ever returns
+          // a same-origin relative path.
+          const dest = consumeAuthRedirectDest();
+          if (dest) setLocation(dest);
         }
       })
       .catch((error) => {

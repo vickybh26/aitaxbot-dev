@@ -29,7 +29,7 @@ export function generateCalculatorSchema(props: CalculatorSchemaProps) {
     "creator": {
       "@type": "Organization",
       "name": "AiTaxBot",
-      "url": "https://aitaxbot.co.in"
+      "url": "https://www.aitaxbot.co.in"
     }
   };
 }
@@ -51,10 +51,10 @@ export function generateOrganizationSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "@id": "https://aitaxbot.co.in/#organization",
+    "@id": "https://www.aitaxbot.co.in/#organization",
     "name": "AiTaxBot",
-    "url": "https://aitaxbot.co.in",
-    "logo": "https://aitaxbot.co.in/images/aitaxbot-logo.png",
+    "url": "https://www.aitaxbot.co.in",
+    "logo": "https://www.aitaxbot.co.in/images/aitaxbot-logo.png",
     "description": "India's premier AI-powered Income Tax filing platform offering tax calculators, investment tools, and crypto tax compliance.",
     "sameAs": [
       "https://twitter.com/aitaxbot"
@@ -89,16 +89,16 @@ export function generateWebSiteSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "@id": "https://aitaxbot.co.in/#website",
+    "@id": "https://www.aitaxbot.co.in/#website",
     "name": "AiTaxBot",
-    "url": "https://aitaxbot.co.in",
+    "url": "https://www.aitaxbot.co.in",
     "description": "AI-powered Income Tax Calculator and Financial Tools Platform for India",
     "publisher": {
-      "@id": "https://aitaxbot.co.in/#organization"
+      "@id": "https://www.aitaxbot.co.in/#organization"
     },
     "potentialAction": {
       "@type": "SearchAction",
-      "target": "https://aitaxbot.co.in/search?q={search_term_string}",
+      "target": "https://www.aitaxbot.co.in/search?q={search_term_string}",
       "query-input": "required name=search_term_string"
     }
   };
