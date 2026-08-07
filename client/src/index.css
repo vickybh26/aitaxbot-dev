@@ -162,9 +162,57 @@
 .bg-warning-light { background-color: hsl(var(--warning-orange-light)); }
 .text-warning { color: hsl(var(--warning-orange)); }
 
-.bg-accent { background-color: hsl(var(--accent-purple)); }
+/* `bg-accent` is shadcn's NEUTRAL HOVER SURFACE, not a brand colour. It is
+   paired with --accent-foreground (222.2 84% 4.9%, near-black) by every
+   Radix-based component: outline/ghost button hover, dropdown and context
+   menu focus, command palette selection, calendar selected day.
+
+   It used to be overridden to --accent-purple, which the redesign remapped
+   to brand navy (214 52% 25%). That put near-black text on a dark navy
+   hover background — invisible — everywhere those components are used. It
+   went unnoticed only because text-accent-foreground was itself a no-op, so
+   the text inherited a dark colour and was equally unreadable either way.
+
+   Pointing this at --accent restores the intended light surface. The brand
+   navy is still available as .text-accent / .bg-accent-light below. */
+.bg-accent { background-color: hsl(var(--accent)); }
 .bg-accent-light { background-color: hsl(var(--accent-purple-light)); }
 .text-accent { color: hsl(var(--accent-purple)); }
+
+/* ───────────────────────────────────────────────────────────────────────
+   shadcn *-foreground rescues — REQUIRED, not cosmetic.
+
+   tailwind.config.ts maps these tokens as `var(--primary-foreground)`,
+   but they are declared here as bare HSL triplets (`210 40% 98%`). That
+   yields `color: 210 40% 98%`, which is invalid CSS, so the utility does
+   nothing and the element silently inherits the page's dark body colour.
+
+   The background halves (.bg-primary etc.) were already hand-patched
+   above, so `<Button>` and `<Badge variant="default">` rendered a solid
+   navy background with near-black inherited text. That was survivable
+   while --primary-blue was a mid-tone blue (214 65% 46%); the 2026-08
+   redesign darkened it to 214 52% 25%, at which point the label on every
+   primary button and badge became effectively invisible — reported live
+   on the tax calculator's "Calculate Tax" CTA and "Recommended" badge.
+
+   These rules restore the intended foreground colours with proper hsl()
+   wrapping. Text colour only — no background is touched here.
+
+   PROPER FIX (do this when there is time to eyeball the whole site):
+   wrap the tokens in tailwind.config.ts as `hsl(var(--primary))` etc.,
+   matching what persian-blue already does, then delete this block and
+   the .bg-primary/.text-primary patches above. That also revives
+   bg-card / bg-background / bg-popover / bg-muted, which are currently
+   transparent no-ops — hence the explicit bg-white scattered around the
+   codebase.
+   ─────────────────────────────────────────────────────────────────────── */
+.text-primary-foreground { color: hsl(var(--primary-foreground)); }
+.text-secondary-foreground { color: hsl(var(--secondary-foreground)); }
+.text-destructive-foreground { color: hsl(var(--destructive-foreground)); }
+.text-muted-foreground { color: hsl(var(--muted-foreground)); }
+.text-accent-foreground { color: hsl(var(--accent-foreground)); }
+.text-card-foreground { color: hsl(var(--card-foreground)); }
+.text-popover-foreground { color: hsl(var(--popover-foreground)); }
 
 /* Persian Blue Colors */
 .bg-persian-blue-50 { background-color: hsl(var(--persian-blue-50)); }
