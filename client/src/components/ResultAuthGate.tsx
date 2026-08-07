@@ -73,7 +73,7 @@ export default function ResultAuthGate({ toolName, headline }: ResultAuthGatePro
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Button
-            className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700"
+            className="w-full sm:w-auto bg-persian-blue-700 hover:bg-persian-blue-800"
             onClick={() => setModalTab("signup")}
             data-testid="button-gate-signup"
           >

@@ -153,7 +153,7 @@ export default function LeadCaptureForm({ source, summaryText }: Props) {
         <button
           type="submit"
           disabled={loading || !name.trim() || !email.trim()}
-          className="w-full h-9 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
+          className="w-full h-9 bg-persian-blue-700 hover:bg-persian-blue-800 disabled:opacity-50 text-white text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
         >
           {loading ? (
             <><Loader2 className="w-4 h-4 animate-spin" />Sending…</>

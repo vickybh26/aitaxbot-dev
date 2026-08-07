@@ -1,42 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <!-- Client-Side Debug/Error Logger -->
+    <!-- Client-Side Error Logger
+         The red on-page banner is a DEBUGGING tool and must never render for
+         real visitors. It previously fired on any unhandled rejection —
+         including AdSense's "Failed to fetch", which happens on every pageview
+         where an ad blocker, Brave shields or a corporate proxy blocks
+         pagead2.googlesyndication.com. Visitors saw a full-width red error box
+         covering the top of the site, for a third-party script failure that has
+         no effect on the product working.
+
+         Banner now appears only on localhost or with ?debug=1. Reporting to
+         /api/logs/client is kept, minus third-party noise — that endpoint also
+         carries the auth-failure telemetry, which is worth keeping legible. -->
     <script>
       (function() {
+        var SHOW_BANNER =
+          location.hostname === 'localhost' ||
+          location.hostname === '127.0.0.1' ||
+          /[?&]debug=1(&|$)/.test(location.search);
+
+        // Failures originating in embedded ad/analytics scripts. We neither
+        // surface nor report these: we cannot fix them and they are dominated
+        // by ad-blocker traffic.
+        var THIRD_PARTY = /googlesyndication|adsbygoogle|doubleclick|googletagmanager|google-analytics|adtrafficquality|clarity\.ms/i;
+
         function logError(type, payload) {
           console.error('[' + type + ']', payload);
-          var div = document.getElementById('debug-error-banner');
-          if (!div) {
-            div = document.createElement('div');
-            div.id = 'debug-error-banner';
-            div.style.position = 'fixed';
-            div.style.top = '0';
-            div.style.left = '0';
-            div.style.width = '100%';
-            div.style.background = '#fee2e2';
-            div.style.color = '#991b1b';
-            div.style.padding = '20px';
-            div.style.borderBottom = '4px solid #f87171';
-            div.style.zIndex = '99999999';
-            div.style.fontFamily = 'monospace';
-            div.style.fontSize = '14px';
-            div.style.whiteSpace = 'pre-wrap';
-            div.style.overflow = 'auto';
-            div.style.maxHeight = '50vh';
-            if (document.body) {
-              document.body.appendChild(div);
-            } else {
-              document.documentElement.appendChild(div);
-            }
-          }
-          div.textContent = '❌ CLIENT ERROR: ' + type + '\n\n' + JSON.stringify(payload, null, 2);
 
-          fetch('/api/logs/client', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ type: type, payload: payload })
-          }).catch(function() {});
+          var isThirdParty = THIRD_PARTY.test(JSON.stringify(payload || {}));
+
+          if (SHOW_BANNER) {
+            var div = document.getElementById('debug-error-banner');
+            if (!div) {
+              div = document.createElement('div');
+              div.id = 'debug-error-banner';
+              div.style.position = 'fixed';
+              div.style.top = '0';
+              div.style.left = '0';
+              div.style.width = '100%';
+              div.style.background = '#fee2e2';
+              div.style.color = '#991b1b';
+              div.style.padding = '20px';
+              div.style.borderBottom = '4px solid #f87171';
+              div.style.zIndex = '99999999';
+              div.style.fontFamily = 'monospace';
+              div.style.fontSize = '14px';
+              div.style.whiteSpace = 'pre-wrap';
+              div.style.overflow = 'auto';
+              div.style.maxHeight = '50vh';
+              if (document.body) {
+                document.body.appendChild(div);
+              } else {
+                document.documentElement.appendChild(div);
+              }
+            }
+            div.textContent = '❌ CLIENT ERROR: ' + type + '\n\n' + JSON.stringify(payload, null, 2);
+          }
+
+          if (!isThirdParty) {
+            fetch('/api/logs/client', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ type: type, payload: payload })
+            }).catch(function() {});
+          }
         }
 
         window.onerror = function(msg, url, line, col, err) {

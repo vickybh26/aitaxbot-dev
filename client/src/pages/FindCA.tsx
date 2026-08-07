@@ -295,7 +295,7 @@ export default function FindCA() {
                 be able to send you enquiries directly.
               </p>
               <Link href="/ca/register">
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                <Button className="bg-persian-blue-700 hover:bg-persian-blue-800 text-white">
                   List Your Profile — It's Free
                 </Button>
               </Link>
@@ -625,7 +625,7 @@ export default function FindCA() {
                 <Button
                   type="submit"
                   disabled={sending}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  className="w-full bg-persian-blue-700 hover:bg-persian-blue-800 text-white"
                 >
                   {sending ? (
                     <><Loader2 className="w-4 h-4 animate-spin mr-2" />Sending…</>

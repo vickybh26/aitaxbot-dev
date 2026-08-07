@@ -69,7 +69,7 @@ export default function AccountingDashboard() {
               </div>
               <Button 
                 size="lg" 
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="bg-persian-blue-700 hover:bg-persian-blue-800 text-white"
                 onClick={() => window.location.href = "/login"}
                 data-testid="button-login-to-accounting"
               >

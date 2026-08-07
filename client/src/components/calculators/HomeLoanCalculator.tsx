@@ -190,7 +190,7 @@ export default function HomeLoanCalculator() {
               <div className="flex justify-between text-slate-600"><span>Loan Amount:</span><span className="font-semibold text-slate-900">{formatINR(loanAmount)}</span></div>
             </div>
 
-            <Button onClick={calculate} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3">
+            <Button onClick={calculate} className="w-full bg-persian-blue-700 hover:bg-persian-blue-800 text-white font-semibold py-3">
               Calculate Affordability & EMI
             </Button>
           </div>

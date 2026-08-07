@@ -163,7 +163,12 @@ export default function Header({ showModal }: HeaderProps = {}) {
             <Link
               href="/calculators/income-tax"
               onClick={() => trackButtonClick("Income Tax Calculator", "Header Navigation")}
-              className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap"
+              /* Brand navy, matching every other primary button (<Button> resolves
+                 to .bg-primary = --primary-blue). This was bg-blue-600, i.e. the
+                 interactive-blue reserved for links and secondary actions — which
+                 is also what "Find a CA" and "Login" use in this same bar, so the
+                 site's main CTA was colour-coded as a link. */
+              className="bg-persian-blue-700 hover:bg-persian-blue-800 text-white text-sm px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap"
               data-testid="button-header-tax-calculator"
             >
               Tax Calculator
@@ -289,7 +294,7 @@ export default function Header({ showModal }: HeaderProps = {}) {
               <Link
                 href="/calculators/income-tax"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block bg-blue-600 text-white text-center text-sm font-medium px-4 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+                className="block bg-persian-blue-700 text-white text-center text-sm font-medium px-4 py-3 rounded-lg hover:bg-persian-blue-800 transition-colors"
               >
                 Tax Calculator
               </Link>

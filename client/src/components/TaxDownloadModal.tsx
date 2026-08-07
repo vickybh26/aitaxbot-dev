@@ -275,7 +275,7 @@ export default function TaxDownloadModal({
               <Button
                 type="submit"
                 disabled={loading || !dataConsent}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 disabled:opacity-50"
+                className="w-full bg-persian-blue-700 hover:bg-persian-blue-800 text-white font-semibold py-2.5 disabled:opacity-50"
               >
                 {loading ? (
                   <span className="flex items-center gap-2">
@@ -303,7 +303,7 @@ export default function TaxDownloadModal({
               </div>
 
               <a href={signInUrl}>
-                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold">
+                <Button className="w-full bg-persian-blue-700 hover:bg-persian-blue-800 text-white font-semibold">
                   <LogIn className="h-4 w-4 mr-2" />
                   Sign In & Download
                 </Button>

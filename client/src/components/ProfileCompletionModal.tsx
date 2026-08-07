@@ -169,7 +169,7 @@ export default function ProfileCompletionModal({ onClose }: Props) {
             <Button type="button" variant="outline" className="flex-1" onClick={onClose}>
               Skip for now
             </Button>
-            <Button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700" disabled={saving}>
+            <Button type="submit" className="flex-1 bg-persian-blue-700 hover:bg-persian-blue-800" disabled={saving}>
               {saving ? "Saving..." : "Save Profile"}
             </Button>
           </div>

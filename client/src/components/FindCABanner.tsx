@@ -24,7 +24,7 @@ export default function FindCABanner({ context = "filing your ITR" }: Props) {
       </div>
       <a
         href="/find-ca"
-        className="flex-shrink-0 inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-xl transition-colors"
+        className="flex-shrink-0 inline-flex items-center gap-1.5 bg-persian-blue-700 hover:bg-persian-blue-800 text-white text-sm font-medium px-4 py-2 rounded-xl transition-colors"
       >
         Find a CA
         <ArrowRight className="w-3.5 h-3.5" />

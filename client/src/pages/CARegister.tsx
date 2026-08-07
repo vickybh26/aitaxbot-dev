@@ -334,7 +334,7 @@ export default function CARegister() {
               </div>
             )}
 
-            <Button type="submit" disabled={loading} className="w-full bg-blue-600 hover:bg-blue-700 text-white h-11 text-base font-semibold">
+            <Button type="submit" disabled={loading} className="w-full bg-persian-blue-700 hover:bg-persian-blue-800 text-white h-11 text-base font-semibold">
               {loading ? "Submitting…" : "Submit for Review"}
             </Button>
 

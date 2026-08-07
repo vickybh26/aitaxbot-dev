@@ -197,7 +197,7 @@ function SavingsCard() {
           <div className="text-xs mt-2 opacity-80">Assumes ₹1.5L 80C claimed (Old Regime) · FY 2026-27</div>
         </div>
         <Link href="/calculators/income-tax"
-          className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-colors">
+          className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-persian-blue-700 hover:bg-persian-blue-800 text-white text-sm font-semibold transition-colors">
           <Calculator className="h-4 w-4" />See full computation<ArrowRight className="h-4 w-4" />
         </Link>
       </div>
@@ -277,7 +277,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                 <p className="text-base lg:text-lg text-slate-600 mb-8 leading-relaxed max-w-xl">{t("hero.subheadline")}</p>
                 <div className="flex flex-wrap gap-3 mb-8">
                   <Link href="/calculators/income-tax" data-testid="button-calculate-tax"
-                    className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3.5 rounded-xl transition-colors text-sm">
+                    className="inline-flex items-center gap-2 bg-persian-blue-700 hover:bg-persian-blue-800 text-white font-semibold px-6 py-3.5 rounded-xl transition-colors text-sm">
                     <Calculator className="h-4 w-4" />{t("hero.cta")}
                   </Link>
                   <Link href="/tools/ais-26as-form16" data-testid="button-ais-recon"
@@ -446,7 +446,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                   ))}
                 </div>
                 <Link href="/tools/ais-26as-form16"
-                  className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold px-6 py-3.5 rounded-xl transition-colors text-sm">
+                  className="inline-flex items-center gap-2 bg-persian-blue-700 hover:bg-persian-blue-800 text-white font-semibold px-6 py-3.5 rounded-xl transition-colors text-sm">
                   <Layers className="h-4 w-4" />Try AIS Reconciliation<ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
@@ -505,7 +505,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                   <div className="flex items-center gap-2 text-sm text-orange-700"><Clock className="h-4 w-4 text-orange-500" />Deadline: July 31, 2026 — act now</div>
                 </div>
                 <Link href="/find-ca"
-                  className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3.5 rounded-xl transition-colors text-sm">
+                  className="inline-flex items-center gap-2 bg-persian-blue-700 hover:bg-persian-blue-800 text-white font-semibold px-6 py-3.5 rounded-xl transition-colors text-sm">
                   <UserCheck className="h-4 w-4" />Find a CA near you<ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
@@ -619,7 +619,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                 <a href="https://www.linkedin.com/company/aitaxbot/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full p-2 transition-colors"><Linkedin className="h-4 w-4" /></a>
                 <a href="https://www.instagram.com/aitaxbot/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="bg-pink-100 hover:bg-pink-200 text-pink-600 rounded-full p-2 transition-colors"><Instagram className="h-4 w-4" /></a>
               </div>
-              <Link href="/contact" className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors">
+              <Link href="/contact" className="inline-flex items-center gap-2 bg-persian-blue-700 hover:bg-persian-blue-800 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors">
                 <Send className="h-4 w-4" />Send a Message
               </Link>
             </div>

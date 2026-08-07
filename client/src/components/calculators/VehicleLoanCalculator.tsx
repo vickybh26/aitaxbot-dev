@@ -139,7 +139,7 @@ export default function VehicleLoanCalculator() {
   const d = DEFAULTS[vehicleType];
   const loanAmount = Math.max(0, onRoadPrice - downPayment);
   const downPct = onRoadPrice > 0 ? ((downPayment / onRoadPrice) * 100).toFixed(1) : "0";
-  const accentBtn = vehicleType === "four-wheeler" ? "bg-blue-600 hover:bg-blue-700" : "bg-orange-500 hover:bg-orange-600";
+  const accentBtn = vehicleType === "four-wheeler" ? "bg-persian-blue-700 hover:bg-persian-blue-800" : "bg-orange-500 hover:bg-orange-600";
   const accentBg = vehicleType === "four-wheeler" ? "bg-blue-50 border-blue-200 text-blue-700" : "bg-orange-50 border-orange-200 text-orange-600";
 
   return (

@@ -39,7 +39,7 @@ export default function NotFound() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
               <Link
                 href="/"
-                className="w-full h-auto py-4 flex flex-col items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors cursor-pointer text-center justify-center"
+                className="w-full h-auto py-4 flex flex-col items-center gap-2 bg-persian-blue-700 hover:bg-persian-blue-800 text-white rounded-md transition-colors cursor-pointer text-center justify-center"
                 data-testid="button-home-404"
               >
                 <Home className="h-6 w-6" />
