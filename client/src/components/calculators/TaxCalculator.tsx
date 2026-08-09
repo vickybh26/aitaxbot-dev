@@ -34,6 +34,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useTrackToolUse } from '@/hooks/useTrackToolUse';
 import { recommendITRForm, type ITRFormResult } from '@shared/itrFormSelector';
+import { computeTaxLiability, type AgeGroup } from '@shared/taxLiability';
 import ResultAuthGate from '@/components/ResultAuthGate';
 import { SUCCESS, INTERACTIVE, AXIS } from '@/lib/chartColors';
 
@@ -68,6 +69,13 @@ interface TaxResult {
   cess: number;
   rebate87A: number;
   marginalRelief: number;
+  /** Surcharge after its own marginal relief. 0 below ₹50,00,000. */
+  surcharge: number;
+  surchargeRate: number;
+  /** Tax on s.112A / s.111A gains — charged outside the slab ladder. */
+  specialRateTax: number;
+  ltcgEquity: number;
+  stcgEquity: number;
   totalTax: number;
   takeHome: number;
   effectiveRate: number;
@@ -165,9 +173,12 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
   // Form state
   const [formData, setFormData] = useState({
     salaryIncome: '',
+    basicSalary: '',
     housePropertyIncome: '',
     businessIncome: '',
     capitalGainsIncome: '',
+    ltcgEquity: '',
+    stcgEquity: '',
     otherIncome: '',
     section80C: '',
     section80D: '',
@@ -275,13 +286,29 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
   };
 
   const calculateSingleRegime = (regime: 'old' | 'new'): TaxResult => {
-    const totalIncome = [
+    // Listed-equity gains are charged at their own statutory rates (s.112A at
+    // 12.5% above a ₹1,25,000 annual allowance; s.111A at 20%) and must NOT be
+    // pooled into the slab ladder. They are passed to the engine separately
+    // below. Pooling them previously did two things at once: it taxed gains at
+    // slab rates, and it let the s.87A/156 rebate absorb the tax on them, which
+    // could report "zero tax" on a return that in fact had a liability.
+    const ltcgEquityIncome = parseFloat(formData.ltcgEquity) || 0;
+    const stcgEquityIncome = parseFloat(formData.stcgEquity) || 0;
+
+    // `capitalGainsIncome` remains the slab-taxed bucket — debt-fund gains,
+    // unlisted shares, short-term gains outside s.111A — which genuinely are
+    // charged at the ordinary rates.
+    const slabTaxedIncome = [
       parseFloat(formData.salaryIncome) || 0,
       parseFloat(formData.housePropertyIncome) || 0,
       parseFloat(formData.businessIncome) || 0,
       parseFloat(formData.capitalGainsIncome) || 0,
       parseFloat(formData.otherIncome) || 0
     ].reduce((sum, val) => sum + val, 0);
+
+    // Gross total income for display and effective-rate purposes includes the
+    // special-rate gains, even though they bypass the slab computation.
+    const totalIncome = slabTaxedIncome + ltcgEquityIncome + stcgEquityIncome;
 
     // Standard deduction — allowed ONLY against income under the head
     // "Salaries" (s.16(ia) of ITA 1961 / the equivalent under ITA 2025).
@@ -309,24 +336,65 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
     const salaryIncome = parseFloat(formData.salaryIncome) || 0;
     let hraExemption = 0;
 
-    if (hraReceived > 0 && rentPaid > 0 && salaryIncome > 0) {
-      // HRA exemption: minimum of (i) actual HRA, (ii) rent paid - 10% of basic, (iii) 50%/40% of basic
-      const rentExcess = Math.max(0, rentPaid - (salaryIncome * 0.1));
+    // Rule 2A defines "salary" for HRA purposes as BASIC + DA, not gross salary.
+    // This previously passed salaryIncome (the gross figure) as the basic, which
+    // over-exempted heavily on allowance-heavy packages — basic ₹2L inside a
+    // ₹10L gross gave a ₹5,00,000 exemption where the statute allows ₹1,00,000 —
+    // and under-exempted on basic-heavy ones. The standalone HRACalculator has
+    // always taken a proper basic input; only this embedded copy was wrong.
+    //
+    // If the user leaves basic blank we fall back to the gross figure and say so
+    // in the UI, because silently assuming a percentage would be inventing data.
+    const basicPlusDA = parseFloat(formData.basicSalary) || 0;
+    const hraSalaryBase = basicPlusDA > 0 ? basicPlusDA : salaryIncome;
+
+    if (hraReceived > 0 && rentPaid > 0 && hraSalaryBase > 0) {
+      // Least of: (i) actual HRA received, (ii) rent paid − 10% of salary,
+      // (iii) 50% of salary in the 8 notified metros, else 40%.
+      const rentExcess = Math.max(0, rentPaid - (hraSalaryBase * 0.1));
       const hraPercentage = formData.isMetroCity ? 0.5 : 0.4;
-      hraExemption = Math.min(hraReceived, rentExcess, salaryIncome * hraPercentage);
+      hraExemption = Math.min(hraReceived, rentExcess, hraSalaryBase * hraPercentage);
     }
 
     // Total deductions
     let totalDeductions = 0;
+    const isSenior = formData.ageGroup === '60to80' || formData.ageGroup === 'above80';
+
     const section80C = Math.min(parseFloat(formData.section80C) || 0, 150000);
-    const section80D = parseFloat(formData.section80D) || 0;
-    const section80E = parseFloat(formData.section80E) || 0;  // No upper cap
-    const section80TTA = Math.min(parseFloat(formData.section80TTA) || 0, 10000); // Savings interest cap ₹10k
+    // 80D: ₹25,000 self/family (₹50,000 if senior) + ₹25,000 parents (₹50,000 if
+    // the parents are senior). ₹1,00,000 is the absolute statutory ceiling and is
+    // only reachable when both the assessee and the parents are 60+. Without a
+    // separate "parents' age" input we take the assessee's age as the proxy,
+    // which is the conservative reading. Previously uncapped entirely.
+    const section80DCap = isSenior ? 100000 : 50000;
+    const section80D = Math.min(parseFloat(formData.section80D) || 0, section80DCap);
+    const section80E = parseFloat(formData.section80E) || 0;  // No upper cap — correct, 80E is uncapped
+    // 80TTA is ₹10,000 on savings interest for under-60s. A senior citizen
+    // claims 80TTB instead at ₹50,000, which covers ALL deposit interest.
+    // The senior branch was missing, capping 60+ users at ₹10,000.
+    const savingsInterestCap = isSenior ? 50000 : 10000; // 80TTB : 80TTA
+    const section80TTA = Math.min(parseFloat(formData.section80TTA) || 0, savingsInterestCap);
     const section80CCD1B = Math.min(parseFloat(formData.section80CCD1B) || 0, 50000); // NPS extra cap ₹50k
-    const section80G = parseFloat(formData.section80G) || 0;  // Donations (qualifying amounts)
+    // 80G: most donees carry a qualifying limit of 10% of adjusted gross total
+    // income, and many attract a 50% deduction rate rather than 100%. Modelling
+    // the full donee taxonomy needs an input this form does not have, so we
+    // apply the qualifying limit only — the part that is universal — and leave
+    // the 50%/100% split to the user's own figure. Previously uncapped, which
+    // let a donation of any size be deducted in full.
+    const adjustedGTI = Math.max(0, totalIncome - standardDeduction);
+    const section80G = Math.min(parseFloat(formData.section80G) || 0, adjustedGTI * 0.10);
     const homeLoanInterest = Math.min(parseFloat(formData.homeLoanInterest) || 0, 200000); // Sec 24(b) cap ₹2L
     const lta = parseFloat(formData.lta) || 0;  // LTA exemption under old regime
-    const otherDeductions = parseFloat(formData.otherDeductions) || 0;
+    // "Other deductions" is a free-text catch-all. Left uncapped it allowed any
+    // user to drive taxable income to zero. Bounded to the remaining Chapter
+    // VI-A headroom — Chapter VI-A can reduce gross total income to nil but
+    // never below it, and cannot create or enlarge a loss.
+    const namedChapterVIA = section80C + section80D + section80E + section80TTA +
+      section80CCD1B + section80G;
+    const otherDeductions = Math.min(
+      parseFloat(formData.otherDeductions) || 0,
+      Math.max(0, totalIncome - namedChapterVIA)
+    );
 
     if (regime === 'old') {
       totalDeductions = section80C + section80D + section80E + section80TTA +
@@ -337,7 +405,11 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
       totalDeductions = standardDeduction;
     }
 
-    const taxableIncome = Math.max(0, totalIncome - totalDeductions);
+    // Deductions are set against SLAB income only. Chapter VI-A deductions are
+    // not allowable against income charged at the special rates in s.111A /
+    // s.112A, so the gains must be excluded from the base the deductions reduce
+    // — otherwise a large 80C claim would erode tax on capital gains.
+    const taxableIncome = Math.max(0, slabTaxedIncome - totalDeductions);
 
     // For both regimes, taxable amount is the taxable income
     // (exemption limits are built into the tax slabs themselves)
@@ -353,94 +425,40 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
     // Step 3: Apply marginal relief if applicable (New Regime FY 2025-26+)
     // Step 4: Compute 4% Health & Education Cess on the NET tax (after rebate & relief)
 
-    let rebate87A = 0;
-    let rebateLimit = 0;
-    let rebateAmount = 0;
+    // ── Rebate / marginal relief / surcharge / cess ────────────────────────
+    //
+    // This block used to re-implement the whole ladder inline — a second tax
+    // engine sitting alongside shared/taxLiability.ts, kept in step only by a
+    // comment asking that they "stay in sync". They had already diverged in the
+    // way that mattered most: neither computed surcharge, but only this copy is
+    // what ~84% of traffic actually hits.
+    //
+    // It now delegates to the shared engine, so there is one implementation of
+    // the statutory sequence (rebate before cess, marginal relief at each
+    // threshold, surcharge with its own relief, cess on tax + surcharge) and the
+    // drift guard in scripts/test-tax-calculations.ts has something real to
+    // guard.
+    //
+    // Capital gains are passed as special-rate income rather than pooled into
+    // the slab ladder: s.112A charges listed-equity LTCG at 12.5% above a
+    // ₹1,25,000 annual allowance and s.111A charges STCG at 20%, and the
+    // s.87A/156 rebate is not available against either.
+    const liability = computeTaxLiability(
+      taxableAmount,
+      regime,
+      formData.financialYear,
+      formData.ageGroup as AgeGroup,
+      { ltcgEquity: ltcgEquityIncome, stcgEquity: stcgEquityIncome }
+    );
 
-    if (regime === 'new') {
-      if (formData.financialYear === "2025-26" || formData.financialYear === "2026-27") {
-        rebateLimit = 1200000;
-        rebateAmount = 60000;
-      } else {
-        rebateLimit = 700000;
-        rebateAmount = 25000;
-      }
-    } else {
-      rebateLimit = 500000;
-      rebateAmount = 12500;
-    }
-
-    let marginalRelief = 0;
-    let marginalReliefApplied = false;
-    let taxAfterRebate = incomeTax;
-    let cessAmount = 0;
-    let finalTax = 0;
-
-    if (regime === 'new' && (formData.financialYear === "2025-26" || formData.financialYear === "2026-27")) {
-      if (taxableIncome <= 1200000) {
-        // Full rebate u/s 156 (2025 Act) / 87A (1961 Act) — tax is NIL up to ₹12 lakh
-        rebate87A = incomeTax;
-        taxAfterRebate = 0;
-        cessAmount = 0;
-        finalTax = 0;
-      } else {
-        // Income > ₹12 lakh — no rebate applies, but marginal relief may
-        rebate87A = 0;
-        taxAfterRebate = incomeTax;
-
-        const excessIncome = taxableIncome - 1200000;
-
-        if (taxAfterRebate > excessIncome) {
-          marginalRelief = taxAfterRebate - excessIncome;
-          taxAfterRebate = excessIncome;
-          marginalReliefApplied = true;
-        }
-
-        cessAmount = taxAfterRebate * 0.04;
-        finalTax = taxAfterRebate + cessAmount;
-      }
-    } else if (regime === 'new') {
-      // New Regime, FY 2023-24 / FY 2024-25 — Section 87A rebate up to ₹7 lakh.
-      // Budget 2023 legislated marginal relief at this cliff too (same shape
-      // as the ₹12L branch above, just at the ₹7L threshold): tax payable on
-      // income marginally above ₹7L can't exceed the amount by which income
-      // exceeds ₹7L. This was previously missing here, which overstated tax
-      // by a wide margin for income just above ₹7,00,000 (e.g. ₹7.1L showed
-      // ~₹27,040 instead of the correct ~₹10,400).
-      if (taxableIncome <= rebateLimit) {
-        rebate87A = incomeTax;
-        taxAfterRebate = 0;
-        cessAmount = 0;
-        finalTax = 0;
-      } else {
-        rebate87A = 0;
-        taxAfterRebate = incomeTax;
-
-        const excessIncome = taxableIncome - rebateLimit;
-
-        if (taxAfterRebate > excessIncome) {
-          marginalRelief = taxAfterRebate - excessIncome;
-          taxAfterRebate = excessIncome;
-          marginalReliefApplied = true;
-        }
-
-        cessAmount = taxAfterRebate * 0.04;
-        finalTax = taxAfterRebate + cessAmount;
-      }
-    } else {
-      // Old Regime — Section 87A rebate up to ₹5 lakh. NO statutory marginal
-      // relief exists for this cliff (unlike the New Regime cliffs above) —
-      // crossing ₹5,00,000 by even ₹1 loses the entire ₹12,500 rebate. This
-      // is a real, well-known quirk of Indian tax law, not a gap in this code.
-      if (taxableIncome <= rebateLimit) {
-        rebate87A = Math.min(incomeTax, rebateAmount);
-      }
-      taxAfterRebate = Math.max(0, incomeTax - rebate87A);
-
-      // Step 4: Cess on the net tax after rebate
-      cessAmount = taxAfterRebate * 0.04;
-      finalTax = taxAfterRebate + cessAmount;
-    }
+    const rebate87A = liability.rebate;
+    const marginalRelief = liability.marginalRelief;
+    const marginalReliefApplied = liability.marginalReliefApplied;
+    const cessAmount = liability.cess;
+    const surchargeAmount = liability.surcharge;
+    const surchargeRate = liability.surchargeRate;
+    const specialRateTax = liability.specialRateTax;
+    const finalTax = liability.totalTax;
 
     const totalTax = Math.max(0, finalTax);
     const takeHome = totalIncome - totalTax;
@@ -463,6 +481,11 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
       cess: cessAmount,
       rebate87A,
       marginalRelief,
+      surcharge: surchargeAmount,
+      surchargeRate,
+      specialRateTax,
+      ltcgEquity: ltcgEquityIncome,
+      stcgEquity: stcgEquityIncome,
       totalTax,
       takeHome,
       effectiveRate,
@@ -582,9 +605,12 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
     setResult(null);
     setFormData({
       salaryIncome: '',
+      basicSalary: '',
       housePropertyIncome: '',
       businessIncome: '',
       capitalGainsIncome: '',
+      ltcgEquity: '',
+      stcgEquity: '',
       otherIncome: '',
       section80C: '',
       section80D: '',
@@ -752,7 +778,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
         incomeTax:        result.oldRegime.incomeTax,
         rebate87A:        result.oldRegime.rebate87A,
         taxAfterRebate:   oldTaxAfterRebate,
-        surcharge:        0,
+        surcharge:        result.oldRegime.surcharge,
         cess:             result.oldRegime.cess,
         totalTax:         result.oldRegime.totalTax,
         monthlyTDS:       Math.round(result.oldRegime.totalTax / 12),
@@ -778,7 +804,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
         incomeTax:        result.newRegime.incomeTax,
         rebate87A:        result.newRegime.rebate87A,
         taxAfterRebate:   newTaxAfterRebate,
-        surcharge:        0,
+        surcharge:        result.newRegime.surcharge,
         cess:             result.newRegime.cess,
         totalTax:         result.newRegime.totalTax,
         monthlyTDS:       Math.round(result.newRegime.totalTax / 12),
@@ -805,7 +831,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
         taxBreakdown: {
           taxableIncome: result.oldRegime.taxableIncome,
           taxOnIncome:   result.oldRegime.incomeTax,
-          surcharge:     0,
+          surcharge:     result.oldRegime.surcharge,
           cess:          result.oldRegime.cess,
           totalTax:      result.oldRegime.totalTax,
         },
@@ -1171,6 +1197,50 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                       onChange={(e) => updateFormData('capitalGainsIncome', e.target.value)}
                       data-testid="input-capital-gains-income"
                     />
+                    <p className="text-xs text-slate-500 mt-1">
+                      Debt funds, unlisted shares, property — gains taxed at your slab rate.
+                      Listed shares and equity mutual funds go in the two fields below.
+                    </p>
+                  </div>
+
+                  {/* Listed-equity gains are charged at their own statutory rates and
+                      are deliberately separate inputs. Previously a single "Capital
+                      Gains" figure was added to slab income, which both taxed the
+                      gains at the wrong rate and let the s.87A/156 rebate absorb the
+                      tax on them. */}
+                  <div>
+                    <Label htmlFor="ltcg-equity">
+                      Long-Term Capital Gains — Listed Equity / Equity MF
+                    </Label>
+                    <Input
+                      id="ltcg-equity"
+                      type="number"
+                      placeholder="e.g., 300000"
+                      value={formData.ltcgEquity}
+                      onChange={(e) => updateFormData('ltcgEquity', e.target.value)}
+                      data-testid="input-ltcg-equity"
+                    />
+                    <p className="text-xs text-slate-500 mt-1">
+                      Held over 12 months. Section 112A — first ₹1,25,000 exempt each
+                      year, balance taxed at 12.5%. Not eligible for the rebate.
+                    </p>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="stcg-equity">
+                      Short-Term Capital Gains — Listed Equity / Equity MF
+                    </Label>
+                    <Input
+                      id="stcg-equity"
+                      type="number"
+                      placeholder="e.g., 100000"
+                      value={formData.stcgEquity}
+                      onChange={(e) => updateFormData('stcgEquity', e.target.value)}
+                      data-testid="input-stcg-equity"
+                    />
+                    <p className="text-xs text-slate-500 mt-1">
+                      Held 12 months or less. Section 111A — taxed at 20%.
+                    </p>
                   </div>
 
                   <div>
@@ -1403,6 +1473,26 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                       onChange={(e) => { updateFormData('hraReceived', e.target.value); setHraFromCalculator(false); }}
                       data-testid="input-hra-received"
                     />
+                  </div>
+
+                  {/* Rule 2A computes the HRA exemption on BASIC + DA, not gross
+                      salary. Without this input the calculation fell back to gross
+                      and over-exempted allowance-heavy packages substantially. */}
+                  <div>
+                    <Label htmlFor="basic-salary">Basic Salary + DA (annual)</Label>
+                    <Input
+                      id="basic-salary"
+                      type="number"
+                      placeholder="e.g., 600000"
+                      value={formData.basicSalary}
+                      onChange={(e) => updateFormData('basicSalary', e.target.value)}
+                      data-testid="input-basic-salary"
+                    />
+                    <p className="text-xs text-slate-500 mt-1">
+                      {parseFloat(formData.basicSalary) > 0
+                        ? 'Used for the HRA exemption — the law computes it on basic + DA, not gross salary.'
+                        : 'Needed for an accurate HRA exemption. Left blank, we fall back to gross salary, which overstates the exemption.'}
+                    </p>
                   </div>
 
                   <div>

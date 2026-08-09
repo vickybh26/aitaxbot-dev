@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AiTaxBot — UI/UX Audit</title>
+<style>
+  :root{
+    --navy:#1E3A5F; --navy-d:#132840; --navy-l:#F0F4F9;
+    --ink:#0f172a; --body:#334155; --mute:#64748b; --line:#e2e8f0;
+    --bg:#f8fafc; --card:#ffffff;
+    --p0:#b91c1c; --p0bg:#fef2f2; --p0br:#fecaca;
+    --p1:#c2410c; --p1bg:#fff7ed; --p1br:#fed7aa;
+    --p2:#a16207; --p2bg:#fefce8; --p2br:#fde68a;
+    --p3:#0369a1; --p3bg:#f0f9ff; --p3br:#bae6fd;
+    --ok:#047857;  --okbg:#ecfdf5; --okbr:#a7f3d0;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--bg); color:var(--body);
+    font-family:'IBM Plex Sans',Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+    font-size:15px; line-height:1.65; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+  h1,h2,h3,h4{color:var(--ink);letter-spacing:-.02em;margin:0}
+  code,.mono{font-family:var(--mono);font-size:.86em}
+  code{background:#eef2f7;color:#1e293b;padding:.12em .4em;border-radius:4px;border:1px solid #dde5ee}
+
+  /* ── header ── */
+  header{background:var(--navy);color:#fff;padding:48px 0 40px;border-bottom:4px solid var(--navy-d)}
+  header h1{color:#fff;font-size:34px;line-height:1.15;margin-bottom:10px}
+  header .sub{color:#b9cbe0;font-size:15px;max-width:660px}
+  header .meta{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px}
+  header .meta span{font-size:12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);
+    color:#d7e4f0;padding:5px 11px;border-radius:999px;white-space:nowrap}
+
+  /* ── scoreboard ── */
+  .scores{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:-26px 0 34px}
+  .score{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;
+    box-shadow:0 1px 3px rgba(15,23,42,.06)}
+  .score .n{font-size:30px;font-weight:700;color:var(--ink);line-height:1;font-variant-numeric:tabular-nums}
+  .score .l{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--mute);margin-top:7px}
+  .score.p0 .n{color:var(--p0)} .score.p1 .n{color:var(--p1)}
+  .score.p2 .n{color:var(--p2)} .score.p3 .n{color:var(--p3)}
+
+  section{margin-bottom:44px}
+  .shead{display:flex;align-items:baseline;gap:12px;margin-bottom:6px;flex-wrap:wrap}
+  .shead h2{font-size:22px}
+  .shead .tag{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--mute)}
+  .lede{color:var(--mute);font-size:14px;margin:0 0 20px;max-width:760px}
+
+  /* ── filters ── */
+  .filters{position:sticky;top:0;z-index:20;background:rgba(248,250,252,.93);
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);padding:12px 0;margin-bottom:26px}
+  .filters .row{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+  .filters .lbl{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--mute);margin-right:4px}
+  button.f{font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;border-radius:999px;
+    padding:6px 14px;border:1px solid var(--line);background:#fff;color:var(--body);
+    transition:all .15s ease;min-height:34px}
+  button.f:hover{border-color:#94a3b8}
+  button.f[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+  button.f:focus-visible{outline:2px solid #2563eb;outline-offset:2px}
+  .count{font-size:12.5px;color:var(--mute);margin-left:auto;font-variant-numeric:tabular-nums}
+
+  /* ── finding cards ── */
+  .find{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--line);
+    border-radius:10px;margin-bottom:11px;overflow:hidden;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+  .find[data-sev="P0"]{border-left-color:var(--p0)}
+  .find[data-sev="P1"]{border-left-color:var(--p1)}
+  .find[data-sev="P2"]{border-left-color:var(--p2)}
+  .find[data-sev="P3"]{border-left-color:var(--p3)}
+  .find.hide{display:none}
+  .find > summary{list-style:none;cursor:pointer;padding:15px 18px;display:flex;gap:13px;
+    align-items:flex-start;user-select:none}
+  .find > summary::-webkit-details-marker{display:none}
+  .find > summary:hover{background:#fafcff}
+  .find > summary:focus-visible{outline:2px solid #2563eb;outline-offset:-2px}
+  .chip{font-size:10.5px;font-weight:800;letter-spacing:.06em;padding:3px 8px;border-radius:5px;
+    flex-shrink:0;margin-top:2px;border:1px solid}
+  .chip.P0{background:var(--p0bg);color:var(--p0);border-color:var(--p0br)}
+  .chip.P1{background:var(--p1bg);color:var(--p1);border-color:var(--p1br)}
+  .chip.P2{background:var(--p2bg);color:var(--p2);border-color:var(--p2br)}
+  .chip.P3{background:var(--p3bg);color:var(--p3);border-color:var(--p3br)}
+  .ttl{flex:1;min-width:0}
+  .ttl .t{font-weight:650;color:var(--ink);font-size:15px;line-height:1.4}
+  .ttl .m{font-size:12px;color:var(--mute);margin-top:4px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+  .ttl .m .cat{background:#f1f5f9;border:1px solid #e2e8f0;padding:1.5px 7px;border-radius:4px;font-weight:600}
+  .caret{color:#94a3b8;flex-shrink:0;transition:transform .18s ease;margin-top:4px}
+  .find[open] .caret{transform:rotate(90deg)}
+  .body{padding:2px 18px 20px 18px;border-top:1px solid #f1f5f9;margin-top:-1px}
+  .body > *:first-child{margin-top:14px}
+  .body p{margin:0 0 11px}
+  .body ul{margin:0 0 11px;padding-left:20px}
+  .body li{margin-bottom:5px}
+  .lab{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--mute);margin:16px 0 6px}
+  .files{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px}
+  .files span{font-family:var(--mono);font-size:11.5px;background:#f1f5f9;border:1px solid #e2e8f0;
+    color:#475569;padding:3px 8px;border-radius:5px}
+  pre{background:#0f172a;color:#e2e8f0;padding:13px 15px;border-radius:8px;overflow-x:auto;
+    font-family:var(--mono);font-size:12.5px;line-height:1.6;margin:0 0 11px}
+  pre .g{color:#6ee7b7} pre .r{color:#fca5a5} pre .c{color:#94a3b8}
+  .fix{background:var(--okbg);border:1px solid var(--okbr);border-radius:8px;padding:13px 15px;margin-top:6px}
+  .fix .h{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ok);margin-bottom:6px}
+  .fix p:last-child, .fix ul:last-child{margin-bottom:0}
+  .steel{background:#f8fafc;border:1px dashed #cbd5e1;border-radius:8px;padding:12px 15px;margin-top:10px}
+  .steel .h{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin-bottom:5px}
+  .steel p:last-child{margin-bottom:0}
+
+  /* ── tables ── */
+  table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);
+    border-radius:10px;overflow:hidden;font-size:13.5px}
+  th{background:#f1f5f9;text-align:left;padding:10px 13px;font-size:11px;font-weight:800;
+    letter-spacing:.07em;text-transform:uppercase;color:var(--mute);border-bottom:1px solid var(--line)}
+  td{padding:10px 13px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+  tr:last-child td{border-bottom:none}
+  td.num{font-variant-numeric:tabular-nums;font-weight:650;text-align:right;white-space:nowrap}
+  .pill{font-size:10.5px;font-weight:800;padding:2.5px 8px;border-radius:5px;border:1px solid;white-space:nowrap}
+  .pill.pass{background:var(--okbg);color:var(--ok);border-color:var(--okbr)}
+  .pill.fail{background:var(--p0bg);color:var(--p0);border-color:var(--p0br)}
+  .pill.warn{background:var(--p2bg);color:var(--p2);border-color:var(--p2br)}
+  .sw{display:inline-block;width:15px;height:15px;border-radius:4px;border:1px solid rgba(15,23,42,.14);
+    vertical-align:-3px;margin-right:7px}
+
+  /* ── bars ── */
+  .bars{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 20px}
+  .bar{display:grid;grid-template-columns:112px 1fr 54px;align-items:center;gap:12px;margin-bottom:7px}
+  .bar .nm{font-size:12.5px;font-weight:600;color:var(--body);display:flex;align-items:center}
+  .bar .tr{background:#f1f5f9;border-radius:4px;height:15px;overflow:hidden}
+  .bar .fl{height:100%;border-radius:4px}
+  .bar .vl{font-size:12px;color:var(--mute);text-align:right;font-variant-numeric:tabular-nums}
+
+  /* ── good list ── */
+  .good{background:var(--okbg);border:1px solid var(--okbr);border-radius:10px;padding:18px 22px}
+  .good h3{color:var(--ok);font-size:15px;margin-bottom:9px}
+  .good ul{margin:0;padding-left:20px}
+  .good li{margin-bottom:6px;color:#065f46}
+
+  /* ── plan ── */
+  .plan{display:grid;gap:12px}
+  .phase{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 20px}
+  .phase h4{font-size:14px;margin-bottom:3px}
+  .phase .when{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--mute);margin-bottom:9px}
+  .phase ol{margin:0;padding-left:20px;font-size:13.5px}
+  .phase li{margin-bottom:5px}
+
+  footer{border-top:1px solid var(--line);padding:26px 0 46px;color:var(--mute);font-size:12.5px}
+  .empty{display:none;text-align:center;padding:44px;color:var(--mute);font-size:14px;
+    background:var(--card);border:1px dashed var(--line);border-radius:10px}
+  .empty.show{display:block}
+  @media (max-width:640px){
+    header h1{font-size:26px} .wrap{padding:0 16px}
+    .bar{grid-template-columns:82px 1fr 46px}
+    .find > summary{padding:13px 14px} .body{padding:2px 14px 17px}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>AiTaxBot — UI/UX Design Audit</h1>
+    <p class="sub">A design-led review of the front-end: token architecture, information architecture,
+    core task flows, accessibility, mobile behaviour and content integrity. Every finding below was
+    verified against the source in this repository.</p>
+    <div class="meta">
+      <span>154 client source files</span>
+      <span>~18,850 lines of page &amp; calculator code</span>
+      <span>38 routes</span>
+      <span>88 Card instances · 51 outline Buttons</span>
+      <span>Audited 7 Aug 2026</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="scores">
+    <div class="score p0"><div class="n">4</div><div class="l">Critical</div></div>
+    <div class="score p1"><div class="n">6</div><div class="l">High</div></div>
+    <div class="score p2"><div class="n">11</div><div class="l">Medium</div></div>
+    <div class="score p3"><div class="n">5</div><div class="l">Low</div></div>
+    <div class="score"><div class="n">16</div><div class="l">Colour families</div></div>
+    <div class="score"><div class="n">296</div><div class="l"><code style="font-size:11px">bg-white</code> patches</div></div>
+  </div>
+
+  <section>
+    <div class="shead"><h2>The one-paragraph version</h2></div>
+    <p class="lede" style="font-size:15px;color:var(--body);max-width:820px">
+      This is a genuinely well-reasoned product. The code is unusually well-documented, several
+      decisions are backed by real usage data, and the recent direction — navy over "AI purple",
+      show the headline number before the sign-in gate — is the right instinct for a tax product.
+      The problem is not judgement, it is <strong>layering</strong>. A design-token system was installed,
+      then broken at the root by a one-line mapping bug, then worked around 296 times with
+      <code>bg-white</code>. Three separate design specifications now exist and contradict each other.
+      The result is a site that renders acceptably but where nobody can change a colour with confidence.
+      Fix the token layer first — most of the visual inconsistency below is downstream of it.
+    </p>
+  </section>
+
+  <div class="filters">
+    <div class="wrap" style="padding:0">
+      <div class="row">
+        <span class="lbl">Severity</span>
+        <button class="f sev" data-v="all" aria-pressed="true">All</button>
+        <button class="f sev" data-v="P0" aria-pressed="false">Critical</button>
+        <button class="f sev" data-v="P1" aria-pressed="false">High</button>
+        <button class="f sev" data-v="P2" aria-pressed="false">Medium</button>
+        <button class="f sev" data-v="P3" aria-pressed="false">Low</button>
+        <span class="count" id="count"></span>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <span class="lbl">Area</span>
+        <button class="f cat" data-v="all" aria-pressed="true">All</button>
+        <button class="f cat" data-v="Design system" aria-pressed="false">Design system</button>
+        <button class="f cat" data-v="Navigation" aria-pressed="false">Navigation</button>
+        <button class="f cat" data-v="Flow" aria-pressed="false">Flow</button>
+        <button class="f cat" data-v="Accessibility" aria-pressed="false">Accessibility</button>
+        <button class="f cat" data-v="Mobile" aria-pressed="false">Mobile</button>
+        <button class="f cat" data-v="Content" aria-pressed="false">Content</button>
+      </div>
+    </div>
+  </div>
+
+  <section id="findings">
+
+  <!-- ══════════════ P0 ══════════════ -->
+
+  <details class="find" data-sev="P0" data-cat="Design system">
+    <summary>
+      <span class="chip P0">P0</span>
+      <span class="ttl">
+        <span class="t">The shadcn token layer is broken at the root — every Card and outline Button renders wrong</span>
+        <span class="m"><span class="cat">Design system</span> · affects 88 Cards, 58 Buttons, 32 other usages</span>
+      </span>
+      <span class="caret">›</span>
+    </summary>
+    <div class="body">
+      <p><code>tailwind.config.ts</code> maps the shadcn tokens straight to the CSS variables:
+      <code>primary: "var(--primary)"</code>. But in <code>index.css</code> those variables are declared as
+      bare HSL triplets — <code>--card: 0 0% 100%</code>. The utility therefore emits
+      <code>background-color: 0 0% 100%</code>, which is invalid CSS and does nothing.</p>
+
+      <p>The <code>persian-blue</code> scale in the same config gets this right (<code>hsl(var(--persian-blue-50))</code>),
+      which is why that ramp works and nothing else does.</p>
+
+      <div class="lab">What actually renders</div>
+      <ul>
+        <li><code>&lt;Card&gt;</code> ships <code>"rounded-lg border bg-card"</code>. <code>bg-card</code> is a
+        no-op → transparent. <code>border</code> has no colour because <code>border-border</code> is also
+        broken → the border falls back to <code>currentColor</code>, i.e. the inherited dark body text
+        colour. Every one of the <strong>88 cards</strong> draws a near-black hairline instead of a light grey one.</li>
+        <li><code>&lt;Button variant="outline"&gt;</code> (<strong>51 uses</strong>) = <code>bg-background</code> +
+        <code>border-input</code> — both dead. Transparent button, currentColor border.</li>
+        <li><code>secondary</code> (6), <code>destructive</code> (1), <code>ghost</code> (5) likewise have no background.</li>
+        <li><code>focus-visible:ring-ring</code> is dead on every shadcn component. Only the global
+        <code>:focus-visible</code> rule in <code>index.css</code> is keeping keyboard focus visible at all.</li>
+        <li>Unpatched and in use: <code>bg-background</code> ×15, <code>bg-muted</code> ×9, <code>bg-popover</code> ×8,
+        <code>bg-secondary</code> ×8, <code>bg-destructive</code> ×5, <code>text-foreground</code> ×10.</li>
+      </ul>
+
+      <p>The <strong>296 hand-written <code>bg-white</code> classes</strong> and the growing block of
+      <code>.text-*-foreground</code> rescues in <code>index.css</code> are scar tissue from this single bug.
+      The file's own comments already diagnose it correctly and label the proper fix "when there is
+      time" — this audit's position is that it <em>is</em> the highest-leverage hour available.</p>
+
+      <div class="lab">Files</div>
+      <div class="files"><span>tailwind.config.ts:29–70</span><span>client/src/index.css:7–30, 178–200</span><span>client/src/components/ui/card.tsx:12</span><span>client/src/components/ui/button.tsx:13–24</span></div>
+
+      <div class="fix">
+        <div class="h">Fix</div>
+        <p>Wrap every token in <code>hsl()</code> in the Tailwind config, matching what <code>persian-blue</code>
+        already does, then delete the rescue block and the <code>.bg-primary</code>/<code>.text-primary</code>
+        patches from <code>index.css</code>.</p>
+<pre><span class="r">- background: "var(--background)",</span>
+<span class="r">- primary: { DEFAULT: "var(--primary)", foreground: "var(--primary-foreground)" },</span>
+<span class="g">+ background: "hsl(var(--background))",</span>
+<span class="g">+ primary: { DEFAULT: "hsl(var(--primary))", foreground: "hsl(var(--primary-foreground))" },</span>
+<span class="c">  // …same for card, popover, secondary, muted, accent, destructive, border, input, ring</span></pre>
+        <p style="margin-bottom:0">Do it on a branch and walk the site once — some pages have been visually
+        tuned <em>around</em> the broken behaviour, so a handful of <code>bg-white</code> overrides will need removing
+        rather than keeping. Budget half a day, not an hour, for the sweep.</p>
+      </div>
+    </div>
+  </details>
+
+  <details class="find" data-sev="P0" data-cat="Mobile">
+    <summary>
+      <span class="chip P0">P0</span>
+      <span class="ttl">
+        <span class="t">Three fixed elements fight over the bottom of the mobile screen — the cookie banner hides the entire primary nav</span>
+        <span class="m"><span class="cat">Mobile</span> · every first-time mobile visit</span>
+      </span>
+      <span class="caret">›</span>
+    </summary>
+    <div class="body">
+      <p>Four components are mounted at the app root and three of them anchor to the bottom edge at
+      <code>z-50</code>:</p>
+
+      <div class="lab">Geometry</div>
+      <table style="margin-bottom:12px">
+        <tr><th>Element</th><th>Position</th><th>Occupies</th><th>Paint order</th></tr>
+        <tr><td>MobileTabBar</td><td class="mono">bottom-0 · z-50</td><td class="mono">0 – 56px</td><td>1st</td></tr>
+        <tr><td>CookieConsent</td><td class="mono">bottom-0 · z-50 · full-bleed</td><td class="mono">0 – ~180px</td><td>2nd — <strong>wins</strong></td></tr>
+        <tr><td>WhatsApp FAB</td><td class="mono">bottom-5 right-4 · z-50 · 56px</td><td class="mono">20 – 76px</td><td>3rd — <strong>wins</strong></td></tr>
+      </table>
+
+      <ul>
+        <li><strong>Cookie banner over the tab bar.</strong> It appears on a 1-second timer on every first
+        visit and, being later in the DOM at equal <code>z-index</code>, paints on top. The four primary
+        navigation destinations are completely hidden until the user dismisses it. The banner is
+        also the tallest element on the page at mobile width because the three buttons wrap.</li>
+        <li><strong>WhatsApp FAB permanently overlaps the 4th tab.</strong> 20px + 56px = 76px of occupied
+        height against a 56px bar. The "Tools" tab sits underneath it on every page, on every phone.</li>
+        <li>The tooltip bubble at <code>bottom-24</code> then fires unprompted after 5 seconds, adding a
+        fourth floating layer.</li>
+      </ul>
+
+      <p>The <code>Layout.tsx</code> spacer correctly reserves 56px + safe-area for the tab bar — but nothing
+      reserves space for the other two, and nothing coordinates them.</p>
+
+      <div class="lab">Files</div>
+      <div class="files"><span>client/src/components/MobileTabBar.tsx:59</span><span>client/src/components/CookieConsent.tsx:120</span><span>client/src/components/WhatsAppButton.tsx:43,73</span><span>client/src/App.tsx:216–219</span></div>
+
+      <div class="fix">
+        <div class="h">Fix</div>
+        <ul style="margin-bottom:0">
+          <li>Give the bottom edge a z-scale: tab bar <code>z-40</code>, FAB <code>z-45</code>, cookie banner <code>z-60</code>.</li>
+          <li>Raise the FAB above the bar on mobile only: <code>bottom-5 md:bottom-5 bottom-[76px]</code>
+          (or <code>bottom-[calc(56px+env(safe-area-inset-bottom)+12px)]</code>).</li>
+          <li>While the cookie banner is open, add <code>pb-[180px]</code> to the tab-bar spacer, or simply hide
+          the tab bar — one bottom-anchored decision surface at a time.</li>
+          <li>Suppress the WhatsApp tooltip until the cookie choice is made. Two unsolicited popovers in
+          the first six seconds is a lot to ask of someone who came to calculate one number.</li>
+        </ul>
+      </div>
+    </div>
+  </details>
+
+  <details class="find" data-sev="P0" data-cat="Content">
+    <summary>
+      <span class="chip P0">P0</span>
+      <span class="ttl">
+        <span class="t">The site makes three contradictory claims about whether it stores your data</span>
+        <span class="m"><span class="cat">Content</span> · trust-critical · homepage + every calculator</span>
+      </span>
+      <span class="caret">›</span>
+    </summary>
+    <div class="body">
+      <p>Users are handing over salary figures and PAN-adjacent data. The copy tells them three
+      different things about what happens to it:</p>
+      <ul>
+        <li><strong>Homepage trust ribbon</strong> — "Runs in browser — data never stored"</li>
+        <li><strong>Tax calculator badge</strong> — "No data stored"</li>
+        <li><strong>Result gate</strong> — "Signing in saves your latest result to your dashboard — you can
+        clear it any time"</li>
+      </ul>
+      <p>The third is the accurate one. The calculator POSTs to the API, the Dashboard reads saved
+      calculations back, and the AIS tool uploads Form 16 / 26AS PDFs for server-side parsing. The
+      first two are false as written.</p>
+      <p>This is not pedantry. In a tax product, a visible contradiction about data handling is the
+      cheapest possible way to lose a cautious user — and the cautious user is exactly the one who
+      reads trust ribbons. It also sits awkwardly against DPDP disclosure expectations.</p>
+
+      <div class="lab">Files</div>
+      <div class="files"><span>client/src/pages/Landing.tsx:251–262</span><span>client/src/components/calculators/TaxCalculator.tsx:987–996</span><span>client/src/components/ResultAuthGate.tsx:101–104</span></div>
+
+      <div class="fix">
+        <div class="h">Fix</div>
+        <p style="margin-bottom:0">Make one true claim and repeat it verbatim everywhere:
+        <em>"Calculations run in your browser. Nothing is saved unless you sign in."</em> That is
+        both accurate and still a strong reassurance — arguably stronger, because it is specific.</p>
+      </div>
+    </div>
+  </details>
+
+  <details class="find" data-sev="P0" data-cat="Accessibility">
+    <summary>
+      <span class="chip P0">P0</span>
+      <span class="ttl">
+        <span class="t">Printing is disabled site-wide — users cannot print or PDF a tax computation</span>
+        <span class="m"><span class="cat">Accessibility</span> · <span class="cat">Flow</span> · every page including Terms &amp; Privacy</span>
+      </span>
+      <span class="caret">›</span>
+    </summary>
+    <div class="body">
+      <p><code>index.css</code> ends print output entirely:</p>
+<pre>@media print {
+  body { display: none !important; }   <span class="c">/* line 141 */</span></pre>
+      <p>The stated intent is to funnel users to the Download button. But the rule is total: Ctrl+P
+      and "Save as PDF" produce a blank page on the homepage, the blog, the Privacy Policy and the
+      Terms of Service. Printing a tax computation for your own records or your CA is a completely
+      ordinary thing an Indian taxpayer does in filing season, and refusing it silently — the user
+      gets no message, just a blank sheet — reads as a bug, not a policy.</p>
+      <p>It also blocks some print-to-reader and offline-archive workflows used by assistive tooling.</p>
+
+      <div class="steel">
+        <div class="h">The counter-case, stated fairly</div>
+        <p>There is a real argument here: a browser-printed calculator page would be an ugly,
+        half-broken artefact with navigation and ads in it, and a user forwarding that to their CA
+        reflects badly on the product. The generated PDF is genuinely better. The disagreement is
+        only about method — that is an argument for a good print stylesheet, not for a blackout,
+        and it does not justify blanking the Terms of Service.</p>
+      </div>
+
+      <div class="fix">
+        <div class="h">Fix</div>
+        <p style="margin-bottom:0">Replace the blackout with a real print stylesheet: hide header, footer,
+        tab bar, FAB, cookie banner and ad slots; keep the result card, the breakdown table and a
+        one-line "Generated by aitaxbot.co.in · not a filed return" footer. Roughly 20 lines. Keep
+        the Download PDF button as the promoted path.</p>
+      </div>
+    </div>
+  </details>
+
+  <!-- ══════════════ P1 ══════════════ -->
+
+  <details class="find" data-sev="P1" data-cat="Accessibility">
+    <summary>
+      <span class="chip P1">P1</span>
+      <span class="ttl">
+        <span class="t">Hint and disclaimer text fails WCAG AA at 2.5:1 — 138 usages</span>
+        <span class="m"><span class="cat">Accessibility</span> · WCAG 2.1 AA 1.4.3</span>
+      </span>
+      <span class="caret">›</span>
+    </summary>
+    <div class="body">
+      <p>Ratios computed from the actual token values (see the full contrast table further down):</p>
+      <table style="margin-bottom:12px">
+        <tr><th>Pair</th><th style="text-align:right">Ratio</th><th>AA (4.5:1)</th><th>Uses</th></tr>
+        <tr><td><span class="sw" style="background:#94a3b8"></span><code>text-slate-400</code> on white</td><td class="num">2.56</td><td><span class="pill fail">FAIL</span></td><td class="num">110</td></tr>
+        <tr><td><span class="sw" style="background:#9ca3af"></span><code>text-gray-400</code> on white</td><td class="num">2.54</td><td><span class="pill fail">FAIL</span></td><td class="num">28</td></tr>
+        <tr><td><span class="sw" style="background:#7b93b8"></span><code>persian-blue-300</code> on white</td><td class="num">2.70</td><td><span class="pill fail">FAIL</span></td><td class="num">—</td></tr>
+      </table>
+      <p>These fail not just AA for body text but the 3:1 large-text floor as well. What is written in
+      them matters: the ResultAuthGate disclosure ("Free forever. Signing in saves your latest
+      result…"), news timestamps, stat sub-labels, calculator footnotes and assumption notes. This
+      is precisely the text a careful taxpayer wants to read, rendered at the lowest contrast on the
+      page.</p>
+      <p>Note the near-miss too: <code>--neutral-500</code> on white is <strong>4.38:1</strong>, just under the bar.</p>
+
+      <div class="fix">
+        <div class="h">Fix</div>
+        <p style="margin-bottom:0">Global find-and-replace <code>text-slate-400 → text-slate-500</code> and
+        <code>text-gray-400 → text-slate-500</code> where the background is white or slate-50 (4.76:1, passes).
+        Keep <code>slate-400</code> only on the dark navy surfaces, where it measures 6.96:1 and is fine.
+        Nudge <code>--neutral-500</code> from <code>48%</code> to <code>46%</code> lightness.</p>
+      </div>
+    </div>
+  </details>
+
+  <details class="find" data-sev="P1" data-cat="Content">
+    <summary>
+      <span class="chip P1">P1</span>
+      <span class="ttl">
+        <span class="t">The Hindi toggle is a promise the product doesn't keep</span>
+        <span class="m"><span class="cat">Content</span> · <span class="cat">Flow</span> · 62 keys, 18 call sites, 3 files</span>
+      </span>
+      <span class="caret">›</span>
+    </summary>
+    <div class="body">
+      <p>The language switcher is given prime real estate — desktop header <em>and</em> mobile header, visible
+      before anything else. Behind it:</p>
+      <ul>
+        <li><code>en.ts</code> / <code>hi.ts</code>: 62 keys each</li>
+        <li><code>useTranslation()</code> imported in exactly <strong>3 files</strong>: <code>Header</code>, <code>Landing</code>, <code>i18n.tsx</code></li>
+        <li><strong>18</strong> <code>t()</code> call sites across ~18,850 lines of UI</li>
+      </ul>
+      <p>Tapping हिंदी translates the nav labels and the hero headline. Every calculator label, every
+      field, every result, every error message, every FAQ, the entire blog and all 38 pages stay in
+      English. A Hindi-preferring user is arguably <em>worse</em> off than with no toggle: they have been
+      told the product speaks their language, made a choice, and been handed the same English form
+      with a translated menu bar on top.</p>
+      <p>The translation keys also reference features that no longer exist — <code>footer.mutualFunds</code>,
+      <code>footer.stockQuotes</code>, <code>footer.ipoAnalyzer</code>, <code>footer.marketNews</code> — pointing at the
+      archived <code>_backup/market</code> module.</p>
+
+      <div class="fix">
+        <div class="h">Fix — pick one</div>
+        <ul style="margin-bottom:0">
+          <li><strong>Commit.</strong> Translate the Income Tax Calculator end-to-end first (391 of 464
+          measured page views land there). One fully bilingual high-traffic page beats 38 half-done ones.</li>
+          <li><strong>Or scope it honestly.</strong> Keep the toggle, but only render it on pages that are
+          actually translated, and label it "हिंदी (beta)".</li>
+          <li><strong>Or remove it</strong> until there is capacity. An absent feature costs less trust than a
+          hollow one.</li>
+        </ul>
+      </div>
+    </div>
+  </details>
+
+  <details class="find" data-sev="P1" data-cat="Design system">
+    <summary>
+      <span class="chip P1">P1</span>
+      <span class="ttl">
+        <span class="t">Three design specifications exist and contradict each other — one of them fails contrast</span>
+        <span class="m"><span class="cat">Design system</span> · governance</span>
+      </span>
+      <span class="caret">›</span>
+    </summary>
+    <div class="body">
+      <table style="margin-bottom:13px">
+        <tr><th>Source</th><th>Primary</th><th>Accent</th><th>Surface</th><th>Type</th></tr>
+        <tr>
+          <td><code>design_guidelines.md</code></td>
+          <td><span class="sw" style="background:#635bff"></span>"Stripe-like"</td>
+          <td>—</td><td>White</td><td>Inter + IBM Plex Sans</td>
+        </tr>
+        <tr>
+          <td><code>design-system/aitaxbot/MASTER.md</code><br><span style="font-size:11.5px;color:var(--mute)">generated 24 Jul 2026</span></td>
+          <td><span class="sw" style="background:#F59E0B"></span>#F59E0B gold</td>
+          <td><span class="sw" style="background:#8B5CF6"></span>#8B5CF6 purple</td>
+          <td><span class="sw" style="background:#0F172A"></span>#0F172A dark</td>
+          <td>Inter only</td>
+        </tr>
+        <tr>
+          <td><code>client/src/index.css</code><br><span style="font-size:11.5px;color:var(--mute)">the one that ships</span></td>
+          <td><span class="sw" style="background:#1E3A5F"></span>#1E3A5F navy</td>
+          <td><span class="sw" style="background:#059669"></span>#059669 green<br><span style="font-size:11.5px;color:var(--mute)">money-positive only</span></td>
+          <td>White</td><td>IBM Plex Sans</td>
+        </tr>
+      </table>
+
+      <p>These are not variations, they are three different products. MASTER.md specifies a
+      <strong>dark</strong> app with a <strong>gold</strong> primary and a <strong>purple</strong> accent; the shipping CSS
+      explicitly retires purple and calls the AI-purple gradient an anti-pattern for finance. Yet
+      MASTER.md is the newest file, is labelled "Master", and opens with an instruction to follow it
+      strictly — so the next person to read it will build the wrong thing.</p>
+
+      <p>MASTER.md is also not accessible on its own terms: its primary gold on white measures
+      <strong>2.15:1</strong>, and white on its purple accent <strong>4.23:1</strong> — both fail AA for text.</p>
+
+      <div class="fix">
+        <div class="h">Fix</div>
+        <p style="margin-bottom:0">Declare <code>index.css</code> the single source of truth. Move the other two to
+        <code>docs/archive/</code> with a one-line header explaining they are superseded, or regenerate
+        MASTER.md from the shipping tokens so it describes reality. Fifteen minutes; prevents weeks
+        of drift.</p>
+      </div>
+    </div>
+  </details>
+
+  <details class="find" data-sev="P1" data-cat="Design system">
+    <summary>
+      <span class="chip P1">P1</span>
+      <span class="ttl">
+        <span class="t">Two grey ramps and sixteen accent families are in simultaneous use</span>
+        <span class="m"><span class="cat">Design system</span> · 3,041 grey utility usages across 3 scales</span>
+      </span>
+      <span class="caret">›</span>
+    </summary>
+    <div class="body">
+      <div class="lab">Colour-family usage across <code>client/src/**/*.tsx</code></div>
+      <div class="bars" style="margin-bottom:14px">
+        <div class="bar"><span class="nm"><span class="sw" style="background:#64748b"></span>slate</span><span class="tr"><span class="fl" style="width:100%;background:#64748b"></span></span><span class="vl">2043</span></div>
+        <div class="bar"><span class="nm"><span class="sw" style="background:#6b7280"></span>gray</span><span class="tr"><span class="fl" style="width:47.9%;background:#6b7280"></span></span><span class="vl">978</span></div>
+        <div class="bar"><span class="nm"><span class="sw" style="background:#2563eb"></span>blue</span><span class="tr"><span class="fl" style="width:26.9%;background:#2563eb"></span></span><span class="vl">549</span></div>
+        <div class="bar"><span class="nm"><span class="sw" style="background:#16a34a"></span>green</span><span class="tr"><span class="fl" style="width:20.1%;background:#16a34a"></span></span><span class="vl">411</span></div>
+        <div class="bar"><span class="nm"><span class="sw" style="background:#1E3A5F"></span>persian-blue</span><span class="tr"><span class="fl" style="width:17.8%;background:#1E3A5F"></span></span><span class="vl">364</span></div>
+        <div class="bar"><span class="nm"><span class="sw" style="background:#f59e0b"></span>amber</span><span class="tr"><span class="fl" style="width:17.8%;background:#f59e0b"></span></span><span class="vl">363</span></div>
+        <div class="bar"><span class="nm"><span class="sw" style="background:#dc2626"></span>red</span><span class="tr"><span class="fl" style="width:15.6%;background:#dc2626"></span></span><span class="vl">318</span></div>
+        <div class="bar"><span class="nm"><span class="sw" style="background:#f97316"></span>orange</span><span class="tr"><span class="fl" style="width:4.6%;background:#f97316"></span></span><span class="vl">94</span></div>
+        <div class="bar"><span class="nm"><span class="sw" style="background:#10b981"></span>emerald</span><span class="tr"><span class="fl" style="width:3.8%;background:#10b981"></span></span><span class="vl">77</span></div>
+        <div class="bar"><span class="nm"><span class="sw" style="background:#f43f5e"></span>rose</span><span class="tr"><span class="fl" style="width:2.1%;background:#f43f5e"></span></span><span class="vl">42</span></div>
+        <div class="bar"><span class="nm"><span class="sw" style="background:#eab308"></span>yellow</span><span class="tr"><span class="fl" style="width:1.7%;background:#eab308"></span></span><span class="vl">34</span></div>
+        <div class="bar"><span class="nm"><span class="sw" style="background:#14b8a6"></span>teal</span><span class="tr"><span class="fl" style="width:1.6%;background:#14b8a6"></span></span><span class="vl">33</span></div>
+        <div class="bar"><span class="nm"><span class="sw" style="background:#8a99ab"></span>neutral*</span><span class="tr"><span class="fl" style="width:1%;background:#8a99ab"></span></span><span class="vl">20</span></div>
+        <div class="bar"><span class="nm"><span class="sw" style="background:#06b6d4"></span>cyan</span><span class="tr"><span class="fl" style="width:.8%;background:#06b6d4"></span></span><span class="vl">16</span></div>
+        <div class="bar"><span class="nm"><span class="sw" style="background:#8b5cf6"></span>violet</span><span class="tr"><span class="fl" style="width:.6%;background:#8b5cf6"></span></span><span class="vl">12</span></div>
+        <div class="bar"><span class="nm"><span class="sw" style="background:#ec4899"></span>pink</span><span class="tr"><span class="fl" style="width:.3%;background:#ec4899"></span></span><span class="vl">6</span></div>
+      </div>
+      <p style="font-size:12.5px;color:var(--mute);margin-top:-4px">* plus the custom <code>--neutral-*</code> HSL scale
+      declared in <code>index.css</code>, a third grey system.</p>
+
+      <p><strong>Two greys.</strong> <code>slate</code> is cool-blue-tinted, <code>gray</code> is neutral. They sit side by
+      side — the 404 page is entirely <code>gray-900/800/600/500</code> while every page around it is
+      <code>slate</code>. Nobody consciously notices; everybody feels the page is slightly "off".</p>
+
+      <p><strong>The brand colour is outnumbered by a generic one.</strong> <code>persian-blue</code> (the actual navy)
+      appears 364 times; plain Tailwind <code>blue</code> appears 549. The header alone uses <code>blue-600</code> for
+      "Find a CA" <em>and</em> "Login", while the CTA next to them is navy.</p>
+
+      <p><strong>Green is doing three jobs.</strong> The design rule says green is reserved for money-positive
+      outcomes. In practice green is also: the "Find a Verified CA" tool icon, the mobile
+      <em>Login</em> button (<code>bg-green-600</code>), and the 404 page's "Tax Calculators" button. When
+      green means "you saved money" <em>and</em> "sign in here", it stops meaning either.</p>
+
+      <p><strong>Nine icon colours in one grid.</strong> The homepage TOOLS array assigns blue, violet, cyan,
+      emerald, red, orange, navy, green and navy to nine adjacent cards — a rainbow inside a design
+      system whose stated principle is "trust through restraint".</p>
+
+      <div class="lab">Files</div>
+      <div class="files"><span>client/src/pages/Landing.tsx:64–74</span><span>client/src/pages/not-found.tsx</span><span>client/src/components/Header.tsx</span><span>client/src/pages/Calculators.tsx:47–160</span></div>
+
+      <div class="fix">
+        <div class="h">Fix</div>
+        <ul style="margin-bottom:0">
+          <li>Pick <code>slate</code>. Codemod <code>gray-N → slate-N</code> (978 replacements, mechanical) and retire the
+          <code>--neutral-*</code> scale.</li>
+          <li>Codemod <code>blue-600/700 → persian-blue-700</code> for anything that is a brand surface or a
+          primary action; keep plain <code>blue-600</code> <em>only</em> for inline text links.</li>
+          <li>Reduce the palette to five roles: navy (brand), interactive blue (links), green (money
+          gained), amber (warning), red (error/loss). Everything else becomes navy or slate.</li>
+          <li>Replace the nine-colour tool grid with navy icons on <code>persian-blue-50</code>, and let the
+          "Popular" / "New" badges carry the emphasis instead.</li>
+        </ul>
+      </div>
+    </div>
+  </details>
+
+  <details class="find" data-sev="P1" data-cat="Accessibility">
+    <summary>
+      <span class="chip P1">P1</span>
+      <span class="ttl">
+        <span class="t">Hand-rolled modals have no dialog semantics, focus trap or Escape key</span>
+        <span class="m"><span class="cat">Accessibility</span> · 5 modals · Radix Dialog already installed</span>
+      </span>
+      <span class="caret">›</span>
+    </summary>
+    <div class="body">
+      <p>Five overlays are built as plain <code>fixed inset-0</code> divs rather than using the Radix
+      <code>Dialog</code> that is already in <code>components/ui/</code>:</p>
+      <div class="files" style="margin-bottom:11px">
+        <span>ProfileCompletionModal.tsx:75</span><span>FindCA.tsx:525</span>
+        <span>TaxDownloadModal.tsx:126</span><span>ui/modal.tsx:28</span><span>AdminUsers.tsx:273</span>
+      </div>
+      <p>None of them has <code>role="dialog"</code>, <code>aria-modal="true"</code>, a labelled title, a focus trap,
+      an Escape handler, background scroll-lock, or focus restoration on close. A screen-reader user
+      is not told a dialog opened; a keyboard user tabs straight out of it into the page behind;
+      Escape does nothing.</p>
+      <p><code>ProfileCompletionModal</code> is the worst case because <code>GlobalProfilePrompt</code> mounts it at
+      the app root — it can appear over <em>any</em> page, unannounced, mid-task, immediately after a
+      user signs in from a calculator.</p>
+      <p>Only <code>CookieConsent</code> carries <code>role="dialog"</code>, and it has no focus management either.</p>
+
+      <div class="fix">
+        <div class="h">Fix</div>
+        <p style="margin-bottom:0">Port all five to the existing <code>&lt;Dialog&gt;</code> / <code>&lt;DialogContent&gt;</code>.
+        Radix gives focus trap, Escape, scroll-lock, <code>aria-modal</code> and focus restore for free —
+        this is mostly deletion, not new code. Also unify the overlay: currently <code>black/60</code>,
+        <code>black/50</code>, <code>black/80</code> and <code>bg-opacity-50</code> are all in use, and
+        <code>index.css</code> separately defines a light <code>.modal-overlay</code> that nothing uses.</p>
+      </div>
+    </div>
+  </details>
+
+  <details class="find" data-sev="P1" data-cat="Flow">
+    <summary>
+      <span class="chip P1">P1</span>
+      <span class="ttl">
+        <span class="t">Published FAQ still describes the paywall that was removed on 1 Aug</span>
+        <span class="m"><span class="cat">Content</span> · <span class="cat">Flow</span> · emitted as FAQ structured data</span>
+      </span>
+      <span class="caret">›</span>
+    </summary>
+    <div class="body">
+      <p>The Calculators hub FAQ states: <em>"A free account (sign in or sign up) is required to view
+      your result."</em></p>
+      <p>That was true until <code>ResultAuthGate</code> was changed on 2026-08-01 — explicitly because full
+      gating was costing 82% of signups and drew an AdSense "low value content" rejection. Visitors
+      now always see the headline figure; sign-in buys the breakdown.</p>
+      <p>So the site's own FAQ now advertises a login wall that no longer exists — to a visitor
+      deciding whether to bother, and to Google, since this block is emitted through
+      <code>&lt;FAQSchema&gt;</code> and is eligible for rich results. This directly undercuts the fix that was
+      made for exactly this reason.</p>
+
+      <div class="lab">Files</div>
+      <div class="files"><span>client/src/pages/Calculators.tsx:16–19</span><span>client/src/components/ResultAuthGate.tsx:29–43</span></div>
+
+      <div class="fix">
+        <div class="h">Fix</div>
+        <p style="margin-bottom:0">Rewrite to: <em>"Yes — all calculators are free and unlimited. You'll see
+        your result straight away. Creating a free account unlocks the full breakdown, the old-vs-new
+        regime comparison, saved history and PDF download."</em> Then grep the whole codebase for
+        "required to view" and "sign in to see" — the old framing is likely echoed elsewhere.</p>
+      </div>
+    </div>
+  </details>
+
+  <!-- ══════════════ P2 ══════════════ -->
+
+  <details class="find" data-sev="P2" data-cat="Navigation">
+    <summary>
+      <span class="chip P2">P2</span>
+      <span class="ttl">
+        <span class="t">Mobile has two parallel navigations that disagree with each other</span>
+        <span class="m"><span class="cat">Navigation</span> · <span class="cat">Mobile</span></span>
+      </span>
+      <span class="caret">›</span>
+    </summary>
+    <div class="body">
+      <p>A phone user gets a 4-item bottom tab bar <em>and</em> a 10-item hamburger drawer. They overlap
+      but don't agree:</p>
+      <table style="margin-bottom:12px">
+        <tr><th>Destination</th><th>Tab bar</th><th>Hamburger</th></tr>
+        <tr><td>Dashboard</td><td>Tab 1</td><td>Item 1 (only if signed in)</td></tr>
+        <tr><td>Calculators</td><td>Tab 2</td><td>Item 2</td></tr>
+        <tr><td>AIS check</td><td>Tab 3, labelled "AIS Check"</td><td>Item 4, labelled "AIS Reconciliation"</td></tr>
+        <tr><td>Tools</td><td>Tab 4</td><td>—</td></tr>
+        <tr><td>NRI · Accounting · Blog · Find a CA · For CAs · About · Contact</td><td>—</td><td>Items 3, 5–10</td></tr>
+      </table>
+      <p>Same destination, two labels. No shared active state — the drawer never indicates where you
+      are. And "Find a CA", which the header treats as important enough for its own coloured link
+      and its own homepage hero button, is buried seventh in the drawer and absent from the bar.</p>
+      <div class="fix">
+        <div class="h">Fix</div>
+        <p style="margin-bottom:0">Make the tab bar the primary mobile nav and demote the hamburger to
+        secondary/account items only (NRI, Accounting, Blog, For CAs, About, Contact, Login).
+        Use one label per destination. Mirror <code>aria-current</code> into the drawer.</p>
+      </div>
+    </div>
+  </details>
+
+  <details class="find" data-sev="P2" data-cat="Flow">
+    <summary>
+      <span class="chip P2">P2</span>
+      <span class="ttl">
+        <span class="t">The first mobile tab is a login wall for the 99% who are first-time visitors</span>
+        <span class="m"><span class="cat">Flow</span> · <span class="cat">Mobile</span> · MobileTabBar.tsx:38</span>
+      </span>
+      <span class="caret">›</span>
+    </summary>
+    <div class="body">
+      <p>Tab 1 is <strong>Dashboard</strong>, and <code>/dashboard</code> is a <code>ProtectedRoute</code>. An anonymous
+      visitor's most likely first tap on the new navigation redirects them to
+      <code>/login?returnUrl=/dashboard</code> — where the payoff is an empty dashboard.</p>
+      <p>Two further wrinkles:</p>
+      <ul>
+        <li><code>matches: ["/"]</code> makes the Dashboard tab render as active on the homepage. The user is
+        told they are on Dashboard while looking at the marketing page.</li>
+        <li>The component's own docstring notes that 99% of sessions are first-time visitors — which
+        is an argument <em>against</em> giving them a signed-in-only first tab.</li>
+      </ul>
+      <div class="steel">
+        <div class="h">The counter-case, stated fairly</div>
+        <p>The docstring's reasoning is sound as far as it goes: returning users' saved results live
+        on the dashboard, and there is no other "home screen". The flaw is not the destination, it's
+        the position and the unconditional label.</p>
+      </div>
+      <div class="fix">
+        <div class="h">Fix</div>
+        <p style="margin-bottom:0">Make tab 1 conditional: <strong>Home → /</strong> when signed out,
+        <strong>Dashboard → /dashboard</strong> when signed in. Drop <code>matches:["/"]</code> so the active state
+        is honest. Optionally promote Calculators to position 1 for anonymous users, since that is
+        where 84% of measured traffic already lands.</p>
+      </div>
+    </div>
+  </details>
+
+  <details class="find" data-sev="P2" data-cat="Navigation">
+    <summary>
+      <span class="chip P2">P2</span>
+      <span class="ttl">
+        <span class="t">Three things compete to be the header's primary action</span>
+        <span class="m"><span class="cat">Navigation</span> · Header.tsx</span>
+      </span>
+      <span class="caret">›</span>
+    </summary>
+    <div class="body">
+      <p>Inside one 64px bar: three plain nav links, then <strong>"Find a CA"</strong> (blue-600, semibold, with
+      an icon), a "More" dropdown, <strong>"Tax Calculator"</strong> (filled navy button), a language pill, and
+      <strong>"Login"</strong> (blue-600). Two of those are the same colour as each other and a third is the
+      actual CTA. Visual weight says "Find a CA" and "Tax Calculator" are equally important, and
+      "Login" is styled identically to "Find a CA" despite being an account action, not a product one.</p>
+      <p>The mobile drawer then inverts it: <strong>Login</strong> becomes a full-width <code>bg-green-600</code> block —
+      louder than the Tax Calculator CTA directly above it, and reusing the colour reserved for
+      money-positive results.</p>
+      <p>The logo compounds it: <code>h-14 md:h-16</code> inside an <code>h-16</code> bar leaves literally zero vertical
+      breathing room at desktop, against 14px nav text.</p>
+      <div class="fix">
+        <div class="h">Fix</div>
+        <ul style="margin-bottom:0">
+          <li>One filled button in the bar: <strong>Tax Calculator</strong> (navy).</li>
+          <li>"Find a CA" → outlined navy, or a plain nav link with the icon. Keep the icon, drop the colour.</li>
+          <li>"Login" → slate text link, matching the other nav items. Same in the drawer — remove the green.</li>
+          <li>Logo to <code>h-10 md:h-11</code>; let the wordmark breathe.</li>
+        </ul>
+      </div>
+    </div>
+  </details>
+
+  <details class="find" data-sev="P2" data-cat="Flow">
+    <summary>
+      <span class="chip P2">P2</span>
+      <span class="ttl">
+        <span class="t">The tax calculator uses tabs for a linear task, creating two empty states</span>
+        <span class="m"><span class="cat">Flow</span> · TaxCalculator.tsx:985–1011 (1,953 lines)</span>
+      </span>
+      <span class="caret">›</span>
+    </summary>
+    <div class="body">
+      <p>The flagship calculator is a three-tab control: <strong>Calculator</strong> / <strong>Results</strong> /
+      <strong>Tax Breakdown</strong>. Tabs imply peer views you can browse in any order. This is a strict
+      sequence: you cannot have results before you calculate.</p>
+      <ul>
+        <li>Tabs 2 and 3 are clickable from first paint and lead to empty panels.</li>
+        <li>Calculating fires <code>setActiveTab('results')</code> — the view teleports, which on mobile means
+        the user's scroll position and mental place both reset.</li>
+        <li>Results and Breakdown are conceptually one answer split across two tabs, so comparing the
+        number to its derivation requires a click.</li>
+      </ul>
+      <div class="fix">
+        <div class="h">Fix</div>
+        <p style="margin-bottom:0">Either (a) render the result <em>below</em> the form on the same page and
+        smooth-scroll to it — the pattern the SIP/HRA calculators and the homepage SavingsCard
+        already use successfully — or (b) keep tabs but disable 2 and 3 until <code>result !== null</code> and
+        merge Breakdown into Results as a collapsible section. Option (a) is closer to how the rest
+        of the site already behaves.</p>
+      </div>
+    </div>
+  </details>
+
+  <details class="find" data-sev="P2" data-cat="Design system">
+    <summary>
+      <span class="chip P2">P2</span>
+      <span class="ttl">
+        <span class="t">Ten duplicate class definitions in index.css silently overwrite each other</span>
+        <span class="m"><span class="cat">Design system</span> · index.css (729 lines)</span>
+      </span>
+      <span class="caret">›</span>
+    </summary>
+    <div class="body">
+      <p>Duplicate top-level selectors, counted:</p>
+      <table style="margin-bottom:12px">
+        <tr><th>Selector</th><th style="text-align:right">Declarations</th><th>Effect</th></tr>
+        <tr><td><code>.modern-button-outline</code></td><td class="num">6</td><td>Last wins — earlier blue-filled versions are dead</td></tr>
+        <tr><td><code>.modern-button-secondary</code></td><td class="num">5</td><td>Same; declared blue, renders neutral</td></tr>
+        <tr><td><code>.modern-button-primary</code></td><td class="num">3</td><td>Hardcoded <code>hsl(214 65% 56%)</code>, not the navy token</td></tr>
+        <tr><td><code>.container-padding</code> · <code>.max-container</code></td><td class="num">2 each</td><td>Different values (<code>px-4 sm:px-6</code> vs <code>px-4 md:px-6</code>)</td></tr>
+        <tr><td><code>.card-hover</code> · <code>.modern-card</code> · <code>.market-card</code> · <code>.btn-transition</code> · <code>.premium-glass-card-hover</code></td><td class="num">2 each</td><td>Conflicting shadows and transforms</td></tr>
+      </table>
+      <p>Worse, <code>.modern-button-primary</code> hardcodes <code>hsl(214 65% 56%)</code> — a mid blue that has no
+      relationship to the current navy token at <code>214 52% 25%</code>. Any surface still using that class
+      is showing the pre-redesign colour.</p>
+      <p><code>.animate-spin</code> is also redefined at line 659, overriding Tailwind's built-in.</p>
+      <div class="fix">
+        <div class="h">Fix</div>
+        <p style="margin-bottom:0">Delete the dead earlier declarations, point <code>.modern-button-*</code> at
+        <code>hsl(var(--primary-blue))</code>, and remove the <code>.animate-spin</code> override. Then consider
+        retiring the whole <code>.modern-*</code> / <code>.premium-*</code> layer — it duplicates what the shadcn
+        <code>Button</code> and <code>Card</code> already do, which is part of why both systems drifted.</p>
+      </div>
+    </div>
+  </details>
+
+  <details class="find" data-sev="P2" data-cat="Design system">
+    <summary>
+      <span class="chip P2">P2</span>
+      <span class="ttl">
+        <span class="t">Dark mode is half-wired: 18 <code>dark:</code> utilities, zero dark tokens, no toggle</span>
+        <span class="m"><span class="cat">Design system</span></span>
+      </span>
+      <span class="caret">›</span>
+    </summary>
+    <div class="body">
+      <p><code>tailwind.config.ts</code> declares <code>darkMode: ["class"]</code>. <code>index.css</code> contains
+      <strong>zero</strong> <code>.dark</code> or <code>[data-theme]</code> blocks, and no UI ever sets the class. Meanwhile 18
+      <code>dark:</code> utilities are scattered through components — e.g. <code>CookieConsent</code> styles a
+      <code>dark:bg-gray-900/95</code> panel that can never render.</p>
+      <p>Harmless today, but it is a trap: the next developer sees <code>dark:</code> classes, assumes dark
+      mode is supported, and builds a page for a mode that does not exist.</p>
+      <div class="fix">
+        <div class="h">Fix</div>
+        <p style="margin-bottom:0">Strip the 18 <code>dark:</code> utilities and drop <code>darkMode</code> from the config,
+        or commit to it properly by adding a <code>.dark</code> token block. Given the trust-through-restraint
+        positioning and a white-first palette, removing is the cheaper honest answer.</p>
+      </div>
+    </div>
+  </details>
+
+  <details class="find" data-sev="P2" data-cat="Accessibility">
+    <summary>
+      <span class="chip P2">P2</span>
+      <span class="ttl">
+        <span class="t">Type runs small: 511 uses of 12px, plus 19 at 10–11px</span>
+        <span class="m"><span class="cat">Accessibility</span> · <span class="cat">Mobile</span></span>
+      </span>
+      <span class="caret">›</span>
+    </summary>
+    <div class="body">
+      <ul>
+        <li><code>text-xs</code> (12px) — <strong>511</strong> usages</li>
+        <li><code>text-[11px]</code> — 7 (including every mobile tab-bar label)</li>
+        <li><code>text-[10px]</code> — 12 (badges: "Popular", "New", "SAVES MORE")</li>
+      </ul>
+      <p>The homepage trust ribbon, tool-card descriptions, calculator assumption notes, news meta and
+      all footnotes sit at 12px. On a phone that is at the edge of comfortable, and the audience for
+      an Indian income-tax product skews well into the 40s and 50s where near-vision decline is the
+      norm. Several of these 12px lines are also <code>text-slate-400</code>, compounding the contrast
+      failure above.</p>
+      <div class="fix">
+        <div class="h">Fix</div>
+        <p style="margin-bottom:0">Set a floor of 13px (<code>text-[13px]</code>) for any prose, and reserve
+        <code>text-xs</code> for badges and true metadata only. Bump the trust ribbon and tool-card
+        descriptions to <code>text-sm</code> (14px). Nothing below 11px, ever.</p>
+      </div>
+    </div>
+  </details>
+
+  <details class="find" data-sev="P2" data-cat="Content">
+    <summary>
+      <span class="chip P2">P2</span>
+      <span class="ttl">
+        <span class="t">Two support addresses on two different domains in the footer</span>
+        <span class="m"><span class="cat">Content</span> · Footer.tsx:173,179</span>
+      </span>
+      <span class="caret">›</span>
+    </summary>
+    <div class="body">
+      <p>The footer offers <code>info@aitaxbot.in</code> and <code>admin@aitaxbot.co.in</code>, with no explanation of
+      which to use for what. The canonical domain throughout the site's meta tags is
+      <code>aitaxbot.co.in</code>, so the <code>.in</code> address reads as either a typo or a second, unrelated
+      organisation — neither is what you want on a page where users are deciding whether to trust
+      you with financial data.</p>
+      <div class="fix">
+        <div class="h">Fix</div>
+        <p style="margin-bottom:0">One address on the canonical domain, labelled by purpose
+        ("Support · support@aitaxbot.co.in"). If two are genuinely needed, label them
+        ("General enquiries" / "Data &amp; privacy requests").</p>
+      </div>
+    </div>
+  </details>
+
+  <details class="find" data-sev="P2" data-cat="Design system">
+    <summary>
+      <span class="chip P2">P2</span>
+      <span class="ttl">
+        <span class="t">Hardcoded hex colours bypass the token system in 24 places</span>
+        <span class="m"><span class="cat">Design system</span></span>
+      </span>
+      <span class="caret">›</span>
+    </summary>
+    <div class="body">
+      <p>Literal hex values appear inline in JSX, including the homepage's most prominent element.
+      The hero <code>SavingsCard</code> — the single largest number on the site — paints its "You save"
+      panel with <code>linear-gradient(135deg,#16a34a,#22c55e)</code> and its slider track with
+      <code>#16a34a</code>. Neither is the success token (<code>#059669</code>). Change the brand green and the
+      homepage hero will not follow.</p>
+      <p>Also present: <code>#4685d8</code> (×7), <code>#4f46e5</code> (×5), <code>#3B82F6</code>, <code>#10b981</code>,
+      <code>#8b5cf6</code> — the retired purple — plus <code>#25D366</code> (legitimate: WhatsApp brand) and the
+      four Google brand colours (legitimate: sign-in button).</p>
+      <div class="fix">
+        <div class="h">Fix</div>
+        <p style="margin-bottom:0">Replace all non-third-party hexes with
+        <code>hsl(var(--…))</code>. Add a lint rule banning raw hex in <code>client/src/**/*.tsx</code> with an
+        allowlist for genuine third-party brand marks.</p>
+      </div>
+    </div>
+  </details>
+
+  <details class="find" data-sev="P2" data-cat="Accessibility">
+    <summary>
+      <span class="chip P2">P2</span>
+      <span class="ttl">
+        <span class="t">No skip link, and 18 inputs rely on placeholder text alone</span>
+        <span class="m"><span class="cat">Accessibility</span> · WCAG 2.4.1, 3.3.2</span>
+      </span>
+      <span class="caret">›</span>
+    </summary>
+    <div class="body">
+      <ul>
+        <li><strong>No skip-to-content link.</strong> On a calculator page a keyboard user tabs through the logo,
+        six nav links, a dropdown, a CTA, a language toggle and a login link before reaching the
+        first form field — on every page load.</li>
+        <li><strong>18 inputs have a placeholder but no <code>id</code>/<code>htmlFor</code> pair.</strong> Placeholders vanish
+        on focus and are not reliably announced. Overall the ratio is decent (104 <code>htmlFor</code> against
+        213 inputs, many of which are Radix-wrapped), but the gap is concentrated in the
+        contact and CA-registration forms.</li>
+        <li>Only 26 <code>aria-label</code>s across the codebase, against a large number of icon-only buttons —
+        the modal close "✕" in <code>WhatsAppButton</code> is labelled, several others are not.</li>
+      </ul>
+      <div class="fix">
+        <div class="h">Fix</div>
+        <p style="margin-bottom:0">Add <code>&lt;a href="#main" class="sr-only focus:not-sr-only …"&gt;Skip to content&lt;/a&gt;</code>
+        as the first child of <code>Layout</code>, and <code>id="main"</code> on the existing <code>&lt;main&gt;</code> (2 lines).
+        Then sweep the 18 unlabelled inputs — a visible <code>&lt;Label&gt;</code> is better than a placeholder
+        for financial forms anyway, since the field's meaning must stay visible while typing.</p>
+      </div>
+    </div>
+  </details>
+
+  <details class="find" data-sev="P2" data-cat="Navigation">
+    <summary>
+      <span class="chip P2">P2</span>
+      <span class="ttl">
+        <span class="t">Dropdowns are mouse-only: no aria-expanded, no Escape, no keyboard close</span>
+        <span class="m"><span class="cat">Navigation</span> · <span class="cat">Accessibility</span> · Header.tsx:29–37</span>
+      </span>
+      <span class="caret">›</span>
+    </summary>
+    <div class="body">
+      <p>The header's "More" and user-avatar menus are hand-built. They close via a
+      <code>mousedown</code> listener on <code>document</code> only. Consequences:</p>
+      <ul>
+        <li>No <code>aria-expanded</code> / <code>aria-haspopup</code> — a screen reader announces "More, button" with no
+        indication it opens a menu or that it is currently open.</li>
+        <li>Escape does not close them.</li>
+        <li>Tabbing away leaves the panel open and floating over the page.</li>
+        <li>Touch devices fire <code>mousedown</code> inconsistently, so on some phones an outside tap won't dismiss.</li>
+      </ul>
+      <p>The mobile drawer has the same issue, and additionally stays open on browser back-navigation
+      because it only closes through explicit <code>onClick</code> handlers.</p>
+      <div class="fix">
+        <div class="h">Fix</div>
+        <p style="margin-bottom:0">Swap both for the Radix <code>DropdownMenu</code> already sitting in
+        <code>components/ui/dropdown-menu.tsx</code> — it handles roving focus, Escape, typeahead and ARIA.
+        For the mobile drawer, close it on <code>location</code> change with a <code>useEffect</code> rather than
+        per-link handlers.</p>
+      </div>
+    </div>
+  </details>
+
+  <!-- ══════════════ P3 ══════════════ -->
+
+  <details class="find" data-sev="P3" data-cat="Flow">
+    <summary>
+      <span class="chip P3">P3</span>
+      <span class="ttl">
+        <span class="t">Ad slots reserve no space — enabling real slots will shift results on click</span>
+        <span class="m"><span class="cat">Flow</span> · AdBanner.tsx</span>
+      </span>
+      <span class="caret">›</span>
+    </summary>
+    <div class="body">
+      <p>All three slot IDs are placeholders (<code>1234567890</code> etc.), so <code>AdBanner</code> currently returns
+      <code>null</code> and nothing renders. The moment real IDs land, a <code>ResponsiveAd</code> and a
+      <code>RectangleAd</code> will inflate directly beneath the result on every calculator page, pushing
+      content down — classic cumulative layout shift, and worst on the exact page where the user is
+      reading a number.</p>
+      <div class="fix">
+        <div class="h">Fix</div>
+        <p style="margin-bottom:0">Reserve the space now: wrap each slot in a container with an explicit
+        <code>min-height</code> matching the ad format, so enabling ads is a no-shift change. Also consider
+        moving the ad block below the FAQ rather than immediately under the result — an ad adjacent
+        to a tax figure hurts the "CA-reviewed" positioning.</p>
+      </div>
+    </div>
+  </details>
+
+  <details class="find" data-sev="P3" data-cat="Mobile">
+    <summary>
+      <span class="chip P3">P3</span>
+      <span class="ttl">
+        <span class="t">The WhatsApp button pulses forever next to the user's tax result</span>
+        <span class="m"><span class="cat">Mobile</span> · WhatsAppButton.tsx:88</span>
+      </span>
+      <span class="caret">›</span>
+    </summary>
+    <div class="body">
+      <p>An <code>animate-ping</code> ring runs indefinitely, and an unsolicited tooltip appears at 5s and
+      leaves at 12s. On a results page the brightest moving thing on screen is a chat button, not
+      the number the user came for. Attention is a fixed budget.</p>
+      <p>Credit where due: the global <code>prefers-reduced-motion</code> block in <code>index.css</code> does neutralise
+      the animation for users who ask for that — good, and better than most sites manage.</p>
+      <div class="fix">
+        <div class="h">Fix</div>
+        <p style="margin-bottom:0">Limit the pulse to ~3 iterations on first load, then stop. Suppress the
+        tooltip on calculator result views. Persist dismissal to <code>localStorage</code> rather than
+        component state, so it doesn't reappear on every page navigation.</p>
+      </div>
+    </div>
+  </details>
+
+  <details class="find" data-sev="P3" data-cat="Design system">
+    <summary>
+      <span class="chip P3">P3</span>
+      <span class="ttl">
+        <span class="t">The 404 page is built entirely off-system</span>
+        <span class="m"><span class="cat">Design system</span> · not-found.tsx</span>
+      </span>
+      <span class="caret">›</span>
+    </summary>
+    <div class="body">
+      <p>It uses the legacy <code>gray</code> ramp throughout (<code>gray-900</code>, <code>gray-800</code>, <code>gray-600</code>,
+      <code>gray-500</code>, <code>border-gray-300</code>) where the rest of the site uses <code>slate</code>, and gives
+      "Tax Calculators" a <code>bg-green-600</code> button — reusing the money-positive green for
+      navigation. Two of its four tiles are borderless <code>border-2 border-gray-300</code> blocks with no
+      background, so the grid reads as two buttons and two outlines rather than four peers.</p>
+      <p>Minor, but 404s are disproportionately seen by people arriving from stale search results —
+      i.e. first impressions.</p>
+      <div class="fix">
+        <div class="h">Fix</div>
+        <p style="margin-bottom:0">Convert to <code>slate</code>, make one action primary (Home, navy) and the
+        other three consistent outlined tiles. Add a search or a link to the Calculators hub.</p>
+      </div>
+    </div>
+  </details>
+
+  <details class="find" data-sev="P3" data-cat="Flow">
+    <summary>
+      <span class="chip P3">P3</span>
+      <span class="ttl">
+        <span class="t">Two loading spinners with different sizes, colours and copy</span>
+        <span class="m"><span class="cat">Flow</span> · App.tsx:62–95</span>
+      </span>
+      <span class="caret">›</span>
+    </summary>
+    <div class="body">
+      <p><code>PageLoader</code>: <code>h-10 w-10</code>, <code>border-persian-blue-600</code>, "Loading…" in
+      <code>text-slate-500</code>. <code>ProtectedRoute</code>'s inline loader six lines later: <code>h-12 w-12</code>,
+      <code>border-blue-600</code>, "Loading..." in <code>text-gray-600</code>. The admin loader is a third variant
+      on a <code>bg-slate-900</code> background.</p>
+      <p>Navigating to <code>/dashboard</code> shows both in sequence — the user watches the spinner change size
+      and colour mid-load, which reads as a glitch. There is also an unused
+      <code>ui/loading-state.tsx</code> component in the codebase.</p>
+      <div class="fix">
+        <div class="h">Fix</div>
+        <p style="margin-bottom:0">One <code>&lt;PageLoader&gt;</code>, used everywhere. Consider a skeleton of the
+        dashboard layout instead of a spinner — perceived performance improves measurably and the
+        page doesn't visibly "jump" into existence.</p>
+      </div>
+    </div>
+  </details>
+
+  <details class="find" data-sev="P3" data-cat="Navigation">
+    <summary>
+      <span class="chip P3">P3</span>
+      <span class="ttl">
+        <span class="t">Accounting is a fully public route with no gate and no entry point</span>
+        <span class="m"><span class="cat">Navigation</span> · App.tsx:190</span>
+      </span>
+      <span class="caret">›</span>
+    </summary>
+    <div class="body">
+      <p><code>/accounting</code> is registered as a plain <code>&lt;Route&gt;</code> — not a <code>ProtectedRoute</code> — despite
+      being a firm-management dashboard with client records, invoices and sales/purchase registers.
+      An anonymous visitor reaching it sees a business tool with nothing in it and no explanation.</p>
+      <p>It is reachable only from the "More" dropdown and the mobile drawer, appears in no hub page
+      hierarchy, and the Dashboard deliberately hides its stats for non-accounting users. So it is
+      simultaneously under-signposted for the people who want it and fully open to those who don't.</p>
+      <div class="fix">
+        <div class="h">Fix</div>
+        <p style="margin-bottom:0">Decide what it is. If it's a CA/business feature, gate it behind
+        <code>ProtectedRoute</code> and surface it from the "For CAs" footer column alongside the directory
+        listing. If it's a public demo, give it a marketing header explaining who it's for.</p>
+      </div>
+    </div>
+  </details>
+
+  </section>
+
+  <div class="empty" id="empty">No findings match these filters.</div>
+
+  <!-- ══════════════ CONTRAST TABLE ══════════════ -->
+  <section>
+    <div class="shead"><h2>Contrast reference</h2><span class="tag">computed from token values · WCAG 2.1</span></div>
+    <p class="lede">Ratios calculated from the HSL/hex values actually declared in <code>index.css</code>,
+    <code>MASTER.md</code> and the Tailwind defaults in use. AA requires 4.5:1 for body text, 3:1 for
+    large text (18.66px bold / 24px regular) and for non-text UI indicators.</p>
+    <table>
+      <tr><th>Foreground on background</th><th style="text-align:right">Ratio</th><th>AA text</th><th>Where it appears</th></tr>
+      <tr><td><span class="sw" style="background:#94a3b8"></span>slate-400 on white</td><td class="num">2.56</td><td><span class="pill fail">FAIL</span></td><td>Disclaimers, timestamps, stat sub-labels ×110</td></tr>
+      <tr><td><span class="sw" style="background:#9ca3af"></span>gray-400 on white</td><td class="num">2.54</td><td><span class="pill fail">FAIL</span></td><td>404 page, legacy components ×28</td></tr>
+      <tr><td><span class="sw" style="background:#7b93b8"></span>persian-blue-300 on white</td><td class="num">2.70</td><td><span class="pill fail">FAIL</span></td><td>Token available for misuse</td></tr>
+      <tr><td><span class="sw" style="background:#F59E0B"></span>MASTER.md gold on white</td><td class="num">2.15</td><td><span class="pill fail">FAIL</span></td><td>Spec only — reason not to adopt it</td></tr>
+      <tr><td><span class="sw" style="background:#25D366"></span>white on WhatsApp green</td><td class="num">1.98</td><td><span class="pill warn">N/A</span></td><td>Third-party brand mark — exempt, but the glyph is low-contrast</td></tr>
+      <tr><td><span class="sw" style="background:#16a34a"></span>white on green-600</td><td class="num">3.30</td><td><span class="pill fail">FAIL</span></td><td>Mobile Login button, 404 CTA — passes large-text only</td></tr>
+      <tr><td><span class="sw" style="background:#059669"></span>white on success green</td><td class="num">3.77</td><td><span class="pill fail">FAIL</span></td><td>Token — safe for large figures, not for 14px labels</td></tr>
+      <tr><td><span class="sw" style="background:#8B5CF6"></span>white on MASTER.md purple</td><td class="num">4.23</td><td><span class="pill fail">FAIL</span></td><td>Spec only</td></tr>
+      <tr><td><span class="sw" style="background:#6b7280"></span>neutral-500 on white</td><td class="num">4.38</td><td><span class="pill fail">FAIL</span></td><td>Near miss — 2% lightness fixes it</td></tr>
+      <tr><td><span class="sw" style="background:#64748b"></span>slate-500 on white</td><td class="num">4.76</td><td><span class="pill pass">PASS</span></td><td>The correct replacement for slate-400</td></tr>
+      <tr><td><span class="sw" style="background:#15803d"></span>green-700 on green-50</td><td class="num">4.79</td><td><span class="pill pass">PASS</span></td><td>"SAVES MORE" badge</td></tr>
+      <tr><td><span class="sw" style="background:#2563eb"></span>blue-600 on white</td><td class="num">5.17</td><td><span class="pill pass">PASS</span></td><td>Links, focus ring</td></tr>
+      <tr><td><span class="sw" style="background:#94a3b8"></span>slate-400 on slate-900</td><td class="num">6.96</td><td><span class="pill pass">PASS</span></td><td>Footer, dark sections — fine here</td></tr>
+      <tr><td><span class="sw" style="background:#4ade80"></span>green-400 on slate-900</td><td class="num">10.25</td><td><span class="pill pass">PASS</span></td><td>Trust ribbon icons</td></tr>
+      <tr><td><span class="sw" style="background:#fdba74"></span>orange-300 on slate-900</td><td class="num">10.59</td><td><span class="pill pass">PASS</span></td><td>ITR deadline emphasis</td></tr>
+      <tr><td><span class="sw" style="background:#1E3A5F"></span>white on brand navy</td><td class="num">11.31</td><td><span class="pill pass">PASS</span></td><td>Every primary button — excellent</td></tr>
+    </table>
+  </section>
+
+  <!-- ══════════════ WHAT'S GOOD ══════════════ -->
+  <section>
+    <div class="shead"><h2>What's working — keep it</h2></div>
+    <div class="good">
+      <h3>Genuine strengths worth protecting through the refactor</h3>
+      <ul>
+        <li><strong>The colour rationale is right.</strong> Retiring the blue→purple AI gradient for institutional
+        navy, and reserving green strictly for money gained, is exactly the correct call for a tax
+        product. The reasoning is written down in <code>index.css</code>, in full, with the evidence.</li>
+        <li><strong>Decisions are documented and evidence-backed.</strong> <code>MobileTabBar</code> cites 391/464 page
+        views; <code>ResultAuthGate</code> cites 123 signups against 22 completed calculations. Design
+        arguments grounded in numbers are rarer than they should be.</li>
+        <li><strong>The headline-before-gate change is correct.</strong> Showing the answer and charging sign-in
+        for the breakdown is the right trade, and directly addresses both the drop-off and the
+        AdSense "low value content" finding.</li>
+        <li><strong>Accessibility fundamentals are present where they matter.</strong> A global
+        <code>:focus-visible</code> ring that is explicitly never removed, a full
+        <code>prefers-reduced-motion</code> block, <code>aria-current</code> on the tab bar, 56px touch targets, and
+        <code>aria-label</code>s on the icon-only controls that matter most.</li>
+        <li><strong><code>tabular-nums</code> on money.</strong> A small, expert detail — rupee columns stay aligned and
+        digits don't jitter as live values update.</li>
+        <li><strong>Sensible performance architecture.</strong> Landing and Login eager, all 36 other routes
+        lazy — a ~600–800 KiB saving on first paint, on the page that matters most.</li>
+        <li><strong>The footer is the most consistent surface on the site.</strong> One palette, correct contrast,
+        clear column hierarchy, and a well-judged supply-side "For CAs" column. Use it as the
+        reference when normalising everything else.</li>
+        <li><strong>Calculator pages share real components.</strong> All nine wrap
+        <code>components/calculators/*</code> with a common <code>CalcPageHeader</code> — no copy-paste duplication.
+        The structure is sound; only the tokens under it are broken.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══════════════ PLAN ══════════════ -->
+  <section>
+    <div class="shead"><h2>Suggested sequence</h2><span class="tag">highest leverage first</span></div>
+    <p class="lede">Ordered so that each phase makes the next one cheaper. Phase 1 in particular
+    removes the root cause of a large share of the visual inconsistency below it — do not reorder it.</p>
+    <div class="plan">
+      <div class="phase">
+        <div class="when">Phase 1 · half a day</div>
+        <h4>Repair the foundation</h4>
+        <ol>
+          <li>Wrap all shadcn tokens in <code>hsl()</code> in <code>tailwind.config.ts</code>; walk the site; remove the
+          <code>index.css</code> rescue block and the now-redundant <code>bg-white</code> overrides.</li>
+          <li>Replace the print blackout with a real print stylesheet.</li>
+          <li>Fix the bottom-edge z-stack: cookie banner above the tab bar, FAB above both.</li>
+          <li>Unify the data-handling copy to one true sentence, sitewide.</li>
+        </ol>
+      </div>
+      <div class="phase">
+        <div class="when">Phase 2 · one day</div>
+        <h4>Accessibility and honesty</h4>
+        <ol>
+          <li>Codemod <code>text-slate-400</code> / <code>text-gray-400</code> → <code>text-slate-500</code> on light surfaces.</li>
+          <li>Port the five hand-rolled modals to Radix <code>Dialog</code>; port the two header dropdowns to
+          Radix <code>DropdownMenu</code>.</li>
+          <li>Add the skip link; label the 18 placeholder-only inputs.</li>
+          <li>Fix the stale Calculators FAQ; decide the fate of the Hindi toggle.</li>
+        </ol>
+      </div>
+      <div class="phase">
+        <div class="when">Phase 3 · two to three days</div>
+        <h4>Consolidate the system</h4>
+        <ol>
+          <li>Codemod <code>gray-*</code> → <code>slate-*</code>; retire the <code>--neutral-*</code> scale.</li>
+          <li>Cut the palette to five roles; de-rainbow the homepage tool grid and the calculator hub.</li>
+          <li>Delete the duplicate <code>index.css</code> declarations and the <code>.modern-*</code> button layer.</li>
+          <li>Archive <code>design_guidelines.md</code> and <code>MASTER.md</code>; declare <code>index.css</code> canonical.</li>
+          <li>Strip dead <code>dark:</code> utilities; unify the loaders; raise the type floor to 13px.</li>
+        </ol>
+      </div>
+      <div class="phase">
+        <div class="when">Phase 4 · design work, not cleanup</div>
+        <h4>Improve the core task</h4>
+        <ol>
+          <li>Rework the tax calculator from tabs to a linear form → result flow.</li>
+          <li>Rationalise the header to a single primary CTA; make mobile tab 1 auth-aware.</li>
+          <li>Reserve ad space to pre-empt layout shift; move ads below the FAQ.</li>
+          <li>Give <code>/accounting</code> a clear audience, a gate, and an entry point.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p style="margin:0 0 5px"><strong>Method.</strong> Static review of all 154 files under
+    <code>client/src</code>, the Tailwind and PostCSS configuration, and the three design specification
+    documents. Usage counts are exact <code>ripgrep</code> tallies; contrast ratios are computed from the
+    declared token values using the WCAG 2.1 relative-luminance formula. Findings involving runtime
+    layout (the bottom-edge overlap) are derived from declared CSS geometry rather than a rendered
+    screenshot — worth confirming on a real device, though the arithmetic is unambiguous.</p>
+    <p style="margin:0"><strong>Not covered.</strong> Server-side code, tax-calculation correctness, real-user
+    performance metrics, and live cross-browser rendering.</p>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var sev='all', cat='all';
+  var items=[].slice.call(document.querySelectorAll('.find'));
+  var countEl=document.getElementById('count');
+  var emptyEl=document.getElementById('empty');
+
+  function apply(){
+    var n=0;
+    items.forEach(function(el){
+      var ok=(sev==='all'||el.dataset.sev===sev)&&(cat==='all'||el.dataset.cat===cat);
+      el.classList.toggle('hide',!ok);
+      if(ok)n++;
+    });
+    countEl.textContent=n+' of '+items.length+' findings';
+    emptyEl.classList.toggle('show',n===0);
+  }
+
+  function wire(sel,set){
+    var btns=[].slice.call(document.querySelectorAll(sel));
+    btns.forEach(function(b){
+      b.addEventListener('click',function(){
+        btns.forEach(function(x){x.setAttribute('aria-pressed','false')});
+        b.setAttribute('aria-pressed','true');
+        set(b.dataset.v);
+        apply();
+      });
+    });
+  }
+  wire('.f.sev',function(v){sev=v});
+  wire('.f.cat',function(v){cat=v});
+  apply();
+})();
+</script>
+</body>
+</html>

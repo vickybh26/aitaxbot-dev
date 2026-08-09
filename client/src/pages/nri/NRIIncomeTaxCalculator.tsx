@@ -4,6 +4,12 @@ import { Link } from "wouter";
 import { Globe, ChevronRight, AlertCircle, Calculator, TrendingUp } from "lucide-react";
 import AuthorBox from "@/components/AuthorBox";
 import { AdBanner, ResponsiveAd, RectangleAd } from "@/components/AdBanner";
+import {
+  getTaxSlabs,
+  calculateTaxForSlab,
+  computeSurcharge,
+  LTCG_EQUITY_EXEMPTION,
+} from "@shared/taxLiability";
 
 export default function NRIIncomeTaxCalculator() {
   // State for calculator inputs
@@ -38,17 +44,29 @@ export default function NRIIncomeTaxCalculator() {
     setIncomeToggles((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  // Tax calculation functions
+  // The page is titled "FY 2026-27"; pin the slab lookup to the same year
+  // rather than letting it drift from the heading.
+  const FINANCIAL_YEAR = "2026-27";
+
+  // Slab tax on salary + rental.
+  //
+  // This used to be a hand-rolled ladder that matched no statutory year: the
+  // FY 2024-25 lower bands (₹3L exempt, 5% to ₹7L) grafted onto FY 2025-26
+  // upper bands, with a 10% band from ₹7L–₹12L that exists in neither Act, and
+  // no 20% or 25% band at all — so it jumped straight from 15% to 30% at ₹15L.
+  // At ₹20,00,000 it overstated tax by ₹65,000, at ₹25,00,000 by ₹85,000.
+  //
+  // Now delegated to the shared engine, which carries the real s.202 ladder for
+  // the year and is covered by scripts/test-tax-calculations.ts.
+  //
+  // Note NRIs are not eligible for the s.87A / s.156 rebate, so we take the
+  // pre-rebate slab figure rather than the engine's post-rebate total.
   const calculateTaxOnSalaryAndRental = (income: number): number => {
-    if (income <= 300000) return 0;
-    if (income <= 700000) return (income - 300000) * 0.05;
-    if (income <= 1200000) return (400000 * 0.05) + (income - 700000) * 0.1;
-    if (income <= 1500000) return (400000 * 0.05) + (500000 * 0.1) + (income - 1200000) * 0.15;
-    return (400000 * 0.05) + (500000 * 0.1) + (300000 * 0.15) + (income - 1500000) * 0.3;
+    const slabs = getTaxSlabs(regime === "old" ? "old" : "new", FINANCIAL_YEAR, "below60");
+    return calculateTaxForSlab(Math.max(0, income), slabs).totalTax;
   };
 
   const totalSalaryAndRental = (incomeToggles.salary ? salary : 0) + (incomeToggles.rental ? rentalIncome : 0);
-  const taxOnSalaryAndRental = calculateTaxOnSalaryAndRental(totalSalaryAndRental);
 
   // NRO Interest - 30% TDS (no threshold)
   const nroInterestTax = incomeToggles.nroInterest ? nroInterest * 0.3 : 0;
@@ -56,11 +74,17 @@ export default function NRIIncomeTaxCalculator() {
   // Dividend - 20% TDS
   const dividendTax = incomeToggles.dividend ? dividendIncome * 0.2 : 0;
 
-  // STCG Equity - 20% flat
+  // STCG Equity — s.111A, 20% flat
   const stcgEquityTax = incomeToggles.stcgEquity ? stcgEquity * 0.2 : 0;
 
-  // LTCG Equity - 12.5% flat
-  const ltcgEquityTax = incomeToggles.ltcgEquity ? ltcgEquity * 0.125 : 0;
+  // LTCG Equity — s.112A: the first ₹1,25,000 of listed-equity LTCG is exempt
+  // each year, and only the balance is charged at 12.5%. The allowance was
+  // missing entirely, overstating tax by ₹15,625 plus cess for any NRI with
+  // equity gains.
+  const ltcgEquityTaxable = incomeToggles.ltcgEquity
+    ? Math.max(0, ltcgEquity - LTCG_EQUITY_EXEMPTION)
+    : 0;
+  const ltcgEquityTax = ltcgEquityTaxable * 0.125;
 
   // LTCG Property - 20% with indexation or 12.5% without
   const ltcgPropertyTax = incomeToggles.ltcgProperty ? ltcgProperty * 0.125 : 0;
@@ -74,8 +98,20 @@ export default function NRIIncomeTaxCalculator() {
     (incomeToggles.ltcgEquity ? ltcgEquity : 0) +
     (incomeToggles.ltcgProperty ? ltcgProperty : 0);
 
-  // Deductions (only old regime)
-  const totalDeductions = regime === "old" ? Math.min(section80c, 150000) + section80d + homeLoamInterest : 0;
+  // Deductions (old regime only). Chapter VI-A is allowable against slab income
+  // — salary and rental here — and NOT against the special-rate heads below.
+  //
+  // These were previously computed, displayed as "Taxable Income", and then
+  // never used: the slab tax was taken on the GROSS salary+rental figure, so
+  // entering ₹1,50,000 of 80C moved the number on screen and changed the tax by
+  // exactly ₹0. Every old-regime NRI who claimed a deduction was overcharged.
+  const totalDeductions =
+    regime === "old"
+      ? Math.min(section80c, 150000) + Math.min(section80d, 50000) + Math.min(homeLoamInterest, 200000)
+      : 0;
+
+  const slabIncomeAfterDeductions = Math.max(0, totalSalaryAndRental - totalDeductions);
+  const taxOnSalaryAndRental = calculateTaxOnSalaryAndRental(slabIncomeAfterDeductions);
   const taxableIncome = Math.max(totalIncome - totalDeductions, 0);
 
   // Total tax before surcharge and cess
@@ -87,8 +123,20 @@ export default function NRIIncomeTaxCalculator() {
     ltcgEquityTax +
     ltcgPropertyTax;
 
-  // Surcharge (applicable on total income over 1 crore)
-  const surcharge = totalIncome > 10000000 ? totalTaxBeforeSurcharge * 0.25 : 0;
+  // Surcharge — 10% above ₹50L, 15% above ₹1Cr, 25% above ₹2Cr, with marginal
+  // relief at each threshold. Was a flat 25% above ₹1Cr and nil below it, which
+  // missed the 10% band entirely (understating ₹50L–₹1Cr) and charged 25% where
+  // 15% applies (overstating ₹1Cr–₹2Cr).
+  const surchargeResult = computeSurcharge(
+    totalIncome,
+    totalTaxBeforeSurcharge,
+    "new",
+    (threshold) => {
+      const slabs = getTaxSlabs(regime === "old" ? "old" : "new", FINANCIAL_YEAR, "below60");
+      return calculateTaxForSlab(threshold, slabs).totalTax;
+    }
+  );
+  const surcharge = surchargeResult.surcharge;
 
   // Health and Education Cess (4%)
   const cess = (totalTaxBeforeSurcharge + surcharge) * 0.04;
