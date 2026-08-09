@@ -540,7 +540,7 @@ export default function Dashboard() {
                     <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${from} ${to} flex items-center justify-center shrink-0`}>
                       <Icon className="w-3.5 h-3.5 text-white" />
                     </div>
-                    <span className="text-xs font-bold text-slate-400">Step {step}</span>
+                    <span className="text-xs font-bold text-slate-500">Step {step}</span>
                     {badge && <span className="ml-auto text-[10px] font-bold text-persian-blue-800 bg-persian-blue-50 border border-persian-blue-100 px-1.5 py-0.5 rounded-full">{badge}</span>}
                   </div>
                   <p className="text-sm font-bold text-slate-900 mb-1">{title}</p>
@@ -615,7 +615,7 @@ export default function Dashboard() {
               </div>
             ))}
           </div>
-          <p className="text-xs text-slate-400 mt-3">* Tax saved estimates based on 30% slab. Actual savings depend on your income & deductions.</p>
+          <p className="text-xs text-slate-500 mt-3">* Tax saved estimates based on 30% slab. Actual savings depend on your income & deductions.</p>
         </div>
 
         {/* Quick Stats */}
@@ -687,7 +687,7 @@ export default function Dashboard() {
                 </div>
               ) : taxCalculations.length === 0 ? (
                 <div className="text-center py-12">
-                  <Calculator className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <Calculator className="h-12 w-12 text-slate-500 mx-auto mb-4" />
                   <p className="text-gray-600 mb-2">No saved calculations</p>
                   <p className="text-sm text-gray-500 mb-4">Use the Income Tax Calculator and click "Save Calculation" to store your results here.</p>
                   <Link href="/calculators/income-tax">
@@ -799,7 +799,7 @@ export default function Dashboard() {
                           </CardDescription>
                         </div>
                       </div>
-                      <ArrowRight className="h-5 w-5 text-gray-400 group-hover:translate-x-1 transition-transform" />
+                      <ArrowRight className="h-5 w-5 text-slate-500 group-hover:translate-x-1 transition-transform" />
                     </div>
                   </CardHeader>
                 </Card>
@@ -821,7 +821,7 @@ export default function Dashboard() {
                 </div>
               ) : toolUsageEvents.length === 0 ? (
                 <div className="text-center py-12">
-                  <Activity className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <Activity className="h-12 w-12 text-slate-500 mx-auto mb-4" />
                   <p className="text-gray-600 mb-2">No calculator activity yet</p>
                   <p className="text-sm text-gray-500">Use any calculator while logged in and your activity will appear here.</p>
                 </div>

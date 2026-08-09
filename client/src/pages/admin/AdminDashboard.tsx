@@ -52,7 +52,7 @@ function StatCard({
         <div>
           <p className="text-slate-500 text-sm font-medium">{label}</p>
           <p className="text-2xl font-bold text-slate-800 mt-1">{value}</p>
-          {sub && <p className="text-xs text-slate-400 mt-1">{sub}</p>}
+          {sub && <p className="text-xs text-slate-500 mt-1">{sub}</p>}
         </div>
         <div className={`p-2.5 rounded-xl ${color}`}>
           <Icon className="w-5 h-5 text-white" />
@@ -212,7 +212,7 @@ export default function AdminDashboard() {
               </AreaChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-52 flex items-center justify-center text-slate-400 text-sm">
+            <div className="h-52 flex items-center justify-center text-slate-500 text-sm">
               No signup data yet — send traffic to aitaxbot.co.in to start seeing trends here.
             </div>
           )}

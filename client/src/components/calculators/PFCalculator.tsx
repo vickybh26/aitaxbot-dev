@@ -592,7 +592,7 @@ export default function PFCalculator() {
                           <span className="text-sm">Employer EPS (8.33%):</span>
                           <span className="font-medium text-slate-500">{formatCurrencyFull(result.employerEPSMonthly)}</span>
                         </div>
-                        <p className="text-xs text-slate-400">EPS goes to pension fund, not your PF balance</p>
+                        <p className="text-xs text-slate-500">EPS goes to pension fund, not your PF balance</p>
                       </>
                     )}
                     {vpfPercent > 0 && (

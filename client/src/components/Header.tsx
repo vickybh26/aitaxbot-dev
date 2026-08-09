@@ -10,7 +10,7 @@ import {
   Menu, X, Calculator, LogOut, User, LayoutDashboard,
   Globe, Shield, ChevronDown, UserCheck, FileText,
 } from "lucide-react";
-import { useTranslation, type Lang } from "@/lib/i18n";
+import { useTranslation } from "@/lib/i18n";
 
 interface HeaderProps {
   showModal?: (modalType: string) => void;
@@ -22,19 +22,46 @@ export default function Header({ showModal }: HeaderProps = {}) {
   const [userOpen, setUserOpen] = useState(false);
   const { isAuthenticated, user, adminLevel } = useAuth();
   const [currentPath] = useLocation();
-  const { t, lang, setLang } = useTranslation();
+  const { t } = useTranslation();
   const moreRef = useRef<HTMLDivElement>(null);
   const userRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdowns on outside click
+  // Close dropdowns on outside interaction.
+  //
+  // `mousedown` alone was the previous behaviour and it missed touch entirely
+  // on some mobile browsers, so an outside tap could leave a panel open. The
+  // `touchstart` listener covers that. Escape is handled here too — without it
+  // the only way out of an open menu was to find and click elsewhere.
   useEffect(() => {
-    function handle(e: MouseEvent) {
-      if (moreRef.current && !moreRef.current.contains(e.target as Node)) setMoreOpen(false);
-      if (userRef.current && !userRef.current.contains(e.target as Node)) setUserOpen(false);
+    function handlePointer(e: Event) {
+      const t = e.target as Node;
+      if (moreRef.current && !moreRef.current.contains(t)) setMoreOpen(false);
+      if (userRef.current && !userRef.current.contains(t)) setUserOpen(false);
     }
-    document.addEventListener("mousedown", handle);
-    return () => document.removeEventListener("mousedown", handle);
+    function handleKey(e: KeyboardEvent) {
+      if (e.key !== "Escape") return;
+      setMoreOpen(false);
+      setUserOpen(false);
+      setMobileMenuOpen(false);
+    }
+    document.addEventListener("mousedown", handlePointer);
+    document.addEventListener("touchstart", handlePointer);
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.removeEventListener("mousedown", handlePointer);
+      document.removeEventListener("touchstart", handlePointer);
+      document.removeEventListener("keydown", handleKey);
+    };
   }, []);
+
+  // Close every menu on navigation. Previously each link carried its own
+  // onClick to do this, which meant the drawer stayed open on browser
+  // back/forward and on any navigation triggered from outside the header.
+  useEffect(() => {
+    setMobileMenuOpen(false);
+    setMoreOpen(false);
+    setUserOpen(false);
+  }, [currentPath]);
 
   const getLoginUrl = () => {
     if (currentPath && currentPath !== "/" && currentPath !== "/login") {
@@ -46,12 +73,6 @@ export default function Header({ showModal }: HeaderProps = {}) {
   const handleLogout = async () => {
     await logout();
     window.location.href = "/";
-  };
-
-  const toggleLang = () => {
-    const next: Lang = lang === "en" ? "hi" : "en";
-    setLang(next);
-    trackButtonClick(`Language: ${next}`, "Header");
   };
 
   const navLink =
@@ -128,12 +149,15 @@ export default function Header({ showModal }: HeaderProps = {}) {
               <button
                 onClick={() => setMoreOpen((o) => !o)}
                 className={`${navLink} flex items-center gap-1`}
+                aria-expanded={moreOpen}
+                aria-haspopup="menu"
+                aria-controls="header-more-menu"
               >
                 More
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform ${moreOpen ? "rotate-180" : ""}`} />
               </button>
               {moreOpen && (
-                <div className="absolute top-full left-0 mt-2 w-56 bg-white border border-slate-200 rounded-xl shadow-lg py-1.5 z-50">
+                <div id="header-more-menu" role="menu" className="absolute top-full left-0 mt-2 w-56 bg-white border border-slate-200 rounded-xl shadow-lg py-1.5 z-50">
                   <Link href="/tools/ais-26as-form16" onClick={() => { trackButtonClick("AIS Reconciliation", "Header More"); setMoreOpen(false); }} className={dropItem}>
                     AIS Reconciliation
                   </Link>
@@ -174,15 +198,16 @@ export default function Header({ showModal }: HeaderProps = {}) {
               Tax Calculator
             </Link>
 
-            {/* Language switcher */}
-            <button
-              onClick={toggleLang}
-              className="text-xs font-semibold px-2 py-1.5 rounded-md border border-slate-200 text-slate-600 hover:border-blue-400 hover:text-blue-600 transition-colors"
-              aria-label="Switch language"
-              title={lang === "en" ? "हिंदी में बदलें" : "Switch to English"}
-            >
-              {lang === "en" ? t("lang.hi") : t("lang.en")}
-            </button>
+            {/* The हिंदी / EN switcher used to sit here and has been removed.
+                It was given prime position in both the desktop and mobile bars,
+                but only 3 files ever called t() — 18 call sites against ~18,850
+                lines of UI — so switching translated the nav and the hero and
+                nothing else. A Hindi-preferring user was told the product spoke
+                their language, chose it, and got the same English calculator.
+                The i18n plumbing (lib/i18n.tsx, locales/*) is intact and the
+                remaining t() calls still work, so restoring the control is a
+                one-line change once a page is genuinely translated end to end.
+                Start with /calculators/income-tax — 84% of traffic lands there. */}
 
             {/* Auth: user dropdown OR login */}
             {isAuthenticated ? (
@@ -190,6 +215,10 @@ export default function Header({ showModal }: HeaderProps = {}) {
                 <button
                   onClick={() => setUserOpen((o) => !o)}
                   className="flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+                  aria-expanded={userOpen}
+                  aria-haspopup="menu"
+                  aria-controls="header-user-menu"
+                  aria-label="Account menu"
                   data-testid="button-user-menu"
                 >
                   <div className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center">
@@ -198,15 +227,15 @@ export default function Header({ showModal }: HeaderProps = {}) {
                   <ChevronDown className={`w-3.5 h-3.5 transition-transform ${userOpen ? "rotate-180" : ""}`} />
                 </button>
                 {userOpen && (
-                  <div className="absolute top-full right-0 mt-2 w-48 bg-white border border-slate-200 rounded-xl shadow-lg py-1.5 z-50">
+                  <div id="header-user-menu" role="menu" className="absolute top-full right-0 mt-2 w-48 bg-white border border-slate-200 rounded-xl shadow-lg py-1.5 z-50">
                     {isAuthenticated && (
                       <Link href="/dashboard" onClick={() => { trackButtonClick("Dashboard", "User Menu"); setUserOpen(false); }} className={dropItem} data-testid="link-header-dashboard">
-                        <LayoutDashboard className="w-4 h-4 text-slate-400" />
+                        <LayoutDashboard className="w-4 h-4 text-slate-500" />
                         Dashboard
                       </Link>
                     )}
                     <Link href="/profile" onClick={() => setUserOpen(false)} className={dropItem} data-testid="link-header-profile">
-                      <User className="w-4 h-4 text-slate-400" />
+                      <User className="w-4 h-4 text-slate-500" />
                       {t("nav.profile")}
                     </Link>
                     {adminLevel !== null && (
@@ -241,13 +270,7 @@ export default function Header({ showModal }: HeaderProps = {}) {
 
           {/* ── Mobile Menu Button ── */}
           <div className="md:hidden flex items-center gap-2">
-            <button
-              onClick={toggleLang}
-              className="text-xs font-semibold px-2 py-1 rounded border border-slate-200 text-slate-600"
-              aria-label="Switch language"
-            >
-              {lang === "en" ? t("lang.hi") : t("lang.en")}
-            </button>
+            {/* Language switcher removed — see the note in the desktop nav above. */}
             <button
               className="p-2 text-slate-600 hover:text-slate-900 transition-colors"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}

@@ -56,7 +56,14 @@ export default function MobileTabBar() {
   return (
     <nav
       aria-label="Primary"
-      className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-white border-t border-slate-200
+      // z-40 is deliberate and part of a shared bottom-edge stack. Three
+      // elements anchor to the bottom of the viewport and they previously all
+      // sat at z-50, so paint order decided the winner: the cookie banner
+      // (mounted later in App.tsx) covered this entire bar on every first
+      // visit, and the WhatsApp FAB sat on top of the fourth tab permanently.
+      //   z-40 → this bar        z-45 → WhatsApp FAB       z-60 → cookie banner
+      // Keep those three in sync if any of them changes.
+      className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-slate-200
                  pb-[env(safe-area-inset-bottom)]"
       data-testid="mobile-tab-bar"
     >

@@ -141,7 +141,7 @@ export default function About() {
                   </div>
                   <div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">Your Data, Your Control</h3>
-                    <p className="text-gray-700">Calculator inputs stay in your browser session and are never stored without your consent. When you sign up and save a calculation, you can delete your account and all associated data at any time.</p>
+                    <p className="text-gray-700">Calculations run in your browser, and nothing is saved unless you are signed in. Once you are, your latest result is kept so it is waiting on your dashboard next time — you can delete any saved result, or your whole account, at any time.</p>
                   </div>
                 </div>
               </div>

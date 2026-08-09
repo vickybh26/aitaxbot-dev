@@ -23,39 +23,58 @@ export default {
           800: "hsl(var(--persian-blue-800))",
           900: "hsl(var(--persian-blue-900))",
         },
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        /* ─────────────────────────────────────────────────────────────────
+           These MUST be wrapped in hsl().
+
+           The tokens are declared in client/src/index.css as bare HSL
+           triplets (e.g. `--card: 0 0% 100%`), which is the shadcn
+           convention — it lets utilities compose opacity as
+           `hsl(var(--card) / 0.5)`. Mapping them here as a bare
+           `var(--card)` emitted `background-color: 0 0% 100%`, which is
+           invalid CSS, so every one of these utilities was a silent no-op.
+
+           Concretely, that meant <Card> ("border bg-card") rendered
+           transparent with a currentColor border, and <Button
+           variant="outline"|"secondary"|"destructive"> had no background at
+           all. The persian-blue scale above always did this correctly,
+           which is why that ramp was the only one that worked.
+
+           If you add a token here, wrap it. If a colour ever looks like it
+           "isn't applying", check this first.
+           ───────────────────────────────────────────────────────────────── */
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
         card: {
-          DEFAULT: "var(--card)",
-          foreground: "var(--card-foreground)",
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
         },
         popover: {
-          DEFAULT: "var(--popover)",
-          foreground: "var(--popover-foreground)",
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
         },
         primary: {
-          DEFAULT: "var(--primary)",
-          foreground: "var(--primary-foreground)",
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
-          DEFAULT: "var(--secondary)",
-          foreground: "var(--secondary-foreground)",
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
         },
         muted: {
-          DEFAULT: "var(--muted)",
-          foreground: "var(--muted-foreground)",
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
-          DEFAULT: "var(--accent)",
-          foreground: "var(--accent-foreground)",
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
         },
         destructive: {
-          DEFAULT: "var(--destructive)",
-          foreground: "var(--destructive-foreground)",
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
         },
-        border: "var(--border)",
-        input: "var(--input)",
-        ring: "var(--ring)",
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
         chart: {
           "1": "var(--chart-1)",
           "2": "var(--chart-2)",

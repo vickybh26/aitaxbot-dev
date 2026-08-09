@@ -177,11 +177,11 @@ export default function AdminCAs() {
 
         {/* Table */}
         {isLoading ? (
-          <div className="flex items-center justify-center py-20 text-slate-400">
+          <div className="flex items-center justify-center py-20 text-slate-500">
             <RefreshCw className="h-5 w-5 animate-spin mr-2" /> Loading…
           </div>
         ) : cas.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-slate-400 gap-2">
+          <div className="flex flex-col items-center justify-center py-20 text-slate-500 gap-2">
             <Users className="h-10 w-10 opacity-40" />
             <p>No CA profiles found for this filter.</p>
           </div>
@@ -213,7 +213,7 @@ export default function AdminCAs() {
                           </span>
                         ))}
                         {(ca.practiceAreas ?? []).length > 3 && (
-                          <span className="text-slate-400 text-xs">+{ca.practiceAreas.length - 3}</span>
+                          <span className="text-slate-500 text-xs">+{ca.practiceAreas.length - 3}</span>
                         )}
                       </div>
                     </td>
@@ -230,7 +230,7 @@ export default function AdminCAs() {
                         <button
                           title="View profile"
                           onClick={() => { setSelected(ca); setViewOpen(true); }}
-                          className="p-1 text-slate-400 hover:text-blue-600 transition-colors"
+                          className="p-1 text-slate-500 hover:text-blue-600 transition-colors"
                         >
                           <Eye className="h-4 w-4" />
                         </button>
@@ -240,14 +240,14 @@ export default function AdminCAs() {
                               title="Approve"
                               onClick={() => approveMutation.mutate(ca.id)}
                               disabled={approveMutation.isPending}
-                              className="p-1 text-slate-400 hover:text-green-600 transition-colors disabled:opacity-40"
+                              className="p-1 text-slate-500 hover:text-green-600 transition-colors disabled:opacity-40"
                             >
                               <CheckCircle className="h-4 w-4" />
                             </button>
                             <button
                               title="Reject"
                               onClick={() => { setSelected(ca); setRejectOpen(true); }}
-                              className="p-1 text-slate-400 hover:text-red-600 transition-colors"
+                              className="p-1 text-slate-500 hover:text-red-600 transition-colors"
                             >
                               <XCircle className="h-4 w-4" />
                             </button>
@@ -257,7 +257,7 @@ export default function AdminCAs() {
                           <button
                             title="Delete permanently"
                             onClick={() => { setSelected(ca); setDeleteOpen(true); }}
-                            className="p-1 text-slate-400 hover:text-red-700 transition-colors"
+                            className="p-1 text-slate-500 hover:text-red-700 transition-colors"
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -373,6 +373,7 @@ export default function AdminCAs() {
           <div className="space-y-3">
             <p className="text-sm text-slate-500">Provide a reason. This will be emailed to the CA.</p>
             <Textarea
+              aria-label="Reason for rejection"
               placeholder="e.g. ICAI membership number could not be verified. Please re-register with your valid membership details."
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}

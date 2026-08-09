@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { User, Phone, MapPin, Briefcase, X } from "lucide-react";
+import ModalShell from "@/components/ui/modal-shell";
 
 const OCCUPATIONS = [
   { value: "salaried", label: "Salaried Employee" },
@@ -72,19 +73,19 @@ export default function ProfileCompletionModal({ onClose }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+    <ModalShell onClose={onClose} labelledBy="profile-modal-title" data-testid="profile-completion-modal">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg relative animate-in fade-in zoom-in-95 duration-200">
 
         {/* Header */}
         <div className="bg-gradient-to-r from-persian-blue-600 to-persian-blue-700 rounded-t-2xl px-6 py-5 text-white">
-          <button onClick={onClose} className="absolute top-4 right-4 text-white/70 hover:text-white">
+          <button onClick={onClose} className="absolute top-4 right-4 text-white/70 hover:text-white" aria-label="Close">
             <X className="w-5 h-5" />
           </button>
           <div className="flex items-center gap-3 mb-1">
             <div className="bg-white/20 rounded-full p-2">
               <User className="w-5 h-5" />
             </div>
-            <h2 className="text-xl font-bold">Complete your profile</h2>
+            <h2 id="profile-modal-title" className="text-xl font-bold">Complete your profile</h2>
           </div>
           <p className="text-blue-100 text-sm">Takes 30 seconds — helps us personalise your tax experience.</p>
 
@@ -175,6 +176,6 @@ export default function ProfileCompletionModal({ onClose }: Props) {
           </div>
         </form>
       </div>
-    </div>
+    </ModalShell>
   );
 }

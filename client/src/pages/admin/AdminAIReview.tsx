@@ -180,7 +180,7 @@ function AnswerCard({ title, text, accent }: { title: string; text: string | nul
     <div className="flex-1 min-w-0">
       <p className={`text-xs font-semibold uppercase tracking-wide mb-1.5 ${accent}`}>{title}</p>
       <div className="rounded-lg border border-slate-100 bg-slate-50 p-3 text-sm text-slate-700 whitespace-pre-wrap leading-relaxed max-h-64 overflow-y-auto">
-        {text || <span className="text-slate-400 italic">No answer captured</span>}
+        {text || <span className="text-slate-500 italic">No answer captured</span>}
       </div>
     </div>
   );
@@ -197,7 +197,7 @@ function QueryRow({ item }: { item: AIQuery }) {
       <div className="flex items-start justify-between gap-4 flex-wrap mb-3">
         <div className="min-w-0">
           <p className="font-semibold text-slate-900 break-words">{item.question}</p>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 mt-1">
             {new Date(item.timestamp).toLocaleString("en-IN")} · concepts: {item.concepts_triggered.join(", ") || "none"}
             {item.source ? ` · source: ${item.source}` : ""}
           </p>
@@ -327,7 +327,7 @@ export default function AdminAIReview() {
       )}
 
       {!isLoading && !isError && filtered.length === 0 && (
-        <p className="text-sm text-slate-400 text-center py-12">
+        <p className="text-sm text-slate-500 text-center py-12">
           No queries in this bucket yet — ask the AI something on the site that matches a known tax topic,
           then come back here.
         </p>

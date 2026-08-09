@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { CA_PRACTICE_AREA_LABELS, type CAPracticeArea, CA_PRACTICE_AREAS } from "@shared/schema";
+import ModalShell from "@/components/ui/modal-shell";
 
 interface CAProfile {
   id: string;
@@ -139,7 +140,7 @@ export default function FindCA() {
             {/* Search bar */}
             <div className="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
+                <Search className="absolute left-3 top-3 w-4 h-4 text-slate-500" />
                 <Input
                   value={cityFilter}
                   onChange={(e) => setCityFilter(e.target.value)}
@@ -158,7 +159,7 @@ export default function FindCA() {
                     <option key={a} value={a}>{CA_PRACTICE_AREA_LABELS[a]}</option>
                   ))}
                 </select>
-                <ChevronDown className="absolute right-2 top-3 w-4 h-4 text-slate-400 pointer-events-none" />
+                <ChevronDown className="absolute right-2 top-3 w-4 h-4 text-slate-500 pointer-events-none" />
               </div>
             </div>
           </div>
@@ -188,7 +189,7 @@ export default function FindCA() {
         {/* Directory */}
         <div className="max-w-5xl mx-auto px-6 py-10">
           {loading && (
-            <div className="flex items-center justify-center py-20 text-slate-400">
+            <div className="flex items-center justify-center py-20 text-slate-500">
               <Loader2 className="w-6 h-6 animate-spin mr-2" />
               Loading directory…
             </div>
@@ -267,7 +268,7 @@ export default function FindCA() {
                 </div>
 
                 {/* Languages */}
-                <p className="text-xs text-slate-400 mb-4">
+                <p className="text-xs text-slate-500 mb-4">
                   {ca.languages.join(" · ")}
                 </p>
 
@@ -522,16 +523,20 @@ export default function FindCA() {
 
       {/* Contact / Introduction Modal */}
       {contactCA && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <ModalShell
+          onClose={closeModal}
+          labelledBy="ca-enquiry-title"
+          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+        >
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="flex items-start justify-between p-6 pb-0">
               <div>
-                <h2 className="text-lg font-bold text-slate-800">Send an Enquiry</h2>
+                <h2 id="ca-enquiry-title" className="text-lg font-bold text-slate-800">Send an Enquiry</h2>
                 <p className="text-sm text-slate-500 mt-0.5">
                   to <strong>{contactCA.fullName}</strong>
                 </p>
               </div>
-              <button onClick={closeModal} className="text-slate-400 hover:text-slate-600 p-1">
+              <button onClick={closeModal} className="text-slate-500 hover:text-slate-600 p-1" aria-label="Close enquiry form">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -547,7 +552,7 @@ export default function FindCA() {
                   directly at their discretion. Response times vary by individual CA.
                 </p>
                 <Button onClick={closeModal} variant="outline" className="w-full">Close</Button>
-                <p className="text-xs text-slate-400 mt-3">
+                <p className="text-xs text-slate-500 mt-3">
                   Please verify ICAI membership number at icai.org before engaging or paying any fees.
                 </p>
               </div>
@@ -634,7 +639,7 @@ export default function FindCA() {
                   )}
                 </Button>
 
-                <p className="text-xs text-slate-400 text-center">
+                <p className="text-xs text-slate-500 text-center">
                   By submitting, you consent to AiTaxBot forwarding your contact details and enquiry
                   to the selected CA for the sole purpose of enabling you to seek their professional
                   services. No fees are charged for this service.
@@ -642,7 +647,7 @@ export default function FindCA() {
               </form>
             )}
           </div>
-        </div>
+        </ModalShell>
       )}
     </>
   );

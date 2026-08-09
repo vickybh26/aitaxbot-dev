@@ -201,7 +201,7 @@ export default function CARegister() {
                         <option key={s} value={s}>{s}</option>
                       ))}
                     </select>
-                    <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-slate-400 pointer-events-none" />
+                    <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-slate-500 pointer-events-none" />
                   </div>
                   {errors.state && <p className="text-red-500 text-xs mt-1">{errors.state.message}</p>}
                 </div>
@@ -297,7 +297,7 @@ export default function CARegister() {
                     placeholder="e.g. Practising CA with focus on individual taxation, ITR filing, and NRI tax matters."
                     className="mt-1"
                   />
-                  <p className="text-xs text-slate-400 mt-1">Factual practice description only. No marketing claims.</p>
+                  <p className="text-xs text-slate-500 mt-1">Factual practice description only. No marketing claims.</p>
                   {errors.bio && <p className="text-red-500 text-xs mt-1">{errors.bio.message}</p>}
                 </div>
               </div>
@@ -338,7 +338,7 @@ export default function CARegister() {
               {loading ? "Submitting…" : "Submit for Review"}
             </Button>
 
-            <p className="text-center text-xs text-slate-400">
+            <p className="text-center text-xs text-slate-500">
               Profile goes live after admin verification of your ICAI membership number (1–2 business days).
               Free listing. No charges. No hidden fees.
             </p>

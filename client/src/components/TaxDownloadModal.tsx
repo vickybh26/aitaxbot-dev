@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trackEvent } from "@/lib/analytics";
+import ModalShell from "@/components/ui/modal-shell";
 
 interface TaxDownloadModalProps {
   open: boolean;
@@ -123,7 +124,16 @@ export default function TaxDownloadModal({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+    <ModalShell
+      onClose={handleClose}
+      label="Download your tax computation"
+      /* This dialog keeps its own absolutely-positioned backdrop child, so the
+         shell's own click-to-dismiss would never fire — the backdrop element
+         sits on top of it. Dismissal stays on that child; the shell still
+         provides Escape, the focus trap and scroll lock. */
+      closeOnOverlayClick={false}
+      className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+    >
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={handleClose} />
 
@@ -314,7 +324,7 @@ export default function TaxDownloadModal({
                   <div className="w-full border-t border-slate-200" />
                 </div>
                 <div className="relative flex justify-center text-xs">
-                  <span className="bg-white px-2 text-slate-400">or</span>
+                  <span className="bg-white px-2 text-slate-500">or</span>
                 </div>
               </div>
 
@@ -326,7 +336,7 @@ export default function TaxDownloadModal({
                 Use a different email
               </Button>
 
-              <Button variant="ghost" onClick={handleClose} className="w-full text-slate-400 hover:text-slate-600">
+              <Button variant="ghost" onClick={handleClose} className="w-full text-slate-500 hover:text-slate-600">
                 Cancel
               </Button>
             </div>
@@ -359,7 +369,7 @@ export default function TaxDownloadModal({
                 </a>
               </div>
 
-              <Button variant="ghost" onClick={handleClose} className="w-full text-slate-400 hover:text-slate-600">
+              <Button variant="ghost" onClick={handleClose} className="w-full text-slate-500 hover:text-slate-600">
                 Maybe later
               </Button>
             </div>
@@ -367,6 +377,6 @@ export default function TaxDownloadModal({
 
         </div>
       </div>
-    </div>
+    </ModalShell>
   );
 }

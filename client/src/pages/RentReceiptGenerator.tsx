@@ -246,26 +246,26 @@ export default function RentReceiptGenerator() {
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1">Tenant Name *</label>
-                    <input placeholder="Full name of tenant" className={inputClass(errors.tenantName)} {...field("tenantName")} />
+                    <label htmlFor="rr-tenantName" className="block text-xs font-semibold text-slate-600 mb-1">Tenant Name *</label>
+                    <input id="rr-tenantName" placeholder="Full name of tenant" className={inputClass(errors.tenantName)} {...field("tenantName")} />
                     {errors.tenantName && <p className="text-xs text-red-500 mt-1">{errors.tenantName}</p>}
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1">Landlord Name *</label>
-                    <input placeholder="Full name of landlord" className={inputClass(errors.landlordName)} {...field("landlordName")} />
+                    <label htmlFor="rr-landlordName" className="block text-xs font-semibold text-slate-600 mb-1">Landlord Name *</label>
+                    <input id="rr-landlordName" placeholder="Full name of landlord" className={inputClass(errors.landlordName)} {...field("landlordName")} />
                     {errors.landlordName && <p className="text-xs text-red-500 mt-1">{errors.landlordName}</p>}
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1">Tenant Address</label>
-                    <input placeholder="Tenant's current address (optional)" className={inputClass()} {...field("tenantAddress")} />
+                    <label htmlFor="rr-tenantAddress" className="block text-xs font-semibold text-slate-600 mb-1">Tenant Address</label>
+                    <input id="rr-tenantAddress" placeholder="Tenant's current address (optional)" className={inputClass()} {...field("tenantAddress")} />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1">Landlord Address</label>
-                    <input placeholder="Landlord's address (optional)" className={inputClass()} {...field("landlordAddress")} />
+                    <label htmlFor="rr-landlordAddress" className="block text-xs font-semibold text-slate-600 mb-1">Landlord Address</label>
+                    <input id="rr-landlordAddress" placeholder="Landlord's address (optional)" className={inputClass()} {...field("landlordAddress")} />
                   </div>
                   <div className="sm:col-span-2">
-                    <label className="block text-xs font-semibold text-slate-600 mb-1">Property Address *</label>
-                    <input placeholder="Full address of the rented property" className={inputClass(errors.propertyAddress)} {...field("propertyAddress")} />
+                    <label htmlFor="rr-propertyAddress" className="block text-xs font-semibold text-slate-600 mb-1">Property Address *</label>
+                    <input id="rr-propertyAddress" placeholder="Full address of the rented property" className={inputClass(errors.propertyAddress)} {...field("propertyAddress")} />
                     {errors.propertyAddress && <p className="text-xs text-red-500 mt-1">{errors.propertyAddress}</p>}
                   </div>
                 </div>
@@ -278,8 +278,8 @@ export default function RentReceiptGenerator() {
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1">Monthly Rent (₹) *</label>
-                    <input type="number" placeholder="e.g. 15000" min={1} className={inputClass(errors.rentAmount)} {...field("rentAmount")} />
+                    <label htmlFor="rr-rentAmount" className="block text-xs font-semibold text-slate-600 mb-1">Monthly Rent (₹) *</label>
+                    <input id="rr-rentAmount" type="number" placeholder="e.g. 15000" min={1} className={inputClass(errors.rentAmount)} {...field("rentAmount")} />
                     {errors.rentAmount && <p className="text-xs text-red-500 mt-1">{errors.rentAmount}</p>}
                   </div>
                   <div>
@@ -290,15 +290,15 @@ export default function RentReceiptGenerator() {
                   </div>
                   {form.paymentMode === "Cheque" && (
                     <div className="sm:col-span-2">
-                      <label className="block text-xs font-semibold text-slate-600 mb-1">Cheque No. & Bank</label>
-                      <input placeholder="e.g. 004521 — HDFC Bank, MG Road Branch" className={inputClass()} {...field("chequeDetails")} />
+                      <label htmlFor="rr-chequeDetails" className="block text-xs font-semibold text-slate-600 mb-1">Cheque No. & Bank</label>
+                      <input id="rr-chequeDetails" placeholder="e.g. 004521 — HDFC Bank, MG Road Branch" className={inputClass()} {...field("chequeDetails")} />
                     </div>
                   )}
                   <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1">
-                      Landlord PAN {needsPan ? <span className="text-red-500">*</span> : <span className="text-slate-400">(optional)</span>}
+                    <label htmlFor="rr-landlordPan" className="block text-xs font-semibold text-slate-600 mb-1">
+                      Landlord PAN {needsPan ? <span className="text-red-500">*</span> : <span className="text-slate-500">(optional)</span>}
                     </label>
-                    <input placeholder="AAAPL1234C" maxLength={10} className={inputClass(errors.landlordPan)}
+                    <input id="rr-landlordPan" placeholder="AAAPL1234C" maxLength={10} className={inputClass(errors.landlordPan)}
                       {...field("landlordPan")}
                       onChange={e => { setForm(f => ({ ...f, landlordPan: e.target.value.toUpperCase() })); if (errors.landlordPan) setErrors(er => { const { landlordPan: _, ...r } = er; return r; }); }}
                     />
@@ -310,9 +310,9 @@ export default function RentReceiptGenerator() {
                     )}
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1">Receipt Prefix</label>
-                    <input placeholder="RR" maxLength={8} className={inputClass()} value={receiptPrefix} onChange={e => setReceiptPrefix(e.target.value.toUpperCase() || "RR")} />
-                    <p className="text-xs text-slate-400 mt-1">First receipt will be {receiptPrefix}-001</p>
+                    <label htmlFor="rr-receiptPrefix" className="block text-xs font-semibold text-slate-600 mb-1">Receipt Prefix</label>
+                    <input id="rr-receiptPrefix" placeholder="RR" maxLength={8} className={inputClass()} value={receiptPrefix} onChange={e => setReceiptPrefix(e.target.value.toUpperCase() || "RR")} />
+                    <p className="text-xs text-slate-500 mt-1">First receipt will be {receiptPrefix}-001</p>
                   </div>
                 </div>
 
@@ -344,7 +344,7 @@ export default function RentReceiptGenerator() {
                 <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
                   {months.map((entry, i) => (
                     <div key={i} className="flex items-center gap-2 bg-slate-50 rounded-xl px-3 py-2">
-                      <span className="text-xs font-bold text-slate-400 w-6">{i + 1}.</span>
+                      <span className="text-xs font-bold text-slate-500 w-6">{i + 1}.</span>
                       <select value={entry.month} onChange={e => updateMonth(i, "month", +e.target.value)}
                         className="flex-1 text-sm border border-slate-200 rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-persian-blue-300">
                         {MONTHS.map((m, mi) => <option key={mi + 1} value={mi + 1}>{m}</option>)}
@@ -353,7 +353,7 @@ export default function RentReceiptGenerator() {
                         className="w-24 text-sm border border-slate-200 rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-persian-blue-300">
                         {YEAR_OPTIONS.map(y => <option key={y}>{y}</option>)}
                       </select>
-                      <button onClick={() => removeMonth(i)} className="text-slate-400 hover:text-red-500 transition p-1">
+                      <button onClick={() => removeMonth(i)} className="text-slate-500 hover:text-red-500 transition p-1">
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
                     </div>
@@ -364,7 +364,7 @@ export default function RentReceiptGenerator() {
                   <Plus className="h-3.5 w-3.5" /> Add another month
                 </button>
                 {months.length > 1 && (
-                  <p className="text-xs text-slate-400 mt-2">Will generate {months.length} receipts as a single PDF ({months.length} pages)</p>
+                  <p className="text-xs text-slate-500 mt-2">Will generate {months.length} receipts as a single PDF ({months.length} pages)</p>
                 )}
               </div>
 
@@ -445,7 +445,7 @@ export default function RentReceiptGenerator() {
                     { label: "Receipts", value: months.length > 0 ? `${months.length} month${months.length > 1 ? "s" : ""}` : "—" },
                   ].map(({ label, value }) => (
                     <div key={label} className="flex justify-between gap-2">
-                      <dt className="text-slate-400 flex-shrink-0">{label}</dt>
+                      <dt className="text-slate-500 flex-shrink-0">{label}</dt>
                       <dd className="text-slate-800 font-medium text-right truncate max-w-[140px]">{value}</dd>
                     </div>
                   ))}

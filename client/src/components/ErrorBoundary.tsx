@@ -63,7 +63,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 <summary className="cursor-pointer text-slate-500 mb-2">Error details</summary>
                 <p className="text-red-600 font-semibold">{this.state.error.message}</p>
                 {this.state.info && (
-                  <pre className="mt-2 text-slate-400 whitespace-pre-wrap text-xs">
+                  <pre className="mt-2 text-slate-500 whitespace-pre-wrap text-xs">
                     {this.state.info.trim()}
                   </pre>
                 )}
@@ -78,7 +78,7 @@ export class ErrorBoundary extends Component<Props, State> {
               Reload Page
             </button>
 
-            <p className="text-xs text-slate-400 mt-4">
+            <p className="text-xs text-slate-500 mt-4">
               If this keeps happening,{" "}
               <a href="/contact" className="underline hover:text-persian-blue-600">contact us</a>.
             </p>

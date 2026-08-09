@@ -992,7 +992,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
             <CheckCircle className="h-3 w-3" /> Updated for Finance Act 2025
           </span>
           <span className="inline-flex items-center gap-1 text-xs font-medium text-slate-600 bg-slate-50 border border-slate-200 rounded-full px-2.5 py-0.5">
-            <Shield className="h-3 w-3" /> No data stored
+            <Shield className="h-3 w-3" /> Nothing saved unless you sign in
           </span>
         </div>
         <TabsList className="grid w-full grid-cols-3 mb-6">
@@ -1028,7 +1028,10 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                 </div>
                 <div className="flex items-center gap-1.5 text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-1.5 mb-4 w-fit">
                   <Shield className="h-3.5 w-3.5 flex-shrink-0" />
-                  <span>Your data is never stored or shared</span>
+                  <span>
+                    Calculations run in your browser. Signed in, your latest result is saved to your
+                    dashboard — you can delete it any time.
+                  </span>
                 </div>
                 
                 <div className="space-y-4">

@@ -27,7 +27,7 @@ export default function CalcPageHeader({
     <header className="bg-white border-b border-slate-100">
       {/* Breadcrumb strip */}
       <div className={cn(maxWidth, "mx-auto px-6 pt-4")}>
-        <nav className="flex items-center gap-1.5 text-xs text-slate-400" aria-label="Breadcrumb">
+        <nav className="flex items-center gap-1.5 text-xs text-slate-500" aria-label="Breadcrumb">
           {breadcrumbs.map((crumb, idx) => (
             <span key={idx} className="flex items-center gap-1.5">
               {idx > 0 && <span className="text-slate-300">/</span>}

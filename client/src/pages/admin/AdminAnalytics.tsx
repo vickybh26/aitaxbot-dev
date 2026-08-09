@@ -243,7 +243,7 @@ export default function AdminAnalytics() {
 function EmptyChart({ label }: { label: string }) {
   return (
     <div className="h-52 flex items-center justify-center">
-      <p className="text-slate-400 text-sm text-center max-w-xs">{label}</p>
+      <p className="text-slate-500 text-sm text-center max-w-xs">{label}</p>
     </div>
   );
 }

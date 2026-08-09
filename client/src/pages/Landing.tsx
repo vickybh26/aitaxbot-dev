@@ -175,7 +175,7 @@ function SavingsCard() {
             className="w-full h-1.5 rounded-full appearance-none cursor-pointer"
             style={{ background: `linear-gradient(90deg,#16a34a 0%,#16a34a ${pct}%,#e2e8f0 ${pct}%,#e2e8f0 100%)` }}
           />
-          <div className="flex justify-between text-xs text-slate-400 mt-1.5"><span>₹3L</span><span>₹50L</span></div>
+          <div className="flex justify-between text-xs text-slate-500 mt-1.5"><span>₹3L</span><span>₹50L</span></div>
         </div>
         <div className="rounded-xl border border-slate-200 overflow-hidden divide-y divide-slate-100">
           {([
@@ -187,7 +187,7 @@ function SavingsCard() {
                 {label}
                 {better && <span className="text-[10px] font-bold text-green-700 bg-green-50 border border-green-100 px-1.5 py-0.5 rounded-full">SAVES MORE</span>}
               </span>
-              <span className={cn("text-base font-semibold tabular-nums", better ? "text-green-700" : "text-slate-400 line-through")}>{inr(value)}</span>
+              <span className={cn("text-base font-semibold tabular-nums", better ? "text-green-700" : "text-slate-500 line-through")}>{inr(value)}</span>
             </div>
           ))}
         </div>
@@ -255,7 +255,11 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
             <span className="text-slate-700">·</span>
             <span className="flex items-center gap-1.5 text-orange-300 font-semibold"><Clock className="h-3.5 w-3.5 text-orange-400 flex-shrink-0" />ITR Deadline: July 31, 2026</span>
             <span className="text-slate-700">·</span>
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-green-400 flex-shrink-0" />Runs in browser — data never stored</span>
+            {/* Was "Runs in browser — data never stored", which is not true for
+                a signed-in user: every calculation persists a saved result via
+                /api/tool-usage. One accurate claim, repeated verbatim on the
+                calculator badge and the result gate. */}
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-green-400 flex-shrink-0" />Nothing saved unless you sign in</span>
           </div>
         </div>
 
@@ -321,7 +325,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                 <div key={label} ref={ref} className="text-center px-6 py-8">
                   <div className="text-3xl font-black text-slate-900 tracking-tight mb-1">{val}</div>
                   <div className="text-sm font-semibold text-slate-700 mb-0.5">{label}</div>
-                  <div className="text-xs text-slate-400">{sub}</div>
+                  <div className="text-xs text-slate-500">{sub}</div>
                 </div>
               ))}
             </div>
@@ -344,7 +348,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                       className="block p-4 bg-white rounded-xl border border-slate-200 hover:border-slate-300 hover:shadow-sm transition-all group"
                       data-testid={`news-card-${i}`}>
                       <h4 className="text-sm font-medium text-slate-800 group-hover:text-blue-600 transition-colors line-clamp-2 mb-2">{item.title}</h4>
-                      <div className="flex items-center justify-between text-xs text-slate-400">
+                      <div className="flex items-center justify-between text-xs text-slate-500">
                         <span className="font-medium truncate max-w-[120px]">{item.source}</span>
                         <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{item.date}</span>
                       </div>
@@ -373,7 +377,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                   className="group block bg-white rounded-2xl border border-slate-200 hover:border-blue-200 hover:shadow-md p-6 transition-all duration-200">
                   <div className="flex items-center gap-2 mb-3">
                     <span className="text-xs bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full font-semibold border border-blue-100">{post.tag}</span>
-                    <span className="text-xs text-slate-400 flex items-center gap-1"><Clock className="h-3 w-3" />{post.readTime}</span>
+                    <span className="text-xs text-slate-500 flex items-center gap-1"><Clock className="h-3 w-3" />{post.readTime}</span>
                   </div>
                   <h3 className="text-base font-bold text-slate-900 group-hover:text-blue-600 transition-colors leading-snug line-clamp-2 mb-3">{post.title}</h3>
                   <div className="flex items-center gap-1.5 text-xs font-semibold text-blue-600 group-hover:gap-2.5 transition-all">
@@ -573,7 +577,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
               ].map(({ q, a }, i) => (
                 <details key={i} className="group rounded-xl border border-slate-200 bg-white open:border-blue-200 transition-all">
                   <summary className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold text-slate-800 list-none [&::-webkit-details-marker]:hidden focus:outline-none">
-                    {q}<ChevronDown className="h-4 w-4 flex-shrink-0 text-slate-400 transition-transform group-open:rotate-180" />
+                    {q}<ChevronDown className="h-4 w-4 flex-shrink-0 text-slate-500 transition-transform group-open:rotate-180" />
                   </summary>
                   <div className="px-5 pb-5 pt-3 text-sm text-slate-600 leading-relaxed border-t border-slate-100">{a}</div>
                 </details>

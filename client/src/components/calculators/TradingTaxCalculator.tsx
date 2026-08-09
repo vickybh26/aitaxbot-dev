@@ -164,7 +164,7 @@ function RateStatus({ rate, fetching }: { rate: number | null; fetching: boolean
     </span>
   );
   return (
-    <span className="inline-flex items-center gap-1 text-xs text-slate-400 bg-slate-50 px-2 py-0.5 rounded-full">
+    <span className="inline-flex items-center gap-1 text-xs text-slate-500 bg-slate-50 px-2 py-0.5 rounded-full">
       <Clock className="w-3 h-3" /> Rate auto-fetches on date entry
     </span>
   );
@@ -285,13 +285,13 @@ function USStocksTab({ trades, setTrades, slabRate }: {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label className="text-xs text-slate-500">Stock / ETF</Label>
-                <Input placeholder="e.g. AAPL, VOO, QQQ" value={t.stockName}
+                <Input aria-label="Stock / ETF" placeholder="e.g. AAPL, VOO, QQQ" value={t.stockName}
                   onChange={e => update(t.id, { stockName: e.target.value })}
                   className="h-9 text-sm mt-1" />
               </div>
               <div>
                 <Label className="text-xs text-slate-500">Quantity (shares)</Label>
-                <Input type="number" min={0.001} step={0.001} value={t.quantity || ""}
+                <Input aria-label="Quantity (shares)" type="number" min={0.001} step={0.001} value={t.quantity || ""}
                   onChange={e => update(t.id, { quantity: parseFloat(e.target.value) || 0 })}
                   className="h-9 text-sm mt-1" />
               </div>
@@ -301,7 +301,7 @@ function USStocksTab({ trades, setTrades, slabRate }: {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label className="text-xs text-slate-500">Buy Date</Label>
-                <Input type="date" value={t.buyDate}
+                <Input aria-label="Buy Date" type="date" value={t.buyDate}
                   onChange={e => {
                     const d = e.target.value;
                     update(t.id, { buyDate: d, buyRate: null });
@@ -311,7 +311,7 @@ function USStocksTab({ trades, setTrades, slabRate }: {
               </div>
               <div>
                 <Label className="text-xs text-slate-500">Buy Price (USD/share)</Label>
-                <Input type="number" min={0} step={0.01} placeholder="0.00" value={t.buyPriceUSD || ""}
+                <Input aria-label="Buy Price (USD/share)" type="number" min={0} step={0.01} placeholder="0.00" value={t.buyPriceUSD || ""}
                   onChange={e => update(t.id, { buyPriceUSD: parseFloat(e.target.value) || 0 })}
                   className="h-9 text-sm mt-1" />
               </div>
@@ -321,7 +321,7 @@ function USStocksTab({ trades, setTrades, slabRate }: {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label className="text-xs text-slate-500">Sell Date</Label>
-                <Input type="date" value={t.sellDate}
+                <Input aria-label="Sell Date" type="date" value={t.sellDate}
                   onChange={e => {
                     const d = e.target.value;
                     update(t.id, { sellDate: d, sellRate: null });
@@ -331,7 +331,7 @@ function USStocksTab({ trades, setTrades, slabRate }: {
               </div>
               <div>
                 <Label className="text-xs text-slate-500">Sell Price (USD/share)</Label>
-                <Input type="number" min={0} step={0.01} placeholder="0.00" value={t.sellPriceUSD || ""}
+                <Input aria-label="Sell Price (USD/share)" type="number" min={0} step={0.01} placeholder="0.00" value={t.sellPriceUSD || ""}
                   onChange={e => update(t.id, { sellPriceUSD: parseFloat(e.target.value) || 0 })}
                   className="h-9 text-sm mt-1" />
               </div>
@@ -341,7 +341,7 @@ function USStocksTab({ trades, setTrades, slabRate }: {
             <div className="flex items-center gap-3 flex-wrap">
               <RateStatus rate={t.buyRate} fetching={t.fetching} />
               {t.buyRate && t.sellRate && (
-                <span className="text-xs text-slate-400">
+                <span className="text-xs text-slate-500">
                   Buy: ₹{t.buyRate.toFixed(2)} · Sell: ₹{t.sellRate.toFixed(2)}
                 </span>
               )}
@@ -362,7 +362,7 @@ function USStocksTab({ trades, setTrades, slabRate }: {
                     <div className={`text-2xl font-bold ${r.gainINR >= 0 ? "text-green-700" : "text-red-600"}`}>
                       {fmt(r.gainINR)}
                     </div>
-                    <div className="text-xs text-slate-400 mt-1">
+                    <div className="text-xs text-slate-500 mt-1">
                       Cost {fmt(r.costINR)} → Proceeds {fmt(r.proceedsINR)}
                     </div>
                   </div>
@@ -462,13 +462,13 @@ function USDividendsTab({ dividends, setDividends, slabRate }: {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label className="text-xs text-slate-500">Stock / Fund</Label>
-                <Input placeholder="e.g. AAPL, VTI" value={d.description}
+                <Input aria-label="Stock / Fund" placeholder="e.g. AAPL, VTI" value={d.description}
                   onChange={e => update(d.id, { description: e.target.value })}
                   className="h-9 text-sm mt-1" />
               </div>
               <div>
                 <Label className="text-xs text-slate-500">Pay Date</Label>
-                <Input type="date" value={d.payDate}
+                <Input aria-label="Pay Date" type="date" value={d.payDate}
                   onChange={e => {
                     const dt = e.target.value;
                     update(d.id, { payDate: dt, rate: null });
@@ -481,13 +481,13 @@ function USDividendsTab({ dividends, setDividends, slabRate }: {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label className="text-xs text-slate-500">Gross Dividend (USD)</Label>
-                <Input type="number" min={0} step={0.01} placeholder="0.00" value={d.amountUSD || ""}
+                <Input aria-label="Gross Dividend (USD)" type="number" min={0} step={0.01} placeholder="0.00" value={d.amountUSD || ""}
                   onChange={e => update(d.id, { amountUSD: parseFloat(e.target.value) || 0 })}
                   className="h-9 text-sm mt-1" />
               </div>
               <div>
                 <Label className="text-xs text-slate-500">US Tax Withheld (USD)</Label>
-                <Input type="number" min={0} step={0.01} placeholder="15% or 25% of gross"
+                <Input aria-label="US Tax Withheld (USD)" type="number" min={0} step={0.01} placeholder="15% or 25% of gross"
                   value={d.withheldUSD || ""}
                   onChange={e => update(d.id, { withheldUSD: parseFloat(e.target.value) || 0 })}
                   className="h-9 text-sm mt-1" />
@@ -602,7 +602,7 @@ function IndianFOTab({ trades, setTrades, slabRate }: {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
                 <Label className="text-xs text-slate-500">Description</Label>
-                <Input placeholder="e.g. NIFTY options FY25-26" value={t.description}
+                <Input aria-label="Description" placeholder="e.g. NIFTY options FY25-26" value={t.description}
                   onChange={e => update(t.id, { description: e.target.value })}
                   className="h-9 text-sm mt-1" />
               </div>
@@ -618,7 +618,7 @@ function IndianFOTab({ trades, setTrades, slabRate }: {
               </div>
               <div>
                 <Label className="text-xs text-slate-500">Net P&L (₹)</Label>
-                <Input type="number" step={1} placeholder="Profit is positive, loss is negative"
+                <Input aria-label="Net P&L (₹)" type="number" step={1} placeholder="Profit is positive, loss is negative"
                   value={t.netPL || ""}
                   onChange={e => update(t.id, { netPL: parseFloat(e.target.value) || 0 })}
                   className={`h-9 text-sm mt-1 ${t.netPL < 0 ? "border-red-300 text-red-600" : t.netPL > 0 ? "border-green-300 text-green-700" : ""}`} />
@@ -646,7 +646,7 @@ function IndianFOTab({ trades, setTrades, slabRate }: {
               <div>
                 <div className="text-xs text-slate-500">Net P&L across all F&O</div>
                 <div className={`text-2xl font-bold mt-0.5 ${totalPL >= 0 ? "text-amber-700" : "text-red-600"}`}>{fmt(totalPL)}</div>
-                <div className="text-xs text-slate-400 mt-1">Turnover: {fmt(totalTurnover)}</div>
+                <div className="text-xs text-slate-500 mt-1">Turnover: {fmt(totalTurnover)}</div>
               </div>
               <div className="text-right">
                 <div className="text-xs text-slate-500">Tax @ {slabRate}% slab + 4% cess</div>
@@ -729,13 +729,13 @@ function USFOTab({ trades, setTrades, slabRate }: {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
                 <Label className="text-xs text-slate-500">Description</Label>
-                <Input placeholder="e.g. SPY Dec Put" value={t.description}
+                <Input aria-label="Description" placeholder="e.g. SPY Dec Put" value={t.description}
                   onChange={e => update(t.id, { description: e.target.value })}
                   className="h-9 text-sm mt-1" />
               </div>
               <div>
                 <Label className="text-xs text-slate-500">Settlement / Expiry Date</Label>
-                <Input type="date" value={t.date}
+                <Input aria-label="Settlement / Expiry Date" type="date" value={t.date}
                   onChange={e => {
                     const d = e.target.value;
                     update(t.id, { date: d, rate: null });
@@ -745,7 +745,7 @@ function USFOTab({ trades, setTrades, slabRate }: {
               </div>
               <div>
                 <Label className="text-xs text-slate-500">Net P&L (USD)</Label>
-                <Input type="number" step={0.01} placeholder="Profit positive, loss negative"
+                <Input aria-label="Net P&L (USD)" type="number" step={0.01} placeholder="Profit positive, loss negative"
                   value={t.netPLUSD || ""}
                   onChange={e => update(t.id, { netPLUSD: parseFloat(e.target.value) || 0 })}
                   className={`h-9 text-sm mt-1 ${t.netPLUSD < 0 ? "border-red-300 text-red-600" : t.netPLUSD > 0 ? "border-green-300 text-green-700" : ""}`} />
@@ -843,7 +843,7 @@ function ForexTab({ trades, setTrades, slabRate }: {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
                 <Label className="text-xs text-slate-500">Description</Label>
-                <Input placeholder="e.g. USD/INR futures NSE" value={t.description}
+                <Input aria-label="Description" placeholder="e.g. USD/INR futures NSE" value={t.description}
                   onChange={e => update(t.id, { description: e.target.value })}
                   className="h-9 text-sm mt-1" />
               </div>
@@ -858,7 +858,7 @@ function ForexTab({ trades, setTrades, slabRate }: {
               </div>
               <div>
                 <Label className="text-xs text-slate-500">Net P&L (₹)</Label>
-                <Input type="number" step={1} placeholder="Profit positive, loss negative"
+                <Input aria-label="Net P&L (₹)" type="number" step={1} placeholder="Profit positive, loss negative"
                   value={t.netPL || ""}
                   onChange={e => update(t.id, { netPL: parseFloat(e.target.value) || 0 })}
                   className={`h-9 text-sm mt-1 ${t.netPL < 0 ? "border-red-300 text-red-600" : t.netPL > 0 ? "border-green-300 text-green-700" : ""}`} />
@@ -948,7 +948,7 @@ function SummaryTab({ usStocks, usDividends, indianFO, usFO, forex, slabRate }: 
 
   if (bars.length === 0) {
     return (
-      <div className="text-center py-16 text-slate-400">
+      <div className="text-center py-16 text-slate-500">
         <FileText className="w-12 h-12 mx-auto mb-3 opacity-30" />
         <p className="text-sm">Add trades in other tabs to see your tax summary here.</p>
       </div>
@@ -959,9 +959,9 @@ function SummaryTab({ usStocks, usDividends, indianFO, usFO, forex, slabRate }: 
     <div className="space-y-5">
       {/* Hero total */}
       <div className="rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 p-6 text-white">
-        <div className="text-sm text-slate-400 mb-1">Total Estimated Tax — FY 2025-26</div>
+        <div className="text-sm text-slate-500 mb-1">Total Estimated Tax — FY 2025-26</div>
         <div className="text-4xl font-bold">{fmt(grandTotal)}</div>
-        <div className="text-sm text-slate-400 mt-1">Includes 4% Health & Education cess · New Regime</div>
+        <div className="text-sm text-slate-500 mt-1">Includes 4% Health & Education cess · New Regime</div>
         <div className="mt-4 flex items-center gap-3">
           <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold ${itrForm === "ITR-3" ? "bg-amber-500/20 text-amber-300" : "bg-blue-500/20 text-blue-300"}`}>
             <FileText className="w-3.5 h-3.5" /> File {itrForm}
@@ -984,9 +984,9 @@ function SummaryTab({ usStocks, usDividends, indianFO, usFO, forex, slabRate }: 
               <div className="flex justify-between items-center text-sm">
                 <span className="text-slate-600">{b.label}</span>
                 <div className="flex items-center gap-3">
-                  <span className="text-slate-400 text-xs">{fmt(b.income)} income</span>
+                  <span className="text-slate-500 text-xs">{fmt(b.income)} income</span>
                   <span className="font-semibold text-slate-800 w-24 text-right">{fmt(b.tax)}</span>
-                  <span className="text-slate-400 text-xs w-8 text-right">{pct}%</span>
+                  <span className="text-slate-500 text-xs w-8 text-right">{pct}%</span>
                 </div>
               </div>
               <div className="w-full bg-slate-100 rounded-full h-2">
@@ -1111,12 +1111,12 @@ export default function TradingTaxCalculator() {
             />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-400">→</span>
+            <span className="text-xs text-slate-500">→</span>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold">
               {slabRate}% marginal slab · {slabBand(annualIncome)}
             </span>
           </div>
-          <span className="text-xs text-slate-400 hidden md:inline">New Regime FY 2026-27 · LTCG on US stocks always 12.5%</span>
+          <span className="text-xs text-slate-500 hidden md:inline">New Regime FY 2026-27 · LTCG on US stocks always 12.5%</span>
         </div>
       </div>
 
@@ -1136,7 +1136,7 @@ export default function TradingTaxCalculator() {
             ) : (
               <span className="text-sm font-semibold text-blue-600">Sign in to view</span>
             )}
-            <span className="text-xs text-slate-400 flex items-center gap-1">
+            <span className="text-xs text-slate-500 flex items-center gap-1">
               View breakdown <ChevronRight className="w-3 h-3" />
             </span>
           </div>
@@ -1212,7 +1212,7 @@ export default function TradingTaxCalculator() {
 
       {/* ── Footer ─────────────────────────────────────────────────────────── */}
       <div className="border-t border-slate-100 px-5 py-3 bg-slate-50">
-        <p className="text-xs text-slate-400">
+        <p className="text-xs text-slate-500">
           Exchange rates via Frankfurter API (ECB data). Verify against RBI/FBIL reference rates at rbi.org.in for ITR. Estimation only — not tax advice.
         </p>
       </div>

@@ -30,6 +30,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import ModalShell from "@/components/ui/modal-shell";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -113,15 +114,15 @@ function UserRow({
             <img src={user.profileImageUrl} className="w-8 h-8 rounded-full object-cover" alt="" />
           ) : (
             <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center">
-              <UserCircle className="w-5 h-5 text-slate-400" />
+              <UserCircle className="w-5 h-5 text-slate-500" />
             </div>
           )}
           <div>
             <div className="font-medium text-slate-800 text-sm">
               {user.firstName ?? ""} {user.lastName ?? ""}
-              {!user.firstName && !user.lastName && <span className="text-slate-400">No name</span>}
+              {!user.firstName && !user.lastName && <span className="text-slate-500">No name</span>}
             </div>
-            <div className="text-slate-400 text-xs">{user.email}</div>
+            <div className="text-slate-500 text-xs">{user.email}</div>
           </div>
         </div>
       </td>
@@ -156,12 +157,12 @@ function UserRow({
           // nothing anywhere in the codebase, so completing a profile changed
           // nothing for the user. Zero recipients completed their profile.
           // The status is still shown because it is useful admin context.
-          <span className="flex items-center gap-1 text-slate-400 text-xs">
+          <span className="flex items-center gap-1 text-slate-500 text-xs">
             <Circle className="w-3.5 h-3.5" /> Incomplete
           </span>
         )}
       </td>
-      <td className="px-4 py-3 text-xs text-slate-400">{joinedDate}</td>
+      <td className="px-4 py-3 text-xs text-slate-500">{joinedDate}</td>
     </tr>
   );
 }
@@ -270,13 +271,20 @@ function CRMDrawer({
   const canWrite = adminLevel !== null && adminLevel <= 2;
 
   return (
-    <div className="fixed inset-0 z-40 flex justify-end">
+    <ModalShell
+      onClose={onClose}
+      labelledBy="admin-user-drawer-title"
+      /* Dismissal stays on the backdrop child below, which sits above the
+         shell — see the same note in TaxDownloadModal. */
+      closeOnOverlayClick={false}
+      className="fixed inset-0 z-40 flex justify-end"
+    >
       <div className="fixed inset-0 bg-black/30" onClick={onClose} />
       <aside className="relative z-50 w-full max-w-sm bg-white shadow-2xl flex flex-col h-full overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b">
-          <h3 className="font-semibold text-slate-800">User Profile &amp; CRM</h3>
-          <button onClick={onClose} className="p-1 rounded-lg hover:bg-slate-100">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200">
+          <h3 id="admin-user-drawer-title" className="font-semibold text-slate-800">User Profile &amp; CRM</h3>
+          <button onClick={onClose} className="p-1 rounded-lg hover:bg-slate-100" aria-label="Close user profile">
             <X className="w-4 h-4 text-slate-500" />
           </button>
         </div>
@@ -294,16 +302,16 @@ function CRMDrawer({
                   <img src={user.profileImageUrl} className="w-14 h-14 rounded-2xl object-cover" alt="" />
                 ) : (
                   <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center">
-                    <UserCircle className="w-8 h-8 text-slate-400" />
+                    <UserCircle className="w-8 h-8 text-slate-500" />
                   </div>
                 )}
                 <div>
                   <div className="font-semibold text-slate-800">
                     {user.firstName ?? ""} {user.lastName ?? ""}
-                    {!user.firstName && !user.lastName && <span className="text-slate-400">No name</span>}
+                    {!user.firstName && !user.lastName && <span className="text-slate-500">No name</span>}
                   </div>
                   <div className="text-slate-500 text-sm">{user.email}</div>
-                  {user.mobile && <div className="text-slate-400 text-xs mt-0.5">{user.mobile}</div>}
+                  {user.mobile && <div className="text-slate-500 text-xs mt-0.5">{user.mobile}</div>}
                 </div>
               </div>
 
@@ -317,7 +325,7 @@ function CRMDrawer({
                   { label: "Joined", value: joinedDate },
                 ].map(({ label, value }) => (
                   <div key={label}>
-                    <p className="text-xs text-slate-400 font-medium uppercase tracking-wide">{label}</p>
+                    <p className="text-xs text-slate-500 font-medium uppercase tracking-wide">{label}</p>
                     <p className="text-slate-700 mt-0.5">{value ?? "—"}</p>
                   </div>
                 ))}
@@ -326,7 +334,7 @@ function CRMDrawer({
               {/* Tags */}
               <div>
                 <div className="flex items-center gap-1.5 mb-3">
-                  <Tag className="w-4 h-4 text-slate-400" />
+                  <Tag className="w-4 h-4 text-slate-500" />
                   <span className="text-sm font-semibold text-slate-700">Tags</span>
                 </div>
                 <div className="flex flex-wrap gap-2 mb-3">
@@ -352,6 +360,7 @@ function CRMDrawer({
                 {canWrite && (
                   <div className="flex gap-2">
                     <Input
+                      aria-label="Add a custom tag"
                       placeholder="Custom tag…"
                       value={newTag}
                       onChange={(e) => setNewTag(e.target.value)}
@@ -368,14 +377,15 @@ function CRMDrawer({
               {/* Notes */}
               <div>
                 <div className="flex items-center gap-1.5 mb-3">
-                  <StickyNote className="w-4 h-4 text-slate-400" />
+                  <StickyNote className="w-4 h-4 text-slate-500" />
                   <span className="text-sm font-semibold text-slate-700">Notes</span>
-                  <span className="ml-auto text-xs text-slate-400">{user.notes?.length ?? 0} note(s)</span>
+                  <span className="ml-auto text-xs text-slate-500">{user.notes?.length ?? 0} note(s)</span>
                 </div>
 
                 {canWrite && (
                   <div className="flex gap-2 mb-3">
                     <Input
+                      aria-label="Add a note about this user"
                       placeholder="Add a note… (Enter to save)"
                       value={newNote}
                       onChange={(e) => setNewNote(e.target.value)}
@@ -412,7 +422,7 @@ function CRMDrawer({
                         >
                           <p className="text-slate-700 text-sm leading-relaxed">{note.text}</p>
                           <div className="flex items-center justify-between mt-2">
-                            <div className="text-xs text-slate-400">
+                            <div className="text-xs text-slate-500">
                               {note.adminEmail} · {noteDate}
                             </div>
                             {adminLevel === 1 && (
@@ -428,7 +438,7 @@ function CRMDrawer({
                       );
                     })
                   ) : (
-                    <p className="text-slate-400 text-xs italic">No notes yet.</p>
+                    <p className="text-slate-500 text-xs italic">No notes yet.</p>
                   )}
                 </div>
               </div>
@@ -454,7 +464,7 @@ function CRMDrawer({
           </div>
         )}
       </aside>
-    </div>
+    </ModalShell>
   );
 }
 
@@ -593,8 +603,9 @@ export default function AdminUsers() {
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
           <div className="flex flex-wrap gap-3 items-center">
             <div className="relative flex-1 min-w-48">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
               <Input
+                aria-label="Search users by name, email or phone"
                 placeholder="Search name, email, phone…"
                 value={search}
                 onChange={(e) => handleSearch(e.target.value)}
@@ -622,7 +633,7 @@ export default function AdminUsers() {
             {(occupationFilter || stateFilter || tagFilter || debouncedSearch) && (
               <button
                 onClick={() => { setOccupationFilter(""); setStateFilter(""); setTagFilter(""); setSearch(""); setDebouncedSearch(""); setPage(1); }}
-                className="flex items-center gap-1 text-xs text-slate-400 hover:text-slate-600"
+                className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-600"
               >
                 <X className="w-3.5 h-3.5" /> Clear filters
               </button>
@@ -676,7 +687,7 @@ export default function AdminUsers() {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={6} className="px-4 py-12 text-center text-slate-400 text-sm">
+                        <td colSpan={6} className="px-4 py-12 text-center text-slate-500 text-sm">
                           No users found.
                         </td>
                       </tr>

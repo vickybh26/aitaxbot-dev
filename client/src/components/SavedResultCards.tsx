@@ -138,7 +138,7 @@ export default function SavedResultCards() {
                   </p>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
-                  <span className="text-[11px] text-slate-400">
+                  <span className="text-[11px] text-slate-500">
                     {timeAgo(item.updatedAt)}
                   </span>
                   <button
@@ -147,7 +147,7 @@ export default function SavedResultCards() {
                     disabled={clearing === item.toolKey}
                     aria-label={`Clear saved ${item.toolName} result`}
                     title="Clear this saved result"
-                    className="p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 disabled:opacity-50"
+                    className="p-1 rounded-md text-slate-500 hover:text-slate-700 hover:bg-slate-100 disabled:opacity-50"
                     data-testid={`clear-saved-${item.toolKey}`}
                   >
                     {clearing === item.toolKey ? (

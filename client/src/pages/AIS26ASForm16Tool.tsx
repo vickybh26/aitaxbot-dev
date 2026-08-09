@@ -172,7 +172,7 @@ function FileCard({
           </div>
           <div className="flex-1 min-w-0">
             <div className="font-bold text-sm text-gray-900">{label}</div>
-            <div className="text-xs text-gray-400 truncate">{sublabel}</div>
+            <div className="text-xs text-slate-500 truncate">{sublabel}</div>
           </div>
           {file && (
             <button
@@ -193,11 +193,11 @@ function FileCard({
         ) : (
           <div className="flex flex-col items-center justify-center border border-dashed border-gray-200 rounded-lg py-3 gap-1 bg-gray-50/50">
             <Upload className="w-4 h-4 text-gray-300" />
-            <span className="text-xs text-gray-400">Click or drag PDF here</span>
+            <span className="text-xs text-slate-500">Click or drag PDF here</span>
           </div>
         )}
 
-        <p className="text-[11px] text-gray-400 mt-2 leading-relaxed">{tip}</p>
+        <p className="text-[11px] text-slate-500 mt-2 leading-relaxed">{tip}</p>
       </div>
 
       {/* Password toggle — collapsed by default */}
@@ -432,7 +432,7 @@ export default function AIS26ASForm16Tool() {
     OK:        <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />,
     MISMATCH:  <AlertCircle  className="w-4 h-4 text-red-500   flex-shrink-0 mt-0.5" />,
     PARTIAL:   <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />,
-    NOT_FOUND: <Info          className="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5" />,
+    NOT_FOUND: <Info          className="w-4 h-4 text-slate-500 flex-shrink-0 mt-0.5" />,
   };
 
   const statusCfg = report ? STATUS_CFG[report.overallStatus] : null;
@@ -582,7 +582,7 @@ export default function AIS26ASForm16Tool() {
                               type="button"
                               onClick={() => removeForm16Slot(i)}
                               title="Remove this Form 16"
-                              className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-white border border-gray-300 text-gray-400 hover:text-red-500 hover:border-red-300 flex items-center justify-center text-xs shadow-sm"
+                              className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-white border border-gray-300 text-slate-500 hover:text-red-500 hover:border-red-300 flex items-center justify-center text-xs shadow-sm"
                             >×</button>
                           </div>
                         );
@@ -629,15 +629,15 @@ export default function AIS26ASForm16Tool() {
                   </Button>
 
                   {!loading && missingFiles.length > 0 && (
-                    <p className="text-xs text-center text-gray-400 mt-2">
+                    <p className="text-xs text-center text-slate-500 mt-2">
                       {uploadedCount > 0
                         ? <>You can generate a report now — adding {missingFiles.join(" and ")} enables the full cross-document check.</>
                         : <>Upload at least one document — any one gives a summary; all three give the full cross-check.</>}
                     </p>
                   )}
 
-                  <div className="flex items-center justify-center gap-1.5 mt-2 text-xs text-gray-400">
-                    <Shield className="w-3 h-3" /> Files are processed securely on our server and never stored
+                  <div className="flex items-center justify-center gap-1.5 mt-2 text-xs text-slate-500">
+                    <Shield className="w-3 h-3" /> Files are uploaded for processing and deleted once your report is generated
                   </div>
                 </div>
               </div>
@@ -764,7 +764,7 @@ export default function AIS26ASForm16Tool() {
                           <div className="font-semibold text-gray-800 truncate">
                             {emp.employerName || `Employer ${i + 1}`}
                           </div>
-                          <div className="text-xs text-gray-400">
+                          <div className="text-xs text-slate-500">
                             {emp.newRegime == null ? "Regime unknown" : emp.newRegime ? "New Regime" : "Old Regime"}
                           </div>
                         </div>
@@ -797,7 +797,7 @@ export default function AIS26ASForm16Tool() {
                         ) : (
                           <p className="text-xs text-green-700 mt-1">No significant shortfall detected — TDS and advance tax appear to cover the estimated liability.</p>
                         )}
-                        <p className="text-[11px] text-gray-400 mt-2 leading-relaxed">
+                        <p className="text-[11px] text-slate-500 mt-2 leading-relaxed">
                           Estimate only, from AI-extracted figures and standard slab math — not exact interest under Sections 234B/234C. Consult a CA or use the Income Tax Calculator to confirm before paying.
                         </p>
                       </div>
@@ -815,7 +815,7 @@ export default function AIS26ASForm16Tool() {
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                   <div className="px-5 py-4 border-b border-gray-100 flex items-start justify-between gap-4 flex-wrap">
                     <div>
-                      <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">Recommended ITR Form</p>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">Recommended ITR Form</p>
                       <h3 className="font-bold text-xl text-gray-900">{report.recommendedITRForm.formLabel}</h3>
                     </div>
                     <span className="text-xs bg-gray-100 text-gray-500 rounded-full px-3 py-1 mt-1">
@@ -945,8 +945,8 @@ export default function AIS26ASForm16Tool() {
                               <div className="text-xs text-gray-600 mt-0.5 truncate">{m.description}</div>
                             </div>
                             {isOpen
-                              ? <ChevronUp className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                              : <ChevronDown className="w-4 h-4 text-gray-400 flex-shrink-0" />}
+                              ? <ChevronUp className="w-4 h-4 text-slate-500 flex-shrink-0" />
+                              : <ChevronDown className="w-4 h-4 text-slate-500 flex-shrink-0" />}
                           </button>
 
                           {isOpen && (
@@ -1077,7 +1077,7 @@ export default function AIS26ASForm16Tool() {
                 </Button>
               </div>
 
-              <p className="text-center text-xs text-gray-400 pb-4">
+              <p className="text-center text-xs text-slate-500 pb-4">
                 <Shield className="w-3 h-3 inline mr-1" />
                 Generated {new Date(report.generatedAt).toLocaleString("en-IN")} · Documents not stored · Not a substitute for CA advice
               </p>

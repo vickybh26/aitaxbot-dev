@@ -14,7 +14,12 @@ import { generateBreadcrumbSchema, generateOrganizationSchema } from '@/lib/stru
 const hubFAQs = [
   {
     question: "Are the AiTaxBot calculators free to use?",
-    answer: "Yes, all calculators on AiTaxBot are 100% free with unlimited usage — no fees, no paywall, ever. A free account (sign in or sign up) is required to view your result. We offer Income Tax, HRA, SIP, SWP, NPS, PF, Home Loan, Vehicle Loan, and Trading Tax calculators updated for FY 2026-27 (AY 2027-28)."
+    // Rewritten to match ResultAuthGate as of 2026-08-01: the full gate was
+    // replaced by a headline-first one, so every visitor now sees their result.
+    // This answer still described the old login wall — and it is emitted as
+    // FAQPage structured data, so the stale version was eligible to surface in
+    // Google results and put people off before they ever reached the tool.
+    answer: "Yes, all calculators on AiTaxBot are 100% free with unlimited usage — no fees, no paywall, ever. You'll see your result straight away, no account needed. Creating a free account unlocks the detailed breakdown, the old vs new regime comparison, saved history and PDF download. We offer Income Tax, HRA, SIP, SWP, NPS, PF, Home Loan, Vehicle Loan, and Trading Tax calculators updated for FY 2026-27 (AY 2027-28)."
   },
   {
     question: "Are the calculators updated for the latest tax rules?",
@@ -284,7 +289,7 @@ export default function Calculators() {
         {/* Page header */}
         <header className="bg-white border-b border-slate-100">
           <div className="max-w-7xl mx-auto px-6 pt-4">
-            <nav className="flex items-center gap-1.5 text-xs text-slate-400" aria-label="Breadcrumb">
+            <nav className="flex items-center gap-1.5 text-xs text-slate-500" aria-label="Breadcrumb">
               <Link href="/" className="hover:text-blue-600 transition-colors">Home</Link>
               <span className="text-slate-300">/</span>
               <span className="text-slate-600 font-medium">Calculators</span>

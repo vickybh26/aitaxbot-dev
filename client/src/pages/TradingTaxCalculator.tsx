@@ -316,7 +316,7 @@ export default function TradingTaxCalculatorPage() {
         {/* Disclaimer */}
         <section className="py-8 px-6 bg-white border-t border-slate-100">
           <div className="max-w-5xl mx-auto">
-            <p className="text-xs text-slate-400 leading-relaxed">
+            <p className="text-xs text-slate-500 leading-relaxed">
               <strong>Disclaimer:</strong> This calculator is for educational and informational purposes only. It uses
               approximate exchange rates from the ECB/Frankfurter API which may differ from official RBI/FBIL rates.
               Tax calculations are based on Indian tax law for FY 2025-26 (AY 2026-27). Surcharge and health &

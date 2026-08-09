@@ -94,7 +94,7 @@ export default function AdminLeads() {
 
         {/* Table */}
         {isLoading ? (
-          <div className="flex items-center justify-center py-20 text-slate-400">
+          <div className="flex items-center justify-center py-20 text-slate-500">
             <RefreshCw className="h-5 w-5 animate-spin mr-2" /> Loading…
           </div>
         ) : isError ? (
@@ -105,7 +105,7 @@ export default function AdminLeads() {
             <button onClick={() => refetch()} className="text-xs text-persian-blue-600 hover:underline">Retry</button>
           </div>
         ) : leads.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-slate-400 gap-2">
+          <div className="flex flex-col items-center justify-center py-20 text-slate-500 gap-2">
             <Users className="h-10 w-10 opacity-40" />
             <p>No leads yet. They'll appear here once users calculate their tax and enter their details.</p>
           </div>

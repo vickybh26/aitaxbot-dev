@@ -16,6 +16,7 @@ import {
 import { logout } from "@/lib/firebase";
 import { cn } from "@/lib/utils";
 import logoImage from "@assets/aitaxbot-logo.png";
+import ModalShell from "@/components/ui/modal-shell";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, minLevel: 3 },
@@ -131,12 +132,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
-        <div className="fixed inset-0 z-50 flex md:hidden">
+        <ModalShell
+          onClose={() => setSidebarOpen(false)}
+          label="Admin navigation"
+          closeOnOverlayClick={false}
+          className="fixed inset-0 z-50 flex md:hidden"
+        >
           <div className="fixed inset-0 bg-black/60" onClick={() => setSidebarOpen(false)} />
           <div className="relative z-50">
             <Sidebar mobile />
           </div>
-        </div>
+        </ModalShell>
       )}
 
       {/* Main content */}

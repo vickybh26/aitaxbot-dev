@@ -42,23 +42,31 @@ export default function PrivacyPolicy() {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. What Data We Collect</h2>
 
-              <h3 className="text-xl font-semibold text-gray-900 mb-3 mt-6">1a. Calculator Inputs (No Storage)</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3 mt-6">1a. Calculator Inputs</h3>
               <div className="bg-green-50 border-l-4 border-green-400 p-6 mb-6">
                 <p className="text-green-800 font-medium mb-2">
-                  Financial data you enter into our calculators — income, investments, HRA, loans — is
-                  processed entirely in your browser session.
+                  The tax and investment maths runs in your browser. If you are not signed in, we do not
+                  store anything you type into a calculator, and it is cleared when you close the page.
+                </p>
+                <p className="text-green-700 text-sm mb-2">
+                  <strong>If you are signed in</strong>, the figures you entered and the result are saved to
+                  your account so the tool can show you your latest result on your dashboard and pre-fill
+                  itself when you return. You can delete any saved result from your dashboard, and deleting
+                  your account removes all of them.
                 </p>
                 <p className="text-green-700 text-sm">
-                  This data is never sent to our servers, never stored in any database, and is permanently
-                  cleared when you close or refresh the page. No exceptions.
+                  <strong>AI tax tips.</strong> Where a calculator offers AI-generated suggestions, the
+                  figures for that calculation are sent to our AI provider (Google Gemini) to produce them.
+                  They are used only to answer that request and are not used to train models.
                 </p>
               </div>
 
-              <h3 className="text-xl font-semibold text-gray-900 mb-3 mt-6">1b. Account Registration (Required to View Results)</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3 mt-6">1b. Account Registration (Optional)</h3>
               <p className="text-gray-700 mb-3">
-                A free account (sign in or sign up) is required to view the result of any calculator.
-                Educational content — blog articles and the NRI Corner — remains accessible without an
-                account. When you create an account, we collect and store in Firebase:
+                You do not need an account to use a calculator or to see your headline result. A free
+                account unlocks the detailed breakdown, regime comparison, saved history and PDF download.
+                Educational content — blog articles and the NRI Corner — is open to everyone. When you
+                create an account, we collect and store in Firebase:
               </p>
               <ul className="list-disc pl-6 mb-4 text-gray-700 space-y-1">
                 <li>Full name</li>

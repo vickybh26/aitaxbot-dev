@@ -1,7 +1,8 @@
-import { ReactNode } from "react";
+import { ReactNode, useId } from "react";
 import { X } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import ModalShell from "@/components/ui/modal-shell";
 
 interface ModalProps {
   isOpen: boolean;
@@ -12,6 +13,7 @@ interface ModalProps {
 }
 
 export default function Modal({ isOpen, onClose, title, children, size = "4xl" }: ModalProps) {
+  const titleId = useId();
   if (!isOpen) return null;
 
   const sizeClasses = {
@@ -25,16 +27,24 @@ export default function Modal({ isOpen, onClose, title, children, size = "4xl" }
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <ModalShell
+      onClose={onClose}
+      labelledBy={titleId}
+      /* Overlay unified to bg-black/50 — this was the only one using the
+         legacy `bg-black bg-opacity-50` pair, so backdrops differed slightly
+         from dialog to dialog across the site. */
+      className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+    >
       <Card className={`bg-white rounded-xl ${sizeClasses[size]} w-full max-h-[90vh] overflow-y-auto`}>
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
+            <h2 id={titleId} className="text-2xl font-bold text-slate-900">{title}</h2>
             <Button
               variant="ghost"
               size="sm"
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-700"
+              className="text-slate-500 hover:text-slate-700"
+              aria-label="Close"
               data-testid="button-close-modal"
             >
               <X className="h-5 w-5" />
@@ -43,6 +53,6 @@ export default function Modal({ isOpen, onClose, title, children, size = "4xl" }
           {children}
         </div>
       </Card>
-    </div>
+    </ModalShell>
   );
 }

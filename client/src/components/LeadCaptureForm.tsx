@@ -89,7 +89,7 @@ export default function LeadCaptureForm({ source, summaryText }: Props) {
       {/* Dismiss */}
       <button
         onClick={() => setDismissed(true)}
-        className="absolute top-3 right-3 text-slate-400 hover:text-slate-600 p-1 rounded-full hover:bg-white/60 transition-colors"
+        className="absolute top-3 right-3 text-slate-500 hover:text-slate-600 p-1 rounded-full hover:bg-white/60 transition-colors"
         aria-label="Dismiss"
       >
         <X className="w-4 h-4" />
@@ -119,30 +119,30 @@ export default function LeadCaptureForm({ source, summaryText }: Props) {
             onChange={(e) => setName(e.target.value)}
             placeholder="Your name"
             required
-            className="flex-1 h-9 px-3 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-slate-400"
+            className="flex-1 h-9 px-3 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-slate-500"
           />
           <div className="relative flex-1">
-            <Mail className="absolute left-2.5 top-2 w-4 h-4 text-slate-400" />
+            <Mail className="absolute left-2.5 top-2 w-4 h-4 text-slate-500" />
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email address"
               required
-              className="w-full h-9 pl-8 pr-3 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-slate-400"
+              className="w-full h-9 pl-8 pr-3 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-slate-500"
             />
           </div>
         </div>
 
         {/* WhatsApp (optional) */}
         <div className="relative">
-          <Phone className="absolute left-2.5 top-2 w-4 h-4 text-slate-400" />
+          <Phone className="absolute left-2.5 top-2 w-4 h-4 text-slate-500" />
           <input
             type="tel"
             value={whatsapp}
             onChange={(e) => setWhatsapp(e.target.value)}
             placeholder="WhatsApp number (optional — for filing reminders)"
-            className="w-full h-9 pl-8 pr-3 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-slate-400"
+            className="w-full h-9 pl-8 pr-3 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-slate-500"
           />
         </div>
 
@@ -162,7 +162,7 @@ export default function LeadCaptureForm({ source, summaryText }: Props) {
           )}
         </button>
 
-        <p className="text-xs text-slate-400 text-center">
+        <p className="text-xs text-slate-500 text-center">
           No spam. Unsubscribe anytime. We never share your details.
         </p>
       </form>

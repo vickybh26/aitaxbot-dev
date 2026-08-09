@@ -337,7 +337,7 @@ export default function CAMyProfile() {
                     className="mt-1"
                     placeholder="Brief description of your expertise and services (max 600 characters)"
                   />
-                  <p className="text-xs text-gray-400 mt-1 text-right">{form.bio.length}/600</p>
+                  <p className="text-xs text-slate-500 mt-1 text-right">{form.bio.length}/600</p>
                 </div>
 
                 <div className="flex gap-3 pt-2">

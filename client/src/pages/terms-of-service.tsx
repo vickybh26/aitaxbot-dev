@@ -204,8 +204,9 @@ export default function TermsOfService() {
                 details on what we collect, how we use it, and your rights as a Data Principal.
               </p>
               <p className="text-gray-700">
-                Key points: calculator inputs are never stored; account data is stored in Firebase; you may
-                request deletion of your data at any time.
+                Key points: calculations run in your browser and nothing is saved unless you are signed in;
+                account data and saved results are stored in Firebase; figures are sent to our AI provider
+                only when you use an AI-assisted feature; you may request deletion of your data at any time.
               </p>
             </section>
 

@@ -50,21 +50,12 @@ export default function IncomeTaxCalculatorPage() {
 
   useEffect(() => {
     trackPageView('/calculators/income-tax', 'Income Tax Calculator India FY 2026-27 — New vs Old Regime | AiTaxBot');
-
-    // Disable browser print (Ctrl+P / Cmd+P)
-    const blockPrint = (e: KeyboardEvent) => {
-      if (e.key === 'p' && (e.ctrlKey || e.metaKey)) {
-        e.preventDefault();
-      }
-    };
-    document.addEventListener('keydown', blockPrint);
-    // Override window.print so programmatic calls also do nothing
-    const origPrint = window.print;
-    window.print = () => {};
-    return () => {
-      document.removeEventListener('keydown', blockPrint);
-      window.print = origPrint;
-    };
+    // The Ctrl+P interception and the window.print override that used to sit
+    // here have been removed along with the sitewide print blackout. Printing
+    // is now handled by a proper print stylesheet in index.css: site chrome is
+    // stripped, the computation is kept, and a "not a filed return" line is
+    // appended. The Download PDF button is still the better artefact and
+    // remains the promoted path — it just no longer needs to be the only one.
   }, []);
 
   function handleCalculated(summaryText: string) {

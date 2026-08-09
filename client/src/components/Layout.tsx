@@ -11,8 +11,20 @@ interface LayoutProps {
 export default function Layout({ children, showModal }: LayoutProps) {
   return (
     <div className="min-h-screen bg-white flex flex-col">
+      {/* Skip link. On a calculator page a keyboard user previously had to tab
+          through the logo, six nav links, a dropdown, a CTA and the login link
+          before reaching the first form field — on every single page load.
+          Visually hidden until focused, then rendered as a normal button. */}
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100]
+                   focus:px-4 focus:py-2.5 focus:rounded-lg focus:bg-persian-blue-700
+                   focus:text-white focus:text-sm focus:font-semibold focus:shadow-lg"
+      >
+        Skip to main content
+      </a>
       <Header showModal={showModal} />
-      <main className="w-full flex-1">
+      <main id="main" tabIndex={-1} className="w-full flex-1">
         {children}
       </main>
       <Footer />

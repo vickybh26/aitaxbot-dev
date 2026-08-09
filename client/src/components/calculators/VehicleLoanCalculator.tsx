@@ -249,7 +249,7 @@ export default function VehicleLoanCalculator() {
             </div>
             <div>
               <Label className="text-sm font-medium text-slate-700">
-                Down Payment (₹) <span className="text-slate-400 font-normal">— {downPct}% of price</span>
+                Down Payment (₹) <span className="text-slate-500 font-normal">— {downPct}% of price</span>
               </Label>
               <Input
                 type="number"
@@ -404,7 +404,7 @@ export default function VehicleLoanCalculator() {
               </div>
             ) : (
               <div className="flex items-center justify-center h-full min-h-[260px] bg-slate-50 rounded-xl border border-dashed border-slate-300">
-                <div className="text-center text-slate-400">
+                <div className="text-center text-slate-500">
                   <div className="text-5xl mb-3">{d.emoji}</div>
                   <p className="font-medium text-slate-500">Enter details and click Calculate</p>
                   <p className="text-sm mt-1">Compare Reducing vs Flat rate impact</p>

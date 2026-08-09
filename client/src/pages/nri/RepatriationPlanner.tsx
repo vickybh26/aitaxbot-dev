@@ -650,7 +650,7 @@ export default function RepatriationPlanner() {
               <details key={idx} className="bg-white border border-gray-200 rounded-lg p-6 group cursor-pointer hover:shadow-md transition-shadow">
                 <summary className="font-semibold text-gray-900 flex items-start justify-between">
                   <span>{faq.q}</span>
-                  <ChevronRight size={20} className="text-gray-400 group-open:rotate-90 transition-transform flex-shrink-0 mt-1 ml-2" />
+                  <ChevronRight size={20} className="text-slate-500 group-open:rotate-90 transition-transform flex-shrink-0 mt-1 ml-2" />
                 </summary>
                 <p className="text-gray-700 mt-4">{faq.a}</p>
               </details>

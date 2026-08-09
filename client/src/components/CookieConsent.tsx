@@ -117,7 +117,11 @@ export default function CookieConsent() {
 
   return (
     <div 
-      className="fixed bottom-0 left-0 right-0 z-50 animate-slide-up"
+      /* z-[60] — top of the shared bottom-edge stack (tab bar z-40, WhatsApp
+         FAB z-45). This banner is a blocking decision surface, so it should
+         cover the others rather than merely win on paint order, which is what
+         used to happen when all three sat at z-50. */
+      className="fixed bottom-0 left-0 right-0 z-[60] animate-slide-up"
       data-testid="cookie-consent-banner"
       role="dialog"
       aria-label="Cookie Consent"
@@ -180,7 +184,7 @@ export default function CookieConsent() {
               
               <button
                 onClick={handleRejectNonEssential}
-                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+                className="absolute top-4 right-4 text-slate-500 hover:text-gray-600 transition-colors"
                 aria-label="Close"
                 data-testid="button-close-banner"
               >
@@ -203,7 +207,7 @@ export default function CookieConsent() {
                 </div>
                 <button
                   onClick={() => setShowPreferences(false)}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                  className="text-slate-500 hover:text-gray-600 transition-colors"
                   aria-label="Close"
                   data-testid="button-close-preferences"
                 >
