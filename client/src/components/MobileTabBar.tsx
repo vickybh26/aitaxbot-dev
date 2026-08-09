@@ -23,7 +23,8 @@
  */
 
 import { Link, useLocation } from "wouter";
-import { LayoutGrid, Calculator, FileSearch, Wrench } from "lucide-react";
+import { LayoutGrid, Calculator, FileSearch, Wrench, Home as HomeIcon } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Tab {
   label: string;
@@ -33,8 +34,23 @@ interface Tab {
   matches?: string[];
 }
 
-const TABS: Tab[] = [
-  { label: "Dashboard", href: "/dashboard", icon: LayoutGrid, matches: ["/"] },
+/**
+ * Tab 1 is auth-aware.
+ *
+ * It used to be Dashboard unconditionally, with `matches: ["/"]` so it also lit
+ * up on the homepage. Two problems for the 99% of sessions that are first-time
+ * visitors: /dashboard is a ProtectedRoute, so the most likely first tap on the
+ * new navigation bounced them to /login?returnUrl=/dashboard — where the payoff
+ * is an empty dashboard — and the active state claimed they were on Dashboard
+ * while they were looking at the marketing page.
+ *
+ * Signed out they get Home; signed in they get Dashboard, where their saved
+ * results actually are.
+ */
+const tabsFor = (signedIn: boolean): Tab[] => [
+  signedIn
+    ? { label: "Dashboard", href: "/dashboard", icon: LayoutGrid }
+    : { label: "Home", href: "/", icon: HomeIcon },
   { label: "Calculators", href: "/calculators", icon: Calculator },
   { label: "AIS Check", href: "/tools/ais-26as-form16", icon: FileSearch },
   { label: "Tools", href: "/tools", icon: Wrench },
@@ -46,12 +62,17 @@ function isActive(tab: Tab, path: string): boolean {
   // exclude it from the Tools prefix to keep exactly one tab active.
   if (tab.href === "/tools/ais-26as-form16") return path === tab.href;
   if (tab.href === "/tools") return path === "/tools" || (path.startsWith("/tools/") && path !== "/tools/ais-26as-form16");
-  if (tab.href === "/dashboard") return path === "/dashboard" || path === "/";
+  // Exact match only — "/" is a prefix of every route, so a startsWith check
+  // would light the Home tab up on every page.
+  if (tab.href === "/") return path === "/";
+  if (tab.href === "/dashboard") return path === "/dashboard";
   return path === tab.href || path.startsWith(`${tab.href}/`);
 }
 
 export default function MobileTabBar() {
   const [location] = useLocation();
+  const { isAuthenticated } = useAuth();
+  const TABS = tabsFor(isAuthenticated);
 
   return (
     <nav

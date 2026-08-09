@@ -146,7 +146,7 @@ export default function PurchaseRegister({ firmId }: { firmId: string }) {
   });
 
   if (!firmId) {
-    return <div className="text-center py-8 text-gray-500">Please select a firm first</div>;
+    return <div className="text-center py-8 text-slate-500">Please select a firm first</div>;
   }
 
   if (isLoading) {
@@ -259,7 +259,7 @@ export default function PurchaseRegister({ firmId }: { firmId: string }) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Total Purchases</CardTitle>
+            <CardTitle className="text-sm font-medium text-slate-600">Total Purchases</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-red-600">{formatCurrency(totalPurchases)}</div>
@@ -267,7 +267,7 @@ export default function PurchaseRegister({ firmId }: { firmId: string }) {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Input GST Credit</CardTitle>
+            <CardTitle className="text-sm font-medium text-slate-600">Input GST Credit</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-600">{formatCurrency(totalTax)}</div>
@@ -275,7 +275,7 @@ export default function PurchaseRegister({ firmId }: { firmId: string }) {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Total Entries</CardTitle>
+            <CardTitle className="text-sm font-medium text-slate-600">Total Entries</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-persian-blue-700">{totalEntries}</div>
@@ -292,7 +292,7 @@ export default function PurchaseRegister({ firmId }: { firmId: string }) {
         </CardHeader>
         <CardContent>
           {registers.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-slate-500">
               <TrendingDown className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <p>No purchase data yet.</p>
               <p className="text-sm mt-2">Add purchases to see your purchase register here.</p>

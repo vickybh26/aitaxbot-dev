@@ -34,8 +34,8 @@ export default function BlogPost() {
     return (
       <div className="flex items-center justify-center bg-slate-50">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Post Not Found</h1>
-          <p className="text-gray-600 mb-8">The blog post you're looking for doesn't exist.</p>
+          <h1 className="text-4xl font-bold text-slate-900 mb-4">Post Not Found</h1>
+          <p className="text-slate-600 mb-8">The blog post you're looking for doesn't exist.</p>
           <Link href="/blog">
             <Button data-testid="button-back-to-blog">
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -74,7 +74,7 @@ export default function BlogPost() {
           if (part.startsWith('*') && part.endsWith('*') && part.length > 2)
             return <em key={i}>{part.slice(1, -1)}</em>;
           if (part.startsWith('`') && part.endsWith('`'))
-            return <code key={i} className="bg-gray-100 rounded px-1 font-mono text-sm">{part.slice(1, -1)}</code>;
+            return <code key={i} className="bg-slate-100 rounded px-1 font-mono text-sm">{part.slice(1, -1)}</code>;
           return <span key={i}>{part}</span>;
         })}
       </>
@@ -89,7 +89,7 @@ export default function BlogPost() {
     // tableLines[1] is the |---|---| separator — skip it
     const rows = tableLines.slice(2).map(parseRow);
     return (
-      <div key={`tbl-${keyBase}`} className="overflow-x-auto my-6 rounded-lg border border-gray-200 shadow-sm">
+      <div key={`tbl-${keyBase}`} className="overflow-x-auto my-6 rounded-lg border border-slate-200 shadow-sm">
         <table className="w-full border-collapse text-sm">
           <thead>
             <tr className="bg-blue-700 text-white">
@@ -102,9 +102,9 @@ export default function BlogPost() {
           </thead>
           <tbody>
             {rows.map((row, ri) => (
-              <tr key={ri} className={`border-b border-gray-100 last:border-b-0 transition-colors hover:bg-blue-50 ${ri % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
+              <tr key={ri} className={`border-b border-slate-100 last:border-b-0 transition-colors hover:bg-blue-50 ${ri % 2 === 0 ? 'bg-white' : 'bg-slate-50'}`}>
                 {row.map((cell, ci) => (
-                  <td key={ci} className="px-4 py-3 text-gray-700 border-r border-gray-100 last:border-r-0">
+                  <td key={ci} className="px-4 py-3 text-slate-700 border-r border-slate-100 last:border-r-0">
                     {renderInline(cell)}
                   </td>
                 ))}
@@ -131,7 +131,7 @@ export default function BlogPost() {
       // Sub-sub heading: ### Foo
       if (trimmed.startsWith('### ')) {
         nodes.push(
-          <h4 key={i} className="text-xl font-bold text-gray-900 mt-8 mb-3">
+          <h4 key={i} className="text-xl font-bold text-slate-900 mt-8 mb-3">
             {renderInline(trimmed.slice(4))}
           </h4>
         );
@@ -141,7 +141,7 @@ export default function BlogPost() {
       // Sub heading: ## Foo
       if (trimmed.startsWith('## ')) {
         nodes.push(
-          <h3 key={i} className="text-2xl font-bold text-gray-900 mt-8 mb-3">
+          <h3 key={i} className="text-2xl font-bold text-slate-900 mt-8 mb-3">
             {renderInline(trimmed.slice(3))}
           </h3>
         );
@@ -150,7 +150,7 @@ export default function BlogPost() {
 
       // Horizontal rule
       if (trimmed === '---') {
-        nodes.push(<hr key={i} className="border-gray-200 my-6" />);
+        nodes.push(<hr key={i} className="border-slate-200 my-6" />);
         i++; continue;
       }
 
@@ -174,7 +174,7 @@ export default function BlogPost() {
           else break;
         }
         nodes.push(
-          <ul key={`ul-${i}`} className="list-disc pl-6 space-y-1 mb-4 text-gray-700">
+          <ul key={`ul-${i}`} className="list-disc pl-6 space-y-1 mb-4 text-slate-700">
             {items.map((item, idx) => <li key={idx}>{renderInline(item)}</li>)}
           </ul>
         );
@@ -189,7 +189,7 @@ export default function BlogPost() {
           i++;
         }
         nodes.push(
-          <ol key={`ol-${i}`} className="list-decimal pl-6 space-y-1 mb-4 text-gray-700">
+          <ol key={`ol-${i}`} className="list-decimal pl-6 space-y-1 mb-4 text-slate-700">
             {items.map((item, idx) => <li key={idx}>{renderInline(item)}</li>)}
           </ol>
         );
@@ -207,7 +207,7 @@ export default function BlogPost() {
         nodes.push(
           <ul key={`chk-${i}`} className="space-y-2 mb-4">
             {items.map((item, idx) => (
-              <li key={idx} className="flex items-start gap-2 text-gray-700">
+              <li key={idx} className="flex items-start gap-2 text-slate-700">
                 {renderInline(item)}
               </li>
             ))}
@@ -218,7 +218,7 @@ export default function BlogPost() {
 
       // Regular paragraph
       nodes.push(
-        <p key={i} className="mb-3 leading-relaxed text-gray-700">
+        <p key={i} className="mb-3 leading-relaxed text-slate-700">
           {renderInline(trimmed)}
         </p>
       );
@@ -255,10 +255,10 @@ export default function BlogPost() {
         {/* Breadcrumb */}
         <div className="bg-white border-b">
           <div className="max-w-4xl mx-auto px-6 py-4">
-            <div className="flex items-center gap-2 text-sm text-gray-600">
+            <div className="flex items-center gap-2 text-sm text-slate-600">
               <Link href="/blog" className="hover:text-blue-600">Blog</Link>
               <ChevronRight className="h-4 w-4" />
-              <span className="text-gray-900">{post.tags[0]}</span>
+              <span className="text-slate-900">{post.tags[0]}</span>
             </div>
           </div>
         </div>
@@ -274,11 +274,11 @@ export default function BlogPost() {
               ))}
             </div>
             
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight" data-testid="post-title">
+            <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6 leading-tight" data-testid="post-title">
               {post.metaTitle}
             </h1>
             
-            <div className="flex items-center gap-6 text-gray-600 mb-3 flex-wrap">
+            <div className="flex items-center gap-6 text-slate-600 mb-3 flex-wrap">
               <div className="flex items-center gap-2">
                 <Calendar className="h-5 w-5" />
                 <span>{post.publishedAt || "October 21, 2025"}</span>
@@ -303,10 +303,10 @@ export default function BlogPost() {
                 <UserCheck className="h-5 w-5 text-white" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-gray-900">
+                <p className="text-sm font-semibold text-slate-900">
                   Written by AiTaxBot Editorial Team
                 </p>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-slate-500">
                   Reviewed by a Chartered Accountant · Updated {post.publishedAt || "2025"} · All tax figures follow CBDT guidelines for FY 2026-27
                 </p>
               </div>
@@ -341,7 +341,7 @@ export default function BlogPost() {
 
               if (section.type === 'intro' || section.type === 'outro') {
                 sectionContent = (
-                  <div key={index} className="mb-8 text-lg leading-relaxed text-gray-700">
+                  <div key={index} className="mb-8 text-lg leading-relaxed text-slate-700">
                     {section.content_md && renderMarkdown(section.content_md)}
                   </div>
                 );
@@ -350,11 +350,11 @@ export default function BlogPost() {
               if (section.type === 'h2') {
                 sectionContent = (
                   <div key={index} className="mb-8">
-                    <h2 className="text-3xl font-bold text-gray-900 mb-4 mt-12" data-testid={`heading-${index}`}>
+                    <h2 className="text-3xl font-bold text-slate-900 mb-4 mt-12" data-testid={`heading-${index}`}>
                       {section.heading || section.title}
                     </h2>
                     {section.content_md && (
-                      <div className="text-gray-700 leading-relaxed">
+                      <div className="text-slate-700 leading-relaxed">
                         {renderMarkdown(section.content_md)}
                       </div>
                     )}
@@ -365,11 +365,11 @@ export default function BlogPost() {
               if (section.type === 'h3') {
                 sectionContent = (
                   <div key={index} className="mb-6">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-3 mt-8" data-testid={`subheading-${index}`}>
+                    <h3 className="text-2xl font-bold text-slate-900 mb-3 mt-8" data-testid={`subheading-${index}`}>
                       {section.heading || section.title}
                     </h3>
                     {section.content_md && (
-                      <div className="text-gray-700 leading-relaxed">
+                      <div className="text-slate-700 leading-relaxed">
                         {renderMarkdown(section.content_md)}
                       </div>
                     )}
@@ -380,14 +380,14 @@ export default function BlogPost() {
               if (section.type === 'faq') {
                 sectionContent = (
                   <Card key={index} className="p-6 mb-8 bg-blue-50 border-blue-200" data-testid="faq-section">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-6">Frequently Asked Questions</h3>
+                    <h3 className="text-2xl font-bold text-slate-900 mb-6">Frequently Asked Questions</h3>
                     <div className="space-y-4">
                       {section.items?.map((faq: { q: string; a: string }, faqIdx: number) => (
                         <div key={faqIdx} className="border-b border-blue-200 last:border-b-0 pb-4 last:pb-0">
-                          <p className="font-semibold text-gray-900 mb-2" data-testid={`faq-question-${faqIdx}`}>
+                          <p className="font-semibold text-slate-900 mb-2" data-testid={`faq-question-${faqIdx}`}>
                             Q: {faq.q}
                           </p>
-                          <p className="text-gray-700" data-testid={`faq-answer-${faqIdx}`}>
+                          <p className="text-slate-700" data-testid={`faq-answer-${faqIdx}`}>
                             A: {faq.a}
                           </p>
                         </div>
@@ -409,7 +409,7 @@ export default function BlogPost() {
                           <Link key={linkIdx} href={link.href}>
                             <Button
                               variant="secondary"
-                              className="bg-white text-blue-600 hover:bg-gray-100"
+                              className="bg-white text-blue-600 hover:bg-slate-100"
                               data-testid={`cta-link-${linkIdx}`}
                             >
                               {link.label}
@@ -458,14 +458,14 @@ export default function BlogPost() {
           </div>
 
           {/* Editorial Disclaimer — AdSense / E-E-A-T requirement */}
-          <div className="mt-12 bg-gray-50 border border-gray-200 rounded-xl p-5">
+          <div className="mt-12 bg-slate-50 border border-slate-200 rounded-xl p-5">
             <div className="flex items-start gap-3">
               <ShieldCheck className="h-5 w-5 text-slate-500 mt-0.5 shrink-0" />
               <div>
-                <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-1">
+                <p className="text-xs font-semibold text-slate-700 uppercase tracking-wide mb-1">
                   Editorial Disclaimer
                 </p>
-                <p className="text-xs text-gray-500 leading-relaxed">
+                <p className="text-xs text-slate-500 leading-relaxed">
                   This article is intended for general informational purposes only and does not constitute professional tax, legal, or financial advice. Tax laws and rates may change — always verify figures with the latest CBDT notifications or consult a qualified Chartered Accountant before making tax or investment decisions. AiTaxBot does not accept liability for decisions made based on this content.
                 </p>
                 <p className="text-xs text-slate-500 mt-2">
@@ -478,13 +478,13 @@ export default function BlogPost() {
           {/* Related Posts */}
           {post.relatedPosts && post.relatedPosts.length > 0 && (
             <div className="mt-12 pt-8 border-t" data-testid="related-posts">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Related Articles</h3>
+              <h3 className="text-xl font-bold text-slate-900 mb-4">Related Articles</h3>
               <div className="grid gap-3 sm:grid-cols-3">
                 {post.relatedPosts.map((related) => (
                   <Link key={related.slug} href={`/blog/${related.slug}`}>
-                    <div className="group flex items-start gap-3 p-4 rounded-lg border border-gray-200 hover:border-blue-400 hover:bg-blue-50 transition-colors cursor-pointer">
+                    <div className="group flex items-start gap-3 p-4 rounded-lg border border-slate-200 hover:border-blue-400 hover:bg-blue-50 transition-colors cursor-pointer">
                       <ChevronRight className="h-4 w-4 text-blue-500 mt-0.5 shrink-0 group-hover:translate-x-0.5 transition-transform" />
-                      <span className="text-sm font-medium text-gray-700 group-hover:text-blue-700 leading-snug">
+                      <span className="text-sm font-medium text-slate-700 group-hover:text-blue-700 leading-snug">
                         {related.title}
                       </span>
                     </div>

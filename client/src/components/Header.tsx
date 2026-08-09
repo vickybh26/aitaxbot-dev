@@ -97,7 +97,7 @@ export default function Header({ showModal }: HeaderProps = {}) {
               <img
                 src={logoImagePng}
                 alt="AiTaxBot Logo"
-                className="h-14 md:h-16 w-auto"
+                className="h-10 md:h-11 w-auto"
                 width={320}
                 height={195}
               />
@@ -137,7 +137,7 @@ export default function Header({ showModal }: HeaderProps = {}) {
             <Link
               href="/find-ca"
               onClick={() => trackButtonClick("Find a CA", "Header Navigation")}
-              className="flex items-center gap-1.5 text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+              className={`${navLink} flex items-center gap-1.5`}
               data-testid="link-header-find-ca"
             >
               <UserCheck className="w-4 h-4" />
@@ -260,7 +260,7 @@ export default function Header({ showModal }: HeaderProps = {}) {
               <Link
                 href={getLoginUrl()}
                 onClick={() => trackButtonClick("Login", "Header Navigation")}
-                className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                className={navLink}
                 data-testid="link-header-login"
               >
                 {t("nav.login")}
@@ -304,7 +304,7 @@ export default function Header({ showModal }: HeaderProps = {}) {
             </Link>
             <Link href="/accounting" onClick={() => setMobileMenuOpen(false)} className="py-2.5 text-sm font-medium text-slate-700 block">Accounting</Link>
             <Link href="/blog" onClick={() => setMobileMenuOpen(false)} className="py-2.5 text-sm font-medium text-slate-700 block">Blog</Link>
-            <Link href="/find-ca" onClick={() => { trackButtonClick("Find a CA", "Mobile Header"); setMobileMenuOpen(false); }} className="flex items-center gap-2 py-2.5 text-sm font-medium text-blue-600">
+            <Link href="/find-ca" onClick={() => { trackButtonClick("Find a CA", "Mobile Header"); setMobileMenuOpen(false); }} className="flex items-center gap-2 py-2.5 text-sm font-medium text-slate-700">
               <UserCheck className="w-4 h-4" />Find a CA
             </Link>
             <Link href="/ca/register" onClick={() => { trackButtonClick("List Your Practice", "Mobile Header"); setMobileMenuOpen(false); }} className="py-2.5 text-sm font-medium text-slate-700 block">
@@ -343,7 +343,7 @@ export default function Header({ showModal }: HeaderProps = {}) {
                 <Link
                   href={getLoginUrl()}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block bg-green-600 text-white text-center text-sm font-medium px-4 py-3 rounded-lg hover:bg-green-700 transition-colors"
+                  className="block border border-slate-300 text-slate-700 text-center text-sm font-medium px-4 py-3 rounded-lg hover:bg-slate-50 transition-colors"
                 >
                   {t("nav.login")}
                 </Link>

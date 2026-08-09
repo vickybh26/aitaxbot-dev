@@ -154,7 +154,7 @@ export default function FirmSetup({ onFirmSelected }: { onFirmSelected: (firmId:
             </div>
 
             <div className="space-y-4">
-              <h4 className="font-medium text-sm text-gray-700">Business Address</h4>
+              <h4 className="font-medium text-sm text-slate-700">Business Address</h4>
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-2">
                   <Label htmlFor="address">Address *</Label>
@@ -221,14 +221,14 @@ export default function FirmSetup({ onFirmSelected }: { onFirmSelected: (firmId:
                 <div>
                   <h3 className="font-semibold text-lg">{firm.firmName}</h3>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className={`text-xs px-2 py-1 rounded ${firm.isGstRegistered ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                    <span className={`text-xs px-2 py-1 rounded ${firm.isGstRegistered ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-800'}`}>
                       {firm.isGstRegistered ? 'GST Registered' : 'Non-GST'}
                     </span>
                   </div>
-                  {firm.isGstRegistered && firm.gstin && <p className="text-sm text-gray-600 mt-1">GSTIN: {firm.gstin}</p>}
-                  {firm.email && <p className="text-sm text-gray-600">{firm.email}</p>}
-                  {firm.phone && <p className="text-sm text-gray-600">{firm.phone}</p>}
-                  {firm.address && <p className="text-sm text-gray-600">{firm.address}, {firm.city}, {firm.state} - {firm.pincode}</p>}
+                  {firm.isGstRegistered && firm.gstin && <p className="text-sm text-slate-600 mt-1">GSTIN: {firm.gstin}</p>}
+                  {firm.email && <p className="text-sm text-slate-600">{firm.email}</p>}
+                  {firm.phone && <p className="text-sm text-slate-600">{firm.phone}</p>}
+                  {firm.address && <p className="text-sm text-slate-600">{firm.address}, {firm.city}, {firm.state} - {firm.pincode}</p>}
                 </div>
               </div>
               <Button
@@ -243,7 +243,7 @@ export default function FirmSetup({ onFirmSelected }: { onFirmSelected: (firmId:
         ))}
 
         {firms.length === 0 && !isCreating && (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-slate-500">
             No firms yet. Create your first firm to get started.
           </div>
         )}

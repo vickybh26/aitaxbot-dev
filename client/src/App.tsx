@@ -79,16 +79,11 @@ function ProtectedRoute({ component: Component }: { component: any }) {
     }
   }, [isAuthenticated, loading, location, setLocation]);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+  // Reuses <PageLoader/> rather than declaring a second spinner. There used to
+  // be three variants — h-10 persian-blue, h-12 blue-600, and a third on a dark
+  // background — and navigating to /dashboard rendered two of them in sequence,
+  // so the spinner visibly changed size and colour mid-load.
+  if (loading) return <PageLoader />;
 
   if (!isAuthenticated) {
     return null;
@@ -185,7 +180,13 @@ function Router() {
           <Route path="/profile">
             {() => <ProtectedRoute component={Profile} />}
           </Route>
-          <Route path="/accounting" component={AccountingDashboard} />
+          {/* Gated. This is a firm-management dashboard — client records,
+              invoices, sales and purchase registers — and it was a plain public
+              Route, so an anonymous visitor reaching it saw an empty business
+              tool with no explanation of who it was for. */}
+          <Route path="/accounting">
+            {() => <ProtectedRoute component={AccountingDashboard} />}
+          </Route>
           <Route path="/calculators" component={Calculators} />
           <Route path="/calculators/income-tax" component={IncomeTaxCalculator} />
           <Route path="/calculators/hra" component={HRACalculator} />

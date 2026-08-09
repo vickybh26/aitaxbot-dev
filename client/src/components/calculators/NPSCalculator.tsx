@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import ResultAuthGate from "@/components/ResultAuthGate";
+import { INTERACTIVE, SUCCESS, WHITE } from '@/lib/chartColors';
 
 interface NPSResult {
   totalCorpus: number;
@@ -124,9 +125,9 @@ export default function NPSCalculator() {
             Math.round(result.totalContributed),
             Math.round(result.totalReturns),
           ],
-          backgroundColor: ['#3b82f6', '#10b981'],
+          backgroundColor: [INTERACTIVE, SUCCESS],
           borderWidth: 2,
-          borderColor: '#ffffff'
+          borderColor: WHITE
         }]
       },
       options: {

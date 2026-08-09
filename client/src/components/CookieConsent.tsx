@@ -128,17 +128,17 @@ export default function CookieConsent() {
       aria-live="polite"
       data-nosnippet
     >
-      <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-t border-gray-200 dark:border-gray-700 shadow-2xl">
+      <div className="bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-2xl">
         <div className="max-w-7xl mx-auto px-4 py-6">
           {!showPreferences ? (
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div className="flex items-start gap-4 flex-1">
                 <Cookie className="w-8 h-8 text-persian-blue-600 flex-shrink-0 mt-1" />
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">
+                  <h3 className="font-semibold text-slate-900 mb-1">
                     We Value Your Privacy
                   </h3>
-                  <p className="text-sm text-gray-700 leading-relaxed">
+                  <p className="text-sm text-slate-700 leading-relaxed">
                     We use cookies to enhance your browsing experience, serve personalized ads or content, 
                     and analyze our traffic. By clicking "Accept All", you consent to our use of cookies. 
                     You can manage your preferences or learn more in our{" "}
@@ -184,7 +184,7 @@ export default function CookieConsent() {
               
               <button
                 onClick={handleRejectNonEssential}
-                className="absolute top-4 right-4 text-slate-500 hover:text-gray-600 transition-colors"
+                className="absolute top-4 right-4 text-slate-500 hover:text-slate-600 transition-colors"
                 aria-label="Close"
                 data-testid="button-close-banner"
               >
@@ -197,17 +197,17 @@ export default function CookieConsent() {
                 <div className="flex items-start gap-4">
                   <Cookie className="w-8 h-8 text-persian-blue-600 flex-shrink-0 mt-1" />
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-1">
+                    <h3 className="font-semibold text-slate-900 mb-1">
                       Cookie Preferences
                     </h3>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-slate-600">
                       Choose which types of cookies you want to allow
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={() => setShowPreferences(false)}
-                  className="text-slate-500 hover:text-gray-600 transition-colors"
+                  className="text-slate-500 hover:text-slate-600 transition-colors"
                   aria-label="Close"
                   data-testid="button-close-preferences"
                 >
@@ -217,19 +217,19 @@ export default function CookieConsent() {
 
               <div className="space-y-4">
                 {/* Essential Cookies */}
-                <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-start gap-4 p-4 bg-slate-50 rounded-lg">
                   <input
                     type="checkbox"
                     checked={preferences.essential}
                     disabled
-                    className="mt-1 w-4 h-4 rounded border-gray-300"
+                    className="mt-1 w-4 h-4 rounded border-slate-300"
                     data-testid="checkbox-essential"
                   />
                   <div className="flex-1">
-                    <h4 className="font-semibold text-gray-900 mb-1">
+                    <h4 className="font-semibold text-slate-900 mb-1">
                       Essential Cookies (Required)
                     </h4>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-slate-600">
                       These cookies are necessary for the website to function and cannot be disabled. 
                       They enable basic functions like page navigation and access to secure areas.
                     </p>
@@ -237,19 +237,19 @@ export default function CookieConsent() {
                 </div>
 
                 {/* Analytics Cookies */}
-                <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-start gap-4 p-4 bg-slate-50 rounded-lg">
                   <input
                     type="checkbox"
                     checked={preferences.analytics}
                     onChange={(e) => setPreferences({ ...preferences, analytics: e.target.checked })}
-                    className="mt-1 w-4 h-4 rounded border-gray-300 text-persian-blue-600 focus:ring-persian-blue-500"
+                    className="mt-1 w-4 h-4 rounded border-slate-300 text-persian-blue-600 focus:ring-persian-blue-500"
                     data-testid="checkbox-analytics"
                   />
                   <div className="flex-1">
-                    <h4 className="font-semibold text-gray-900 mb-1">
+                    <h4 className="font-semibold text-slate-900 mb-1">
                       Analytics Cookies
                     </h4>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-slate-600">
                       These cookies help us understand how visitors interact with our website 
                       (e.g., Google Analytics, Microsoft Clarity). This helps us improve our services.
                     </p>
@@ -257,19 +257,19 @@ export default function CookieConsent() {
                 </div>
 
                 {/* Advertising Cookies */}
-                <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-start gap-4 p-4 bg-slate-50 rounded-lg">
                   <input
                     type="checkbox"
                     checked={preferences.advertising}
                     onChange={(e) => setPreferences({ ...preferences, advertising: e.target.checked })}
-                    className="mt-1 w-4 h-4 rounded border-gray-300 text-persian-blue-600 focus:ring-persian-blue-500"
+                    className="mt-1 w-4 h-4 rounded border-slate-300 text-persian-blue-600 focus:ring-persian-blue-500"
                     data-testid="checkbox-advertising"
                   />
                   <div className="flex-1">
-                    <h4 className="font-semibold text-gray-900 mb-1">
+                    <h4 className="font-semibold text-slate-900 mb-1">
                       Advertising Cookies
                     </h4>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-slate-600">
                       These cookies are used by Google AdSense and other advertising partners 
                       to display relevant ads based on your browsing history. You can opt out 
                       via{" "}
@@ -286,7 +286,7 @@ export default function CookieConsent() {
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-3 justify-end pt-4 border-t border-gray-200">
+              <div className="flex flex-col sm:flex-row gap-3 justify-end pt-4 border-t border-slate-200">
                 <Button
                   variant="outline"
                   onClick={() => setShowPreferences(false)}

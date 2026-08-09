@@ -10,6 +10,7 @@ import {
   Activity,
   AlertTriangle,
 } from "lucide-react";
+import { NAVY, AXIS } from "@/lib/chartColors";
 import {
   AreaChart,
   Area,
@@ -184,27 +185,27 @@ export default function AdminDashboard() {
               <AreaChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="signupGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.2} />
-                    <stop offset="95%" stopColor="#4f46e5" stopOpacity={0} />
+                    <stop offset="5%" stopColor={NAVY} stopOpacity={0.2} />
+                    <stop offset="95%" stopColor={NAVY} stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                <CartesianGrid strokeDasharray="3 3" stroke={AXIS.gridSubtle} />
                 <XAxis
                   dataKey="label"
-                  tick={{ fontSize: 11, fill: "#94a3b8" }}
+                  tick={{ fontSize: 11, fill: AXIS.tick }}
                   tickLine={false}
                   interval={4}
                 />
-                <YAxis tick={{ fontSize: 11, fill: "#94a3b8" }} tickLine={false} allowDecimals={false} />
+                <YAxis tick={{ fontSize: 11, fill: AXIS.tick }} tickLine={false} allowDecimals={false} />
                 <Tooltip
                   contentStyle={{ borderRadius: 12, border: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.1)" }}
-                  labelStyle={{ color: "#334155", fontWeight: 600, fontSize: 12 }}
-                  itemStyle={{ color: "#4f46e5", fontSize: 12 }}
+                  labelStyle={{ color: AXIS.emphasis, fontWeight: 600, fontSize: 12 }}
+                  itemStyle={{ color: NAVY, fontSize: 12 }}
                 />
                 <Area
                   type="monotone"
                   dataKey="signups"
-                  stroke="#4f46e5"
+                  stroke={NAVY}
                   strokeWidth={2}
                   fill="url(#signupGrad)"
                   name="Signups"

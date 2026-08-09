@@ -135,8 +135,8 @@ export default function NRICorner() {
       <section className="py-14 px-6 bg-slate-50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-gray-900 mb-3">NRI Tax Tools</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">Everything an NRI needs to stay tax-compliant in India and maximise take-home income.</p>
+            <h2 className="text-3xl font-bold text-slate-900 mb-3">NRI Tax Tools</h2>
+            <p className="text-slate-600 max-w-2xl mx-auto">Everything an NRI needs to stay tax-compliant in India and maximise take-home income.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {nriTools.map((tool) => {
@@ -151,11 +151,11 @@ export default function NRICorner() {
                       </div>
                       <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${c.badge}`}>{tool.badge}</span>
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-persian-blue-800 transition-colors">{tool.title}</h3>
-                    <p className="text-gray-600 text-sm mb-4 leading-relaxed">{tool.description}</p>
+                    <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-persian-blue-800 transition-colors">{tool.title}</h3>
+                    <p className="text-slate-600 text-sm mb-4 leading-relaxed">{tool.description}</p>
                     <ul className="space-y-1.5 mb-5">
                       {tool.features.map((f, i) => (
-                        <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                        <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
                           <span className={`font-bold ${c.text} mt-0.5`}>✓</span>
                           {f}
                         </li>
@@ -175,22 +175,22 @@ export default function NRICorner() {
       {/* Why NRI Section */}
       <section className="py-14 px-6">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Why Indian Tax Is Complex for NRIs</h2>
+          <h2 className="text-2xl font-bold text-slate-900 mb-8 text-center">Why Indian Tax Is Complex for NRIs</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-red-50 border border-red-100 rounded-xl p-6">
               <div className="text-2xl mb-3">⚠️</div>
-              <h3 className="font-bold text-gray-900 mb-2">No 87A Rebate</h3>
-              <p className="text-sm text-gray-700">Resident Indians earning up to ₹12 lakh pay zero tax under Section 87A. NRIs don't get this benefit — they start paying tax from ₹3 lakh itself.</p>
+              <h3 className="font-bold text-slate-900 mb-2">No 87A Rebate</h3>
+              <p className="text-sm text-slate-700">Resident Indians earning up to ₹12 lakh pay zero tax under Section 87A. NRIs don't get this benefit — they start paying tax from ₹3 lakh itself.</p>
             </div>
             <div className="bg-orange-50 border border-orange-100 rounded-xl p-6">
               <div className="text-2xl mb-3">💸</div>
-              <h3 className="font-bold text-gray-900 mb-2">30% TDS on NRO Interest</h3>
-              <p className="text-sm text-gray-700">Banks deduct 30% TDS on NRO account interest — no threshold. DTAA can reduce this to 15% for US/UK/Canada NRIs, but most don't claim it.</p>
+              <h3 className="font-bold text-slate-900 mb-2">30% TDS on NRO Interest</h3>
+              <p className="text-sm text-slate-700">Banks deduct 30% TDS on NRO account interest — no threshold. DTAA can reduce this to 15% for US/UK/Canada NRIs, but most don't claim it.</p>
             </div>
             <div className="bg-blue-50 border border-blue-100 rounded-xl p-6">
               <div className="text-2xl mb-3">📋</div>
-              <h3 className="font-bold text-gray-900 mb-2">Repatriation Paperwork</h3>
-              <p className="text-sm text-gray-700">Moving money from India to abroad requires Form 15CA, Form 15CB (from a CA), and compliance with FEMA's USD 1 million annual limit for NRO accounts.</p>
+              <h3 className="font-bold text-slate-900 mb-2">Repatriation Paperwork</h3>
+              <p className="text-sm text-slate-700">Moving money from India to abroad requires Form 15CA, Form 15CB (from a CA), and compliance with FEMA's USD 1 million annual limit for NRO accounts.</p>
             </div>
           </div>
         </div>
@@ -199,15 +199,15 @@ export default function NRICorner() {
       {/* FAQ */}
       <section className="py-14 px-6 bg-slate-50">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">NRI Tax — Frequently Asked Questions</h2>
+          <h2 className="text-2xl font-bold text-slate-900 mb-8 text-center">NRI Tax — Frequently Asked Questions</h2>
           <div className="space-y-4">
             {faqItems.map((item, i) => (
               <details key={i} className="bg-white border border-slate-200 rounded-xl p-5 group">
-                <summary className="font-semibold text-gray-900 cursor-pointer list-none flex items-center justify-between">
+                <summary className="font-semibold text-slate-900 cursor-pointer list-none flex items-center justify-between">
                   {item.question}
                   <ChevronRight className="h-4 w-4 text-slate-500 group-open:rotate-90 transition-transform" />
                 </summary>
-                <p className="mt-3 text-gray-700 text-sm leading-relaxed">{item.answer}</p>
+                <p className="mt-3 text-slate-700 text-sm leading-relaxed">{item.answer}</p>
               </details>
             ))}
           </div>
@@ -226,7 +226,7 @@ export default function NRICorner() {
       {/* Also explore */}
       <section className="py-12 px-6">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-xl font-bold text-gray-900 mb-6 text-center">Also Explore — Indian Tax Calculators</h2>
+          <h2 className="text-xl font-bold text-slate-900 mb-6 text-center">Also Explore — Indian Tax Calculators</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
               { title: "Income Tax Calculator", link: "/calculators/income-tax", icon: "🧮" },
@@ -237,7 +237,7 @@ export default function NRICorner() {
               <Link key={item.link} href={item.link}>
                 <div className="bg-white border border-slate-200 rounded-xl p-4 text-center hover:border-persian-blue-300 hover:shadow-md transition-all cursor-pointer">
                   <div className="text-2xl mb-2">{item.icon}</div>
-                  <p className="text-sm font-medium text-gray-800">{item.title}</p>
+                  <p className="text-sm font-medium text-slate-800">{item.title}</p>
                 </div>
               </Link>
             ))}

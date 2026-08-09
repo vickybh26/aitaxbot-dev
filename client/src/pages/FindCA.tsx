@@ -125,7 +125,7 @@ export default function FindCA() {
 
       <div>
         {/* Hero */}
-        <div className="bg-gradient-to-br from-persian-blue-700 via-persian-blue-800 to-[#3a6fc4] text-white py-14 px-4">
+        <div className="bg-gradient-to-br from-persian-blue-700 via-persian-blue-800 to-persian-blue-500 text-white py-14 px-4">
           <div className="max-w-3xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 bg-white/20 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
               <Shield className="w-4 h-4" />
@@ -225,7 +225,7 @@ export default function FindCA() {
               >
                 {/* Avatar + name */}
                 <div className="flex items-start gap-3 mb-3">
-                  <div className="w-11 h-11 rounded-full bg-[#4685d8] flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                  <div className="w-11 h-11 rounded-full bg-persian-blue-500 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
                     {ca.fullName.charAt(0)}
                   </div>
                   <div className="min-w-0">
@@ -276,7 +276,7 @@ export default function FindCA() {
                 <div className="mt-auto flex gap-2">
                   <Button
                     size="sm"
-                    className="flex-1 bg-[#4685d8] hover:bg-blue-700 text-white text-xs h-8"
+                    className="flex-1 bg-persian-blue-700 hover:bg-persian-blue-800 text-white text-xs h-8"
                     onClick={() => { setContactCA(ca); setSent(false); }}
                   >
                     <Mail className="w-3.5 h-3.5 mr-1" />

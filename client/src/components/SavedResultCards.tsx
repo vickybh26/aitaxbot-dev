@@ -95,7 +95,7 @@ export default function SavedResultCards() {
       <div className="flex items-center justify-between mb-4">
         <h2
           id="saved-results-heading"
-          className="text-xl font-bold text-gray-900 flex items-center gap-2"
+          className="text-xl font-bold text-slate-900 flex items-center gap-2"
         >
           <Clock className="w-5 h-5 text-blue-600" />
           Where you left off

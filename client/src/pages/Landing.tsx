@@ -37,6 +37,7 @@ import TaxCalculator from "@/components/calculators/TaxCalculator";
 import HRACalculator from "@/components/calculators/HRACalculator";
 import SIPCalculator from "@/components/calculators/SIPCalculator";
 import SWPCalculator from "@/components/calculators/SWPCalculator";
+import { SUCCESS, NAVY, INTERACTIVE, SLATE_200 } from "@/lib/chartColors";
 
 interface NewsItem {
   title: string;
@@ -62,16 +63,27 @@ const latestBlogPosts = [...blogPosts]
     tag: p.tags[0] || "General",
   }));
 
+/**
+ * This grid previously assigned nine different icon colours — blue, violet,
+ * cyan, emerald, red, orange, navy, green, navy — to nine adjacent cards. A
+ * rainbow inside a design system whose stated first principle is "trust through
+ * restraint", and it broke the one hard rule in the palette: green means money
+ * gained, so colouring "Find a Verified CA" green made the colour meaningless.
+ *
+ * Every card is now navy on a navy tint. Emphasis is carried by the "Popular"
+ * and "New" badges, which is what badges are for — and with the colour noise
+ * gone they actually stand out.
+ */
 const TOOLS = [
-  { icon: Calculator, name: "Income Tax Calculator",  desc: "Old vs New Regime, 87A rebate, cess — AY 2027-28 ready.",                href: "/calculators/income-tax",  color: "text-blue-600",         bg: "bg-blue-50",         badge: "Popular" },
-  { icon: HomeIcon,   name: "HRA Calculator",         desc: "Section 10(13A) — 8 metro cities, actual rent, IT Act 2025.",            href: "/calculators/hra",         color: "text-violet-600",       bg: "bg-violet-50"        },
-  { icon: TrendingUp, name: "SIP Calculator",         desc: "Project mutual fund corpus with annual step-ups.",                       href: "/calculators/sip",         color: "text-cyan-600",         bg: "bg-cyan-50"          },
-  { icon: PiggyBank,  name: "NPS Calculator",         desc: "Model retirement corpus + ₹50K extra deduction under 80CCD(1B).", href: "/calculators/nps",         color: "text-emerald-600",      bg: "bg-emerald-50"       },
-  { icon: BarChart2,  name: "Trading Tax Calculator", desc: "STCG, LTCG and F&O tax for equity, MF, and VDA under IT Act 2025.",     href: "/calculators/trading-tax", color: "text-red-500",          bg: "bg-red-50"           },
-  { icon: FileText,   name: "Rent Receipt Generator", desc: "Generate stamped, AO-ready rent receipts as PDFs instantly.",           href: "/tools/rent-receipt",      color: "text-orange-500",       bg: "bg-orange-50"        },
-  { icon: Layers,     name: "AIS · 26AS · Form 16", desc: "AI spots mismatches across all three documents before notices.", href: "/tools/ais-26as-form16", color: "text-persian-blue-600", bg: "bg-persian-blue-50", badge: "New" },
-  { icon: UserCheck,  name: "Find a Verified CA",     desc: "Free introductions — capital gains, NRI filing, notice response.",      href: "/find-ca",                 color: "text-green-600",        bg: "bg-green-50"         },
-  { icon: BookOpen,   name: "Tax Guides & Blog",      desc: "34 in-depth articles on ITR, HRA, capital gains, and IT Act 2025.",    href: "/blog",                    color: "text-persian-blue-700",       bg: "bg-persian-blue-50"        },
+  { icon: Calculator, name: "Income Tax Calculator",  desc: "Old vs New Regime, 87A rebate, cess — AY 2027-28 ready.",           href: "/calculators/income-tax",  badge: "Popular" },
+  { icon: HomeIcon,   name: "HRA Calculator",         desc: "Section 10(13A) — 8 metro cities, actual rent, IT Act 2025.",       href: "/calculators/hra"          },
+  { icon: TrendingUp, name: "SIP Calculator",         desc: "Project mutual fund corpus with annual step-ups.",                  href: "/calculators/sip"          },
+  { icon: PiggyBank,  name: "NPS Calculator",         desc: "Model retirement corpus + ₹50K extra deduction under 80CCD(1B).",   href: "/calculators/nps"          },
+  { icon: BarChart2,  name: "Trading Tax Calculator", desc: "STCG, LTCG and F&O tax for equity, MF, and VDA under IT Act 2025.", href: "/calculators/trading-tax"  },
+  { icon: FileText,   name: "Rent Receipt Generator", desc: "Generate stamped, AO-ready rent receipts as PDFs instantly.",       href: "/tools/rent-receipt"       },
+  { icon: Layers,     name: "AIS · 26AS · Form 16",   desc: "AI spots mismatches across all three documents before notices.",    href: "/tools/ais-26as-form16", badge: "New" },
+  { icon: UserCheck,  name: "Find a Verified CA",     desc: "Free introductions — capital gains, NRI filing, notice response.",  href: "/find-ca"                  },
+  { icon: BookOpen,   name: "Tax Guides & Blog",      desc: "34 in-depth articles on ITR, HRA, capital gains, and IT Act 2025.", href: "/blog"                     },
 ] as const;
 
 function slab(income: number, tiers: [number, number][]): number {
@@ -173,7 +185,7 @@ function SavingsCard() {
             type="range" min={300000} max={5000000} step={50000} value={salary}
             onChange={e => setSalary(+e.target.value)}
             className="w-full h-1.5 rounded-full appearance-none cursor-pointer"
-            style={{ background: `linear-gradient(90deg,#16a34a 0%,#16a34a ${pct}%,#e2e8f0 ${pct}%,#e2e8f0 100%)` }}
+            style={{ background: `linear-gradient(90deg,${SUCCESS} 0%,${SUCCESS} ${pct}%,${SLATE_200} ${pct}%,${SLATE_200} 100%)` }}
           />
           <div className="flex justify-between text-xs text-slate-500 mt-1.5"><span>₹3L</span><span>₹50L</span></div>
         </div>
@@ -191,7 +203,7 @@ function SavingsCard() {
             </div>
           ))}
         </div>
-        <div className="rounded-xl p-5 text-white" style={{ background: "linear-gradient(135deg,#16a34a 0%,#22c55e 100%)" }}>
+        <div className="rounded-xl p-5 text-white" style={{ background: `linear-gradient(135deg,${SUCCESS} 0%,hsl(161 94% 38%) 100%)` }}>
           <div className="text-xs font-bold uppercase tracking-widest opacity-80 mb-1.5">You save vs the other regime</div>
           <div className="text-4xl font-black tabular-nums leading-none tracking-tight">{inr(animSaving)}</div>
           <div className="text-xs mt-2 opacity-80">Assumes ₹1.5L 80C claimed (Old Regime) · FY 2026-27</div>
@@ -265,7 +277,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
 
         {/* Hero */}
         <section className="relative bg-white overflow-hidden">
-          <div className="absolute inset-0 opacity-[0.025] pointer-events-none" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, #94a3b8 1px, transparent 0)", backgroundSize: "24px 24px" }} />
+          <div className="absolute inset-0 opacity-[0.025] pointer-events-none" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, #94A3B8 1px, transparent 0)", backgroundSize: "24px 24px" }} />
           <div className="relative max-w-7xl mx-auto px-4 py-16 lg:py-24">
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
               <div>
@@ -401,11 +413,11 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
               <p className="text-slate-500 max-w-xl mx-auto text-sm">Calculators, document tools, CA directory — all free, all built for India.</p>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {TOOLS.map(({ icon: Icon, name, desc, href, color, bg, badge }: any) => (
+              {TOOLS.map(({ icon: Icon, name, desc, href, badge }: any) => (
                 <Link key={href} href={href}
-                  className="group flex gap-4 p-5 bg-white rounded-2xl border border-slate-200 hover:border-blue-200 hover:shadow-md transition-all duration-200">
-                  <div className={cn("w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:scale-110", bg)}>
-                    <Icon className={cn("h-5 w-5", color)} />
+                  className="group flex gap-4 p-5 bg-white rounded-2xl border border-slate-200 hover:border-persian-blue-300 hover:shadow-md transition-all duration-200">
+                  <div className="w-11 h-11 rounded-xl bg-persian-blue-50 flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                    <Icon className="h-5 w-5 text-persian-blue-700" />
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 mb-1">
@@ -518,7 +530,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
         </section>
 
         {/* CTA Band */}
-        <section className="py-14 lg:py-16" style={{ background: "linear-gradient(135deg,#4685d8 0%,#2563eb 100%)" }}>
+        <section className="py-14 lg:py-16" style={{ background: `linear-gradient(135deg,${NAVY} 0%,${INTERACTIVE} 100%)` }}>
           <div className="max-w-7xl mx-auto px-4 text-center">
             <h2 className="text-3xl font-bold text-white tracking-tight mb-3">Ready to file smarter?</h2>
             <p className="text-white/80 mb-8 text-base max-w-xl mx-auto">Free calculators, CA-reviewed logic, AI document reconciliation — all in one place.</p>

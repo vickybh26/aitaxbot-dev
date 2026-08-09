@@ -1,7 +1,12 @@
 import type { Config } from "tailwindcss";
 
 export default {
-  darkMode: ["class"],
+  /* `darkMode: ["class"]` was declared here but there is no .dark token block
+     in index.css and nothing in the UI ever sets the class, so dark mode has
+     never been able to render. The 17 stray `dark:` utilities that had been
+     written against it have been removed; keeping the config flag would only
+     invite more. Re-add this along with a real .dark token block if dark mode
+     is ever actually built. */
   content: ["./client/index.html", "./client/src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {

@@ -147,7 +147,7 @@ function FileCard({
         ? "border-blue-400 bg-blue-50/50"
         : file
         ? `${selectedBorder} bg-green-50/20`
-        : "border-gray-200"
+        : "border-slate-200"
     }`}>
       {/* Drop zone */}
       <div
@@ -171,13 +171,13 @@ function FileCard({
             <FileText className="w-4 h-4 text-white" />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="font-bold text-sm text-gray-900">{label}</div>
+            <div className="font-bold text-sm text-slate-900">{label}</div>
             <div className="text-xs text-slate-500 truncate">{sublabel}</div>
           </div>
           {file && (
             <button
               onClick={(e) => { e.stopPropagation(); onSelect(null); }}
-              className="text-gray-300 hover:text-red-400 text-xl leading-none transition-colors"
+              className="text-slate-300 hover:text-red-400 text-xl leading-none transition-colors"
               title="Remove file"
             >×</button>
           )}
@@ -191,8 +191,8 @@ function FileCard({
             <span className="text-xs text-green-500 flex-shrink-0">{(file.size / 1024).toFixed(0)} KB</span>
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center border border-dashed border-gray-200 rounded-lg py-3 gap-1 bg-gray-50/50">
-            <Upload className="w-4 h-4 text-gray-300" />
+          <div className="flex flex-col items-center justify-center border border-dashed border-slate-200 rounded-lg py-3 gap-1 bg-slate-50/50">
+            <Upload className="w-4 h-4 text-slate-300" />
             <span className="text-xs text-slate-500">Click or drag PDF here</span>
           </div>
         )}
@@ -202,10 +202,10 @@ function FileCard({
 
       {/* Password toggle — collapsed by default */}
       <div
-        className="border-t border-gray-100 px-4 py-2.5"
+        className="border-t border-slate-100 px-4 py-2.5"
         onClick={(e) => e.stopPropagation()}
       >
-        <label className="flex items-center gap-2 cursor-pointer text-xs text-gray-500 select-none">
+        <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-500 select-none">
           <input
             type="checkbox"
             checked={hasPwd}
@@ -224,7 +224,7 @@ function FileCard({
             value={password}
             onChange={(e) => onPasswordChange(e.target.value)}
             placeholder={passwordHint ?? "Enter PDF password"}
-            className="w-full mt-2 text-xs border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-400 bg-white placeholder-gray-300"
+            className="w-full mt-2 text-xs border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-400 bg-white placeholder-slate-300"
           />
         )}
       </div>
@@ -507,10 +507,10 @@ export default function AIS26ASForm16Tool() {
                UPLOAD FORM
             ────────────────────────────────────────────────────────────── */
             <>
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="px-6 pt-5 pb-4 border-b border-gray-100">
-                  <h2 className="font-bold text-gray-900 text-lg">Upload Your Tax Documents</h2>
-                  <p className="text-sm text-gray-500 mt-1">
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div className="px-6 pt-5 pb-4 border-b border-slate-100">
+                  <h2 className="font-bold text-slate-900 text-lg">Upload Your Tax Documents</h2>
+                  <p className="text-sm text-slate-500 mt-1">
                     Get AIS & 26AS from the{" "}
                     <a href="https://www.incometax.gov.in" target="_blank" rel="noopener noreferrer"
                       className="text-blue-600 underline">Income Tax Portal</a>
@@ -537,8 +537,8 @@ export default function AIS26ASForm16Tool() {
                       label="Form 26AS"
                       sublabel="Annual Tax Statement (TRACES)"
                       tip="TDS credits by deductors — salary TDS (Section 192), bank TDS, advance tax."
-                      accentBg="bg-[#4685d8]"
-                      selectedBorder="border-[#4685d8]/60"
+                      accentBg="bg-persian-blue-500"
+                      selectedBorder="border-persian-blue-500/60"
                       file={form26asFile}
                       onSelect={setForm26asFile}
                       password={form26asPassword}
@@ -582,7 +582,7 @@ export default function AIS26ASForm16Tool() {
                               type="button"
                               onClick={() => removeForm16Slot(i)}
                               title="Remove this Form 16"
-                              className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-white border border-gray-300 text-slate-500 hover:text-red-500 hover:border-red-300 flex items-center justify-center text-xs shadow-sm"
+                              className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-white border border-slate-300 text-slate-500 hover:text-red-500 hover:border-red-300 flex items-center justify-center text-xs shadow-sm"
                             >×</button>
                           </div>
                         );
@@ -595,7 +595,7 @@ export default function AIS26ASForm16Tool() {
                       type="button"
                       onClick={addForm16Slot}
                       disabled={!form16Files[form16Files.length - 1]}
-                      className="mt-3 text-xs font-medium text-blue-600 hover:text-blue-700 disabled:text-gray-300 disabled:cursor-not-allowed"
+                      className="mt-3 text-xs font-medium text-blue-600 hover:text-blue-700 disabled:text-slate-300 disabled:cursor-not-allowed"
                     >
                       + Add another Form 16 — changed jobs this year?
                     </button>
@@ -604,7 +604,7 @@ export default function AIS26ASForm16Tool() {
                   {/* Progress */}
                   {loading && (
                     <div className="mt-4">
-                      <div className="flex justify-between text-xs text-gray-500 mb-1">
+                      <div className="flex justify-between text-xs text-slate-500 mb-1">
                         <span>{progressLabel}</span>
                         <span>{progress}%</span>
                       </div>
@@ -643,22 +643,22 @@ export default function AIS26ASForm16Tool() {
               </div>
 
               {/* How it works */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-                <h3 className="font-bold text-gray-900 mb-5">How It Works</h3>
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
+                <h3 className="font-bold text-slate-900 mb-5">How It Works</h3>
                 <div className="relative flex flex-col md:flex-row gap-5 md:gap-0">
                   {/* connector line */}
-                  <div className="hidden md:block absolute top-5 left-[calc(16.7%+20px)] right-[calc(16.7%+20px)] h-px bg-gray-200" />
+                  <div className="hidden md:block absolute top-5 left-[calc(16.7%+20px)] right-[calc(16.7%+20px)] h-px bg-slate-200" />
                   {[
                     { n: "1", title: "Upload your PDFs", desc: "AIS and Form 26AS from the Income Tax portal, plus Form 16 from each employer — changed jobs? Add up to 3.", color: "bg-blue-600" },
-                    { n: "2", title: "AI Reads & Extracts", desc: "AiTaxBot AI parses every page of your uploaded documents and pulls every salary, TDS, and income figure — even one document gives you a summary", color: "bg-[#4685d8]" },
+                    { n: "2", title: "AI Reads & Extracts", desc: "AiTaxBot AI parses every page of your uploaded documents and pulls every salary, TDS, and income figure — even one document gives you a summary", color: "bg-persian-blue-500" },
                     { n: "3", title: "Get Your Report", desc: "Instant mismatches with severity ratings, Indian tax law explanations, and exact action steps", color: "bg-green-600" },
                   ].map((s) => (
                     <div key={s.n} className="flex-1 flex flex-col items-center text-center px-4 relative">
                       <div className={`w-10 h-10 ${s.color} text-white rounded-full flex items-center justify-center font-bold text-lg mb-3 z-10 relative`}>
                         {s.n}
                       </div>
-                      <div className="font-semibold text-gray-900 text-sm mb-1">{s.title}</div>
-                      <div className="text-xs text-gray-500 leading-relaxed">{s.desc}</div>
+                      <div className="font-semibold text-slate-900 text-sm mb-1">{s.title}</div>
+                      <div className="text-xs text-slate-500 leading-relaxed">{s.desc}</div>
                     </div>
                   ))}
                 </div>
@@ -715,7 +715,7 @@ export default function AIS26ASForm16Tool() {
                       <span className={`inline-block mt-2 text-xs font-semibold px-2.5 py-0.5 rounded-full ${
                         report.extractedData.form16.newRegime
                           ? "bg-blue-100 text-blue-700"
-                          : "bg-gray-100 text-gray-700"
+                          : "bg-slate-100 text-slate-700"
                       }`}>
                         {report.extractedData.form16.newRegime
                           ? "New Tax Regime (Section 115BAC)"
@@ -728,7 +728,7 @@ export default function AIS26ASForm16Tool() {
                     disabled={downloadingPdf}
                     variant="outline"
                     size="sm"
-                    className="flex-shrink-0 bg-white border-gray-300 shadow-sm"
+                    className="flex-shrink-0 bg-white border-slate-300 shadow-sm"
                   >
                     {downloadingPdf
                       ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -748,20 +748,20 @@ export default function AIS26ASForm16Tool() {
 
               {/* ── Multiple Employers ─────────────────────────────────────── */}
               {report.multiEmployer && report.multiEmployer.employerCount > 1 && (
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                  <div className="px-5 py-4 border-b border-gray-100">
-                    <h3 className="font-bold text-gray-900">
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                  <div className="px-5 py-4 border-b border-slate-100">
+                    <h3 className="font-bold text-slate-900">
                       {report.multiEmployer.employerCount} Employers This Year
                     </h3>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-slate-500 mt-1">
                       Salary and TDS combined across all uploaded Form 16s — standard deduction counted once.
                     </p>
                   </div>
                   <div className="p-5 space-y-3">
                     {report.extractedData.form16Employers.map((emp, i) => (
-                      <div key={i} className="flex items-center justify-between gap-3 bg-gray-50 rounded-xl px-4 py-2.5 text-sm">
+                      <div key={i} className="flex items-center justify-between gap-3 bg-slate-50 rounded-xl px-4 py-2.5 text-sm">
                         <div className="min-w-0">
-                          <div className="font-semibold text-gray-800 truncate">
+                          <div className="font-semibold text-slate-800 truncate">
                             {emp.employerName || `Employer ${i + 1}`}
                           </div>
                           <div className="text-xs text-slate-500">
@@ -769,7 +769,7 @@ export default function AIS26ASForm16Tool() {
                           </div>
                         </div>
                         <div className="text-right flex-shrink-0">
-                          <div className="font-mono text-xs text-gray-700">{fmt(emp.grossSalary)} gross</div>
+                          <div className="font-mono text-xs text-slate-700">{fmt(emp.grossSalary)} gross</div>
                           <div className="font-mono text-xs text-green-700">{fmt(emp.totalTaxDeducted)} TDS</div>
                         </div>
                       </div>
@@ -782,12 +782,12 @@ export default function AIS26ASForm16Tool() {
                           : "bg-green-50 border border-green-200"
                       }`}>
                         <div className="flex justify-between text-sm mb-1">
-                          <span className="text-gray-600">Estimated combined tax liability</span>
-                          <span className="font-semibold text-gray-900">{fmt(report.multiEmployer.estimatedTaxLiability)}</span>
+                          <span className="text-slate-600">Estimated combined tax liability</span>
+                          <span className="font-semibold text-slate-900">{fmt(report.multiEmployer.estimatedTaxLiability)}</span>
                         </div>
                         <div className="flex justify-between text-sm mb-1">
-                          <span className="text-gray-600">Credited via TDS + advance tax (26AS)</span>
-                          <span className="font-semibold text-gray-900">{fmt(report.multiEmployer.creditedTax)}</span>
+                          <span className="text-slate-600">Credited via TDS + advance tax (26AS)</span>
+                          <span className="font-semibold text-slate-900">{fmt(report.multiEmployer.creditedTax)}</span>
                         </div>
                         {report.multiEmployer.estimatedShortfall != null && report.multiEmployer.estimatedShortfall > 1000 ? (
                           <div className="flex justify-between text-sm pt-2 mt-2 border-t border-red-200">
@@ -812,29 +812,29 @@ export default function AIS26ASForm16Tool() {
 
               {/* ── Recommended ITR Form ───────────────────────────────────── */}
               {report.recommendedITRForm && (
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                  <div className="px-5 py-4 border-b border-gray-100 flex items-start justify-between gap-4 flex-wrap">
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                  <div className="px-5 py-4 border-b border-slate-100 flex items-start justify-between gap-4 flex-wrap">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">Recommended ITR Form</p>
-                      <h3 className="font-bold text-xl text-gray-900">{report.recommendedITRForm.formLabel}</h3>
+                      <h3 className="font-bold text-xl text-slate-900">{report.recommendedITRForm.formLabel}</h3>
                     </div>
-                    <span className="text-xs bg-gray-100 text-gray-500 rounded-full px-3 py-1 mt-1">
+                    <span className="text-xs bg-slate-100 text-slate-500 rounded-full px-3 py-1 mt-1">
                       Based on your AIS, 26AS, and Form 16
                     </span>
                   </div>
                   <div className="p-5 space-y-3">
                     <ul className="space-y-1.5">
                       {report.recommendedITRForm.reasons.map((r, i) => (
-                        <li key={i} className="text-sm text-gray-700">{r}</li>
+                        <li key={i} className="text-sm text-slate-700">{r}</li>
                       ))}
                     </ul>
                     {report.recommendedITRForm.blockers.length > 0 && (
-                      <div className="pt-3 border-t border-gray-100">
-                        <p className="text-xs font-semibold text-gray-500 mb-1.5">Why not the simpler form:</p>
+                      <div className="pt-3 border-t border-slate-100">
+                        <p className="text-xs font-semibold text-slate-500 mb-1.5">Why not the simpler form:</p>
                         <ul className="space-y-1">
                           {report.recommendedITRForm.blockers.map((b, i) => (
-                            <li key={i} className="text-xs text-gray-500 flex items-start gap-1.5">
-                              <span className="mt-1 w-1 h-1 rounded-full bg-gray-400 flex-shrink-0" />
+                            <li key={i} className="text-xs text-slate-500 flex items-start gap-1.5">
+                              <span className="mt-1 w-1 h-1 rounded-full bg-slate-400 flex-shrink-0" />
                               {b}
                             </li>
                           ))}
@@ -853,14 +853,14 @@ export default function AIS26ASForm16Tool() {
               )}
 
               {/* ── Extracted Data Table ───────────────────────────────────── */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="px-5 py-4 border-b border-gray-100">
-                  <h3 className="font-bold text-gray-900">Extracted Data Comparison</h3>
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div className="px-5 py-4 border-b border-slate-100">
+                  <h3 className="font-bold text-slate-900">Extracted Data Comparison</h3>
                   {report.extractedData.form16.employerName && (
-                    <p className="text-xs text-gray-500 mt-1">
-                      Employer: <span className="font-medium text-gray-700">{report.extractedData.form16.employerName}</span>
+                    <p className="text-xs text-slate-500 mt-1">
+                      Employer: <span className="font-medium text-slate-700">{report.extractedData.form16.employerName}</span>
                       {report.extractedData.form16.employerTAN && (
-                        <> · TAN: <span className="font-medium text-gray-700">{report.extractedData.form16.employerTAN}</span></>
+                        <> · TAN: <span className="font-medium text-slate-700">{report.extractedData.form16.employerTAN}</span></>
                       )}
                     </p>
                   )}
@@ -869,10 +869,10 @@ export default function AIS26ASForm16Tool() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr>
-                        <th className="text-left px-4 py-3 text-gray-500 font-medium text-xs bg-gray-50 w-[44%]">Metric</th>
+                        <th className="text-left px-4 py-3 text-slate-500 font-medium text-xs bg-slate-50 w-[44%]">Metric</th>
                         <th className="text-right px-4 py-3 text-[11px] font-bold text-white bg-blue-600 w-[18.7%]">AIS</th>
                         <th className="text-right px-4 py-3 text-[11px] font-bold text-white bg-green-600 w-[18.7%]">Form 16</th>
-                        <th className="text-right px-4 py-3 text-[11px] font-bold text-white bg-[#4685d8] w-[18.7%]">26AS</th>
+                        <th className="text-right px-4 py-3 text-[11px] font-bold text-white bg-persian-blue-500 w-[18.7%]">26AS</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -881,8 +881,8 @@ export default function AIS26ASForm16Tool() {
                           Do not inline a local array here again. */}
                       {buildSummaryRows(report.extractedData, fmt)
                         .map(({ label, ais, form16: f16, form26as: f26 }, i) => (
-                        <tr key={i} className={i % 2 === 1 ? "bg-gray-50/60" : ""}>
-                          <td className="px-4 py-2.5 text-gray-700 text-sm">{label}</td>
+                        <tr key={i} className={i % 2 === 1 ? "bg-slate-50/60" : ""}>
+                          <td className="px-4 py-2.5 text-slate-700 text-sm">{label}</td>
                           <td className="px-4 py-2.5 text-right font-mono text-xs text-blue-700   bg-blue-50/30">{ais}</td>
                           <td className="px-4 py-2.5 text-right font-mono text-xs text-green-700  bg-green-50/30">{f16}</td>
                           <td className="px-4 py-2.5 text-right font-mono text-xs text-blue-700   bg-blue-50/40">{f26}</td>
@@ -894,8 +894,8 @@ export default function AIS26ASForm16Tool() {
               </div>
 
               {/* ── Reconciliation Checks ──────────────────────────────────── */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-                <h3 className="font-bold text-gray-900 mb-4">Reconciliation Checks</h3>
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
+                <h3 className="font-bold text-slate-900 mb-4">Reconciliation Checks</h3>
                 <div className="grid md:grid-cols-2 gap-2">
                   {report.checks.map((check, i) => (
                     <div
@@ -905,13 +905,13 @@ export default function AIS26ASForm16Tool() {
                           ? "bg-green-50 border-green-100"
                           : check.status === "MISMATCH"
                           ? "bg-red-50 border-red-100"
-                          : "bg-gray-50 border-gray-100"
+                          : "bg-slate-50 border-slate-100"
                       }`}
                     >
                       {CHECK_ICON_MAP[check.status] ?? CHECK_ICON_MAP["NOT_FOUND"]}
                       <div className="min-w-0">
-                        <div className="font-semibold text-xs text-gray-900">{check.name}</div>
-                        <div className="text-xs text-gray-600 mt-0.5 leading-relaxed">{check.note}</div>
+                        <div className="font-semibold text-xs text-slate-900">{check.name}</div>
+                        <div className="text-xs text-slate-600 mt-0.5 leading-relaxed">{check.note}</div>
                       </div>
                     </div>
                   ))}
@@ -920,8 +920,8 @@ export default function AIS26ASForm16Tool() {
 
               {/* ── Issues Found ───────────────────────────────────────────── */}
               {report.mismatches.length > 0 && (
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-                  <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
+                  <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
                     Issues Found
                     <span className="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">
                       {report.mismatches.length}
@@ -942,7 +942,7 @@ export default function AIS26ASForm16Tool() {
                             </span>
                             <div className="flex-1 min-w-0">
                               <div className={`font-semibold text-sm ${sev.text}`}>{m.title}</div>
-                              <div className="text-xs text-gray-600 mt-0.5 truncate">{m.description}</div>
+                              <div className="text-xs text-slate-600 mt-0.5 truncate">{m.description}</div>
                             </div>
                             {isOpen
                               ? <ChevronUp className="w-4 h-4 text-slate-500 flex-shrink-0" />
@@ -951,7 +951,7 @@ export default function AIS26ASForm16Tool() {
 
                           {isOpen && (
                             <div className="px-4 pb-4 space-y-3 border-t border-black/5 pt-3">
-                              <p className="text-sm text-gray-700">{m.description}</p>
+                              <p className="text-sm text-slate-700">{m.description}</p>
 
                               {/* Value chips */}
                               {(
@@ -983,14 +983,14 @@ export default function AIS26ASForm16Tool() {
 
                               <div className="bg-white/70 rounded-xl p-3 space-y-2 text-xs">
                                 <p>
-                                  <span className="font-semibold text-gray-800">Why this happens: </span>
-                                  <span className="text-gray-600">{m.ruleExplanation}</span>
+                                  <span className="font-semibold text-slate-800">Why this happens: </span>
+                                  <span className="text-slate-600">{m.ruleExplanation}</span>
                                 </p>
-                                <div className="flex items-start gap-2 pt-2 border-t border-gray-100">
+                                <div className="flex items-start gap-2 pt-2 border-t border-slate-100">
                                   <ArrowRight className="w-3.5 h-3.5 text-blue-600 flex-shrink-0 mt-0.5" />
                                   <p>
                                     <span className="font-semibold text-blue-800">What to do: </span>
-                                    <span className="text-gray-700">{m.suggestedAction}</span>
+                                    <span className="text-slate-700">{m.suggestedAction}</span>
                                   </p>
                                 </div>
                               </div>
@@ -1022,8 +1022,8 @@ export default function AIS26ASForm16Tool() {
 
               {/* ── Action Items ───────────────────────────────────────────── */}
               {report.actionItems.length > 0 && (
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-                  <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
+                  <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
                     <div className="w-6 h-6 bg-orange-500 rounded-md flex items-center justify-center flex-shrink-0">
                       <AlertTriangle className="w-3.5 h-3.5 text-white" />
                     </div>
@@ -1035,7 +1035,7 @@ export default function AIS26ASForm16Tool() {
                         <span className="w-6 h-6 rounded-full bg-orange-100 text-orange-700 text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
                           {i + 1}
                         </span>
-                        <span className="text-sm text-gray-700 leading-relaxed">{item}</span>
+                        <span className="text-sm text-slate-700 leading-relaxed">{item}</span>
                       </li>
                     ))}
                   </ol>
@@ -1044,11 +1044,11 @@ export default function AIS26ASForm16Tool() {
 
               {/* ── ITR Filing Impact ──────────────────────────────────────── */}
               {report.itrImpact && (
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-                  <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
+                  <h3 className="font-bold text-slate-900 mb-3 flex items-center gap-2">
                     <FileText className="w-5 h-5 text-blue-600" /> ITR Filing Impact
                   </h3>
-                  <p className="text-sm text-gray-700 leading-relaxed">{report.itrImpact}</p>
+                  <p className="text-sm text-slate-700 leading-relaxed">{report.itrImpact}</p>
                 </div>
               )}
 
@@ -1071,7 +1071,7 @@ export default function AIS26ASForm16Tool() {
                     setExpandedMismatch(null);
                   }}
                   variant="outline"
-                  className="border-gray-300"
+                  className="border-slate-300"
                 >
                   <RefreshCw className="w-4 h-4 mr-2" /> New
                 </Button>

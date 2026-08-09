@@ -170,7 +170,7 @@ export default function AuthModal({ open, onOpenChange, defaultTab = "login", to
                 <span className="w-full border-t" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-2 text-gray-500">Or continue with</span>
+                <span className="bg-white px-2 text-slate-500">Or continue with</span>
               </div>
             </div>
 
@@ -212,17 +212,17 @@ export default function AuthModal({ open, onOpenChange, defaultTab = "login", to
                   minLength={6}
                   data-testid="input-modal-signup-password"
                 />
-                <p className="text-xs text-gray-500 mt-1">Minimum 6 characters</p>
+                <p className="text-xs text-slate-500 mt-1">Minimum 6 characters</p>
               </div>
               <label className="flex items-start gap-2 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={signupConsent}
                   onChange={(e) => setSignupConsent(e.target.checked)}
-                  className="mt-0.5 h-4 w-4 rounded border-gray-300"
+                  className="mt-0.5 h-4 w-4 rounded border-slate-300"
                   data-testid="checkbox-modal-signup-consent"
                 />
-                <span className="text-xs text-gray-600">
+                <span className="text-xs text-slate-600">
                   I agree to AiTaxBot's{" "}
                   <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
                     Privacy Policy
@@ -248,7 +248,7 @@ export default function AuthModal({ open, onOpenChange, defaultTab = "login", to
                 <span className="w-full border-t" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-2 text-gray-500">Or continue with</span>
+                <span className="bg-white px-2 text-slate-500">Or continue with</span>
               </div>
             </div>
 

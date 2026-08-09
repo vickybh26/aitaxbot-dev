@@ -35,6 +35,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useTrackToolUse } from '@/hooks/useTrackToolUse';
 import { recommendITRForm, type ITRFormResult } from '@shared/itrFormSelector';
 import ResultAuthGate from '@/components/ResultAuthGate';
+import { SUCCESS, INTERACTIVE, AXIS } from '@/lib/chartColors';
 
 interface AiTip {
   title: string;
@@ -123,15 +124,15 @@ function RegimeChart({
   return (
     <ResponsiveContainer width="100%" height={180}>
       <BarChart data={data} barCategoryGap="30%" margin={{ top: 20, right: 16, left: 0, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-        <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#475569' }} axisLine={false} tickLine={false} />
+        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={AXIS.grid} />
+        <XAxis dataKey="name" tick={{ fontSize: 12, fill: AXIS.label }} axisLine={false} tickLine={false} />
         <YAxis hide />
         <Tooltip content={<CustomTooltip />} />
         <Bar dataKey="tax" radius={[6, 6, 0, 0]}>
           {data.map((entry, index) => (
             <Cell
               key={index}
-              fill={entry.winner ? '#059669' : '#3B82F6'}
+              fill={entry.winner ? SUCCESS : INTERACTIVE}
               opacity={entry.winner ? 1 : 0.65}
             />
           ))}
@@ -139,7 +140,7 @@ function RegimeChart({
             dataKey="tax"
             position="top"
             formatter={fmt}
-            style={{ fontSize: 11, fontWeight: 600, fill: '#334155' }}
+            style={{ fontSize: 11, fontWeight: 600, fill: AXIS.emphasis }}
           />
         </Bar>
       </BarChart>
@@ -1000,11 +1001,15 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
             <Calculator className="h-4 w-4" />
             <span>Calculator</span>
           </TabsTrigger>
-          <TabsTrigger value="results" className="flex items-center space-x-2">
+          {/* Results and Breakdown are disabled until a calculation exists.
+              Tabs imply peer views you can browse in any order, but this is a
+              strict sequence — you cannot have a result before you calculate.
+              Both were clickable from first paint and led to empty panels. */}
+          <TabsTrigger value="results" disabled={!result} className="flex items-center space-x-2" title={!result ? "Run a calculation first" : undefined}>
             <PieChart className="h-4 w-4" />
             <span>Results</span>
           </TabsTrigger>
-          <TabsTrigger value="breakdown" className="flex items-center space-x-2">
+          <TabsTrigger value="breakdown" disabled={!result} className="flex items-center space-x-2" title={!result ? "Run a calculation first" : undefined}>
             <ClipboardList className="h-4 w-4" />
             <span>Tax Breakdown</span>
           </TabsTrigger>
@@ -1813,7 +1818,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                   {/* Tips */}
                   <div className="space-y-3">
                     {aiAdvice.tips.map((tip, i) => (
-                      <div key={i} className={`bg-white rounded-lg p-3 border ${tip.priority === 'high' ? 'border-red-200' : tip.priority === 'medium' ? 'border-amber-200' : 'border-gray-200'}`}>
+                      <div key={i} className={`bg-white rounded-lg p-3 border ${tip.priority === 'high' ? 'border-red-200' : tip.priority === 'medium' ? 'border-amber-200' : 'border-slate-200'}`}>
                         <div className="flex items-start gap-2">
                           <div className="mt-0.5 shrink-0">
                             {tip.priority === 'high' ? <AlertTriangle className="w-4 h-4 text-red-500" /> :

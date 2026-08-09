@@ -166,7 +166,7 @@ export default function SWPCalculator({ onClose }: SWPCalculatorProps = {}) {
               type="button"
               onClick={() => setEnableInflation(!enableInflation)}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
-                enableInflation ? 'bg-persian-blue-600' : 'bg-gray-300'
+                enableInflation ? 'bg-persian-blue-600' : 'bg-slate-300'
               }`}
               data-testid="toggle-inflation"
             >
@@ -208,9 +208,9 @@ export default function SWPCalculator({ onClose }: SWPCalculatorProps = {}) {
 
       {/* Results */}
       <div className="space-y-4">
-        <Card className="bg-gray-50 p-5">
+        <Card className="bg-slate-50 p-5">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-gray-900">Withdrawal Plan Summary</h3>
+            <h3 className="font-semibold text-slate-900">Withdrawal Plan Summary</h3>
             {result?.inflationAdjusted && (
               <Badge className="bg-blue-100 text-blue-800 text-xs">Inflation-Adjusted</Badge>
             )}
@@ -220,7 +220,7 @@ export default function SWPCalculator({ onClose }: SWPCalculatorProps = {}) {
           ) : result && (
             <div className="space-y-3">
               <Card className="bg-white p-4">
-                <div className="text-sm text-gray-600">Initial Corpus</div>
+                <div className="text-sm text-slate-600">Initial Corpus</div>
                 <div className="text-2xl font-bold text-blue-600" data-testid="text-initial-corpus">
                   {formatCurrency(result.totalCorpus)}
                 </div>
@@ -228,14 +228,14 @@ export default function SWPCalculator({ onClose }: SWPCalculatorProps = {}) {
 
               <div className="grid grid-cols-2 gap-3">
                 <Card className="bg-white p-4">
-                  <div className="text-xs text-gray-500">Starting Withdrawal/mo</div>
+                  <div className="text-xs text-slate-500">Starting Withdrawal/mo</div>
                   <div className="text-lg font-bold text-persian-blue-700" data-testid="text-monthly-withdrawal">
                     {formatCurrency(result.startingMonthlyWithdrawal)}
                   </div>
                 </Card>
                 {result.inflationAdjusted && (
                   <Card className="bg-white p-4">
-                    <div className="text-xs text-gray-500">Final Withdrawal/mo</div>
+                    <div className="text-xs text-slate-500">Final Withdrawal/mo</div>
                     <div className="text-lg font-bold text-orange-500">
                       {formatCurrency(result.finalMonthlyWithdrawal)}
                     </div>
@@ -244,7 +244,7 @@ export default function SWPCalculator({ onClose }: SWPCalculatorProps = {}) {
               </div>
 
               <Card className="bg-white p-4">
-                <div className="text-sm text-gray-600">Corpus Duration</div>
+                <div className="text-sm text-slate-600">Corpus Duration</div>
                 <div className="text-2xl font-bold text-green-600" data-testid="text-corpus-duration">
                   {durationText}
                   {result.durationYears >= 50 && (
@@ -255,14 +255,14 @@ export default function SWPCalculator({ onClose }: SWPCalculatorProps = {}) {
 
               <div className="grid grid-cols-2 gap-3">
                 <Card className="bg-white p-4">
-                  <div className="text-xs text-gray-500">Total Withdrawals</div>
+                  <div className="text-xs text-slate-500">Total Withdrawals</div>
                   <div className="text-base font-bold text-orange-600" data-testid="text-total-withdrawals">
                     {formatCurrency(result.totalWithdrawals)}
                   </div>
                 </Card>
                 <Card className="bg-white p-4">
-                  <div className="text-xs text-gray-500">Remaining Corpus</div>
-                  <div className="text-base font-bold text-gray-600" data-testid="text-remaining-corpus">
+                  <div className="text-xs text-slate-500">Remaining Corpus</div>
+                  <div className="text-base font-bold text-slate-600" data-testid="text-remaining-corpus">
                     {formatCurrency(result.remainingCorpus)}
                   </div>
                 </Card>
@@ -274,11 +274,11 @@ export default function SWPCalculator({ onClose }: SWPCalculatorProps = {}) {
         {/* Year-by-year breakdown when inflation is enabled */}
         {result?.inflationAdjusted && result.yearlySnapshots.length > 1 && (
           <Card className="p-4">
-            <h4 className="text-sm font-semibold text-gray-700 mb-3">Year-by-Year Withdrawal (Inflation @ {inflationRate}%)</h4>
+            <h4 className="text-sm font-semibold text-slate-700 mb-3">Year-by-Year Withdrawal (Inflation @ {inflationRate}%)</h4>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b text-left text-gray-500 text-xs">
+                  <tr className="border-b text-left text-slate-500 text-xs">
                     <th className="pb-2">Year</th>
                     <th className="pb-2 text-right">Monthly</th>
                     <th className="pb-2 text-right">Corpus</th>
@@ -286,12 +286,12 @@ export default function SWPCalculator({ onClose }: SWPCalculatorProps = {}) {
                 </thead>
                 <tbody className="space-y-1">
                   {result.yearlySnapshots.map((snap) => (
-                    <tr key={snap.year} className="border-b border-gray-100">
-                      <td className="py-1.5 text-gray-600">Yr {snap.year}</td>
+                    <tr key={snap.year} className="border-b border-slate-100">
+                      <td className="py-1.5 text-slate-600">Yr {snap.year}</td>
                       <td className="py-1.5 text-right font-medium text-persian-blue-800">
                         {formatCurrency(snap.withdrawal)}
                       </td>
-                      <td className="py-1.5 text-right text-gray-600">
+                      <td className="py-1.5 text-right text-slate-600">
                         {formatCurrency(snap.corpus)}
                       </td>
                     </tr>

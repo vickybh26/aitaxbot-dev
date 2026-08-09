@@ -10,6 +10,7 @@ import {
   generateBreadcrumbSchema,
   generateOrganizationSchema
 } from '@/lib/structuredData';
+import { Layers, ArrowRight } from 'lucide-react';
 import { FAQSchema } from '@/components/faq-schema';
 import AuthorBox from '@/components/AuthorBox';
 import { ResponsiveAd, RectangleAd } from '@/components/AdBanner';
@@ -120,6 +121,47 @@ export default function IncomeTaxCalculatorPage() {
               onCalculated={handleCalculated}
               onGuestDownload={handleGuestDownloadRequest}
             />
+          </div>
+        </section>
+
+        {/* ── Next step: AIS / 26AS / Form 16 reconciliation ──────────────────
+            Placed immediately under the calculator, deliberately.
+
+            The reconciliation tool is the product's actual differentiator and
+            had recorded zero uses by a real user, against 391 views a week on
+            this page. It was reachable only from the header "More" dropdown,
+            the mobile tab bar and the footer — never from the moment where it
+            becomes relevant, which is right after someone has just worked out
+            what they owe and is wondering whether their documents agree.
+
+            Framed as the next step in the same job, not as a cross-sell. */}
+        <section className="pt-2 pb-6 px-6">
+          <div className="max-w-6xl mx-auto">
+            <Link
+              href="/tools/ais-26as-form16"
+              className="group flex flex-col sm:flex-row sm:items-center gap-4 p-5 rounded-2xl border border-persian-blue-200 bg-persian-blue-50 hover:border-persian-blue-300 hover:shadow-md transition-all"
+              data-testid="link-calc-to-reconcile"
+            >
+              <div className="w-11 h-11 rounded-xl bg-persian-blue-700 flex items-center justify-center flex-shrink-0">
+                <Layers className="h-5 w-5 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-sm font-bold text-slate-900">
+                    Next: check your figures against AIS, 26AS and Form 16
+                  </span>
+                  <span className="text-[10px] font-bold text-persian-blue-700 bg-white border border-persian-blue-200 px-1.5 py-0.5 rounded-full">
+                    New
+                  </span>
+                </div>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Knowing your tax is half the job. Upload your documents and our AI flags income the
+                  department already knows about but your Form 16 doesn't — the mismatches that trigger
+                  notices — before you file.
+                </p>
+              </div>
+              <ArrowRight className="h-4 w-4 text-persian-blue-700 flex-shrink-0 group-hover:translate-x-1 transition-transform" />
+            </Link>
           </div>
         </section>
 

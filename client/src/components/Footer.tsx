@@ -167,21 +167,19 @@ export default function Footer() {
                 ))}
               </ul>
               <div className="mt-6 p-3 bg-slate-800 rounded-lg">
+                {/* One address, on the canonical domain. There used to be two —
+                    info@aitaxbot.in and admin@aitaxbot.co.in — with no
+                    indication of which to use for what. On a page where people
+                    are deciding whether to trust you with financial data, a
+                    second address on a different TLD reads as either a typo or
+                    a different organisation. */}
                 <p className="text-xs text-slate-400 mb-1">Email us</p>
-                <div className="flex flex-col space-y-1.5">
-                  <a
-                    href="mailto:info@aitaxbot.in"
-                    className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
-                  >
-                    info@aitaxbot.in
-                  </a>
-                  <a
-                    href="mailto:admin@aitaxbot.co.in"
-                    className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
-                  >
-                    admin@aitaxbot.co.in
-                  </a>
-                </div>
+                <a
+                  href="mailto:admin@aitaxbot.co.in"
+                  className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                >
+                  admin@aitaxbot.co.in
+                </a>
               </div>
             </div>
           </div>

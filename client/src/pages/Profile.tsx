@@ -272,7 +272,7 @@ export default function Profile() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-600 mb-4">
+              <p className="text-sm text-slate-600 mb-4">
                 Permanently delete your AiTaxBot account and all associated personal data
                 (profile, saved calculation history, profile change logs). This cannot be
                 undone. Under India's Digital Personal Data Protection Act, 2023, you have
@@ -329,8 +329,8 @@ function InfoRow({ icon, label, value }: { icon: React.ReactNode; label: string;
     <div className="flex items-center gap-3">
       <div className="text-slate-500 shrink-0">{icon}</div>
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-gray-500">{label}</p>
-        <p className="text-sm font-medium text-gray-900 truncate">{value}</p>
+        <p className="text-xs text-slate-500">{label}</p>
+        <p className="text-sm font-medium text-slate-900 truncate">{value}</p>
       </div>
     </div>
   );

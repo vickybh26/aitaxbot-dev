@@ -523,7 +523,7 @@ export default function Dashboard() {
 
         {/* ── TAX SEASON CHECKLIST ── */}
         <div className="mb-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+          <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
             <CheckCircle className="w-5 h-5 text-blue-600" />
             Your ITR Filing Roadmap
           </h2>
@@ -557,7 +557,7 @@ export default function Dashboard() {
         {/* ── TAX SAVING SCOPE (Prosperr-style) ── */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+            <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-green-600" />
               Your Tax Saving Scope
             </h2>
@@ -671,7 +671,7 @@ export default function Dashboard() {
         {/* Saved Tax Calculations */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Saved Tax Calculations</h2>
+            <h2 className="text-2xl font-bold text-slate-900">Saved Tax Calculations</h2>
             <Link href="/calculators/income-tax">
               <Button variant="outline" className="text-blue-600 border-blue-600 hover:bg-blue-50">
                 <Calculator className="h-4 w-4 mr-2" />
@@ -688,8 +688,8 @@ export default function Dashboard() {
               ) : taxCalculations.length === 0 ? (
                 <div className="text-center py-12">
                   <Calculator className="h-12 w-12 text-slate-500 mx-auto mb-4" />
-                  <p className="text-gray-600 mb-2">No saved calculations</p>
-                  <p className="text-sm text-gray-500 mb-4">Use the Income Tax Calculator and click "Save Calculation" to store your results here.</p>
+                  <p className="text-slate-600 mb-2">No saved calculations</p>
+                  <p className="text-sm text-slate-500 mb-4">Use the Income Tax Calculator and click "Save Calculation" to store your results here.</p>
                   <Link href="/calculators/income-tax">
                     <Button variant="default">
                       Go to Tax Calculator
@@ -698,7 +698,7 @@ export default function Dashboard() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <p className="text-sm text-gray-500 mb-4">
+                  <p className="text-sm text-slate-500 mb-4">
                     Your last {taxCalculations.length} calculation{taxCalculations.length > 1 ? 's' : ''}. 
                     Calculations are automatically deleted after 30 days.
                   </p>
@@ -707,7 +707,7 @@ export default function Dashboard() {
                     return (
                       <div
                         key={calc.id}
-                        className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                        className="flex items-start gap-4 p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
                         data-testid={`saved-calc-${calc.id}`}
                       >
                         <div className="p-2 rounded-lg bg-blue-100">
@@ -715,7 +715,7 @@ export default function Dashboard() {
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
-                            <p className="font-semibold text-gray-900">
+                            <p className="font-semibold text-slate-900">
                               FY {calc.financialYear} (AY {calc.assessmentYear})
                             </p>
                             <span className={`px-2 py-0.5 text-xs rounded-full ${
@@ -726,11 +726,11 @@ export default function Dashboard() {
                               {calc.recommendedRegime === 'new' ? 'New Regime' : 'Old Regime'} Recommended
                             </span>
                           </div>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm text-slate-600">
                             Gross Income: ₹{parseFloat(calc.grossIncome).toLocaleString('en-IN')} • 
                             Tax Savings: ₹{parseFloat(calc.savings).toLocaleString('en-IN')}
                           </p>
-                          <div className="flex items-center gap-4 mt-1 text-xs text-gray-500">
+                          <div className="flex items-center gap-4 mt-1 text-xs text-slate-500">
                             <span className="flex items-center gap-1">
                               <Calendar className="h-3 w-3" />
                               Saved {formatDate(calc.createdAt)}
@@ -775,7 +775,7 @@ export default function Dashboard() {
 
         {/* Feature Cards */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Quick Access</h2>
+          <h2 className="text-2xl font-bold text-slate-900 mb-6">Quick Access</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {features.map((feature, index) => (
               <Link key={index} href={feature.link}>
@@ -784,7 +784,7 @@ export default function Dashboard() {
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
-                        <div className={`p-3 rounded-lg bg-gray-50 group-hover:scale-110 transition-transform`}>
+                        <div className={`p-3 rounded-lg bg-slate-50 group-hover:scale-110 transition-transform`}>
                           <feature.icon className={`h-6 w-6 ${feature.color}`} />
                         </div>
                         <div>
@@ -811,7 +811,7 @@ export default function Dashboard() {
         {/* Recent Calculator Activity */}
         <div>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Recent Calculator Activity</h2>
+            <h2 className="text-2xl font-bold text-slate-900">Recent Calculator Activity</h2>
           </div>
           <Card>
             <CardContent className="p-6">
@@ -822,8 +822,8 @@ export default function Dashboard() {
               ) : toolUsageEvents.length === 0 ? (
                 <div className="text-center py-12">
                   <Activity className="h-12 w-12 text-slate-500 mx-auto mb-4" />
-                  <p className="text-gray-600 mb-2">No calculator activity yet</p>
-                  <p className="text-sm text-gray-500">Use any calculator while logged in and your activity will appear here.</p>
+                  <p className="text-slate-600 mb-2">No calculator activity yet</p>
+                  <p className="text-sm text-slate-500">Use any calculator while logged in and your activity will appear here.</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -836,11 +836,11 @@ export default function Dashboard() {
                         <Calculator className="h-5 w-5 text-blue-600" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-gray-900 truncate">{event.tool}</p>
+                        <p className="font-semibold text-slate-900 truncate">{event.tool}</p>
                         {event.summary && (
-                          <p className="text-sm text-gray-600 mt-0.5 truncate">{event.summary}</p>
+                          <p className="text-sm text-slate-600 mt-0.5 truncate">{event.summary}</p>
                         )}
-                        <p className="text-xs text-gray-500 mt-0.5">{getTimeAgo(event.createdAt)}</p>
+                        <p className="text-xs text-slate-500 mt-0.5">{getTimeAgo(event.createdAt)}</p>
                       </div>
                     </div>
                   ))}
@@ -882,7 +882,7 @@ export default function Dashboard() {
 
           return (
             <div className="mb-8">
-              <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
                 <Calendar className="w-5 h-5 text-blue-600" />
                 {fyLabel}
               </h2>
@@ -898,9 +898,9 @@ export default function Dashboard() {
                       {item.past ? '✓' : <Calendar className="w-4 h-4" />}
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-gray-900">{item.display}</p>
-                      <p className="text-xs font-semibold text-gray-700">{item.label}</p>
-                      <p className="text-xs text-gray-500 leading-tight">{item.sub}</p>
+                      <p className="text-xs font-bold text-slate-900">{item.display}</p>
+                      <p className="text-xs font-semibold text-slate-700">{item.label}</p>
+                      <p className="text-xs text-slate-500 leading-tight">{item.sub}</p>
                     </div>
                   </div>
                 ))}

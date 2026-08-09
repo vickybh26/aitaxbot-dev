@@ -180,8 +180,8 @@ export default function CAMyProfile() {
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-blue-100 mb-4">
               <UserCog className="w-7 h-7 text-blue-600" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900">Update My CA Profile</h1>
-            <p className="text-gray-500 mt-2 text-sm">
+            <h1 className="text-3xl font-bold text-slate-900">Update My CA Profile</h1>
+            <p className="text-slate-500 mt-2 text-sm">
               Verify your identity, then update your listing in the AiTaxBot directory.
             </p>
           </div>
@@ -191,10 +191,10 @@ export default function CAMyProfile() {
             {[1, 2, 3].map((s) => (
               <div key={s} className="flex items-center gap-3">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold
-                  ${step === s ? "bg-blue-600 text-white" : step > s ? "bg-green-500 text-white" : "bg-gray-200 text-gray-500"}`}>
+                  ${step === s ? "bg-blue-600 text-white" : step > s ? "bg-green-500 text-white" : "bg-slate-200 text-slate-500"}`}>
                   {step > s ? "✓" : s}
                 </div>
-                {s < 3 && <div className={`w-12 h-0.5 ${step > s ? "bg-green-500" : "bg-gray-200"}`} />}
+                {s < 3 && <div className={`w-12 h-0.5 ${step > s ? "bg-green-500" : "bg-slate-200"}`} />}
               </div>
             ))}
           </div>
@@ -236,7 +236,7 @@ export default function CAMyProfile() {
                 <Button onClick={handleVerify} disabled={verifying} className="w-full">
                   {verifying ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Verifying…</> : "Verify & Continue"}
                 </Button>
-                <p className="text-xs text-gray-500 text-center">
+                <p className="text-xs text-slate-500 text-center">
                   Can't access your registered email?{" "}
                   <Link href="/contact" className="text-blue-600 hover:underline">Contact support</Link>.
                 </p>
@@ -357,8 +357,8 @@ export default function CAMyProfile() {
             <Card>
               <CardContent className="py-12 text-center">
                 <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-4" />
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Profile Updated!</h2>
-                <p className="text-gray-600 mb-6 max-w-sm mx-auto">
+                <h2 className="text-2xl font-bold text-slate-900 mb-2">Profile Updated!</h2>
+                <p className="text-slate-600 mb-6 max-w-sm mx-auto">
                   Your changes have been submitted for admin review. You'll receive a confirmation email once approved — usually within 1–2 business days.
                 </p>
                 <div className="flex gap-3 justify-center">

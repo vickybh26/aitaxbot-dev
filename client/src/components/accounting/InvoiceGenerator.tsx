@@ -286,7 +286,7 @@ export default function InvoiceGenerator({ firmId }: { firmId: string }) {
   });
 
   if (!firmId) {
-    return <div className="text-center py-8 text-gray-500">Please select a firm first</div>;
+    return <div className="text-center py-8 text-slate-500">Please select a firm first</div>;
   }
 
   return (
@@ -340,7 +340,7 @@ export default function InvoiceGenerator({ firmId }: { firmId: string }) {
 
         {/* GST/Non-GST Toggle - Only show if firm is GST registered */}
         {firm?.isGstRegistered && (
-          <div className="mb-6 p-4 border rounded-lg bg-gray-50 dark:bg-gray-800">
+          <div className="mb-6 p-4 border rounded-lg bg-slate-50">
             <div className="flex items-center space-x-3">
               <Switch
                 id="isGstInvoice"
@@ -351,7 +351,7 @@ export default function InvoiceGenerator({ firmId }: { firmId: string }) {
               <Label htmlFor="isGstInvoice" className="cursor-pointer font-medium">
                 GST Invoice
               </Label>
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+              <span className="text-sm text-slate-600">
                 {isGstInvoice ? "(GST will be calculated)" : "(No GST will be applied)"}
               </span>
             </div>
@@ -360,7 +360,7 @@ export default function InvoiceGenerator({ firmId }: { firmId: string }) {
 
         {/* Client Details Preview */}
         {client && (
-          <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded">
+          <div className="mb-6 p-4 bg-slate-50 rounded">
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <strong>Bill To:</strong> {client.clientName}
@@ -475,7 +475,7 @@ export default function InvoiceGenerator({ firmId }: { firmId: string }) {
                   )}
                   <div className="col-span-1">
                     <Label className="text-xs">Amount</Label>
-                    <Input value={item.amount} disabled className="bg-gray-100 dark:bg-gray-800" />
+                    <Input value={item.amount} disabled className="bg-slate-100" />
                   </div>
                   <div className="col-span-1 flex items-end">
                     {lineItems.length > 1 && (
@@ -561,7 +561,7 @@ export default function InvoiceGenerator({ firmId }: { firmId: string }) {
               <span>Grand Total:</span>
               <span>₹{totals.grandTotal.toFixed(2)}</span>
             </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">
+            <div className="text-sm text-slate-600">
               {amountInWords()}
             </div>
           </div>

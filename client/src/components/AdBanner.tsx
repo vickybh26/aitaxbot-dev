@@ -46,13 +46,29 @@ export function AdBanner({
   if (isPlaceholder) return null;
 
   return (
-    <div className={`ad-container ${className}`} role="complementary" aria-label="Advertisement">
+    /**
+     * min-height reserves the slot before the ad loads.
+     *
+     * All three slot IDs are still placeholders, so nothing renders today. The
+     * moment real IDs land, a ResponsiveAd and a RectangleAd would inflate
+     * directly beneath the result on every calculator page and push the content
+     * down — cumulative layout shift at the exact moment the user is reading
+     * their tax figure. Reserving the space now makes enabling ads a no-shift
+     * change. The value is derived from the requested format so a leaderboard
+     * doesn't reserve a rectangle's worth of height.
+     */
+    <div
+      className={`ad-container ${className}`}
+      role="complementary"
+      aria-label="Advertisement"
+      style={{ minHeight: format === 'leaderboard' ? 90 : format === 'rectangle' ? 250 : 100 }}
+    >
       <ins
         className="adsbygoogle"
-        style={{ 
+        style={{
           display: 'block',
           textAlign: 'center',
-          ...style 
+          ...style
         }}
         data-ad-client="ca-pub-6497933645628124"
         data-ad-slot={slot}

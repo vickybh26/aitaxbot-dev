@@ -4,6 +4,7 @@ import { Link } from "wouter";
 import { Globe, ChevronRight, AlertCircle, CreditCard, TrendingUp, BookOpen } from "lucide-react";
 import AuthorBox from "@/components/AuthorBox";
 import { AdBanner, ResponsiveAd, RectangleAd } from "@/components/AdBanner";
+import { NAVY, SLATE_200 } from "@/lib/chartColors";
 
 export default function NRONREComparison() {
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
@@ -126,7 +127,7 @@ export default function NRONREComparison() {
               <h2 className="text-2xl md:text-3xl font-bold text-red-700 mb-4">
                 Most NRIs Use Only NRO — And Overpay Tax by ₹1,50,000+ Every Year
               </h2>
-              <p className="text-gray-800 leading-relaxed">
+              <p className="text-slate-800 leading-relaxed">
                 NRO account interest is taxed at 30% TDS. NRE account interest is 100% tax-free in India. Yet most NRIs park all their Indian savings in NRO accounts because their bank didn't explain the difference. Simply moving fixed deposits to an NRE account can save ₹1.5 lakh or more in annual TDS for a ₹50 lakh deposit.
               </p>
             </div>
@@ -135,10 +136,10 @@ export default function NRONREComparison() {
       </section>
 
       {/* Interactive Account Selector */}
-      <section className="py-12 md:py-16 px-4 md:px-6 bg-gray-50">
+      <section className="py-12 md:py-16 px-4 md:px-6 bg-slate-50">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center">Find Your Ideal Account</h2>
-          <p className="text-center text-gray-600 mb-10 text-lg max-w-2xl mx-auto">
+          <p className="text-center text-slate-600 mb-10 text-lg max-w-2xl mx-auto">
             Answer one question to get a personalized recommendation:
           </p>
 
@@ -152,7 +153,7 @@ export default function NRONREComparison() {
                 "I want to save in foreign currency and avoid exchange risk",
                 "I want tax-free interest on Indian rupee deposits",
               ].map((option, index) => (
-                <label key={index + 1} className="flex items-start gap-4 p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition" style={{ borderColor: selectedOption === index + 1 ? "#14b8a6" : "#e5e7eb" }}>
+                <label key={index + 1} className="flex items-start gap-4 p-4 border-2 rounded-lg cursor-pointer hover:bg-slate-50 transition" style={{ borderColor: selectedOption === index + 1 ? NAVY : SLATE_200 }}>
                   <input
                     type="radio"
                     name="account-selector"
@@ -161,7 +162,7 @@ export default function NRONREComparison() {
                     onChange={(e) => setSelectedOption(Number(e.target.value))}
                     className="mt-1 w-4 h-4 cursor-pointer"
                   />
-                  <span className="text-base md:text-lg text-gray-800">{option}</span>
+                  <span className="text-base md:text-lg text-slate-800">{option}</span>
                 </label>
               ))}
             </div>
@@ -169,8 +170,8 @@ export default function NRONREComparison() {
             {selectedOption && (
               <div className="bg-teal-50 border-l-4 border-teal-600 p-6 rounded-r-lg">
                 <h4 className="text-lg font-bold text-teal-700 mb-2">Recommended: {recommendations[selectedOption].account}</h4>
-                <p className="text-gray-800 mb-3">{recommendations[selectedOption].benefit}</p>
-                <p className="text-sm text-gray-700 italic border-t pt-3 border-teal-200">{recommendations[selectedOption].note}</p>
+                <p className="text-slate-800 mb-3">{recommendations[selectedOption].benefit}</p>
+                <p className="text-sm text-slate-700 italic border-t pt-3 border-teal-200">{recommendations[selectedOption].note}</p>
               </div>
             )}
           </div>
@@ -193,53 +194,53 @@ export default function NRONREComparison() {
                 </tr>
               </thead>
               <tbody>
-                <tr className="bg-white border-b hover:bg-gray-50">
-                  <td className="px-4 md:px-6 py-4 font-semibold text-gray-800">Full Form</td>
-                  <td className="px-4 md:px-6 py-4 text-gray-700">Non-Resident Ordinary</td>
-                  <td className="px-4 md:px-6 py-4 text-gray-700">Non-Resident External</td>
-                  <td className="px-4 md:px-6 py-4 text-gray-700">Foreign Currency Non-Resident</td>
+                <tr className="bg-white border-b hover:bg-slate-50">
+                  <td className="px-4 md:px-6 py-4 font-semibold text-slate-800">Full Form</td>
+                  <td className="px-4 md:px-6 py-4 text-slate-700">Non-Resident Ordinary</td>
+                  <td className="px-4 md:px-6 py-4 text-slate-700">Non-Resident External</td>
+                  <td className="px-4 md:px-6 py-4 text-slate-700">Foreign Currency Non-Resident</td>
                 </tr>
-                <tr className="bg-gray-50 border-b hover:bg-gray-100">
-                  <td className="px-4 md:px-6 py-4 font-semibold text-gray-800">Currency</td>
-                  <td className="px-4 md:px-6 py-4 text-gray-700">Indian Rupee</td>
-                  <td className="px-4 md:px-6 py-4 text-gray-700">Indian Rupee</td>
-                  <td className="px-4 md:px-6 py-4 text-gray-700">Foreign Currency (USD, GBP, EUR, etc.)</td>
+                <tr className="bg-slate-50 border-b hover:bg-slate-100">
+                  <td className="px-4 md:px-6 py-4 font-semibold text-slate-800">Currency</td>
+                  <td className="px-4 md:px-6 py-4 text-slate-700">Indian Rupee</td>
+                  <td className="px-4 md:px-6 py-4 text-slate-700">Indian Rupee</td>
+                  <td className="px-4 md:px-6 py-4 text-slate-700">Foreign Currency (USD, GBP, EUR, etc.)</td>
                 </tr>
-                <tr className="bg-white border-b hover:bg-gray-50">
-                  <td className="px-4 md:px-6 py-4 font-semibold text-gray-800">Source of Funds</td>
-                  <td className="px-4 md:px-6 py-4 text-gray-700">Indian income (rent, salary, pension)</td>
-                  <td className="px-4 md:px-6 py-4 text-gray-700">Foreign earnings only</td>
-                  <td className="px-4 md:px-6 py-4 text-gray-700">Foreign earnings only</td>
+                <tr className="bg-white border-b hover:bg-slate-50">
+                  <td className="px-4 md:px-6 py-4 font-semibold text-slate-800">Source of Funds</td>
+                  <td className="px-4 md:px-6 py-4 text-slate-700">Indian income (rent, salary, pension)</td>
+                  <td className="px-4 md:px-6 py-4 text-slate-700">Foreign earnings only</td>
+                  <td className="px-4 md:px-6 py-4 text-slate-700">Foreign earnings only</td>
                 </tr>
-                <tr className="bg-gray-50 border-b hover:bg-gray-100">
-                  <td className="px-4 md:px-6 py-4 font-semibold text-gray-800">Tax on Interest</td>
+                <tr className="bg-slate-50 border-b hover:bg-slate-100">
+                  <td className="px-4 md:px-6 py-4 font-semibold text-slate-800">Tax on Interest</td>
                   <td className="px-4 md:px-6 py-4 text-red-600 font-semibold">30% TDS (may reduce via DTAA)</td>
                   <td className="px-4 md:px-6 py-4 text-green-600 font-semibold">Completely tax-free in India</td>
                   <td className="px-4 md:px-6 py-4 text-green-600 font-semibold">Completely tax-free in India</td>
                 </tr>
-                <tr className="bg-white border-b hover:bg-gray-50">
-                  <td className="px-4 md:px-6 py-4 font-semibold text-gray-800">Repatriation</td>
-                  <td className="px-4 md:px-6 py-4 text-gray-700">Up to USD 1 million/year (with CA certificate)</td>
+                <tr className="bg-white border-b hover:bg-slate-50">
+                  <td className="px-4 md:px-6 py-4 font-semibold text-slate-800">Repatriation</td>
+                  <td className="px-4 md:px-6 py-4 text-slate-700">Up to USD 1 million/year (with CA certificate)</td>
                   <td className="px-4 md:px-6 py-4 text-green-600 font-semibold">Fully and freely repatriable</td>
                   <td className="px-4 md:px-6 py-4 text-green-600 font-semibold">Fully and freely repatriable</td>
                 </tr>
-                <tr className="bg-gray-50 border-b hover:bg-gray-100">
-                  <td className="px-4 md:px-6 py-4 font-semibold text-gray-800">Joint Account</td>
-                  <td className="px-4 md:px-6 py-4 text-gray-700">With another NRI or resident Indian</td>
-                  <td className="px-4 md:px-6 py-4 text-gray-700">With another NRI only</td>
-                  <td className="px-4 md:px-6 py-4 text-gray-700">With another NRI only</td>
+                <tr className="bg-slate-50 border-b hover:bg-slate-100">
+                  <td className="px-4 md:px-6 py-4 font-semibold text-slate-800">Joint Account</td>
+                  <td className="px-4 md:px-6 py-4 text-slate-700">With another NRI or resident Indian</td>
+                  <td className="px-4 md:px-6 py-4 text-slate-700">With another NRI only</td>
+                  <td className="px-4 md:px-6 py-4 text-slate-700">With another NRI only</td>
                 </tr>
-                <tr className="bg-white border-b hover:bg-gray-50">
-                  <td className="px-4 md:px-6 py-4 font-semibold text-gray-800">Mutual Fund Investment</td>
-                  <td className="px-4 md:px-6 py-4 text-gray-700">Yes (but subject to TDS)</td>
-                  <td className="px-4 md:px-6 py-4 text-gray-700">Yes (tax-free returns)</td>
-                  <td className="px-4 md:px-6 py-4 text-gray-700">Yes</td>
+                <tr className="bg-white border-b hover:bg-slate-50">
+                  <td className="px-4 md:px-6 py-4 font-semibold text-slate-800">Mutual Fund Investment</td>
+                  <td className="px-4 md:px-6 py-4 text-slate-700">Yes (but subject to TDS)</td>
+                  <td className="px-4 md:px-6 py-4 text-slate-700">Yes (tax-free returns)</td>
+                  <td className="px-4 md:px-6 py-4 text-slate-700">Yes</td>
                 </tr>
-                <tr className="bg-gray-50 hover:bg-gray-100">
-                  <td className="px-4 md:px-6 py-4 font-semibold text-gray-800">Best For</td>
-                  <td className="px-4 md:px-6 py-4 text-gray-700">Collecting Indian income</td>
-                  <td className="px-4 md:px-6 py-4 text-gray-700">Bringing foreign money to India</td>
-                  <td className="px-4 md:px-6 py-4 text-gray-700">Long-term FDs in foreign currency</td>
+                <tr className="bg-slate-50 hover:bg-slate-100">
+                  <td className="px-4 md:px-6 py-4 font-semibold text-slate-800">Best For</td>
+                  <td className="px-4 md:px-6 py-4 text-slate-700">Collecting Indian income</td>
+                  <td className="px-4 md:px-6 py-4 text-slate-700">Bringing foreign money to India</td>
+                  <td className="px-4 md:px-6 py-4 text-slate-700">Long-term FDs in foreign currency</td>
                 </tr>
               </tbody>
             </table>
@@ -248,7 +249,7 @@ export default function NRONREComparison() {
       </section>
 
       {/* Three Account Types */}
-      <section className="py-12 md:py-16 px-4 md:px-6 bg-gray-50">
+      <section className="py-12 md:py-16 px-4 md:px-6 bg-slate-50">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center">What is Each Account / When to Open</h2>
 
@@ -262,7 +263,7 @@ export default function NRONREComparison() {
                 </h3>
               </div>
               <div className="p-6">
-                <p className="text-gray-800 leading-relaxed">
+                <p className="text-slate-800 leading-relaxed">
                   Use for collecting Indian-source income: rent from property, dividends, pension, salary if still employed in India part-time. Every NRI who has Indian income needs an NRO account. Interest taxed at 30% + surcharge (may reduce under DTAA).
                 </p>
               </div>
@@ -277,7 +278,7 @@ export default function NRONREComparison() {
                 </h3>
               </div>
               <div className="p-6">
-                <p className="text-gray-800 leading-relaxed">
+                <p className="text-slate-800 leading-relaxed">
                   Ideal for NRIs who want to invest their foreign earnings in India — FDs, mutual funds, stocks. Interest is completely tax-free. Funds can be freely moved back abroad. Best choice for growing Indian corpus with foreign money.
                 </p>
               </div>
@@ -292,7 +293,7 @@ export default function NRONREComparison() {
                 </h3>
               </div>
               <div className="p-6">
-                <p className="text-gray-800 leading-relaxed">
+                <p className="text-slate-800 leading-relaxed">
                   Fixed deposits in foreign currency (USD, GBP, EUR, AUD, CAD, JPY, SGD). Eliminates currency risk since you deposit and withdraw in the same currency. Interest tax-free. Tenure: 1 to 5 years. Best for long-term parking of foreign funds without forex exposure.
                 </p>
               </div>
@@ -313,17 +314,17 @@ export default function NRONREComparison() {
 
               <div className="bg-white rounded-lg p-4 mb-4 border-l-4 border-red-500">
                 <p className="text-sm font-semibold text-red-600 uppercase mb-2">Scenario A: All in NRO</p>
-                <p className="text-gray-800 mb-2">₹50L FD at 7% interest</p>
-                <p className="text-gray-700 text-sm">Interest earned: ₹3.5L</p>
-                <p className="text-gray-700 text-sm">TDS at 30%: ₹1.05L</p>
+                <p className="text-slate-800 mb-2">₹50L FD at 7% interest</p>
+                <p className="text-slate-700 text-sm">Interest earned: ₹3.5L</p>
+                <p className="text-slate-700 text-sm">TDS at 30%: ₹1.05L</p>
                 <p className="text-lg font-bold text-red-600">Net received: ₹2.45L</p>
               </div>
 
               <div className="bg-white rounded-lg p-4 mb-6 border-l-4 border-green-500">
                 <p className="text-sm font-semibold text-green-600 uppercase mb-2">Scenario B: Move to NRE</p>
-                <p className="text-gray-800 mb-2">Same ₹50L at 7% interest</p>
-                <p className="text-gray-700 text-sm">Interest earned: ₹3.5L</p>
-                <p className="text-gray-700 text-sm">TDS: ₹0 (100% tax-free)</p>
+                <p className="text-slate-800 mb-2">Same ₹50L at 7% interest</p>
+                <p className="text-slate-700 text-sm">Interest earned: ₹3.5L</p>
+                <p className="text-slate-700 text-sm">TDS: ₹0 (100% tax-free)</p>
                 <p className="text-lg font-bold text-green-600">Net received: ₹3.5L</p>
               </div>
 
@@ -338,16 +339,16 @@ export default function NRONREComparison() {
               <h3 className="text-2xl font-bold text-blue-700 mb-6">Example 2: Rental Income</h3>
 
               <div className="bg-white rounded-lg p-4 mb-4">
-                <p className="text-gray-800 font-semibold mb-3">Monthly rent: ₹40,000</p>
-                <p className="text-gray-700 text-sm mb-2">Annual rental income: ₹4.8L</p>
+                <p className="text-slate-800 font-semibold mb-3">Monthly rent: ₹40,000</p>
+                <p className="text-slate-700 text-sm mb-2">Annual rental income: ₹4.8L</p>
 
                 <div className="bg-red-50 p-3 rounded border-l-4 border-red-500 my-4">
                   <p className="text-sm text-red-700 font-semibold">Must go to NRO Account</p>
                   <p className="text-xs text-red-600 mt-1">Indian income cannot be credited to NRE account</p>
                 </div>
 
-                <p className="text-gray-700 text-sm mb-2">TDS deducted by tenant at 30% (on income above threshold)</p>
-                <p className="text-gray-700 text-sm mb-4">Potential TDS: ~₹1.44L</p>
+                <p className="text-slate-700 text-sm mb-2">TDS deducted by tenant at 30% (on income above threshold)</p>
+                <p className="text-slate-700 text-sm mb-4">Potential TDS: ~₹1.44L</p>
 
                 <div className="bg-green-50 p-3 rounded border-l-4 border-green-500">
                   <p className="text-sm text-green-700 font-semibold">DTAA Benefit</p>
@@ -398,10 +399,10 @@ export default function NRONREComparison() {
               },
             ].map((tip, index) => (
               <div key={index} className="bg-white rounded-lg shadow-md p-6 border-l-4 border-amber-500 hover:shadow-lg transition">
-                <h3 className="text-lg font-bold text-gray-800 mb-3">
+                <h3 className="text-lg font-bold text-slate-800 mb-3">
                   {index + 1}. {tip.title}
                 </h3>
-                <p className="text-gray-700">{tip.description}</p>
+                <p className="text-slate-700">{tip.description}</p>
               </div>
             ))}
           </div>
@@ -422,12 +423,12 @@ export default function NRONREComparison() {
 
           <div className="space-y-4">
             {faqData.map((item, index) => (
-              <details key={index} className="group border border-gray-200 rounded-lg p-6 bg-white hover:bg-gray-50 transition cursor-pointer">
-                <summary className="flex items-start gap-4 font-semibold text-gray-800 list-none">
+              <details key={index} className="group border border-slate-200 rounded-lg p-6 bg-white hover:bg-slate-50 transition cursor-pointer">
+                <summary className="flex items-start gap-4 font-semibold text-slate-800 list-none">
                   <span className="text-teal-600 font-bold text-lg flex-shrink-0 mt-1">{index + 1}.</span>
                   <span className="text-lg">{item.question}</span>
                 </summary>
-                <p className="text-gray-700 mt-4 ml-8 leading-relaxed">{item.answer}</p>
+                <p className="text-slate-700 mt-4 ml-8 leading-relaxed">{item.answer}</p>
               </details>
             ))}
           </div>
@@ -435,7 +436,7 @@ export default function NRONREComparison() {
       </section>
 
       {/* Related Tools */}
-      <section className="py-12 md:py-16 px-4 md:px-6 bg-gray-50">
+      <section className="py-12 md:py-16 px-4 md:px-6 bg-slate-50">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center">Explore Related Tools</h2>
 
@@ -469,8 +470,8 @@ export default function NRONREComparison() {
               <Link key={index} href={tool.link}>
                 <a className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition h-full">
                   <div className="mb-4">{tool.icon}</div>
-                  <h3 className="text-lg font-bold text-gray-800 mb-2">{tool.title}</h3>
-                  <p className="text-sm text-gray-600">{tool.description}</p>
+                  <h3 className="text-lg font-bold text-slate-800 mb-2">{tool.title}</h3>
+                  <p className="text-sm text-slate-600">{tool.description}</p>
                 </a>
               </Link>
             ))}
@@ -486,7 +487,7 @@ export default function NRONREComparison() {
       </section>
 
       {/* Author Box */}
-      <section className="py-12 md:py-16 px-4 md:px-6 bg-gray-50">
+      <section className="py-12 md:py-16 px-4 md:px-6 bg-slate-50">
         <div className="max-w-4xl mx-auto">
           <AuthorBox />
         </div>

@@ -445,13 +445,13 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Card>
                       <CardHeader>
-                        <CardTitle className="text-sm font-medium text-gray-600">HRA Exemption</CardTitle>
+                        <CardTitle className="text-sm font-medium text-slate-600">HRA Exemption</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="text-3xl font-bold text-green-600">
                           ₹{result.hraExemption.toLocaleString()}
                         </div>
-                        <p className="text-sm text-gray-500 mt-2">
+                        <p className="text-sm text-slate-500 mt-2">
                           {result.exemptionPercentage.toFixed(1)}% of your HRA is exempt
                         </p>
                       </CardContent>
@@ -459,13 +459,13 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
 
                     <Card>
                       <CardHeader>
-                        <CardTitle className="text-sm font-medium text-gray-600">Taxable HRA</CardTitle>
+                        <CardTitle className="text-sm font-medium text-slate-600">Taxable HRA</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="text-3xl font-bold text-red-600">
                           ₹{result.taxableHRA.toLocaleString()}
                         </div>
-                        <p className="text-sm text-gray-500 mt-2">
+                        <p className="text-sm text-slate-500 mt-2">
                           {(100 - result.exemptionPercentage).toFixed(1)}% of your HRA is taxable
                         </p>
                       </CardContent>
@@ -479,24 +479,24 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="space-y-3">
-                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                           <div>
                             <p className="font-medium text-sm">5% Bracket</p>
-                            <p className="text-xs text-gray-500">Savings</p>
+                            <p className="text-xs text-slate-500">Savings</p>
                           </div>
                           <p className="font-semibold">₹{(result.hraExemption * 0.05).toLocaleString()}</p>
                         </div>
-                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                           <div>
                             <p className="font-medium text-sm">20% Bracket</p>
-                            <p className="text-xs text-gray-500">Savings</p>
+                            <p className="text-xs text-slate-500">Savings</p>
                           </div>
                           <p className="font-semibold">₹{(result.hraExemption * 0.20).toLocaleString()}</p>
                         </div>
-                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                           <div>
                             <p className="font-medium text-sm">30% Bracket</p>
-                            <p className="text-xs text-gray-500">Savings</p>
+                            <p className="text-xs text-slate-500">Savings</p>
                           </div>
                           <p className="font-semibold">₹{(result.hraExemption * 0.30).toLocaleString()}</p>
                         </div>
@@ -548,23 +548,23 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
                     <CardContent className="space-y-4">
                       <div className="space-y-3">
                         <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                          <p className="text-sm font-medium text-gray-700 mb-2">Rule 1: HRA Received</p>
+                          <p className="text-sm font-medium text-slate-700 mb-2">Rule 1: HRA Received</p>
                           <p className="text-2xl font-bold text-blue-600">₹{result.calculationBreakdown.rule1.toLocaleString()}</p>
                         </div>
 
                         <div className="p-4 bg-persian-blue-50 rounded-lg border border-persian-blue-200">
-                          <p className="text-sm font-medium text-gray-700 mb-2">Rule 2: Rent - 10% of Basic Salary</p>
-                          <p className="text-sm text-gray-600 mb-2">
+                          <p className="text-sm font-medium text-slate-700 mb-2">Rule 2: Rent - 10% of Basic Salary</p>
+                          <p className="text-sm text-slate-600 mb-2">
                             ₹{result.actualRentPaid.toLocaleString()} - ₹{(result.basicSalary * 0.10).toLocaleString()}
                           </p>
                           <p className="text-2xl font-bold text-persian-blue-700">₹{result.calculationBreakdown.rule2.toLocaleString()}</p>
                         </div>
 
                         <div className="p-4 bg-orange-50 rounded-lg border border-orange-200">
-                          <p className="text-sm font-medium text-gray-700 mb-2">
+                          <p className="text-sm font-medium text-slate-700 mb-2">
                             Rule 3: {result.cityType === 'metro' ? '50%' : '40%'} of Basic Salary
                           </p>
-                          <p className="text-sm text-gray-600 mb-2">
+                          <p className="text-sm text-slate-600 mb-2">
                             {result.cityType === 'metro' ? '50%' : '40%'} × ₹{result.basicSalary.toLocaleString()}
                           </p>
                           <p className="text-2xl font-bold text-orange-600">₹{result.calculationBreakdown.rule3.toLocaleString()}</p>
@@ -574,7 +574,7 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
                       <Separator className="my-4" />
 
                       <div className="p-4 bg-green-50 rounded-lg border-2 border-green-200">
-                        <p className="text-sm font-medium text-gray-700 mb-2">HRA Exemption = Minimum of the above 3 rules</p>
+                        <p className="text-sm font-medium text-slate-700 mb-2">HRA Exemption = Minimum of the above 3 rules</p>
                         <p className="text-3xl font-bold text-green-600">₹{result.calculationBreakdown.minimumOf.toLocaleString()}</p>
                       </div>
                     </CardContent>
@@ -586,23 +586,23 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
                     </CardHeader>
                     <CardContent className="space-y-3">
                       <div className="flex items-center justify-between p-3 border-b">
-                        <span className="text-gray-600">Annual Basic Salary</span>
+                        <span className="text-slate-600">Annual Basic Salary</span>
                         <span className="font-semibold">₹{result.basicSalary.toLocaleString()}</span>
                       </div>
                       <div className="flex items-center justify-between p-3 border-b">
-                        <span className="text-gray-600">Annual HRA Received</span>
+                        <span className="text-slate-600">Annual HRA Received</span>
                         <span className="font-semibold">₹{result.hraReceived.toLocaleString()}</span>
                       </div>
                       <div className="flex items-center justify-between p-3 border-b">
-                        <span className="text-gray-600">Annual Rent Paid</span>
+                        <span className="text-slate-600">Annual Rent Paid</span>
                         <span className="font-semibold">₹{result.actualRentPaid.toLocaleString()}</span>
                       </div>
                       <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                        <span className="text-gray-600">HRA Exemption</span>
+                        <span className="text-slate-600">HRA Exemption</span>
                         <span className="font-bold text-green-600">₹{result.hraExemption.toLocaleString()}</span>
                       </div>
                       <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
-                        <span className="text-gray-600">Taxable HRA</span>
+                        <span className="text-slate-600">Taxable HRA</span>
                         <span className="font-bold text-red-600">₹{result.taxableHRA.toLocaleString()}</span>
                       </div>
                     </CardContent>
@@ -636,8 +636,8 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
                         >
                           <div className="flex items-start gap-3">
                             <div className="flex-1">
-                              <h3 className="font-semibold text-gray-900">{rec.title}</h3>
-                              <p className="text-sm text-gray-700 mt-1">{rec.description}</p>
+                              <h3 className="font-semibold text-slate-900">{rec.title}</h3>
+                              <p className="text-sm text-slate-700 mt-1">{rec.description}</p>
                               {rec.potentialSaving && (
                                 <div className="mt-2 inline-block">
                                   <Badge variant="secondary">
@@ -651,7 +651,7 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
                       ))}
                     </div>
                   ) : (
-                    <p className="text-gray-500">No recommendations at this time.</p>
+                    <p className="text-slate-500">No recommendations at this time.</p>
                   )}
                 </CardContent>
               </Card>

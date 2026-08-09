@@ -26,11 +26,11 @@ export default function NotFound() {
               <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-red-100 mb-6">
                 <AlertCircle className="h-10 w-10 text-red-600" />
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">404</h1>
-              <h2 className="text-2xl md:text-3xl font-semibold text-gray-800 mb-4">
+              <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">404</h1>
+              <h2 className="text-2xl md:text-3xl font-semibold text-slate-800 mb-4">
                 Page Not Found
               </h2>
-              <p className="text-lg text-gray-600 max-w-md mx-auto">
+              <p className="text-lg text-slate-600 max-w-md mx-auto">
                 The page you're looking for doesn't exist or has been moved. 
                 Let's get you back on track!
               </p>
@@ -48,7 +48,7 @@ export default function NotFound() {
 
               <Link
                 href="/calculators"
-                className="w-full h-auto py-4 flex flex-col items-center gap-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors cursor-pointer text-center justify-center"
+                className="w-full h-auto py-4 flex flex-col items-center gap-2 border-2 border-slate-300 hover:border-slate-400 hover:bg-slate-50 text-slate-700 rounded-md transition-colors cursor-pointer text-center justify-center"
                 data-testid="button-calculators-404"
               >
                 <Calculator className="h-6 w-6" />
@@ -57,7 +57,7 @@ export default function NotFound() {
 
               <Link
                 href="/blog"
-                className="w-full h-auto py-4 flex flex-col items-center gap-2 border-2 border-gray-300 hover:border-gray-400 rounded-md transition-colors cursor-pointer text-center justify-center"
+                className="w-full h-auto py-4 flex flex-col items-center gap-2 border-2 border-slate-300 hover:border-slate-400 hover:bg-slate-50 text-slate-700 rounded-md transition-colors cursor-pointer text-center justify-center"
                 data-testid="button-blog-404"
               >
                 <BookOpen className="h-6 w-6" />
@@ -66,7 +66,7 @@ export default function NotFound() {
 
               <Link
                 href="/contact"
-                className="w-full h-auto py-4 flex flex-col items-center gap-2 border-2 border-gray-300 hover:border-gray-400 rounded-md transition-colors cursor-pointer text-center justify-center"
+                className="w-full h-auto py-4 flex flex-col items-center gap-2 border-2 border-slate-300 hover:border-slate-400 hover:bg-slate-50 text-slate-700 rounded-md transition-colors cursor-pointer text-center justify-center"
                 data-testid="button-contact-404"
               >
                 <Mail className="h-6 w-6" />
@@ -75,7 +75,7 @@ export default function NotFound() {
             </div>
 
             <div className="mt-8 text-center">
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-slate-500">
                 Looking for something specific? Try our{" "}
                 <Link href="/calculators/income-tax" className="text-blue-600 hover:underline font-medium">
                   Income Tax Calculator

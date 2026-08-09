@@ -226,18 +226,25 @@
    now come from Tailwind against --primary, which holds the same navy value
    as --primary-blue. The patches have been removed.
 
-   What remains below are the *-light / *-dark / success / warning ramps,
-   which have no Tailwind counterpart and must stay hand-written.
+   What remains below are the *-light / success / warning ramps, which have no
+   Tailwind counterpart and must stay hand-written.
+
+   The palette has five semantic roles and only five. If you reach for a colour
+   that isn't one of these, the answer is almost always navy or slate:
+     navy (--primary-blue)        brand, primary actions, structure
+     interactive (--interactive-blue)  links, focus, secondary actions
+     green (--success-green)      MONEY GAINED ONLY — tax saved, refund due
+     amber (--warning-orange)     caution, deadlines, "check this"
+     red (--destructive)          errors, losses, destructive actions
    ─────────────────────────────────────────────────────────────────────── */
 .bg-primary-light { background-color: hsl(var(--primary-blue-light)); }
-.bg-primary-dark { background-color: hsl(var(--primary-blue-dark)); }
-
-.text-primary-dark { color: hsl(var(--primary-blue-dark)); }
 
 .bg-success { background-color: hsl(var(--success-green)); }
 .bg-success-light { background-color: hsl(var(--success-green-light)); }
 .text-success { color: hsl(var(--success-green)); }
 
+/* Declared but not yet used — kept because "warning" is one of the five named
+   roles above and the ramp should exist for the first component that needs it. */
 .bg-warning { background-color: hsl(var(--warning-orange)); }
 .bg-warning-light { background-color: hsl(var(--warning-orange-light)); }
 .text-warning { color: hsl(var(--warning-orange)); }
@@ -252,7 +259,6 @@
    Tailwind's generated text-accent resolves to --accent (a near-white
    surface tint) and would render those 16 labels invisible. Do not delete
    this line without migrating those call sites to text-primary first. */
-.bg-accent-light { background-color: hsl(var(--accent-purple-light)); }
 .text-accent { color: hsl(var(--accent-purple)); }
 
 /* The block of .text-*-foreground rescues that used to live here has been
@@ -262,68 +268,45 @@
    (hover:bg-primary/90, focus-visible:ring-ring) that a plain CSS patch
    could never cover. */
 
-/* Persian Blue Colors */
-.bg-persian-blue-50 { background-color: hsl(var(--persian-blue-50)); }
-.bg-persian-blue-100 { background-color: hsl(var(--persian-blue-100)); }
-.bg-persian-blue-200 { background-color: hsl(var(--persian-blue-200)); }
-.bg-persian-blue-300 { background-color: hsl(var(--persian-blue-300)); }
-.bg-persian-blue-400 { background-color: hsl(var(--persian-blue-400)); }
-.bg-persian-blue-500 { background-color: hsl(var(--persian-blue-500)); }
-.bg-persian-blue-600 { background-color: hsl(var(--persian-blue-600)); }
-.bg-persian-blue-700 { background-color: hsl(var(--persian-blue-700)); }
-.bg-persian-blue-800 { background-color: hsl(var(--persian-blue-800)); }
-.bg-persian-blue-900 { background-color: hsl(var(--persian-blue-900)); }
+/* ═══════════════════════════════════════════════════════════════════════════
+   UTILITY LAYER
 
-.text-persian-blue-50 { color: hsl(var(--persian-blue-50)); }
-.text-persian-blue-100 { color: hsl(var(--persian-blue-100)); }
-.text-persian-blue-200 { color: hsl(var(--persian-blue-200)); }
-.text-persian-blue-300 { color: hsl(var(--persian-blue-300)); }
-.text-persian-blue-400 { color: hsl(var(--persian-blue-400)); }
-.text-persian-blue-500 { color: hsl(var(--persian-blue-500)); }
-.text-persian-blue-600 { color: hsl(var(--persian-blue-600)); }
-.text-persian-blue-700 { color: hsl(var(--persian-blue-700)); }
-.text-persian-blue-800 { color: hsl(var(--persian-blue-800)); }
-.text-persian-blue-900 { color: hsl(var(--persian-blue-900)); }
+   Trimmed as part of the 2026-08 UI/UX audit. This section previously declared
+   109 classes, of which 65 had zero references anywhere in client/src — an
+   entire dead `.modern-button-*` / `.icon-container-*` / `.heading-*` /
+   `.mobile-*` design system sitting alongside the shadcn one that the app
+   actually uses. Ten selectors were also declared more than once
+   (.modern-button-outline six times, .modern-button-secondary five), so the
+   earlier blue-filled definitions were silently overwritten by later neutral
+   ones and had never rendered as written.
 
-.border-persian-blue-50 { border-color: hsl(var(--persian-blue-50)); }
-.border-persian-blue-100 { border-color: hsl(var(--persian-blue-100)); }
-.border-persian-blue-200 { border-color: hsl(var(--persian-blue-200)); }
-.border-persian-blue-300 { border-color: hsl(var(--persian-blue-300)); }
-.border-persian-blue-400 { border-color: hsl(var(--persian-blue-400)); }
-.border-persian-blue-500 { border-color: hsl(var(--persian-blue-500)); }
-.border-persian-blue-600 { border-color: hsl(var(--persian-blue-600)); }
-.border-persian-blue-700 { border-color: hsl(var(--persian-blue-700)); }
-.border-persian-blue-800 { border-color: hsl(var(--persian-blue-800)); }
-.border-persian-blue-900 { border-color: hsl(var(--persian-blue-900)); }
+   The 30-rule `.bg/.text/.border-persian-blue-*` block is gone too: that ramp
+   is declared in tailwind.config.ts, so Tailwind already generates those exact
+   utilities — including the hover/focus/opacity variants a hand-written rule
+   could never cover. Verified there is no dynamically-constructed class name
+   anywhere in the codebase before removing them.
 
-/* Neutral Colors */
-.bg-neutral-50 { background-color: hsl(var(--neutral-50)); }
-.bg-neutral-100 { background-color: hsl(var(--neutral-100)); }
+   Rule of thumb going forward: if Tailwind can generate it from the config,
+   don't hand-write it here. This file is for tokens, base styles, print, and
+   the handful of composite effects below that have no utility equivalent.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Neutral ramp ──────────────────────────────────────────────────────────
+   Unlike persian-blue, `neutral` is NOT registered in tailwind.config, so
+   these must stay hand-written. Only the ones in use are declared. */
+.bg-neutral-50  { background-color: hsl(var(--neutral-50)); }
 .bg-neutral-200 { background-color: hsl(var(--neutral-200)); }
 .text-neutral-500 { color: hsl(var(--neutral-500)); }
 .text-neutral-600 { color: hsl(var(--neutral-600)); }
-.text-neutral-700 { color: hsl(var(--neutral-700)); }
-.text-neutral-800 { color: hsl(var(--neutral-800)); }
 .text-neutral-900 { color: hsl(var(--neutral-900)); }
 
-/* Improved readability colors */
-.text-readable { color: hsl(var(--neutral-800)); }
+/* Semantic aliases for body copy. */
+.text-readable       { color: hsl(var(--neutral-800)); }
 .text-readable-light { color: hsl(var(--neutral-700)); }
-.text-readable-muted { color: hsl(var(--neutral-600)); }
 
-/* Modern Component Styles */
-.modern-card {
-  @apply bg-white rounded-xl border border-neutral-200 transition-all duration-300;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
-}
-
-.modern-card:hover {
-  transform: translateY(-4px);
-  border-color: hsl(var(--primary-blue) / 0.2);
-  box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.1), 0 10px 10px -5px rgba(59, 130, 246, 0.04);
-}
-
-/* Glassmorphism Effects */
+/* ── Glass / elevation effects ─────────────────────────────────────────────
+   Composite backdrop-filter + layered shadow treatments with no single-utility
+   Tailwind equivalent. */
 .glass-card {
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(12px);
@@ -337,401 +320,6 @@
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-/* Enhanced Shadows */
-.shadow-soft {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
-}
-
-.shadow-medium {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.08);
-}
-
-.shadow-strong {
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.08);
-}
-
-.shadow-colored {
-  box-shadow: 0 10px 40px -10px rgba(59, 130, 246, 0.2);
-}
-
-.shadow-colored-hover:hover {
-  box-shadow: 0 20px 50px -10px rgba(59, 130, 246, 0.3);
-}
-
-.modern-button {
-  @apply inline-flex items-center justify-center rounded-lg px-6 py-3 text-sm font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
-}
-
-.modern-button-primary {
-  @apply modern-button text-white font-medium h-12;
-  background-color: hsl(214 65% 56%); /* Persian Blue 600 */
-  --tw-ring-color: hsl(214 65% 56% / 0.5);
-}
-
-.modern-button-primary:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px hsl(214 65% 56% / 0.5);
-}
-
-.modern-button-primary:hover {
-  background-color: hsl(214 65% 46%); /* Persian Blue 700 */
-}
-
-.modern-button-secondary {
-  @apply modern-button text-white font-medium h-12;
-  background-color: hsl(214 65% 56%); /* Persian Blue 600 */
-  --tw-ring-color: hsl(214 65% 56% / 0.5);
-}
-
-.modern-button-secondary:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px hsl(214 65% 56% / 0.5);
-}
-
-.modern-button-secondary:hover {
-  background-color: hsl(214 65% 46%); /* Persian Blue 700 */
-}
-
-.modern-button-outline {
-  @apply modern-button text-white font-medium h-12;
-  background-color: hsl(214 65% 56%); /* Persian Blue 600 */
-  --tw-ring-color: hsl(214 65% 56% / 0.5);
-}
-
-.modern-button-outline:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px hsl(214 65% 56% / 0.5);
-}
-
-.modern-button-outline:hover {
-  background-color: hsl(214 65% 46%); /* Persian Blue 700 */
-}
-
-.modern-button-secondary {
-  @apply modern-button bg-neutral-100 hover:bg-neutral-200;
-  color: hsl(var(--neutral-800));
-}
-
-.modern-button-secondary:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px hsl(var(--neutral-500) / 0.5);
-}
-
-.modern-button-outline {
-  @apply modern-button bg-white border-2;
-  border-color: hsl(var(--primary-blue));
-  color: hsl(var(--primary-blue));
-}
-
-.modern-button-outline:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px hsl(var(--primary-blue) / 0.5);
-}
-
-.modern-button-outline:hover {
-  background-color: hsl(var(--primary-blue));
-  color: white;
-}
-
-/* Hero Section Gradient */
-.hero-gradient {
-  background: linear-gradient(135deg, hsl(var(--primary-blue-dark)) 0%, hsl(var(--primary-blue)) 100%);
-}
-
-.hero-gradient-light {
-  background: linear-gradient(135deg, hsl(var(--primary-blue-light)) 0%, hsl(214, 65%, 93%) 100%);
-}
-
-/* Section spacing - Mobile optimized */
-.section-spacing {
-  @apply py-12 sm:py-16 md:py-20 lg:py-24;
-}
-
-.section-spacing-sm {
-  @apply py-8 sm:py-12 md:py-16;
-}
-
-/* Mobile-first container system */
-.max-container {
-  @apply max-w-7xl mx-auto;
-}
-
-.container-padding {
-  @apply px-4 sm:px-6 lg:px-8;
-}
-
-/* Typography - Mobile optimized */
-.heading-xl {
-  @apply text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight text-neutral-900 leading-tight;
-}
-
-.heading-lg {
-  @apply text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-neutral-900 leading-tight;
-}
-
-.heading-md {
-  @apply text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold tracking-tight text-neutral-900 leading-tight;
-}
-
-.heading-sm {
-  @apply text-base sm:text-lg md:text-xl lg:text-2xl font-semibold tracking-tight text-neutral-800 leading-tight;
-}
-
-.body-lg {
-  @apply text-lg leading-relaxed;
-  color: hsl(var(--neutral-700));
-}
-
-.body-md {
-  @apply text-base leading-relaxed;
-  color: hsl(var(--neutral-700));
-}
-
-/* Grid System */
-.feature-grid {
-  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8;
-}
-
-.feature-grid-2 {
-  @apply grid grid-cols-1 lg:grid-cols-2 gap-8;
-}
-
-/* Icon containers */
-.icon-container {
-  @apply w-12 h-12 rounded-lg flex items-center justify-center text-white text-xl;
-}
-
-.icon-container-primary {
-  @apply icon-container bg-primary;
-}
-
-.icon-container-success {
-  @apply icon-container bg-success;
-}
-
-.icon-container-warning {
-  @apply icon-container bg-warning;
-}
-
-.icon-container-accent {
-  @apply icon-container bg-accent;
-}
-
-.icon-container-emerald {
-  @apply icon-container bg-emerald-500;
-}
-
-/* Animations */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fadeInUp {
-  animation: fadeInUp 0.6s ease-out;
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(100%);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-slide-up {
-  animation: slideUp 0.5s ease-out;
-}
-
-@keyframes gradientShift {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-}
-
-.animate-gradient {
-  background-size: 200% 200%;
-  animation: gradientShift 8s ease infinite;
-}
-
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -1000px 0;
-  }
-  100% {
-    background-position: 1000px 0;
-  }
-}
-
-.animate-shimmer {
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  background-size: 1000px 100%;
-  animation: shimmer 2s infinite;
-}
-
-/* Focus and accessibility */
-.focus-ring {
-  @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2;
-}
-
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Remove any dark/black elements */
-.no-dark {
-  @apply bg-white text-neutral-700;
-}
-
-/* Modal overlays - light instead of black */
-.modal-overlay {
-  background-color: rgba(248, 250, 252, 0.8);
-  backdrop-filter: blur(4px);
-}
-
-/* Mobile-optimized components */
-.mobile-button {
-  @apply w-full sm:w-auto text-center min-h-[48px] px-6 py-3 text-base font-semibold touch-manipulation;
-  /* Prevent button text selection and improve touch response */
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.mobile-card {
-  @apply p-4 sm:p-6 lg:p-8;
-  /* Ensure proper stacking and no overflow issues */
-  position: relative;
-  overflow: hidden;
-}
-
-.mobile-spacing {
-  @apply space-y-4 sm:space-y-6;
-}
-
-/* Button Container to prevent overlapping */
-.button-container {
-  @apply flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center justify-center w-full;
-}
-
-/* Mobile Layout Fixes */
-.mobile-container {
-  @apply px-4 sm:px-6 lg:px-8;
-  max-width: 100vw;
-  overflow-x: hidden;
-}
-
-/* Tax Calculator Mobile Focus */
-.tax-calc-mobile {
-  @apply bg-gradient-to-br from-blue-50 to-indigo-100 p-6 sm:p-8 rounded-2xl border-2 border-primary border-opacity-20 shadow-lg;
-}
-
-/* Custom animations and transitions */
-.card-hover {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.card-hover:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 20px 40px rgba(59, 130, 246, 0.15), 0 10px 20px rgba(59, 130, 246, 0.1);
-}
-
-/* Modern Gradients */
-.gradient-blue {
-  background: linear-gradient(135deg, hsl(214, 65%, 56%) 0%, hsl(217, 91%, 60%) 100%);
-}
-
-.gradient-blue-light {
-  background: linear-gradient(135deg, hsl(214, 65%, 96%) 0%, hsl(217, 91%, 95%) 100%);
-}
-
-.gradient-mesh {
-  background:
-    radial-gradient(at 0% 0%, hsla(214, 65%, 56%, 0.2) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, hsla(217, 91%, 60%, 0.15) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, hsla(214, 65%, 50%, 0.2) 0px, transparent 50%),
-    radial-gradient(at 0% 100%, hsla(142, 76%, 36%, 0.12) 0px, transparent 50%);
-}
-
-.gradient-text {
-  background: linear-gradient(135deg, hsl(217, 91%, 45%) 0%, hsl(214, 65%, 60%) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.market-card {
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  border: 1px solid #e2e8f0;
-}
-
-.market-card:hover {
-  background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
-  border-color: hsl(var(--primary-blue));
-}
-
-/* Loading animation */
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.animate-spin {
-  animation: spin 1s linear infinite;
-}
-
-/* Button transitions */
-.btn-transition {
-  transition: all 0.2s ease-in-out;
-}
-
-.btn-transition:hover {
-  transform: translateY(-1px);
-}
-
-/* Modern spacing utilities */
-.container-padding {
-  @apply px-4 md:px-6 lg:px-8;
-}
-
-.max-container {
-  @apply max-w-7xl mx-auto;
-}
-
-/* Premium Visual Additions */
-.premium-mesh-bg {
-  background: 
-    radial-gradient(at 0% 0%, hsla(217, 91%, 60%, 0.07) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, hsla(262, 83%, 58%, 0.05) 0px, transparent 50%),
-    #ffffff;
 }
 
 .premium-glass-card {
@@ -749,11 +337,56 @@ html {
 .premium-glass-card-hover:hover {
   transform: translateY(-4px);
   background: rgba(255, 255, 255, 0.9);
-  border-color: rgba(59, 130, 246, 0.3);
-  box-shadow: 0 20px 40px -15px rgba(59, 130, 246, 0.12), 0 0 0 1px rgba(59, 130, 246, 0.05);
+  border-color: hsl(var(--interactive-blue) / 0.3);
+  box-shadow: 0 20px 40px -15px hsl(var(--interactive-blue) / 0.12),
+              0 0 0 1px hsl(var(--interactive-blue) / 0.05);
 }
 
-/* Premium range input */
+.shadow-soft {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.shadow-colored {
+  box-shadow: 0 10px 40px -10px hsl(var(--interactive-blue) / 0.2);
+}
+
+.card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px hsl(var(--interactive-blue) / 0.15),
+              0 10px 20px hsl(var(--interactive-blue) / 0.1);
+}
+
+/* ── Gradients ─────────────────────────────────────────────────────────────
+   Retuned from hardcoded hex/HSL literals to the brand tokens. The previous
+   values (hsl(214 65% 56%) etc.) predated the 2026-08 navy redesign and no
+   longer matched anything else on the page. */
+.gradient-blue {
+  background: linear-gradient(135deg,
+    hsl(var(--primary-blue)) 0%,
+    hsl(var(--interactive-blue)) 100%);
+}
+
+/* ── Animations ────────────────────────────────────────────────────────────
+   The `.animate-spin` override that used to live here has been removed —
+   Tailwind ships that utility, and redefining it only risked the two drifting
+   apart. All 38 call sites now use Tailwind's.
+   Note the global prefers-reduced-motion block near the top of this file
+   neutralises everything below for users who ask for that. */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(100%); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.5s ease-out;
+}
+
+/* ── Range input ───────────────────────────────────────────────────────────
+   Used by the calculator sliders. */
 input[type="range"].premium-slider {
   -webkit-appearance: none;
   appearance: none;
@@ -767,12 +400,15 @@ input[type="range"].premium-slider::-webkit-slider-thumb {
   height: 20px;
   width: 20px;
   border-radius: 50%;
-  background: hsl(214 65% 56%);
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: hsl(var(--primary-blue));
+  box-shadow: 0 0 0 4px hsl(var(--interactive-blue) / 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: all 0.15s ease;
 }
 
 input[type="range"].premium-slider::-webkit-slider-thumb:hover {
   transform: scale(1.15);
-  box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.25), 0 3px 6px rgba(0, 0, 0, 0.15);
-}
+  box-shadow: 0 0 0 6px hsl(var(--interactive-blue) / 0.25), 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Smooth scrolling */
+html { scroll-behavior: smooth; }

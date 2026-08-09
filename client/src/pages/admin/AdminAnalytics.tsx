@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import AdminLayout from "@/components/AdminLayout";
+import { CATEGORICAL, AXIS } from "@/lib/chartColors";
 import {
   PieChart,
   Pie,
@@ -21,10 +22,10 @@ interface AnalyticsData {
   authProviders: { name: string; value: number }[];
 }
 
-const COLORS = [
-  "#4f46e5", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6",
-  "#06b6d4", "#ec4899", "#84cc16", "#f97316", "#6366f1",
-];
+/* Was ten unrelated hues opening with indigo — five non-brand colours before
+   any AiTaxBot colour appeared. CATEGORICAL leads with the navy ramp so the
+   common two- and three-series cases stay on-brand. See lib/chartColors.ts. */
+const COLORS = CATEGORICAL;
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
@@ -46,7 +47,7 @@ const PieCustomLabel = ({ cx, cy, midAngle, outerRadius, percent, name }: any) =
     <text
       x={x}
       y={y}
-      fill="#475569"
+      fill={AXIS.label}
       textAnchor={x > cx ? "start" : "end"}
       dominantBaseline="central"
       style={{ fontSize: 11 }}
@@ -119,13 +120,13 @@ export default function AdminAnalytics() {
                 data={data?.occupation}
                 margin={{ top: 5, right: 20, left: -10, bottom: 0 }}
               >
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                <CartesianGrid strokeDasharray="3 3" stroke={AXIS.gridSubtle} />
                 <XAxis
                   dataKey="name"
-                  tick={{ fontSize: 11, fill: "#94a3b8" }}
+                  tick={{ fontSize: 11, fill: AXIS.tick }}
                   tickLine={false}
                 />
-                <YAxis tick={{ fontSize: 11, fill: "#94a3b8" }} tickLine={false} allowDecimals={false} />
+                <YAxis tick={{ fontSize: 11, fill: AXIS.tick }} tickLine={false} allowDecimals={false} />
                 <Tooltip content={<CustomTooltip />} />
                 <Bar dataKey="value" name="Users" radius={[6, 6, 0, 0]}>
                   {data?.occupation.map((_, i) => (
@@ -150,12 +151,12 @@ export default function AdminAnalytics() {
                   layout="vertical"
                   margin={{ top: 0, right: 20, left: 60, bottom: 0 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
-                  <XAxis type="number" tick={{ fontSize: 11, fill: "#94a3b8" }} tickLine={false} allowDecimals={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke={AXIS.gridSubtle} horizontal={false} />
+                  <XAxis type="number" tick={{ fontSize: 11, fill: AXIS.tick }} tickLine={false} allowDecimals={false} />
                   <YAxis
                     type="category"
                     dataKey="name"
-                    tick={{ fontSize: 11, fill: "#64748b" }}
+                    tick={{ fontSize: 11, fill: AXIS.tick }}
                     tickLine={false}
                     width={55}
                   />
@@ -198,7 +199,7 @@ export default function AdminAnalytics() {
                   <Legend
                     iconType="circle"
                     iconSize={8}
-                    formatter={(value) => <span style={{ fontSize: 12, color: "#475569" }}>{value}</span>}
+                    formatter={(value) => <span style={{ fontSize: 12, color: AXIS.label }}>{value}</span>}
                   />
                 </PieChart>
               </ResponsiveContainer>

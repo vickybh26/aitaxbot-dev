@@ -25,7 +25,7 @@ export default function AccountingDashboard() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+          <p className="mt-4 text-slate-600">Loading...</p>
         </div>
       </div>
     );
@@ -47,23 +47,23 @@ export default function AccountingDashboard() {
             </CardHeader>
             <CardContent className="text-center pb-8">
               <div className="mb-6">
-                <h3 className="font-semibold text-lg mb-3 text-gray-900">Features you'll get access to:</h3>
+                <h3 className="font-semibold text-lg mb-3 text-slate-900">Features you'll get access to:</h3>
                 <ul className="text-left space-y-2 mb-6 max-w-md mx-auto">
                   <li className="flex items-start">
                     <Building2 className="h-5 w-5 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-700">Multi-firm management with GST/Non-GST support</span>
+                    <span className="text-slate-700">Multi-firm management with GST/Non-GST support</span>
                   </li>
                   <li className="flex items-start">
                     <Users className="h-5 w-5 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-700">Client management with complete contact details</span>
+                    <span className="text-slate-700">Client management with complete contact details</span>
                   </li>
                   <li className="flex items-start">
                     <FileText className="h-5 w-5 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-700">GST-compliant invoice generation with auto-calculations</span>
+                    <span className="text-slate-700">GST-compliant invoice generation with auto-calculations</span>
                   </li>
                   <li className="flex items-start">
                     <BookOpen className="h-5 w-5 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-700">Sales register and GST reports</span>
+                    <span className="text-slate-700">Sales register and GST reports</span>
                   </li>
                 </ul>
               </div>
@@ -92,10 +92,10 @@ export default function AccountingDashboard() {
       </Helmet>
     <div className="container mx-auto p-6">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+        <h1 className="text-4xl font-bold text-slate-900 mb-2">
           Accounting & Invoicing
         </h1>
-        <p className="text-gray-600 dark:text-gray-400">
+        <p className="text-slate-600">
           Manage firms, clients, GST invoices, and sales registers
         </p>
       </div>
