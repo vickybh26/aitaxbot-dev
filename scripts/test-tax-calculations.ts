@@ -54,6 +54,7 @@ import {
   computeTaxLiability,
   getTaxSlabs,
   getSurchargeRate,
+  SPECIAL_RATE_SURCHARGE_CAP,
   computeSpecialRateTax,
   LTCG_EQUITY_EXEMPTION,
   type TaxRegime,
@@ -238,6 +239,66 @@ console.log("\nCapital gains — s.112A / s.111A charged separately\n" + "─".r
   check("F3 · rebate covers slab tax only", f3.rebate, 30000);
   check("F3 · LTCG still taxed ₹15,625", f3.specialRateTax, 15625);
   check("F3 · total ₹16,250, not zero", f3.totalTax, 16250);
+}
+
+// ─── 15% surcharge cap on special-rate income (re-verify finding A) ────────
+//
+// The proviso caps surcharge on s.111A / s.112A / s.112 tax at 15%, however
+// high the band rate on the rest of the income. It only bites above ₹2Cr, where
+// the band rate first exceeds 15%.
+//
+// Asserted on the GAINS PORTION directly, not just the total: the re-verify
+// audit's warning was that a total-only assertion can pass on a compensating
+// error, and it is right — the total is a sum of two surcharge terms.
+console.log("\nSurcharge cap on s.111A/112A income — max 15%\n" + "─".repeat(60));
+{
+  check("cap constant is 15%", SPECIAL_RATE_SURCHARGE_CAP, 15, 0);
+
+  // Old regime, band rate 37%. Slab tax and gains tax are known independently,
+  // so the surcharge decomposes and each term can be checked on its own.
+  const slabIncome = 40250000;
+  const ltcg = 10000000;
+  const r = computeTaxLiability(slabIncome, "old", "2026-27", "below60", { ltcgEquity: ltcg });
+
+  const expectedSlabTax = 12500 + 100000 + (slabIncome - 1000000) * 0.30;
+  const expectedGainsTax = (ltcg - 125000) * 0.125;
+  check("band rate is 37% (old, total > ₹5Cr)", r.surchargeRate, 37, 0);
+  check("slab tax", r.incomeTax, expectedSlabTax);
+  check("gains tax @12.5% above the allowance", r.specialRateTax, expectedGainsTax);
+
+  // The decomposition being asserted: slab @37%, gains @15%.
+  const expectedSurcharge = expectedSlabTax * 0.37 + expectedGainsTax * 0.15;
+  check("surcharge = slab@37% + gains@15%", r.surcharge, expectedSurcharge, 1);
+
+  // And the counterfactual the bug produced — gains charged at the band rate.
+  const buggySurcharge = (expectedSlabTax + expectedGainsTax) * 0.37;
+  const overcharge = (buggySurcharge - expectedSurcharge) * 1.04;
+  check(
+    `uncapped would have overcharged ~₹${Math.round(overcharge).toLocaleString("en-IN")}`,
+    r.surcharge < buggySurcharge ? 1 : 0, 1, 0
+  );
+
+  // Below ₹2Cr the cap is inert — band rate 15% or less, so min(rate,15) = rate.
+  const under = computeTaxLiability(15000000, "new", "2026-27", "below60", { ltcgEquity: 2000000 });
+  const underSlab = under.incomeTax - under.rebate - under.marginalRelief;
+  check(
+    "cap inert at the 15% band (no divergence below ₹2Cr)",
+    under.surcharge,
+    (underSlab + under.specialRateTax) * 0.15,
+    1
+  );
+}
+
+// ─── Old-regime surcharge reaches 37% (re-verify finding B) ────────────────
+// The NRI page passed the literal "new" to computeSurcharge, capping an
+// old-regime taxpayer at the 25% band. Guarded here at the engine level.
+console.log("\nRegime is honoured in the surcharge band\n" + "─".repeat(60));
+{
+  check("old regime hits 37% above ₹5Cr", getSurchargeRate(60000000, "old"), 37, 0);
+  check("new regime stays at 25% above ₹5Cr", getSurchargeRate(60000000, "new"), 25, 0);
+  const oldR = computeTaxLiability(60000000, "old", "2026-27");
+  const newR = computeTaxLiability(60000000, "new", "2026-27");
+  check("old-regime surcharge exceeds new at ₹6Cr", oldR.surcharge > newR.surcharge ? 1 : 0, 1, 0);
 }
 
 // ─── Marginal-relief band invariant ────────────────────────────────────────

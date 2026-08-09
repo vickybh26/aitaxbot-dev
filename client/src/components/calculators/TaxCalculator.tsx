@@ -69,6 +69,8 @@ interface TaxResult {
   cess: number;
   rebate87A: number;
   marginalRelief: number;
+  /** HRA exemption under Rule 2A, computed on basic + DA. */
+  hraExemption: number;
   /** Surcharge after its own marginal relief. 0 below ₹50,00,000. */
   surcharge: number;
   surchargeRate: number;
@@ -481,6 +483,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
       cess: cessAmount,
       rebate87A,
       marginalRelief,
+      hraExemption,
       surcharge: surchargeAmount,
       surchargeRate,
       specialRateTax,
@@ -737,13 +740,16 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
       const homeLoanInt    = Math.min(parseFloat(formData.homeLoanInterest) || 0, 200000);
       const lta            = parseFloat(formData.lta)                      || 0;
 
-      // HRA exemption (same formula as calculateSingleRegime)
-      let hraExemption = 0;
-      if (hraReceived > 0 && rentPaid > 0 && salaryIncome > 0) {
-        const rentExcess    = Math.max(0, rentPaid - salaryIncome * 0.1);
-        const hraPercentage = formData.isMetroCity ? 0.5 : 0.4;
-        hraExemption = Math.min(hraReceived, rentExcess, salaryIncome * hraPercentage);
-      }
+      // HRA exemption — read from the engine, never recomputed here.
+      //
+      // This used to be a second copy of the formula, labelled "same formula as
+      // calculateSingleRegime". It stopped being the same formula the moment the
+      // on-screen path was corrected to use basic + DA: the screen exempted
+      // ₹1,00,000 and the PDF ₹5,00,000 on the same inputs. Worse, netSalary and
+      // grossTotalIncome below are derived from this figure while taxableIncome
+      // and totalTax come from the engine — so the generated computation sheet
+      // did not add up, on a document a taxpayer may hand to their CA.
+      const hraExemption = result.oldRegime.hraExemption;
 
       const totalChapterVIA = sec80C + sec80D + sec80E + sec80TTA + sec80CCD1B + sec80G + homeLoanInt;
 

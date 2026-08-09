@@ -123,18 +123,31 @@ export default function NRIIncomeTaxCalculator() {
     ltcgEquityTax +
     ltcgPropertyTax;
 
-  // Surcharge — 10% above ₹50L, 15% above ₹1Cr, 25% above ₹2Cr, with marginal
-  // relief at each threshold. Was a flat 25% above ₹1Cr and nil below it, which
-  // missed the 10% band entirely (understating ₹50L–₹1Cr) and charged 25% where
-  // 15% applies (overstating ₹1Cr–₹2Cr).
+  // Tax charged at the special rates — s.111A STCG, s.112A LTCG, s.112 property
+  // gains — carries a surcharge capped at 15% however high the band rate on the
+  // rest of the income. Passed separately so computeSurcharge can apply that
+  // ceiling; folding it into the base charged it at 25% or 37%.
+  const specialRateTaxNRI = stcgEquityTax + ltcgEquityTax + ltcgPropertyTax;
+  const slabOnlyTaxForSurcharge = totalTaxBeforeSurcharge;
+
+  // Surcharge — 10% above ₹50L, 15% above ₹1Cr, 25% above ₹2Cr, 37% above ₹5Cr
+  // in the old regime, with marginal relief at each threshold. Was a flat 25%
+  // above ₹1Cr and nil below it, which missed the 10% band entirely
+  // (understating ₹50L–₹1Cr) and charged 25% where 15% applies (₹1Cr–₹2Cr).
+  // The regime must come from the user's selection, not a literal. Hardcoding
+  // "new" capped an old-regime NRI at the 25% band when the old regime reaches
+  // 37%, understating by ₹22,23,000 at ₹6Cr — and understatement is the
+  // direction that earns a notice. The taxAtThreshold closure two lines down
+  // already derived the regime correctly; this call did not.
   const surchargeResult = computeSurcharge(
     totalIncome,
-    totalTaxBeforeSurcharge,
-    "new",
+    slabOnlyTaxForSurcharge,
+    regime === "old" ? "old" : "new",
     (threshold) => {
       const slabs = getTaxSlabs(regime === "old" ? "old" : "new", FINANCIAL_YEAR, "below60");
       return calculateTaxForSlab(threshold, slabs).totalTax;
-    }
+    },
+    specialRateTaxNRI
   );
   const surcharge = surchargeResult.surcharge;
 

@@ -398,8 +398,11 @@ export async function getTaxSlabsForCalculation(
   return {
     slabs: rates.slabs as unknown as TaxSlab[],
     standardDeduction: parseFloat(rates.standardDeduction?.toString() || "75000"),
-    rebateLimit: parseFloat(rates.rebateLimit?.toString() || "700000"),
-    maxRebate: parseFloat(rates.maxRebate?.toString() || "25000"),
+    // Fallbacks carry the current (Budget 2025) rebate, not the superseded
+    // ₹7L/₹25,000 pair. These only fire when a seeded row is missing a value,
+    // so a stale default here is a silent wrong answer rather than a visible one.
+    rebateLimit: parseFloat(rates.rebateLimit?.toString() || "1200000"),
+    maxRebate: parseFloat(rates.maxRebate?.toString() || "60000"),
     surchargeSlabs: rates.surchargeSlabs as unknown as SurchargeSlab[],
     cessRate: parseFloat(rates.cessRate?.toString() || "4")
   };

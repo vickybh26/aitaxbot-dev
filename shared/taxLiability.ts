@@ -116,8 +116,14 @@ export function getTaxSlabs(regime: TaxRegime, financialYear: string, ageGroup: 
 //
 // Old regime tops out at 37%; the new regime is capped at 25% (s.202, ITA 2025,
 // carrying forward the erstwhile 115BAC cap). Income taxed at the special rates
-// in s.111A / s.112A carries a surcharge capped at 15% regardless of regime —
-// that cap is applied by computeSpecialRateTax(), not here.
+// in s.111A / s.112A / s.112 carries a surcharge capped at 15% regardless of
+// regime — see SPECIAL_RATE_SURCHARGE_CAP and the `specialRateTax` parameter of
+// computeSurcharge(), which is where that cap is applied.
+//
+// An earlier version of this comment said the cap was applied by
+// computeSpecialRateTax(). It was not applied anywhere — the comment described
+// behaviour that did not exist, which is the most expensive kind of comment to
+// leave lying around, because the next reader concludes it is handled.
 //
 // This was previously not computed at all: `surcharge: 0` was a literal in
 // three places in TaxCalculator.tsx, while the marketing copy claimed surcharge
@@ -128,6 +134,12 @@ export interface SurchargeBand {
   threshold: number;
   rate: number;
 }
+
+/**
+ * Ceiling on the surcharge rate applied to tax charged under s.111A / s.112A /
+ * s.112, per the proviso to the surcharge schedule. Applies in both regimes.
+ */
+export const SPECIAL_RATE_SURCHARGE_CAP = 15;
 
 export const SURCHARGE_BANDS_OLD: SurchargeBand[] = [
   { threshold: 5000000, rate: 10 },
@@ -173,7 +185,19 @@ export function computeSurcharge(
   totalIncome: number,
   baseTaxAtIncome: number,
   regime: TaxRegime,
-  taxAtThreshold: (threshold: number) => number
+  taxAtThreshold: (threshold: number) => number,
+  /**
+   * Tax charged at the s.111A / s.112A / s.112 special rates, if any.
+   *
+   * The proviso to the surcharge schedule caps the surcharge on THIS portion at
+   * 15% in either regime, however high the band rate on the rest of the income.
+   * It must therefore be supplied separately rather than folded into
+   * `baseTaxAtIncome`, which is what previously applied 25% or 37% to it.
+   *
+   * Only bites above ₹2Cr of total income, where the band rate first exceeds
+   * 15% — a small population carrying a large per-user error.
+   */
+  specialRateTax: number = 0
 ): SurchargeResult {
   const rate = getSurchargeRate(totalIncome, regime);
   if (rate === 0) {
@@ -183,7 +207,10 @@ export function computeSurcharge(
   const bands = regime === "new" ? SURCHARGE_BANDS_NEW : SURCHARGE_BANDS_OLD;
   const band = [...bands].reverse().find((b) => totalIncome > b.threshold)!;
 
-  let surcharge = (baseTaxAtIncome * rate) / 100;
+  // Slab tax bears the full band rate; special-rate tax bears min(band, 15%).
+  const specialRate = Math.min(rate, SPECIAL_RATE_SURCHARGE_CAP);
+  const slabPortion = Math.max(0, baseTaxAtIncome - specialRateTax);
+  let surcharge = (slabPortion * rate) / 100 + (specialRateTax * specialRate) / 100;
 
   // Liability of someone exactly at the threshold: tax plus the surcharge of
   // the band BELOW this one (nil for the first band).
@@ -386,7 +413,8 @@ export function computeTaxLiability(
   // the whole tax figure. `taxAtThreshold` re-runs the slab+rebate ladder at
   // the band boundary so marginal relief is measured against a real liability
   // rather than an approximation.
-  const totalIncomeForSurcharge = income + Math.max(0, special.ltcgEquity ?? 0) + Math.max(0, special.stcgEquity ?? 0);
+  // Same figure as the rebate threshold test above — computed once, at
+  // `totalIncomeAll`, rather than reassembled here under a second name.
   const taxBeforeSurcharge = taxAfterRebate + sr.total;
 
   const taxAtThreshold = (threshold: number) => {
@@ -395,10 +423,11 @@ export function computeTaxLiability(
   };
 
   const surchargeResult = computeSurcharge(
-    totalIncomeForSurcharge,
+    totalIncomeAll,
     taxBeforeSurcharge,
     regime,
-    taxAtThreshold
+    taxAtThreshold,
+    sr.total // capped at 15% inside computeSurcharge
   );
 
   // Cess is levied on tax plus surcharge, so it must be recomputed here rather
