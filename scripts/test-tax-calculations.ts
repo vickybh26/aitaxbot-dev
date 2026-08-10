@@ -301,6 +301,95 @@ console.log("\nRegime is honoured in the surcharge band\n" + "─".repeat(60));
   check("old-regime surcharge exceeds new at ₹6Cr", oldR.surcharge > newR.surcharge ? 1 : 0, 1, 0);
 }
 
+// ─── Incremental tax on trading profit (calculator audit T1) ───────────────
+//
+// The Trading calculator took the band rate for the user's EXISTING income and
+// applied it to the profit. Wrong in both directions: it ignored the s.156
+// rebate (overstating for sub-₹12L users) and it read the rate off the wrong
+// income (understating when the profit crossed a band). Understatement is the
+// direction that earns a notice, and the audit missed it — it assumed the tool
+// used the dead slabTax() function, which is never called.
+//
+// The correct figure for "what does this profit cost me" is the difference in
+// liability with and without it. Asserted here at the engine level, which is
+// what the component now calls.
+console.log("\nIncremental tax on additional income\n" + "─".repeat(60));
+{
+  const incremental = (base: number, extra: number) =>
+    computeTaxLiability(base + extra, "new", "2026-27").totalTax -
+    computeTaxLiability(base, "new", "2026-27").totalTax;
+
+  // Under the rebate threshold throughout — the true incremental cost is nil.
+  check("₹9,00,000 + ₹2,00,000 profit → ₹0 (rebate)", incremental(900000, 200000), 0);
+  check("₹6,00,000 + ₹2,00,000 profit → ₹0 (rebate)", incremental(600000, 200000), 0);
+
+  // Crossing ₹12L: the old code charged the ₹8–12L band rate (10%) on the whole
+  // profit, giving ₹31,200 against a true ₹1,01,400.
+  check("₹11,50,000 + ₹3,00,000 profit → ₹1,01,400", incremental(1150000, 300000), 101400);
+  const naive = 300000 * 0.10 * 1.04;
+  check("naive band-rate figure would have been ₹31,200", naive, 31200);
+
+  // Well above the threshold the two agree — 30% band, no rebate in play.
+  check("₹25,00,000 + ₹5,00,000 profit → ₹1,56,000", incremental(2500000, 500000), 156000);
+}
+
+// ─── NPS deduction caps (calculator audit T3) ──────────────────────────────
+// 80CCD(1B) credited a flat ₹50,000 regardless of what was contributed, so
+// every figure carried a fixed ₹15,000 of phantom saving at 30%. These assert
+// the capping rules the component now applies.
+console.log("\nNPS deduction caps — 80CCD(1), (1B), (2)\n" + "─".repeat(60));
+{
+  const npsDeductions = (annualContrib: number, employer: number, salary: number) => {
+    const u1 = Math.min(annualContrib, 150000, salary * 0.10);
+    const u1b = Math.min(Math.max(0, annualContrib - u1), 50000);
+    const u2 = Math.min(employer, salary * 0.14);
+    return { u1, u1b, u2, total: u1 + u1b + u2 };
+  };
+  const salary = 1200000;
+
+  // ₹24,000 contributed: 80CCD(1) takes all of it, (1B) gets nothing.
+  const small = npsDeductions(24000, 0, salary);
+  check("₹2,000/m · 80CCD(1) = ₹24,000", small.u1, 24000);
+  check("₹2,000/m · 80CCD(1B) = ₹0, not ₹50,000", small.u1b, 0);
+  check("₹2,000/m · tax saved @31.2% = ₹7,488", small.total * 0.312, 7488);
+
+  // ₹1,50,000 contributed against ₹12L salary: 10% cap binds at ₹1,20,000,
+  // and the ₹30,000 remainder flows into (1B).
+  const mid = npsDeductions(150000, 0, salary);
+  check("₹12,500/m · 80CCD(1) capped at 10% of salary", mid.u1, 120000);
+  check("₹12,500/m · 80CCD(1B) takes the remainder", mid.u1b, 30000);
+  check("₹12,500/m · total deduction ₹1,50,000, not ₹2,00,000", mid.total, 150000);
+
+  // Employer contribution capped at 14% of salary.
+  const emp = npsDeductions(0, 240000, salary);
+  check("employer ₹20,000/m capped at 14% = ₹1,68,000", emp.u2, 168000);
+}
+
+// ─── SWP self-sustaining corpus (calculator audit T4) ──────────────────────
+// The withdrawal loop exits either on depletion or at the 600-month ceiling,
+// and both were reported as a duration — so a corpus growing to 14× its
+// opening balance was shown as "lasts 50y 0m".
+console.log("\nSWP — depletion vs self-sustaining\n" + "─".repeat(60));
+{
+  const runSWP = (corpus: number, monthly: number, annualReturn: number) => {
+    const mr = annualReturn / 12 / 100;
+    let c = corpus, m = 0;
+    while (c > monthly && m < 600) { c = c * (1 + mr) - monthly; m++; }
+    return { months: m, finalCorpus: c, selfSustaining: m >= 600 && c >= corpus };
+  };
+
+  // 6% withdrawal rate against an 8% return — grows without limit.
+  const grows = runSWP(10000000, 50000, 8);
+  check("₹1Cr @8% drawing ₹50k/m hits the 600-month ceiling", grows.months, 600, 0);
+  check("…and is flagged self-sustaining", grows.selfSustaining ? 1 : 0, 1, 0);
+  check("…terminal corpus ≈ ₹14.22 Cr", grows.finalCorpus, 142195458, 1000);
+
+  // 12% withdrawal rate against an 8% return — genuinely depletes.
+  const depletes = runSWP(10000000, 100000, 8);
+  check("₹1Cr @8% drawing ₹1L/m depletes before 600 months", depletes.months < 600 ? 1 : 0, 1, 0);
+  check("…and is NOT flagged self-sustaining", depletes.selfSustaining ? 1 : 0, 0, 0);
+}
+
 // ─── Marginal-relief band invariant ────────────────────────────────────────
 //
 // A naive "take-home must never decrease" sweep fails here, and the reason is

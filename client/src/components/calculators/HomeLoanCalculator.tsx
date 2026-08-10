@@ -59,9 +59,23 @@ export default function HomeLoanCalculator() {
       ? availableForEMI * (Math.pow(1 + r, n) - 1) / (r * Math.pow(1 + r, n))
       : 0;
 
-    // Tax benefits (Year 1 estimate)
-    // Interest in year 1 ≈ loanAmount * rate / 100
-    const annualInterestYear1 = loanAmount * (rate / 100);
+    // Tax benefits — year 1, from the actual amortisation schedule.
+    //
+    // This was `loanAmount * (rate / 100)`: simple interest on the opening
+    // principal, which ignores the twelve repayments made during the year. It
+    // overstated year-1 interest by ₹725 on ₹25L/8.5%/30y and by ₹4,731 on
+    // ₹1Cr/8%/25y, and understated principal by the same amount. Because both
+    // feed capped deductions the net effect on the tax figure was small
+    // (₹226–₹1,476) — but the schedule is twelve lines of arithmetic and there
+    // is no reason to approximate it.
+    let balance = loanAmount;
+    let annualInterestYear1 = 0;
+    for (let month = 0; month < 12 && balance > 0; month++) {
+      const interestThisMonth = balance * r;
+      annualInterestYear1 += interestThisMonth;
+      balance -= (emi - interestThisMonth);
+    }
+
     const section24Deduction = Math.min(annualInterestYear1, 200000); // ₹2L cap for self-occupied
     const annualPrincipalYear1 = emi * 12 - annualInterestYear1;
     const section80CDeduction = Math.min(annualPrincipalYear1, 150000); // within 80C ₹1.5L cap

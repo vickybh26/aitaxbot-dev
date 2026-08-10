@@ -10,6 +10,7 @@ import {
   DollarSign, BarChart2, Globe, ArrowLeftRight, FileText,
   CheckCircle2, Clock, ChevronRight, Zap,
 } from "lucide-react";
+import { computeTaxLiability } from "@shared/taxLiability";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -111,26 +112,40 @@ function slabBand(income: number): string {
   return "Above ₹24L";
 }
 
-function slabTax(income: number): number {
-  if (income <= 0) return 0;
-  let tax = 0;
-  const slabs = [
-    { limit: 400000, rate: 0 },
-    { limit: 400000, rate: 0.05 },
-    { limit: 400000, rate: 0.10 },
-    { limit: 400000, rate: 0.15 },
-    { limit: 400000, rate: 0.20 },
-    { limit: 400000, rate: 0.25 },
-    { limit: Infinity, rate: 0.30 },
-  ];
-  let remaining = income;
-  for (const slab of slabs) {
-    const chunk = Math.min(remaining, slab.limit);
-    tax += chunk * slab.rate;
-    remaining -= chunk;
-    if (remaining <= 0) break;
-  }
-  return tax * 1.04; // 4% H&E cess
+/**
+ * Effective marginal rate on the trading profit, expressed as a percentage
+ * BEFORE cess — every call site multiplies by 1.04 afterwards.
+ *
+ * `computeSlabRate` above returns the band rate for the user's existing income
+ * and was applied directly to the profit. That is wrong in both directions:
+ *
+ *   • It ignores the s.156 rebate. Someone on ₹9,00,000 with ₹2,00,000 of F&O
+ *     profit stays under ₹12,00,000, owes nothing, and was shown ₹20,800.
+ *   • It reads the rate off the EXISTING income, so profit that pushes the
+ *     user into higher bands is charged at the old rate. Base ₹11,50,000 with
+ *     ₹3,00,000 of profit was shown ₹31,200 against a true ₹1,01,400 — a
+ *     ₹70,200 understatement, which is the direction that earns a notice.
+ *
+ * The honest figure for "what does this trading profit cost me" is the
+ * difference between the liability with the profit and without it. That is what
+ * this computes, via the same shared engine the main calculator uses — so the
+ * rebate, marginal relief and the slab ladder all come from one place.
+ *
+ * A blended rate is returned rather than a per-trade one because incremental
+ * tax is not decomposable per trade: the ladder applies to the total.
+ */
+function effectiveMarginalRate(
+  baseIncome: number,
+  additionalProfit: number,
+  financialYear = "2026-27"
+): number {
+  if (additionalProfit <= 0) return computeSlabRate(baseIncome);
+  const preCess = (income: number) => {
+    const r = computeTaxLiability(Math.max(0, income), "new", financialYear);
+    return r.incomeTax - r.rebate - r.marginalRelief;
+  };
+  const delta = preCess(baseIncome + additionalProfit) - preCess(baseIncome);
+  return Math.max(0, (delta / additionalProfit) * 100);
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -1070,7 +1085,20 @@ export default function TradingTaxCalculator() {
   const [usFO, setUSFO] = useState<USFOTrade[]>([]);
   const [forex, setForex] = useState<ForexTrade[]>([]);
 
-  const slabRate = computeSlabRate(annualIncome);
+  // Total profit taxed at slab rates (LTCG on US stocks held 24m+ is charged at
+  // 12.5% and is excluded — it does not stack onto the slab ladder).
+  const slabTaxableProfit =
+    usStocks.reduce((sum, t) => {
+      if (!t.buyRate || !t.sellRate || !t.buyPriceUSD || !t.sellPriceUSD || !t.quantity) return sum;
+      if (monthsBetween(t.buyDate, t.sellDate) >= 24) return sum;
+      return sum + Math.max(0, (t.sellPriceUSD * t.sellRate - t.buyPriceUSD * t.buyRate) * t.quantity);
+    }, 0) +
+    usDividends.reduce((sum, d) => sum + (d.rate && d.amountUSD ? d.amountUSD * d.rate : 0), 0) +
+    Math.max(0, indianFO.reduce((sum, t) => sum + t.netPL, 0)) +
+    Math.max(0, usFO.reduce((sum, t) => sum + t.netPLUSD * (t.rate ?? 0), 0)) +
+    Math.max(0, forex.reduce((sum, t) => sum + t.netPL, 0));
+
+  const slabRate = effectiveMarginalRate(annualIncome, slabTaxableProfit);
   const grandTotal = computeGrandTotal(usStocks, usDividends, indianFO, usFO, forex, slabRate);
 
   const counts = {

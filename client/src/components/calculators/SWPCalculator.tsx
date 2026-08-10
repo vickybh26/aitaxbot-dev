@@ -28,6 +28,8 @@ interface SWPResult {
   remainingCorpus: number;
   durationYears: number;
   durationMonths: number;
+  /** True when the corpus outgrows the withdrawals — no depletion date exists. */
+  isSelfSustaining: boolean;
   inflationAdjusted: boolean;
   yearlySnapshots: YearlySnapshot[];
 }
@@ -68,6 +70,21 @@ export default function SWPCalculator({ onClose }: SWPCalculatorProps = {}) {
       months++;
     }
 
+    // The loop above has TWO exits and the caller could not tell them apart:
+    // the corpus ran out, or we hit the 600-month ceiling. Reporting both as a
+    // duration turned the best answer this tool can give — your money outlasts
+    // you — into a 50-year countdown.
+    //
+    // ₹1,00,00,000 at 8% drawing ₹50,000/month is a 6% withdrawal rate against
+    // an 8% return: the corpus grows without limit. The loop hit 600 months and
+    // reported "50y 0m" while sitting on ₹14,21,95,458, a figure never shown.
+    const isSelfSustaining = months >= 600 && corpus >= initialCorpus;
+
+    // The loop stops while the corpus still holds less than one full
+    // withdrawal. That remainder was neither withdrawn nor reported; it is a
+    // real residual the user keeps.
+    const residualCorpus = Math.max(0, corpus);
+
     // Capture year 0 snapshot
     if (yearlySnapshots.length === 0 || yearlySnapshots[0].year !== 0) {
       yearlySnapshots.unshift({ year: 0, withdrawal: monthlyWithdrawal, corpus: initialCorpus });
@@ -81,9 +98,10 @@ export default function SWPCalculator({ onClose }: SWPCalculatorProps = {}) {
       startingMonthlyWithdrawal: monthlyWithdrawal,
       finalMonthlyWithdrawal: Math.round(currentMonthlyWithdrawal),
       totalWithdrawals: Math.round(totalWithdrawals),
-      remainingCorpus: Math.max(0, Math.round(corpus)),
+      remainingCorpus: Math.round(residualCorpus),
       durationYears,
       durationMonths,
+      isSelfSustaining,
       inflationAdjusted: enableInflation,
       yearlySnapshots: yearlySnapshots.slice(0, 10), // Show first 10 years
     });
@@ -96,11 +114,13 @@ export default function SWPCalculator({ onClose }: SWPCalculatorProps = {}) {
       headline: {
         label: "Monthly withdrawal",
         value: rsSwp(monthlyWithdrawal),
-        hint: `Corpus lasts ${durationYears}y ${durationMonths}m`,
+        hint: isSelfSustaining
+          ? `Corpus never depletes — grows to ${rsSwp(residualCorpus)} over 50 years`
+          : `Corpus lasts ${durationYears}y ${durationMonths}m`,
       },
       details: [
         { label: "Total withdrawn", value: rsSwp(totalWithdrawals) },
-        { label: "Corpus left", value: rsSwp(Math.max(0, corpus)) },
+        { label: isSelfSustaining ? "Corpus after 50 years" : "Corpus left", value: rsSwp(residualCorpus) },
       ],
     });
   };
@@ -111,10 +131,15 @@ export default function SWPCalculator({ onClose }: SWPCalculatorProps = {}) {
 
   const formatCurrency = (amount: number) => `₹${amount.toLocaleString('en-IN')}`;
 
+  // "Never depletes" is the honest answer when withdrawals are covered by
+  // returns, and it is the most reassuring thing this tool can say. Showing
+  // "50y" instead states the opposite of the truth.
   const durationText = result
-    ? result.durationYears > 0
-      ? `${result.durationYears}y ${result.durationMonths > 0 ? result.durationMonths + 'm' : ''}`
-      : `${result.durationMonths} months`
+    ? result.isSelfSustaining
+      ? 'Never depletes'
+      : result.durationYears > 0
+        ? `${result.durationYears}y ${result.durationMonths > 0 ? result.durationMonths + 'm' : ''}`
+        : `${result.durationMonths} months`
     : '—';
 
   const calculatorContent = (

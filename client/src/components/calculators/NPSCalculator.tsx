@@ -30,6 +30,10 @@ export default function NPSCalculator() {
   const [employerContribution, setEmployerContribution] = useState<number>(0);
   const [expectedReturn, setExpectedReturn] = useState<number>(10);
   const [annuityRate, setAnnuityRate] = useState<number>(6);
+  // Annual salary (basic + DA) — needed for the statutory percentage caps:
+  // 80CCD(1) is limited to 10% of salary and 80CCD(2) to 14%. Without it the
+  // deductions could only be capped by their absolute ceilings.
+  const [annualSalary, setAnnualSalary] = useState<number>(1200000);
   const [taxRate, setTaxRate] = useState<number>(30);
   const [regime, setRegime] = useState<'new' | 'old'>('new');
   const [result, setResult] = useState<NPSResult | null>(null);
@@ -73,9 +77,30 @@ export default function NPSCalculator() {
     // Only 80CCD(2) employer contribution remains deductible under new regime.
     // Old Regime: All three deductions available.
     const annualContrib = monthlyContribution * 12;
-    const tax80CCD1 = regime === 'old' ? Math.min(annualContrib, 150000) * (taxRate / 100) : 0;
-    const tax80CCD1B = regime === 'old' ? 50000 * (taxRate / 100) : 0;
-    const tax80CCD2 = employerContribution * 12 * (taxRate / 100);  // available in both regimes
+    const annualEmployerContrib = employerContribution * 12;
+
+    // Deductions must be capped at what was ACTUALLY contributed, and at the
+    // statutory percentage limits. Previously:
+    //   • 80CCD(1B) credited a flat ₹50,000 regardless of contribution, so a
+    //     ₹2,000/month investor was shown more than triple the real benefit and
+    //     every figure carried a fixed ₹15,000 of phantom saving at 30%.
+    //   • 80CCD(1) had no 10%-of-salary cap, and combined with the flat (1B)
+    //     could deduct ₹2,00,000 on a ₹1,50,000 contribution.
+    //   • 80CCD(2) had no 14%-of-salary cap.
+    //
+    // s.80CCD(1B) is an ADDITIONAL ₹50,000 out of contributions not already
+    // claimed under (1), which is why it is computed from the remainder.
+    const under80CCD1 = Math.min(annualContrib, 150000, annualSalary * 0.10);
+    const under80CCD1B = Math.min(Math.max(0, annualContrib - under80CCD1), 50000);
+    const under80CCD2 = Math.min(annualEmployerContrib, annualSalary * 0.14);
+
+    // Cess is due on the tax saved, so the effective rate is rate × 1.04.
+    // HomeLoanCalculator uses 0.312 for the same concept; this used a bare 0.30.
+    const effectiveRate = (taxRate / 100) * 1.04;
+
+    const tax80CCD1 = regime === 'old' ? under80CCD1 * effectiveRate : 0;
+    const tax80CCD1B = regime === 'old' ? under80CCD1B * effectiveRate : 0;
+    const tax80CCD2 = under80CCD2 * effectiveRate;  // available in both regimes
 
     setResult({
       totalCorpus,
@@ -281,6 +306,25 @@ export default function NPSCalculator() {
             <p className="text-xs text-slate-500 mt-1">Current annuity rates: 5–7%</p>
           </div>
 
+          {/* Salary drives the percentage caps: 80CCD(1) is limited to 10% of
+              salary and 80CCD(2) to 14%. Without it the tool could only apply
+              the absolute ceilings, which overstated the benefit. */}
+          <div>
+            <Label htmlFor="annualSalary" className="text-sm font-medium text-slate-700 mb-1 block">
+              Annual Salary (Basic + DA)
+            </Label>
+            <Input
+              id="annualSalary"
+              type="number"
+              value={annualSalary || ""}
+              onChange={(e) => { setAnnualSalary(Number(e.target.value)); setResult(null); }}
+              className="w-full"
+            />
+            <p className="text-xs text-slate-500 mt-1">
+              80CCD(1) is capped at 10% of this figure, and employer 80CCD(2) at 14%.
+            </p>
+          </div>
+
           <div>
             <Label htmlFor="taxRate" className="text-sm font-medium text-slate-700 mb-1 block">
               Your Marginal Tax Slab (%)
@@ -417,7 +461,10 @@ export default function NPSCalculator() {
             </div>
             {regime === 'new' && (
               <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800">
-                80CCD(1) and 80CCD(1B) deductions on your own NPS contributions are <strong>not available under the New Regime</strong>. Switch to Old Regime to unlock up to ₹{formatCurrency(50000 * (taxRate / 100) + Math.min(monthlyContribution * 12, 150000) * (taxRate / 100))} more in tax savings.
+                80CCD(1) and 80CCD(1B) deductions on your own NPS contributions are <strong>not available under the New Regime</strong>. Switch to Old Regime to unlock up to ₹{formatCurrency(
+                  (Math.min(monthlyContribution * 12, 150000, annualSalary * 0.10) +
+                   Math.min(Math.max(0, monthlyContribution * 12 - Math.min(monthlyContribution * 12, 150000, annualSalary * 0.10)), 50000)
+                  ) * (taxRate / 100) * 1.04)} more in tax savings.
               </div>
             )}
             <div className="mt-4 bg-slate-50 p-4 rounded-lg flex justify-between items-center">
