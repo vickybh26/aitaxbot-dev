@@ -34,7 +34,12 @@
        over salary and PAN data and need institutional trust cues instead.
        Navy carries authority; green is reserved for money-positive
        outcomes (tax saved, refund due) so colour itself signals result.
-       Full spec: design-system/aitaxbot/MASTER.md
+
+       This file — not any external doc — is the single source of truth for
+       the design system. design_guidelines.md and design-system/aitaxbot/
+       MASTER.md both predate this redesign, contradict it (MASTER.md
+       specifies a dark theme with a gold primary and purple accent, neither
+       of which ships), and have been moved to docs/archive/ as historical.
        ─────────────────────────────────────────────────────────────────── */
 
     /* Navy — primary brand + structure */

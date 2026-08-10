@@ -1,5 +1,11 @@
 # AiTaxBot Design Guidelines
 
+> **⚠️ SUPERSEDED — do not follow this file.**
+> Moved to `docs/archive/` on 2026-08-09. `client/src/index.css` is the design
+> system that actually ships — it postdates this document (the 2026-07 "Trust
+> Navy + Profit Green" redesign) and diverges in colour palette, typography and
+> several component patterns described below. Kept for historical reference.
+
 ## Design Approach
 
 **Selected Framework**: Fintech-Inspired Professional Design

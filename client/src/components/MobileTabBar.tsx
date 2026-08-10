@@ -52,7 +52,13 @@ const tabsFor = (signedIn: boolean): Tab[] => [
     ? { label: "Dashboard", href: "/dashboard", icon: LayoutGrid }
     : { label: "Home", href: "/", icon: HomeIcon },
   { label: "Calculators", href: "/calculators", icon: Calculator },
-  { label: "AIS Check", href: "/tools/ais-26as-form16", icon: FileSearch },
+  // "AIS Recon" — was "AIS Check", which disagreed with the header's "AIS
+  // Reconciliation" (desktop dropdown and mobile drawer) and the page's own
+  // title ("...Reconciliation — AiTaxBot"). Three different names for one
+  // destination. Kept short for the 4-column mobile grid rather than matching
+  // "AIS Reconciliation" verbatim, which wraps awkwardly at 11px in a ~90px
+  // column — but it now reads as the same feature everywhere else names it.
+  { label: "AIS Recon", href: "/tools/ais-26as-form16", icon: FileSearch },
   { label: "Tools", href: "/tools", icon: Wrench },
 ];
 

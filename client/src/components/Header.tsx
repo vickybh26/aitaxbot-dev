@@ -80,6 +80,23 @@ export default function Header({ showModal }: HeaderProps = {}) {
   const dropItem =
     "flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors";
 
+  /**
+   * Active-state props for a mobile drawer link.
+   *
+   * The drawer had no active-state indication at all, unlike MobileTabBar,
+   * which sets aria-current and a visual highlight. A screen-reader user
+   * opening the drawer had no way to tell which item was the current page;
+   * a sighted user got no visual confirmation either. This mirrors the same
+   * aria-current + colour treatment the tab bar already uses.
+   */
+  const mobileNavLink = (href: string) => {
+    const active = currentPath === href;
+    return {
+      "aria-current": active ? ("page" as const) : undefined,
+      className: active ? "text-persian-blue-700 font-semibold" : "text-slate-700",
+    };
+  };
+
   return (
     <header className="glass-header sticky top-0 z-50 shadow-soft">
       <div className="max-w-7xl mx-auto px-4">
@@ -289,29 +306,29 @@ export default function Header({ showModal }: HeaderProps = {}) {
         <div className="md:hidden bg-white border-t border-slate-200 shadow-lg">
           <div className="px-5 py-4 space-y-1">
             {isAuthenticated && (
-              <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 py-2.5 text-sm font-medium text-slate-700">
+              <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} aria-current={mobileNavLink("/dashboard")["aria-current"]} className={`flex items-center gap-2 py-2.5 text-sm font-medium ${mobileNavLink("/dashboard").className}`}>
                 <LayoutDashboard className="w-4 h-4" />{t("nav.dashboard")}
               </Link>
             )}
-            <Link href="/calculators" onClick={() => { trackButtonClick("Calculators", "Mobile Header"); setMobileMenuOpen(false); }} className="flex items-center gap-2 py-2.5 text-sm font-medium text-slate-700">
+            <Link href="/calculators" onClick={() => { trackButtonClick("Calculators", "Mobile Header"); setMobileMenuOpen(false); }} aria-current={mobileNavLink("/calculators")["aria-current"]} className={`flex items-center gap-2 py-2.5 text-sm font-medium ${mobileNavLink("/calculators").className}`}>
               <Calculator className="w-4 h-4" />Calculators
             </Link>
-            <Link href="/nri" onClick={() => { trackButtonClick("NRI", "Mobile Header"); setMobileMenuOpen(false); }} className="flex items-center gap-2 py-2.5 text-sm font-medium text-slate-700">
+            <Link href="/nri" onClick={() => { trackButtonClick("NRI", "Mobile Header"); setMobileMenuOpen(false); }} aria-current={mobileNavLink("/nri")["aria-current"]} className={`flex items-center gap-2 py-2.5 text-sm font-medium ${mobileNavLink("/nri").className}`}>
               <Globe className="w-4 h-4" />NRI
             </Link>
-            <Link href="/tools/ais-26as-form16" onClick={() => { trackButtonClick("AIS Reconciliation", "Mobile Header"); setMobileMenuOpen(false); }} className="flex items-center gap-2 py-2.5 text-sm font-medium text-slate-700">
+            <Link href="/tools/ais-26as-form16" onClick={() => { trackButtonClick("AIS Reconciliation", "Mobile Header"); setMobileMenuOpen(false); }} aria-current={mobileNavLink("/tools/ais-26as-form16")["aria-current"]} className={`flex items-center gap-2 py-2.5 text-sm font-medium ${mobileNavLink("/tools/ais-26as-form16").className}`}>
               <FileText className="w-4 h-4" />AIS Reconciliation
             </Link>
-            <Link href="/accounting" onClick={() => setMobileMenuOpen(false)} className="py-2.5 text-sm font-medium text-slate-700 block">Accounting</Link>
-            <Link href="/blog" onClick={() => setMobileMenuOpen(false)} className="py-2.5 text-sm font-medium text-slate-700 block">Blog</Link>
-            <Link href="/find-ca" onClick={() => { trackButtonClick("Find a CA", "Mobile Header"); setMobileMenuOpen(false); }} className="flex items-center gap-2 py-2.5 text-sm font-medium text-slate-700">
+            <Link href="/accounting" onClick={() => setMobileMenuOpen(false)} aria-current={mobileNavLink("/accounting")["aria-current"]} className={`py-2.5 text-sm font-medium block ${mobileNavLink("/accounting").className}`}>Accounting</Link>
+            <Link href="/blog" onClick={() => setMobileMenuOpen(false)} aria-current={mobileNavLink("/blog")["aria-current"]} className={`py-2.5 text-sm font-medium block ${mobileNavLink("/blog").className}`}>Blog</Link>
+            <Link href="/find-ca" onClick={() => { trackButtonClick("Find a CA", "Mobile Header"); setMobileMenuOpen(false); }} aria-current={mobileNavLink("/find-ca")["aria-current"]} className={`flex items-center gap-2 py-2.5 text-sm font-medium ${mobileNavLink("/find-ca").className}`}>
               <UserCheck className="w-4 h-4" />Find a CA
             </Link>
-            <Link href="/ca/register" onClick={() => { trackButtonClick("List Your Practice", "Mobile Header"); setMobileMenuOpen(false); }} className="py-2.5 text-sm font-medium text-slate-700 block">
+            <Link href="/ca/register" onClick={() => { trackButtonClick("List Your Practice", "Mobile Header"); setMobileMenuOpen(false); }} aria-current={mobileNavLink("/ca/register")["aria-current"]} className={`py-2.5 text-sm font-medium block ${mobileNavLink("/ca/register").className}`}>
               For CAs — List Your Practice
             </Link>
-            <Link href="/about" onClick={() => setMobileMenuOpen(false)} className="py-2.5 text-sm font-medium text-slate-700 block">About</Link>
-            <Link href="/contact" onClick={() => setMobileMenuOpen(false)} className="py-2.5 text-sm font-medium text-slate-700 block">Contact</Link>
+            <Link href="/about" onClick={() => setMobileMenuOpen(false)} aria-current={mobileNavLink("/about")["aria-current"]} className={`py-2.5 text-sm font-medium block ${mobileNavLink("/about").className}`}>About</Link>
+            <Link href="/contact" onClick={() => setMobileMenuOpen(false)} aria-current={mobileNavLink("/contact")["aria-current"]} className={`py-2.5 text-sm font-medium block ${mobileNavLink("/contact").className}`}>Contact</Link>
 
             <div className="pt-3 border-t border-slate-100 space-y-2">
               <Link

@@ -1,5 +1,13 @@
 # Design System Master File
 
+> **⚠️ SUPERSEDED — do not follow this file.**
+> Moved to `docs/archive/` on 2026-08-09. `client/src/index.css` is the design
+> system that actually ships. This file specifies a dark theme with a gold
+> primary (`#F59E0B`, 2.15:1 on white — fails WCAG AA) and a purple accent —
+> neither of which exists in the shipping product, and purple is explicitly
+> retired as an anti-pattern for finance products (see the rationale comment
+> at the top of index.css). Kept for historical reference only.
+
 > **LOGIC:** When building a specific page, first check `design-system/pages/[page-name].md`.
 > If that file exists, its rules **override** this Master file.
 > If not, strictly follow the rules below.
