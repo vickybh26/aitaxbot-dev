@@ -1085,11 +1085,20 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                       </SelectContent>
                     </Select>
 
-                    {/* Dynamic Section Reference Panel */}
+                    {/* Dynamic Section Reference Panel.
+                        Collapsed by default via <details>: measured on a real
+                        375px mobile viewport, this block alone was 488px tall
+                        (more than half the screen) sitting between the page
+                        header and the very first input field, and was the
+                        single largest contributor to a 1,362px scroll before
+                        any calculator input was reachable. <details> keeps the
+                        content in the DOM (still crawlable for AdSense/SEO —
+                        Google indexes collapsed accordion content) without
+                        forcing every visitor to scroll past it first. */}
                     {formData.financialYear === '2026-27' ? (
-                      <div className="mt-2 rounded-lg border border-green-200 bg-green-50 p-3 text-xs text-green-900">
-                        <p className="font-semibold mb-1.5">📗 Income Tax Act, 2025 — effective Tax Year 2026-27 (1 Apr 2026)</p>
-                        <div className="grid grid-cols-2 gap-x-4 gap-y-0.5">
+                      <details className="mt-2 rounded-lg border border-green-200 bg-green-50 p-3 text-xs text-green-900">
+                        <summary className="font-semibold mb-1.5 cursor-pointer select-none">📗 Income Tax Act, 2025 — effective Tax Year 2026-27 (1 Apr 2026)</summary>
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 mt-1.5">
                           <span><span className="font-medium">New Regime:</span> Section 202</span>
                           <span><span className="font-medium">Rebate (≤ ₹12L):</span> Section 156</span>
                           <span><span className="font-medium">Std. Deduction:</span> Section 19</span>
@@ -1100,11 +1109,11 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                           <span><span className="font-medium">Health Insurance:</span> Section 126</span>
                           <span className="col-span-2 mt-0.5"><span className="font-medium">Metro cities (8, HRA 50%):</span> Delhi, Mumbai, Kolkata, Chennai, Bangalore, Hyderabad, Pune, Ahmedabad</span>
                         </div>
-                      </div>
+                      </details>
                     ) : formData.financialYear === '2025-26' ? (
-                      <div className="mt-2 rounded-lg border border-blue-200 bg-blue-50 p-3 text-xs text-blue-900">
-                        <p className="font-semibold mb-1.5">📘 Income Tax Act, 2025 — FY 2026-27 (Budget 2026 slabs)</p>
-                        <div className="grid grid-cols-2 gap-x-4 gap-y-0.5">
+                      <details className="mt-2 rounded-lg border border-blue-200 bg-blue-50 p-3 text-xs text-blue-900">
+                        <summary className="font-semibold mb-1.5 cursor-pointer select-none">📘 Income Tax Act, 2025 — FY 2026-27 (Budget 2026 slabs)</summary>
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 mt-1.5">
                           <span><span className="font-medium">New Regime:</span> Section 115BAC</span>
                           <span><span className="font-medium">Rebate (≤ ₹12L):</span> Section 87A</span>
                           <span><span className="font-medium">Std. Deduction:</span> Section 16(ia)</span>
@@ -1115,11 +1124,11 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                           <span><span className="font-medium">Health Insurance:</span> Section 80D</span>
                           <span className="col-span-2 mt-0.5"><span className="font-medium">Metro cities (4, HRA 50%):</span> Delhi, Mumbai, Kolkata, Chennai</span>
                         </div>
-                      </div>
+                      </details>
                     ) : (
-                      <div className="mt-2 rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs text-slate-700">
-                        <p className="font-semibold mb-1.5">📙 Income Tax Act, 1961 — FY 2024-25 (Budget 2024 slabs)</p>
-                        <div className="grid grid-cols-2 gap-x-4 gap-y-0.5">
+                      <details className="mt-2 rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs text-slate-700">
+                        <summary className="font-semibold mb-1.5 cursor-pointer select-none">📙 Income Tax Act, 1961 — FY 2024-25 (Budget 2024 slabs)</summary>
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 mt-1.5">
                           <span><span className="font-medium">New Regime:</span> Section 115BAC</span>
                           <span><span className="font-medium">Rebate (≤ ₹7L):</span> Section 87A</span>
                           <span><span className="font-medium">Std. Deduction:</span> Section 16(ia)</span>
@@ -1130,7 +1139,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                           <span><span className="font-medium">Health Insurance:</span> Section 80D</span>
                           <span className="col-span-2 mt-0.5"><span className="font-medium">Metro cities (4, HRA 50%):</span> Delhi, Mumbai, Kolkata, Chennai</span>
                         </div>
-                      </div>
+                      </details>
                     )}
                   </div>
 
