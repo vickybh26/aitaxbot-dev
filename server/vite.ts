@@ -240,8 +240,15 @@ export function serveStatic(app: Express) {
   }
 
   // Serve static assets (JS bundles, CSS, images, etc.) — these have no inline
-  // scripts so no nonce injection is needed.
-  app.use(express.static(distPath));
+  // scripts so no nonce injection is needed. `index: false` is required: by
+  // default express.static auto-serves distPath/index.html for a request to
+  // "/", which would hand the homepage the raw, un-injected template and
+  // skip injectSeoContent() entirely — every other route has no matching
+  // file on disk so it already fell through to the "*" handler below, but
+  // "/" always resolved directly here. Confirmed live: after the first
+  // deploy of injectSeoContent(), every route except "/" showed the new
+  // per-page content while the homepage still served the old generic shell.
+  app.use(express.static(distPath, { index: false }));
 
   // Cache the HTML template in memory (read once, inject nonce per request).
   let htmlTemplate: string | null = null;
