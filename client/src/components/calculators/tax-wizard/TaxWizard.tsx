@@ -9,6 +9,7 @@ import HousePropertyStep, { isHousePropertyStepValid } from "./steps/HouseProper
 import BusinessStep, { isBusinessStepValid } from "./steps/BusinessStep";
 import CapitalGainsStep, { isCapitalGainsStepValid } from "./steps/CapitalGainsStep";
 import OtherSourcesStep, { isOtherSourcesStepValid } from "./steps/OtherSourcesStep";
+import DeductionsStep, { isDeductionsStepValid } from "./steps/DeductionsStep";
 import { createEmptyWizardState, type WizardState } from "./types";
 
 /**
@@ -16,13 +17,16 @@ import { createEmptyWizardState, type WizardState } from "./types";
  * isn't wired into the live calculator route yet.
  *
  * Steps implemented so far: Basic Details, FY/AY + Income Head picker,
- * Salary, House Property, Business, Capital Gains, Other Sources. Steps
- * landing in follow-up PRs: Deductions, Result — each one only shown if its
- * income head was selected in step 2.
+ * Salary, House Property, Business, Capital Gains, Other Sources,
+ * Deductions. Only the Result screen remains before the final cutover PR.
  *
  * The step LIST is dynamic, not a fixed array: getActiveSteps() below
  * recomputes it from state.incomeHeads on every render, so toggling a head
  * on/off in step 2 immediately adds or removes its step from the flow.
+ * Deductions is the first step that is NOT gated by an income head — it's
+ * unconditionally appended at the end, since Chapter VI-A deductions (80C,
+ * 80D, etc.) can apply to any taxpayer regardless of which income heads
+ * they have.
  */
 
 type StepId =
@@ -32,7 +36,8 @@ type StepId =
   | "houseProperty"
   | "business"
   | "capitalGains"
-  | "otherSources";
+  | "otherSources"
+  | "deductions";
 
 function getActiveSteps(incomeHeads: WizardState["incomeHeads"]): { id: StepId; label: string }[] {
   const steps: { id: StepId; label: string }[] = [
@@ -44,7 +49,7 @@ function getActiveSteps(incomeHeads: WizardState["incomeHeads"]): { id: StepId; 
   if (incomeHeads.business) steps.push({ id: "business", label: "Business" });
   if (incomeHeads.capitalGains) steps.push({ id: "capitalGains", label: "Capital Gains" });
   if (incomeHeads.otherSources) steps.push({ id: "otherSources", label: "Other Sources" });
-  // All 5 income heads now covered. Deductions + Result land in follow-up PRs.
+  steps.push({ id: "deductions", label: "Deductions" }); // unconditional — see comment above
   return steps;
 }
 
@@ -73,6 +78,8 @@ export default function TaxWizard() {
       ? isCapitalGainsStepValid(state.capitalGains)
       : currentStep.id === "otherSources"
       ? isOtherSourcesStepValid(state.otherSources)
+      : currentStep.id === "deductions"
+      ? isDeductionsStepValid()
       : false;
 
   const isLastStep = safeStepIndex === steps.length - 1;
@@ -127,8 +134,10 @@ export default function TaxWizard() {
       {currentStep.id === "fyAndHeads" && (
         <FYAndHeadsStep
           financialYear={state.financialYear}
+          ageGroup={state.ageGroup}
           incomeHeads={state.incomeHeads}
           onFinancialYearChange={(financialYear) => setState((s) => ({ ...s, financialYear }))}
+          onAgeGroupChange={(ageGroup) => setState((s) => ({ ...s, ageGroup }))}
           onIncomeHeadsChange={(incomeHeads) => setState((s) => ({ ...s, incomeHeads }))}
         />
       )}
@@ -165,6 +174,15 @@ export default function TaxWizard() {
         <OtherSourcesStep
           value={state.otherSources}
           onChange={(otherSources) => setState((s) => ({ ...s, otherSources }))}
+        />
+      )}
+
+      {currentStep.id === "deductions" && (
+        <DeductionsStep
+          value={state.deductions}
+          otherSources={state.otherSources}
+          ageGroup={state.ageGroup}
+          onChange={(deductions) => setState((s) => ({ ...s, deductions }))}
         />
       )}
 

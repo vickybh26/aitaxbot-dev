@@ -15,7 +15,7 @@
  * client/src/pages/IncomeTaxCalculatorWizard.tsx for the preview route.
  */
 
-import { computeSpecialRateTax } from "@shared/taxLiability";
+import { computeSpecialRateTax, type AgeGroup } from "@shared/taxLiability";
 
 export type IncomeHeadKey =
   | "salary"
@@ -155,15 +155,49 @@ export interface OtherSourcesDetails {
   otherInterest: string; // FD/RD/bonds/etc — NOT 80TTA/80TTB-eligible
 }
 
+/**
+ * Deductions — Chapter VI-A, Old Regime only (New Regime disallows all of
+ * these except employer NPS contribution u/s 80CCD(2), which this wizard
+ * doesn't collect since it isn't information the TAXPAYER provides — it's
+ * already reflected in Form 16/payslip figures collected in SalaryStep).
+ *
+ * Two deductions from the real ITR-3's Schedule VI-A are deliberately NOT
+ * fields here because they're already fully accounted for elsewhere without
+ * double-asking:
+ *   - Home loan interest (s.24(b)) reduces "Income from House Property"
+ *     itself (computed in HousePropertyStep) — it is not a Chapter VI-A
+ *     deduction from Gross Total Income, so it must never appear again here.
+ *   - Section 80TTA/80TTB (savings interest) is auto-derived from
+ *     state.otherSources.savingsInterest + ageGroup (see
+ *     computeAutoDerivedDeductions) rather than re-asked, per the same
+ *     "don't ask twice" reasoning documented on OtherSourcesDetails.
+ */
+export interface DeductionsDetails {
+  section80C: string; // PPF, ELSS, life insurance, etc. — capped Rs.1,50,000
+  section80D: string; // Health insurance premium — capped Rs.25,000/Rs.50,000 by age (simplified, see below)
+  section80E: string; // Student loan interest — uncapped
+  section80CCD1B: string; // Additional NPS (own contribution) — capped Rs.50,000
+  section80G: string; // Donations — treated as fully deductible here (simplified; real rule varies 50%/100% by donee)
+}
+
+export const SECTION_80C_CAP = 150000;
+export const SECTION_80CCD1B_CAP = 50000;
+export const SECTION_80D_CAP_BELOW60 = 25000;
+export const SECTION_80D_CAP_SENIOR = 50000;
+export const SECTION_80TTA_CAP = 10000;
+export const SECTION_80TTB_CAP = 50000; // senior citizens only
+
 export interface WizardState {
   basicDetails: BasicDetails;
   financialYear: string; // matches TaxCalculator.tsx's existing values: "2024-25" | "2025-26" | "2026-27"
+  ageGroup: AgeGroup;
   incomeHeads: Record<IncomeHeadKey, boolean>;
   salary: SalaryDetails;
   houseProperty: HousePropertyDetails;
   business: BusinessDetails;
   capitalGains: CapitalGainsDetails;
   otherSources: OtherSourcesDetails;
+  deductions: DeductionsDetails;
 }
 
 export const SELF_OCCUPIED_INTEREST_CAP = 200000;
@@ -195,6 +229,7 @@ export function createEmptyWizardState(): WizardState {
   return {
     basicDetails: { name: "", mobile: "", email: "" },
     financialYear: "2026-27",
+    ageGroup: "below60",
     incomeHeads: {
       salary: false,
       houseProperty: false,
@@ -236,6 +271,13 @@ export function createEmptyWizardState(): WizardState {
       dividendIncome: "",
       savingsInterest: "",
       otherInterest: "",
+    },
+    deductions: {
+      section80C: "",
+      section80D: "",
+      section80E: "",
+      section80CCD1B: "",
+      section80G: "",
     },
   };
 }
@@ -412,5 +454,49 @@ export function computeCapitalGainsTax(cg: CapitalGainsDetails) {
   return {
     ...special,
     debtFundGains: toAmount(cg.debtFundGains),
+  };
+}
+
+export interface DeductionsComputation {
+  section80C: number; // capped
+  section80D: number; // capped by age
+  section80E: number; // uncapped
+  section80CCD1B: number; // capped
+  section80G: number; // uncapped here (simplified)
+  section80TTAorTTB: number; // auto-derived, capped by age — not a user input
+  total: number;
+}
+
+/**
+ * Applies every cap explicitly, rather than trusting the raw entered figures
+ * — the same "compute the real minimum/maximum for the user, don't just
+ * echo what they typed" principle as every other step's live totals. The
+ * 80TTA/80TTB line is auto-derived from otherSources.savingsInterest + the
+ * wizard-level ageGroup — see the doc comment on DeductionsDetails for why
+ * it isn't a field the user fills in here.
+ */
+export function computeDeductions(
+  deductions: DeductionsDetails,
+  otherSources: OtherSourcesDetails,
+  ageGroup: AgeGroup
+): DeductionsComputation {
+  const section80C = Math.min(toAmount(deductions.section80C), SECTION_80C_CAP);
+  const section80DCap = ageGroup === "below60" ? SECTION_80D_CAP_BELOW60 : SECTION_80D_CAP_SENIOR;
+  const section80D = Math.min(toAmount(deductions.section80D), section80DCap);
+  const section80E = toAmount(deductions.section80E);
+  const section80CCD1B = Math.min(toAmount(deductions.section80CCD1B), SECTION_80CCD1B_CAP);
+  const section80G = toAmount(deductions.section80G);
+
+  const savingsInterestCap = ageGroup === "below60" ? SECTION_80TTA_CAP : SECTION_80TTB_CAP;
+  const section80TTAorTTB = Math.min(toAmount(otherSources.savingsInterest), savingsInterestCap);
+
+  return {
+    section80C,
+    section80D,
+    section80E,
+    section80CCD1B,
+    section80G,
+    section80TTAorTTB,
+    total: section80C + section80D + section80E + section80CCD1B + section80G + section80TTAorTTB,
   };
 }

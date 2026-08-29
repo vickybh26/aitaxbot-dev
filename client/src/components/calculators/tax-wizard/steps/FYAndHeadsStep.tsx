@@ -1,14 +1,24 @@
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { SegmentedToggle } from "@/components/ui/segmented-toggle";
+import type { AgeGroup } from "@shared/taxLiability";
 import { INCOME_HEAD_LABELS, type IncomeHeadKey, type WizardState } from "../types";
 
 interface FYAndHeadsStepProps {
   financialYear: string;
+  ageGroup: AgeGroup;
   incomeHeads: WizardState["incomeHeads"];
   onFinancialYearChange: (fy: string) => void;
+  onAgeGroupChange: (ageGroup: AgeGroup) => void;
   onIncomeHeadsChange: (next: WizardState["incomeHeads"]) => void;
 }
+
+const AGE_GROUP_OPTIONS: { value: AgeGroup; label: string }[] = [
+  { value: "below60", label: "Below 60" },
+  { value: "60to80", label: "60–80" },
+  { value: "above80", label: "Above 80" },
+];
 
 export function hasAtLeastOneIncomeHead(heads: WizardState["incomeHeads"]): boolean {
   return Object.values(heads).some(Boolean);
@@ -24,8 +34,10 @@ const HEAD_ORDER: IncomeHeadKey[] = [
 
 export default function FYAndHeadsStep({
   financialYear,
+  ageGroup,
   incomeHeads,
   onFinancialYearChange,
+  onAgeGroupChange,
   onIncomeHeadsChange,
 }: FYAndHeadsStepProps) {
   function toggleHead(key: IncomeHeadKey) {
@@ -54,6 +66,20 @@ export default function FYAndHeadsStep({
             <SelectItem value="2026-27">FY 2026-27 (AY 2027-28) — Income Tax Act, 2025</SelectItem>
           </SelectContent>
         </Select>
+      </div>
+
+      <div>
+        <Label className="mb-2 block">Age Group</Label>
+        <SegmentedToggle
+          fullWidth
+          options={AGE_GROUP_OPTIONS}
+          value={ageGroup}
+          onChange={(v) => onAgeGroupChange(v as AgeGroup)}
+        />
+        <p className="text-xs text-neutral-500 mt-1">
+          Affects your tax-free income threshold under the Old Regime, and deduction limits like 80D
+          and 80TTB.
+        </p>
       </div>
 
       <div>
