@@ -32,7 +32,7 @@ from dotenv import load_dotenv
 import requests
 from qdrant_client import QdrantClient
 from qdrant_client.models import (
-    Distance, VectorParams, PointStruct
+    Distance, VectorParams, PointStruct, PayloadSchemaType
 )
 
 try:
@@ -61,49 +61,64 @@ EMBED_DELAY      = 0.1    # seconds between Gemini embed calls (rate limit)
 
 BASE_DIR = Path(r"C:\Users\Vicky\ATB\Bare Act and Study Material")
 
+# law_version tags which Act each source was written under — NOT which Act
+# is "more current." ITA 1961 governs all income earned before 1 April 2026
+# (every AY up to and including AY 2026-27); ITA 2025 governs only income
+# earned from 1 April 2026 onward. ICAI study material teaches under ITA
+# 1961 (CLAUDE.md: "ICAI still teaches ITA 1961; ITA 2025 applicable for CA
+# exams from May 2027"), even though it's dated 2026 — so source_type alone
+# (icai_material vs ita_2025) is not a reliable proxy for law_version, and
+# each source needs its own explicit tag rather than inferring one from the
+# other. See server/ragService.ts LAW_TRANSITION_RULE for how this is used
+# at query time — this is the same mistake, caught in a different place,
+# that led to campaign 26's wrong section citations (2026-07-14).
 PDF_SOURCES = [
     {
         "path": BASE_DIR / "Income_Tax_Act_2025_as_amended_by_FA_Act_2026.pdf",
         "source_type": "ita_2025",
+        "law_version": "ita_2025",
         "concepts": ["regime_choice", "salary_income", "capital_gains", "business_income",
                      "section_87a", "advance_tax", "itr_deadline", "tds_salary"]
     },
     {
         "path": BASE_DIR / "En-Notified-IT-Rules-2026-20-03-2026.pdf",
         "source_type": "it_rules_2026",
+        "law_version": "ita_2025",
         "concepts": ["hra", "gift_tax", "lta", "tds_other"]
     },
-    # ICAI chapters — each tagged with its primary concept area
-    {"path": BASE_DIR / "ICAI Material" / "CH1.pdf",  "source_type": "icai_material", "concepts": ["salary_income", "regime_choice"]},
-    {"path": BASE_DIR / "ICAI Material" / "CH2.pdf",  "source_type": "icai_material", "concepts": ["hra", "standard_deduction", "lta"]},
-    {"path": BASE_DIR / "ICAI Material" / "CH3.pdf",  "source_type": "icai_material", "concepts": ["business_income", "gst_compliance"]},
-    {"path": BASE_DIR / "ICAI Material" / "CH4.pdf",  "source_type": "icai_material", "concepts": ["business_income", "audit_44ab"]},
-    {"path": BASE_DIR / "ICAI Material" / "CH5.pdf",  "source_type": "icai_material", "concepts": ["capital_gains", "property_gains"]},
-    {"path": BASE_DIR / "ICAI Material" / "CH6.pdf",  "source_type": "icai_material", "concepts": ["capital_gains", "equity_stcg", "equity_ltcg"]},
-    {"path": BASE_DIR / "ICAI Material" / "CH7.pdf",  "source_type": "icai_material", "concepts": ["other_income", "gift_tax", "crypto_vda"]},
-    {"path": BASE_DIR / "ICAI Material" / "CH8.pdf",  "source_type": "icai_material", "concepts": ["set_off_rules", "advance_tax"]},
-    {"path": BASE_DIR / "ICAI Material" / "CH9.pdf",  "source_type": "icai_material", "concepts": ["section_80c", "section_80d", "nps_80ccd1b"]},
-    {"path": BASE_DIR / "ICAI Material" / "CH10.pdf", "source_type": "icai_material", "concepts": ["section_80c", "home_loan"]},
-    {"path": BASE_DIR / "ICAI Material" / "CH11.pdf", "source_type": "icai_material", "concepts": ["regime_choice", "section_87a", "surcharge"]},
-    {"path": BASE_DIR / "ICAI Material" / "CH12.pdf", "source_type": "icai_material", "concepts": ["itr_form_selection", "itr_deadline"]},
-    {"path": BASE_DIR / "ICAI Material" / "CH13.pdf", "source_type": "icai_material", "concepts": ["tds_salary", "tds_other", "advance_tax"]},
-    {"path": BASE_DIR / "ICAI Material" / "CH14.pdf", "source_type": "icai_material", "concepts": ["ais_reconciliation", "form_16"]},
-    {"path": BASE_DIR / "ICAI Material" / "CH15.pdf", "source_type": "icai_material", "concepts": ["nri_taxation"]},
-    {"path": BASE_DIR / "ICAI Material" / "CH16.pdf", "source_type": "icai_material", "concepts": ["capital_gains", "debt_mf"]},
-    {"path": BASE_DIR / "ICAI Material" / "CH17.pdf", "source_type": "icai_material", "concepts": ["gst_compliance", "business_income"]},
-    {"path": BASE_DIR / "ICAI Material" / "CH18.pdf", "source_type": "icai_material", "concepts": ["advance_tax", "tds_other"]},
-    {"path": BASE_DIR / "ICAI Material" / "CH19.pdf", "source_type": "icai_material", "concepts": ["section_80c", "section_80d"]},
-    {"path": BASE_DIR / "ICAI Material" / "CH20.pdf", "source_type": "icai_material", "concepts": ["business_income", "professional_tax"]},
-    {"path": BASE_DIR / "ICAI Material" / "CH21.pdf", "source_type": "icai_material", "concepts": ["property_gains", "section_54"]},
-    {"path": BASE_DIR / "ICAI Material" / "CH22.pdf", "source_type": "icai_material", "concepts": ["equity_stcg", "equity_ltcg", "crypto_vda"]},
-    {"path": BASE_DIR / "ICAI Material" / "CH23.pdf", "source_type": "icai_material", "concepts": ["ais_reconciliation", "itr_deadline"]},
-    {"path": BASE_DIR / "ICAI Material" / "CH24.pdf", "source_type": "icai_material", "concepts": ["nri_taxation", "dtaa"]},
-    {"path": BASE_DIR / "ICAI Material" / "CH25.pdf", "source_type": "icai_material", "concepts": ["surcharge", "section_87a"]},
-    {"path": BASE_DIR / "ICAI Material" / "CH26.pdf", "source_type": "icai_material", "concepts": ["gst_compliance"]},
-    {"path": BASE_DIR / "ICAI Material" / "CH27.pdf", "source_type": "icai_material", "concepts": ["business_income", "audit_44ab"]},
-    {"path": BASE_DIR / "ICAI Material" / "CH28.pdf", "source_type": "icai_material", "concepts": ["advance_tax", "tds_other"]},
-    {"path": BASE_DIR / "ICAI Material" / "Annex M1.pdf", "source_type": "icai_material", "concepts": ["itr_form_selection", "ais_reconciliation"]},
-    {"path": BASE_DIR / "ICAI Material" / "Annex M4.pdf", "source_type": "icai_material", "concepts": ["capital_gains", "set_off_rules"]},
+    # ICAI chapters — each tagged with its primary concept area. law_version
+    # is "ita_1961" for all of these: ICAI's syllabus (and therefore this
+    # material) is written under the old Act.
+    {"path": BASE_DIR / "ICAI Material" / "CH1.pdf",  "source_type": "icai_material", "law_version": "ita_1961", "concepts": ["salary_income", "regime_choice"]},
+    {"path": BASE_DIR / "ICAI Material" / "CH2.pdf",  "source_type": "icai_material", "law_version": "ita_1961", "concepts": ["hra", "standard_deduction", "lta"]},
+    {"path": BASE_DIR / "ICAI Material" / "CH3.pdf",  "source_type": "icai_material", "law_version": "ita_1961", "concepts": ["business_income", "gst_compliance"]},
+    {"path": BASE_DIR / "ICAI Material" / "CH4.pdf",  "source_type": "icai_material", "law_version": "ita_1961", "concepts": ["business_income", "audit_44ab"]},
+    {"path": BASE_DIR / "ICAI Material" / "CH5.pdf",  "source_type": "icai_material", "law_version": "ita_1961", "concepts": ["capital_gains", "property_gains"]},
+    {"path": BASE_DIR / "ICAI Material" / "CH6.pdf",  "source_type": "icai_material", "law_version": "ita_1961", "concepts": ["capital_gains", "equity_stcg", "equity_ltcg"]},
+    {"path": BASE_DIR / "ICAI Material" / "CH7.pdf",  "source_type": "icai_material", "law_version": "ita_1961", "concepts": ["other_income", "gift_tax", "crypto_vda"]},
+    {"path": BASE_DIR / "ICAI Material" / "CH8.pdf",  "source_type": "icai_material", "law_version": "ita_1961", "concepts": ["set_off_rules", "advance_tax"]},
+    {"path": BASE_DIR / "ICAI Material" / "CH9.pdf",  "source_type": "icai_material", "law_version": "ita_1961", "concepts": ["section_80c", "section_80d", "nps_80ccd1b"]},
+    {"path": BASE_DIR / "ICAI Material" / "CH10.pdf", "source_type": "icai_material", "law_version": "ita_1961", "concepts": ["section_80c", "home_loan"]},
+    {"path": BASE_DIR / "ICAI Material" / "CH11.pdf", "source_type": "icai_material", "law_version": "ita_1961", "concepts": ["regime_choice", "section_87a", "surcharge"]},
+    {"path": BASE_DIR / "ICAI Material" / "CH12.pdf", "source_type": "icai_material", "law_version": "ita_1961", "concepts": ["itr_form_selection", "itr_deadline"]},
+    {"path": BASE_DIR / "ICAI Material" / "CH13.pdf", "source_type": "icai_material", "law_version": "ita_1961", "concepts": ["tds_salary", "tds_other", "advance_tax"]},
+    {"path": BASE_DIR / "ICAI Material" / "CH14.pdf", "source_type": "icai_material", "law_version": "ita_1961", "concepts": ["ais_reconciliation", "form_16"]},
+    {"path": BASE_DIR / "ICAI Material" / "CH15.pdf", "source_type": "icai_material", "law_version": "ita_1961", "concepts": ["nri_taxation"]},
+    {"path": BASE_DIR / "ICAI Material" / "CH16.pdf", "source_type": "icai_material", "law_version": "ita_1961", "concepts": ["capital_gains", "debt_mf"]},
+    {"path": BASE_DIR / "ICAI Material" / "CH17.pdf", "source_type": "icai_material", "law_version": "ita_1961", "concepts": ["gst_compliance", "business_income"]},
+    {"path": BASE_DIR / "ICAI Material" / "CH18.pdf", "source_type": "icai_material", "law_version": "ita_1961", "concepts": ["advance_tax", "tds_other"]},
+    {"path": BASE_DIR / "ICAI Material" / "CH19.pdf", "source_type": "icai_material", "law_version": "ita_1961", "concepts": ["section_80c", "section_80d"]},
+    {"path": BASE_DIR / "ICAI Material" / "CH20.pdf", "source_type": "icai_material", "law_version": "ita_1961", "concepts": ["business_income", "professional_tax"]},
+    {"path": BASE_DIR / "ICAI Material" / "CH21.pdf", "source_type": "icai_material", "law_version": "ita_1961", "concepts": ["property_gains", "section_54"]},
+    {"path": BASE_DIR / "ICAI Material" / "CH22.pdf", "source_type": "icai_material", "law_version": "ita_1961", "concepts": ["equity_stcg", "equity_ltcg", "crypto_vda"]},
+    {"path": BASE_DIR / "ICAI Material" / "CH23.pdf", "source_type": "icai_material", "law_version": "ita_1961", "concepts": ["ais_reconciliation", "itr_deadline"]},
+    {"path": BASE_DIR / "ICAI Material" / "CH24.pdf", "source_type": "icai_material", "law_version": "ita_1961", "concepts": ["nri_taxation", "dtaa"]},
+    {"path": BASE_DIR / "ICAI Material" / "CH25.pdf", "source_type": "icai_material", "law_version": "ita_1961", "concepts": ["surcharge", "section_87a"]},
+    {"path": BASE_DIR / "ICAI Material" / "CH26.pdf", "source_type": "icai_material", "law_version": "ita_1961", "concepts": ["gst_compliance"]},
+    {"path": BASE_DIR / "ICAI Material" / "CH27.pdf", "source_type": "icai_material", "law_version": "ita_1961", "concepts": ["business_income", "audit_44ab"]},
+    {"path": BASE_DIR / "ICAI Material" / "CH28.pdf", "source_type": "icai_material", "law_version": "ita_1961", "concepts": ["advance_tax", "tds_other"]},
+    {"path": BASE_DIR / "ICAI Material" / "Annex M1.pdf", "source_type": "icai_material", "law_version": "ita_1961", "concepts": ["itr_form_selection", "ais_reconciliation"]},
+    {"path": BASE_DIR / "ICAI Material" / "Annex M4.pdf", "source_type": "icai_material", "law_version": "ita_1961", "concepts": ["capital_gains", "set_off_rules"]},
 ]
 
 # ─── Text cleaning ────────────────────────────────────────────────────────────
@@ -146,6 +161,7 @@ def extract_pdf_chunks(source_info: dict) -> list[dict]:
     """Extract text from a PDF and return as tagged chunks."""
     pdf_path = source_info["path"]
     source_type = source_info["source_type"]
+    law_version = source_info["law_version"]  # required — see PDF_SOURCES comment
     concepts = source_info.get("concepts", [])
     source_name = pdf_path.name
 
@@ -173,6 +189,7 @@ def extract_pdf_chunks(source_info: dict) -> list[dict]:
                     "text": chunk["text"],
                     "source": source_name,
                     "source_type": source_type,
+                    "law_version": law_version,
                     "page": chunk["page"],
                     "concepts": concepts,
                 })
@@ -228,6 +245,30 @@ def embed_batch(texts: list[str]) -> list[list[float]]:
 
 # ─── Qdrant setup ────────────────────────────────────────────────────────────
 
+def ensure_payload_indexes(client: QdrantClient) -> None:
+    """
+    Create keyword payload indexes needed for filtered search.
+
+    Both "concepts" and "law_version" are filtered on in server/ragService.ts
+    (searchQdrant). Qdrant 400s a filtered search with "Bad Request" if the
+    filtered field has no index — this took down the whole query pipeline
+    once already for "concepts" (fixed 2026-07-24, but only by hand, directly
+    against the Qdrant Cloud console — never recorded here). Creating both
+    indexes as part of ingestion means a future collection recreate can't
+    silently reintroduce the same outage.
+    """
+    for field in ("concepts", "law_version"):
+        try:
+            client.create_payload_index(
+                collection_name=COLLECTION,
+                field_name=field,
+                field_schema=PayloadSchemaType.KEYWORD,
+            )
+            print(f"  ✅ Payload index ensured on '{field}'")
+        except Exception as e:
+            # Qdrant errors on a duplicate index — that's fine, it already exists.
+            print(f"  ℹ️  Payload index on '{field}': {e}")
+
 def ensure_collection(client: QdrantClient) -> None:
     """Create Qdrant collection if it doesn't exist.
     Recreate if it exists but is empty OR has wrong vector dimensions."""
@@ -252,6 +293,7 @@ def ensure_collection(client: QdrantClient) -> None:
             client.delete_collection(COLLECTION)
         elif count > 0:
             print(f"  ✅ Collection '{COLLECTION}' already has {count} vectors with correct {VECTOR_SIZE}-dim — skipping ingestion.")
+            ensure_payload_indexes(client)
             return
         else:
             print(f"  Collection '{COLLECTION}' exists but is empty — recreating...")
@@ -263,6 +305,7 @@ def ensure_collection(client: QdrantClient) -> None:
         vectors_config=VectorParams(size=VECTOR_SIZE, distance=Distance.COSINE),
     )
     print("  ✅ Collection created")
+    ensure_payload_indexes(client)
 
 # ─── Main ingestion ───────────────────────────────────────────────────────────
 
@@ -349,6 +392,7 @@ def main():
                     "text": chunk["text"],
                     "source": chunk["source"],
                     "source_type": chunk["source_type"],
+                    "law_version": chunk["law_version"],
                     "page": chunk["page"],
                     "concepts": chunk["concepts"],
                 }
