@@ -132,6 +132,7 @@ export default function HomeLoanCalculator() {
               <Label className="text-sm font-medium text-slate-700">Monthly Gross Income (₹)</Label>
               <Input
                 type="number"
+                inputMode="numeric"
                 value={monthlyIncome}
                 onChange={e => setMonthlyIncome(Number(e.target.value))}
                 className="mt-1"
@@ -143,6 +144,7 @@ export default function HomeLoanCalculator() {
               <Label className="text-sm font-medium text-slate-700">Existing Monthly EMIs (₹)</Label>
               <Input
                 type="number"
+                inputMode="numeric"
                 value={existingEMI}
                 onChange={e => setExistingEMI(Number(e.target.value))}
                 className="mt-1"
@@ -156,6 +158,7 @@ export default function HomeLoanCalculator() {
               <Label className="text-sm font-medium text-slate-700">Property Price (₹)</Label>
               <Input
                 type="number"
+                inputMode="numeric"
                 value={propertyPrice}
                 onChange={e => setPropertyPrice(Number(e.target.value))}
                 className="mt-1"
@@ -168,6 +171,7 @@ export default function HomeLoanCalculator() {
               </Label>
               <Input
                 type="number"
+                inputMode="numeric"
                 value={downPayment}
                 onChange={e => setDownPayment(Number(e.target.value))}
                 className="mt-1"
@@ -180,6 +184,7 @@ export default function HomeLoanCalculator() {
                 <Label className="text-sm font-medium text-slate-700">Tenure (Years)</Label>
                 <Input
                   type="number"
+                  inputMode="numeric"
                   value={tenure}
                   onChange={e => setTenure(Number(e.target.value))}
                   className="mt-1"
@@ -191,6 +196,7 @@ export default function HomeLoanCalculator() {
                 <Label className="text-sm font-medium text-slate-700">Interest Rate (% p.a.)</Label>
                 <Input
                   type="number"
+                  inputMode="decimal"
                   value={rate}
                   onChange={e => setRate(Number(e.target.value))}
                   className="mt-1"

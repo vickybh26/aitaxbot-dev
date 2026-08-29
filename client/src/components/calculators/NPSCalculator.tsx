@@ -217,6 +217,7 @@ export default function NPSCalculator() {
             <Input
               id="currentAge"
               type="number"
+              inputMode="numeric"
               min={18} max={59}
               value={currentAge}
               onChange={(e) => setCurrentAge(Number(e.target.value))}
@@ -232,6 +233,7 @@ export default function NPSCalculator() {
             <Input
               id="retirementAge"
               type="number"
+              inputMode="numeric"
               min={60} max={75}
               value={retirementAge}
               onChange={(e) => setRetirementAge(Number(e.target.value))}
@@ -247,6 +249,7 @@ export default function NPSCalculator() {
             <Input
               id="monthlyContribution"
               type="number"
+              inputMode="numeric"
               min={500}
               value={monthlyContribution}
               onChange={(e) => setMonthlyContribution(Number(e.target.value))}
@@ -262,6 +265,7 @@ export default function NPSCalculator() {
             <Input
               id="employerContribution"
               type="number"
+              inputMode="numeric"
               min={0}
               value={employerContribution}
               onChange={(e) => setEmployerContribution(Number(e.target.value))}
@@ -283,6 +287,7 @@ export default function NPSCalculator() {
             <Input
               id="expectedReturn"
               type="number"
+              inputMode="decimal"
               min={4} max={15} step={0.5}
               value={expectedReturn}
               onChange={(e) => setExpectedReturn(Number(e.target.value))}
@@ -298,6 +303,7 @@ export default function NPSCalculator() {
             <Input
               id="annuityRate"
               type="number"
+              inputMode="decimal"
               min={4} max={10} step={0.5}
               value={annuityRate}
               onChange={(e) => setAnnuityRate(Number(e.target.value))}
@@ -316,6 +322,7 @@ export default function NPSCalculator() {
             <Input
               id="annualSalary"
               type="number"
+              inputMode="numeric"
               value={annualSalary || ""}
               onChange={(e) => { setAnnualSalary(Number(e.target.value)); setResult(null); }}
               className="w-full"

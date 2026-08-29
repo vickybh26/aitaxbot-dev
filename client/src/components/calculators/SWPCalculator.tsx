@@ -151,6 +151,7 @@ export default function SWPCalculator({ onClose }: SWPCalculatorProps = {}) {
           <Input
             id="initial-corpus"
             type="number"
+            inputMode="numeric"
             value={initialCorpus}
             onChange={(e) => setInitialCorpus(Number(e.target.value))}
             placeholder="5000000"
@@ -163,6 +164,7 @@ export default function SWPCalculator({ onClose }: SWPCalculatorProps = {}) {
           <Input
             id="monthly-withdrawal"
             type="number"
+            inputMode="numeric"
             value={monthlyWithdrawal}
             onChange={(e) => setMonthlyWithdrawal(Number(e.target.value))}
             placeholder="50000"
@@ -175,6 +177,7 @@ export default function SWPCalculator({ onClose }: SWPCalculatorProps = {}) {
           <Input
             id="annual-return"
             type="number"
+            inputMode="decimal"
             value={annualReturn}
             onChange={(e) => setAnnualReturn(Number(e.target.value))}
             placeholder="8"
@@ -211,6 +214,7 @@ export default function SWPCalculator({ onClose }: SWPCalculatorProps = {}) {
               <Input
                 id="inflation-rate"
                 type="number"
+                inputMode="decimal"
                 value={inflationRate}
                 onChange={(e) => setInflationRate(Number(e.target.value))}
                 placeholder="6"

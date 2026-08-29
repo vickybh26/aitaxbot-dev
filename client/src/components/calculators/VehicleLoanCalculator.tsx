@@ -241,6 +241,7 @@ export default function VehicleLoanCalculator() {
               <Label className="text-sm font-medium text-slate-700">On-Road Price (₹)</Label>
               <Input
                 type="number"
+                inputMode="numeric"
                 value={onRoadPrice}
                 onChange={e => setOnRoadPrice(Number(e.target.value))}
                 className="mt-1"
@@ -253,6 +254,7 @@ export default function VehicleLoanCalculator() {
               </Label>
               <Input
                 type="number"
+                inputMode="numeric"
                 value={downPayment}
                 onChange={e => setDownPayment(Number(e.target.value))}
                 className="mt-1"
@@ -268,6 +270,7 @@ export default function VehicleLoanCalculator() {
                 <Label className="text-sm font-medium text-slate-700">Tenure (Years)</Label>
                 <Input
                   type="number"
+                  inputMode="numeric"
                   value={tenure}
                   onChange={e => setTenure(Number(e.target.value))}
                   className="mt-1"
@@ -285,6 +288,7 @@ export default function VehicleLoanCalculator() {
                 </Label>
                 <Input
                   type="number"
+                  inputMode="decimal"
                   value={rate}
                   onChange={e => setRate(Number(e.target.value))}
                   className="mt-1"

@@ -325,6 +325,7 @@ export default function PFCalculator() {
                     <Input
                       id="monthlyBasicDA"
                       type="number"
+                      inputMode="numeric"
                       value={monthlyBasicDA}
                       onChange={(e) => setMonthlyBasicDA(Number(e.target.value))}
                       placeholder="50000"
@@ -341,6 +342,7 @@ export default function PFCalculator() {
                     <Input
                       id="annualIncrement"
                       type="number"
+                      inputMode="numeric"
                       value={annualIncrement}
                       onChange={(e) => setAnnualIncrement(Number(e.target.value))}
                       placeholder="5"
@@ -357,6 +359,7 @@ export default function PFCalculator() {
                     <Input
                       id="interestRate"
                       type="number"
+                      inputMode="decimal"
                       value={interestRate}
                       onChange={(e) => setInterestRate(Number(e.target.value))}
                       placeholder="8.25"
@@ -374,6 +377,7 @@ export default function PFCalculator() {
                     <Input
                       id="years"
                       type="number"
+                      inputMode="numeric"
                       value={years}
                       onChange={(e) => setYears(Number(e.target.value))}
                       placeholder="20"
@@ -389,6 +393,7 @@ export default function PFCalculator() {
                     <Input
                       id="vpfPercent"
                       type="number"
+                      inputMode="decimal"
                       value={vpfPercent}
                       onChange={(e) => setVpfPercent(Number(e.target.value))}
                       placeholder="0"
@@ -406,6 +411,7 @@ export default function PFCalculator() {
                     <Input
                       id="existingBalance"
                       type="number"
+                      inputMode="numeric"
                       value={existingBalance}
                       onChange={(e) => setExistingBalance(Number(e.target.value))}
                       placeholder="0"
@@ -424,6 +430,7 @@ export default function PFCalculator() {
                     <Input
                       id="ppfYearlyAmount"
                       type="number"
+                      inputMode="numeric"
                       value={ppfYearlyAmount}
                       onChange={(e) => setPpfYearlyAmount(Math.max(500, Math.min(Number(e.target.value), 150000)))}
                       placeholder="150000"
@@ -440,6 +447,7 @@ export default function PFCalculator() {
                     <Input
                       id="interestRate"
                       type="number"
+                      inputMode="decimal"
                       value={interestRate}
                       onChange={(e) => setInterestRate(Number(e.target.value))}
                       placeholder="7.1"
@@ -457,6 +465,7 @@ export default function PFCalculator() {
                     <Input
                       id="years"
                       type="number"
+                      inputMode="numeric"
                       value={years}
                       onChange={(e) => setYears(Math.max(Number(e.target.value), 15))}
                       placeholder="15"
@@ -473,6 +482,7 @@ export default function PFCalculator() {
                     <Input
                       id="existingBalance"
                       type="number"
+                      inputMode="numeric"
                       value={existingBalance}
                       onChange={(e) => setExistingBalance(Number(e.target.value))}
                       placeholder="0"
