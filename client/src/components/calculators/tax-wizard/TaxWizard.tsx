@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import BasicDetailsStep, { isBasicDetailsValid } from "./steps/BasicDetailsStep";
 import FYAndHeadsStep, { hasAtLeastOneIncomeHead } from "./steps/FYAndHeadsStep";
 import SalaryStep, { isSalaryStepValid } from "./steps/SalaryStep";
+import HousePropertyStep, { isHousePropertyStepValid } from "./steps/HousePropertyStep";
 import { createEmptyWizardState, type WizardState } from "./types";
 
 /**
@@ -12,7 +13,7 @@ import { createEmptyWizardState, type WizardState } from "./types";
  * isn't wired into the live calculator route yet.
  *
  * Steps implemented so far: Basic Details, FY/AY + Income Head picker,
- * Salary. Steps landing in follow-up PRs: House Property, Business
+ * Salary, House Property. Steps landing in follow-up PRs: Business
  * (44AD/44ADA/44AE), Capital Gains (equity/MF), Other Sources, Deductions,
  * Result — each one only shown if its income head was selected in step 2.
  *
@@ -21,7 +22,7 @@ import { createEmptyWizardState, type WizardState } from "./types";
  * on/off in step 2 immediately adds or removes its step from the flow.
  */
 
-type StepId = "basicDetails" | "fyAndHeads" | "salary";
+type StepId = "basicDetails" | "fyAndHeads" | "salary" | "houseProperty";
 
 function getActiveSteps(incomeHeads: WizardState["incomeHeads"]): { id: StepId; label: string }[] {
   const steps: { id: StepId; label: string }[] = [
@@ -29,8 +30,9 @@ function getActiveSteps(incomeHeads: WizardState["incomeHeads"]): { id: StepId; 
     { id: "fyAndHeads", label: "Year & Income Type" },
   ];
   if (incomeHeads.salary) steps.push({ id: "salary", label: "Salary" });
+  if (incomeHeads.houseProperty) steps.push({ id: "houseProperty", label: "House Property" });
   // Future heads append here, in the same order as FYAndHeadsStep's
-  // checklist: houseProperty, business, capitalGains, otherSources.
+  // checklist: business, capitalGains, otherSources.
   return steps;
 }
 
@@ -51,6 +53,8 @@ export default function TaxWizard() {
       ? hasAtLeastOneIncomeHead(state.incomeHeads)
       : currentStep.id === "salary"
       ? isSalaryStepValid(state.salary)
+      : currentStep.id === "houseProperty"
+      ? isHousePropertyStepValid(state.houseProperty)
       : false;
 
   const isLastStep = safeStepIndex === steps.length - 1;
@@ -115,6 +119,13 @@ export default function TaxWizard() {
         <SalaryStep
           value={state.salary}
           onChange={(salary) => setState((s) => ({ ...s, salary }))}
+        />
+      )}
+
+      {currentStep.id === "houseProperty" && (
+        <HousePropertyStep
+          value={state.houseProperty}
+          onChange={(houseProperty) => setState((s) => ({ ...s, houseProperty }))}
         />
       )}
 

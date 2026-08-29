@@ -47,12 +47,43 @@ export interface SalaryDetails {
   professionalTax: string;
 }
 
+/**
+ * House Property, per the plan from this session: interest on home loan,
+ * number of properties, number of let-out properties. TaxCalculator.tsx's
+ * existing "House Property Income" field is a single lump number the user
+ * has to have already computed themselves — this step does that computation
+ * for them instead.
+ *
+ * Deliberately aggregate, not per-property: self-occupied properties are all
+ * summed into one interest figure (capped at Rs.2L total under Section
+ * 24(b)/Section 25 ITA2025 regardless of how many self-occupied properties
+ * there are — only up to 2 can even be treated as self-occupied/nil, a rule
+ * called out in the UI rather than modelled with per-property state, which
+ * would be real complexity for a case that's rare for this product's
+ * audience). Let-out properties are likewise summed into one rent/interest
+ * figure. A user with meaningfully different let-out properties can still
+ * get a correct AGGREGATE answer this way, just not a per-property one.
+ */
+export interface HousePropertyDetails {
+  numberOfProperties: string;
+  numberOfLetOut: string;
+  // Let-out properties
+  annualRentReceived: string;
+  municipalTaxesPaid: string;
+  letOutHomeLoanInterest: string;
+  // Self-occupied properties (up to 2 can be nil-value; interest capped Rs.2L total)
+  selfOccupiedHomeLoanInterest: string;
+}
+
 export interface WizardState {
   basicDetails: BasicDetails;
   financialYear: string; // matches TaxCalculator.tsx's existing values: "2024-25" | "2025-26" | "2026-27"
   incomeHeads: Record<IncomeHeadKey, boolean>;
   salary: SalaryDetails;
+  houseProperty: HousePropertyDetails;
 }
+
+export const SELF_OCCUPIED_INTEREST_CAP = 200000;
 
 export const INCOME_HEAD_LABELS: Record<IncomeHeadKey, { label: string; hint: string }> = {
   salary: {
@@ -96,6 +127,14 @@ export function createEmptyWizardState(): WizardState {
       otherAllowances: "",
       professionalTax: "",
     },
+    houseProperty: {
+      numberOfProperties: "1",
+      numberOfLetOut: "0",
+      annualRentReceived: "",
+      municipalTaxesPaid: "",
+      letOutHomeLoanInterest: "",
+      selfOccupiedHomeLoanInterest: "",
+    },
   };
 }
 
@@ -113,4 +152,50 @@ export function computeGrossSalary(salary: SalaryDetails): number {
     toAmount(salary.lta) +
     toAmount(salary.otherAllowances)
   );
+}
+
+export interface HousePropertyComputation {
+  letOutNetAnnualValue: number;
+  letOutStandardDeduction: number; // 30% of NAV, Section 24(a)
+  letOutIncome: number; // can be negative (loss)
+  selfOccupiedInterestCapped: number; // always <= SELF_OCCUPIED_INTEREST_CAP
+  selfOccupiedIncome: number; // always <= 0 (a deduction/loss, never positive)
+  totalIncome: number; // letOutIncome + selfOccupiedIncome — can be negative
+}
+
+/**
+ * Computes income from house property from the aggregate figures collected
+ * in HousePropertyDetails. Mirrors the standard Section 22-27 (ITA 1961) /
+ * Section 20-25 (ITA 2025) computation:
+ *   Let-out: NAV (rent - municipal taxes) -> less 30% standard deduction
+ *            (s.24(a)) -> less home loan interest, UNCAPPED (s.24(b))
+ *   Self-occupied: Nil annual value; only interest is deductible, CAPPED at
+ *            Rs.2,00,000 total regardless of how many self-occupied
+ *            properties there are (s.24(b) proviso / s.25 ITA2025)
+ */
+export function computeHousePropertyIncome(hp: HousePropertyDetails): HousePropertyComputation {
+  const letOutCount = toAmount(hp.numberOfLetOut);
+
+  const rent = toAmount(hp.annualRentReceived);
+  const municipalTaxes = toAmount(hp.municipalTaxesPaid);
+  const letOutInterest = toAmount(hp.letOutHomeLoanInterest);
+
+  const letOutNetAnnualValue = letOutCount > 0 ? Math.max(0, rent - municipalTaxes) : 0;
+  const letOutStandardDeduction = letOutNetAnnualValue * 0.3;
+  const letOutIncome = letOutCount > 0 ? letOutNetAnnualValue - letOutStandardDeduction - letOutInterest : 0;
+
+  const selfOccupiedInterestCapped = Math.min(
+    toAmount(hp.selfOccupiedHomeLoanInterest),
+    SELF_OCCUPIED_INTEREST_CAP
+  );
+  const selfOccupiedIncome = -selfOccupiedInterestCapped;
+
+  return {
+    letOutNetAnnualValue,
+    letOutStandardDeduction,
+    letOutIncome,
+    selfOccupiedInterestCapped,
+    selfOccupiedIncome,
+    totalIncome: letOutIncome + selfOccupiedIncome,
+  };
 }
