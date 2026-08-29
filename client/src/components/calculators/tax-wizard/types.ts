@@ -15,6 +15,8 @@
  * client/src/pages/IncomeTaxCalculatorWizard.tsx for the preview route.
  */
 
+import { computeSpecialRateTax } from "@shared/taxLiability";
+
 export type IncomeHeadKey =
   | "salary"
   | "houseProperty"
@@ -105,6 +107,33 @@ export interface BusinessDetails {
   monthsHeld: string; // 1-12, average across vehicles if count > 1
 }
 
+/**
+ * Capital Gains — shares and mutual funds only, per this session's explicit
+ * scope ("Support only Sharemarket and mutual fund capital gains").
+ *
+ * Equity shares and equity-oriented mutual funds (STT paid) are taxed at the
+ * special rates in Section 111A (STCG, <12 months) / Section 112A (LTCG,
+ * >=12 months, first Rs.1,25,000/year exempt) — computed here via
+ * computeSpecialRateTax(), the SAME function shared/taxLiability.ts's
+ * computeTaxLiability() already uses for the live calculator. Reusing it
+ * (rather than re-deriving the 12.5%/20%/Rs.1.25L constants here) means this
+ * step's live preview can never drift out of sync with the real computation
+ * engine — a risk every other step in this wizard has, since no shared
+ * function existed for Salary/House Property/Business before this rebuild.
+ *
+ * Debt mutual funds (bought on or after 1 April 2023) lost LTCG/indexation
+ * treatment entirely under Finance Act 2023 — ALL gains, any holding period,
+ * are taxed at the taxpayer's slab rate, same as any other income. So unlike
+ * equity, there's no separate rate to compute here: this figure just gets
+ * added to slab-taxed income downstream, which is why there's no "STCG vs
+ * LTCG" split for it in this type.
+ */
+export interface CapitalGainsDetails {
+  stcgEquity: string; // Section 111A, listed shares/equity MF held <12 months
+  ltcgEquity: string; // Section 112A, listed shares/equity MF held >=12 months
+  debtFundGains: string; // Slab rate since FA2023, any holding period
+}
+
 export interface WizardState {
   basicDetails: BasicDetails;
   financialYear: string; // matches TaxCalculator.tsx's existing values: "2024-25" | "2025-26" | "2026-27"
@@ -112,6 +141,7 @@ export interface WizardState {
   salary: SalaryDetails;
   houseProperty: HousePropertyDetails;
   business: BusinessDetails;
+  capitalGains: CapitalGainsDetails;
 }
 
 export const SELF_OCCUPIED_INTEREST_CAP = 200000;
@@ -174,6 +204,11 @@ export function createEmptyWizardState(): WizardState {
       isHeavyVehicle: false,
       avgTonnageMT: "",
       monthsHeld: "12",
+    },
+    capitalGains: {
+      stcgEquity: "",
+      ltcgEquity: "",
+      debtFundGains: "",
     },
   };
 }
@@ -332,5 +367,19 @@ export function computeBusinessIncome(b: BusinessDetails): BusinessComputation {
     exceedsLimit: false,
     presumptiveIncome: 0,
     auditWarning: null,
+  };
+}
+
+/**
+ * Thin wrapper around shared/taxLiability.ts's computeSpecialRateTax() — see
+ * the doc comment on CapitalGainsDetails for why this delegates instead of
+ * re-deriving the rates. debtFundGains is passed through untaxed here since
+ * it's taxed at slab rate downstream, not at a special rate.
+ */
+export function computeCapitalGainsTax(cg: CapitalGainsDetails) {
+  const special = computeSpecialRateTax(toAmount(cg.ltcgEquity), toAmount(cg.stcgEquity));
+  return {
+    ...special,
+    debtFundGains: toAmount(cg.debtFundGains),
   };
 }
