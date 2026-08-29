@@ -306,7 +306,8 @@ function USStocksTab({ trades, setTrades, slabRate }: {
               </div>
               <div>
                 <Label className="text-xs text-slate-500">Quantity (shares)</Label>
-                <Input aria-label="Quantity (shares)" type="number" min={0.001} step={0.001} value={t.quantity || ""}
+                <Input aria-label="Quantity (shares)" type="number"
+                  inputMode="decimal" min={0.001} step={0.001} value={t.quantity || ""}
                   onChange={e => update(t.id, { quantity: parseFloat(e.target.value) || 0 })}
                   className="h-9 text-sm mt-1" />
               </div>
@@ -326,7 +327,8 @@ function USStocksTab({ trades, setTrades, slabRate }: {
               </div>
               <div>
                 <Label className="text-xs text-slate-500">Buy Price (USD/share)</Label>
-                <Input aria-label="Buy Price (USD/share)" type="number" min={0} step={0.01} placeholder="0.00" value={t.buyPriceUSD || ""}
+                <Input aria-label="Buy Price (USD/share)" type="number"
+                  inputMode="decimal" min={0} step={0.01} placeholder="0.00" value={t.buyPriceUSD || ""}
                   onChange={e => update(t.id, { buyPriceUSD: parseFloat(e.target.value) || 0 })}
                   className="h-9 text-sm mt-1" />
               </div>
@@ -346,7 +348,8 @@ function USStocksTab({ trades, setTrades, slabRate }: {
               </div>
               <div>
                 <Label className="text-xs text-slate-500">Sell Price (USD/share)</Label>
-                <Input aria-label="Sell Price (USD/share)" type="number" min={0} step={0.01} placeholder="0.00" value={t.sellPriceUSD || ""}
+                <Input aria-label="Sell Price (USD/share)" type="number"
+                  inputMode="decimal" min={0} step={0.01} placeholder="0.00" value={t.sellPriceUSD || ""}
                   onChange={e => update(t.id, { sellPriceUSD: parseFloat(e.target.value) || 0 })}
                   className="h-9 text-sm mt-1" />
               </div>
@@ -496,13 +499,15 @@ function USDividendsTab({ dividends, setDividends, slabRate }: {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label className="text-xs text-slate-500">Gross Dividend (USD)</Label>
-                <Input aria-label="Gross Dividend (USD)" type="number" min={0} step={0.01} placeholder="0.00" value={d.amountUSD || ""}
+                <Input aria-label="Gross Dividend (USD)" type="number"
+                  inputMode="decimal" min={0} step={0.01} placeholder="0.00" value={d.amountUSD || ""}
                   onChange={e => update(d.id, { amountUSD: parseFloat(e.target.value) || 0 })}
                   className="h-9 text-sm mt-1" />
               </div>
               <div>
                 <Label className="text-xs text-slate-500">US Tax Withheld (USD)</Label>
-                <Input aria-label="US Tax Withheld (USD)" type="number" min={0} step={0.01} placeholder="15% or 25% of gross"
+                <Input aria-label="US Tax Withheld (USD)" type="number"
+                  inputMode="decimal" min={0} step={0.01} placeholder="15% or 25% of gross"
                   value={d.withheldUSD || ""}
                   onChange={e => update(d.id, { withheldUSD: parseFloat(e.target.value) || 0 })}
                   className="h-9 text-sm mt-1" />
@@ -633,7 +638,8 @@ function IndianFOTab({ trades, setTrades, slabRate }: {
               </div>
               <div>
                 <Label className="text-xs text-slate-500">Net P&L (₹)</Label>
-                <Input aria-label="Net P&L (₹)" type="number" step={1} placeholder="Profit is positive, loss is negative"
+                <Input aria-label="Net P&L (₹)" type="number"
+                  inputMode="numeric" step={1} placeholder="Profit is positive, loss is negative"
                   value={t.netPL || ""}
                   onChange={e => update(t.id, { netPL: parseFloat(e.target.value) || 0 })}
                   className={`h-9 text-sm mt-1 ${t.netPL < 0 ? "border-red-300 text-red-600" : t.netPL > 0 ? "border-green-300 text-green-700" : ""}`} />
@@ -760,7 +766,8 @@ function USFOTab({ trades, setTrades, slabRate }: {
               </div>
               <div>
                 <Label className="text-xs text-slate-500">Net P&L (USD)</Label>
-                <Input aria-label="Net P&L (USD)" type="number" step={0.01} placeholder="Profit positive, loss negative"
+                <Input aria-label="Net P&L (USD)" type="number"
+                  inputMode="decimal" step={0.01} placeholder="Profit positive, loss negative"
                   value={t.netPLUSD || ""}
                   onChange={e => update(t.id, { netPLUSD: parseFloat(e.target.value) || 0 })}
                   className={`h-9 text-sm mt-1 ${t.netPLUSD < 0 ? "border-red-300 text-red-600" : t.netPLUSD > 0 ? "border-green-300 text-green-700" : ""}`} />
@@ -873,7 +880,8 @@ function ForexTab({ trades, setTrades, slabRate }: {
               </div>
               <div>
                 <Label className="text-xs text-slate-500">Net P&L (₹)</Label>
-                <Input aria-label="Net P&L (₹)" type="number" step={1} placeholder="Profit positive, loss negative"
+                <Input aria-label="Net P&L (₹)" type="number"
+                  inputMode="numeric" step={1} placeholder="Profit positive, loss negative"
                   value={t.netPL || ""}
                   onChange={e => update(t.id, { netPL: parseFloat(e.target.value) || 0 })}
                   className={`h-9 text-sm mt-1 ${t.netPL < 0 ? "border-red-300 text-red-600" : t.netPL > 0 ? "border-green-300 text-green-700" : ""}`} />
@@ -1130,6 +1138,7 @@ export default function TradingTaxCalculator() {
             <span className="text-sm text-slate-500">₹</span>
             <Input
               type="number"
+              inputMode="numeric"
               min={0}
               step={10000}
               value={annualIncome || ""}

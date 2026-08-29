@@ -1162,6 +1162,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                     <Input
                       id="salary-income"
                       type="number"
+                      inputMode="numeric"
                       placeholder="e.g., 1200000"
                       value={formData.salaryIncome}
                       onChange={(e) => updateFormData('salaryIncome', e.target.value)}
@@ -1174,6 +1175,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                     <Input
                       id="house-property-income"
                       type="number"
+                      inputMode="numeric"
                       placeholder="e.g., 200000"
                       value={formData.housePropertyIncome}
                       onChange={(e) => updateFormData('housePropertyIncome', e.target.value)}
@@ -1186,6 +1188,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                     <Input
                       id="business-income"
                       type="number"
+                      inputMode="numeric"
                       placeholder="e.g., 300000"
                       value={formData.businessIncome}
                       onChange={(e) => updateFormData('businessIncome', e.target.value)}
@@ -1198,6 +1201,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                     <Input
                       id="capital-gains-income"
                       type="number"
+                      inputMode="numeric"
                       placeholder="e.g., 100000"
                       value={formData.capitalGainsIncome}
                       onChange={(e) => updateFormData('capitalGainsIncome', e.target.value)}
@@ -1221,6 +1225,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                     <Input
                       id="ltcg-equity"
                       type="number"
+                      inputMode="numeric"
                       placeholder="e.g., 300000"
                       value={formData.ltcgEquity}
                       onChange={(e) => updateFormData('ltcgEquity', e.target.value)}
@@ -1239,6 +1244,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                     <Input
                       id="stcg-equity"
                       type="number"
+                      inputMode="numeric"
                       placeholder="e.g., 100000"
                       value={formData.stcgEquity}
                       onChange={(e) => updateFormData('stcgEquity', e.target.value)}
@@ -1254,6 +1260,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                     <Input
                       id="other-income"
                       type="number"
+                      inputMode="numeric"
                       placeholder="e.g., 50000"
                       value={formData.otherIncome}
                       onChange={(e) => updateFormData('otherIncome', e.target.value)}
@@ -1338,6 +1345,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                     <Input
                       id="agricultural-income"
                       type="number"
+                      inputMode="numeric"
                       placeholder="e.g., 3000"
                       value={formData.agriculturalIncome}
                       onChange={(e) => updateFormData('agriculturalIncome', e.target.value)}
@@ -1362,6 +1370,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                     <Input
                       id="section-80c"
                       type="number"
+                      inputMode="numeric"
                       placeholder="Max ₹1,50,000"
                       value={formData.section80C}
                       onChange={(e) => updateFormData('section80C', e.target.value)}
@@ -1374,6 +1383,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                     <Input
                       id="section-80d"
                       type="number"
+                      inputMode="numeric"
                       placeholder="e.g., 25000"
                       value={formData.section80D}
                       onChange={(e) => updateFormData('section80D', e.target.value)}
@@ -1386,6 +1396,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                     <Input
                       id="section-80e"
                       type="number"
+                      inputMode="numeric"
                       placeholder="No upper limit"
                       value={formData.section80E}
                       onChange={(e) => updateFormData('section80E', e.target.value)}
@@ -1398,6 +1409,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                     <Input
                       id="section-80tta"
                       type="number"
+                      inputMode="numeric"
                       placeholder="Max ₹10,000"
                       value={formData.section80TTA}
                       onChange={(e) => updateFormData('section80TTA', e.target.value)}
@@ -1410,6 +1422,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                     <Input
                       id="section-80ccd1b"
                       type="number"
+                      inputMode="numeric"
                       placeholder="Max ₹50,000"
                       value={formData.section80CCD1B}
                       onChange={(e) => updateFormData('section80CCD1B', e.target.value)}
@@ -1422,6 +1435,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                     <Input
                       id="section-80g"
                       type="number"
+                      inputMode="numeric"
                       placeholder="Eligible donation amount"
                       value={formData.section80G}
                       onChange={(e) => updateFormData('section80G', e.target.value)}
@@ -1434,6 +1448,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                     <Input
                       id="home-loan-interest"
                       type="number"
+                      inputMode="numeric"
                       placeholder="Max ₹2,00,000"
                       value={formData.homeLoanInterest}
                       onChange={(e) => updateFormData('homeLoanInterest', e.target.value)}
@@ -1446,6 +1461,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                     <Input
                       id="lta"
                       type="number"
+                      inputMode="numeric"
                       placeholder="Actual LTA claimed"
                       value={formData.lta}
                       onChange={(e) => updateFormData('lta', e.target.value)}
@@ -1474,6 +1490,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                     <Input
                       id="hra-received"
                       type="number"
+                      inputMode="numeric"
                       placeholder="e.g., 200000"
                       value={formData.hraReceived}
                       onChange={(e) => { updateFormData('hraReceived', e.target.value); setHraFromCalculator(false); }}
@@ -1489,6 +1506,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                     <Input
                       id="basic-salary"
                       type="number"
+                      inputMode="numeric"
                       placeholder="e.g., 600000"
                       value={formData.basicSalary}
                       onChange={(e) => updateFormData('basicSalary', e.target.value)}
@@ -1506,6 +1524,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                     <Input
                       id="rent-paid"
                       type="number"
+                      inputMode="numeric"
                       placeholder="e.g., 240000"
                       value={formData.rentPaid}
                       onChange={(e) => updateFormData('rentPaid', e.target.value)}
@@ -1537,6 +1556,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                     <Input
                       id="other-deductions"
                       type="number"
+                      inputMode="numeric"
                       placeholder="e.g., 50000"
                       value={formData.otherDeductions}
                       onChange={(e) => updateFormData('otherDeductions', e.target.value)}

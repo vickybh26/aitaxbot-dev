@@ -347,6 +347,7 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
                       <Input
                         id="basicSalary"
                         type="number"
+                        inputMode="numeric"
                         min={0}
                         value={displayBasic}
                         onChange={(e) => {
@@ -365,6 +366,7 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
                       <Input
                         id="hraReceived"
                         type="number"
+                        inputMode="numeric"
                         min={0}
                         value={displayHra}
                         onChange={(e) => {
@@ -384,6 +386,7 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
                     <Input
                       id="rentPaid"
                       type="number"
+                      inputMode="numeric"
                       min={0}
                       value={displayRent}
                       onChange={(e) => {

@@ -197,6 +197,7 @@ export default function SIPCalculator({ onClose }: SIPCalculatorProps = {}) {
             <Input
               id="sip-amount"
               type="number"
+              inputMode="numeric"
               value={monthlyInvestment}
               onChange={(e) => setMonthlyInvestment(Number(e.target.value))}
               placeholder="5000"
@@ -209,6 +210,7 @@ export default function SIPCalculator({ onClose }: SIPCalculatorProps = {}) {
             <Input
               id="sip-return"
               type="number"
+              inputMode="decimal"
               value={annualReturn}
               onChange={(e) => setAnnualReturn(Number(e.target.value))}
               placeholder="12"
@@ -222,6 +224,7 @@ export default function SIPCalculator({ onClose }: SIPCalculatorProps = {}) {
             <Input
               id="sip-years"
               type="number"
+              inputMode="numeric"
               value={years}
               onChange={(e) => setYears(Number(e.target.value))}
               placeholder="10"
@@ -234,6 +237,7 @@ export default function SIPCalculator({ onClose }: SIPCalculatorProps = {}) {
             <Input
               id="sip-stepup"
               type="number"
+              inputMode="decimal"
               value={stepUp}
               onChange={(e) => setStepUp(Number(e.target.value))}
               placeholder="0"
