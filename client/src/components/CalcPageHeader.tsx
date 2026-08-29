@@ -24,19 +24,19 @@ export default function CalcPageHeader({
   maxWidth = "max-w-6xl"
 }: CalcPageHeaderProps) {
   return (
-    <header className="bg-white border-b border-slate-100">
+    <header className="bg-white border-b border-border">
       {/* Breadcrumb strip */}
       <div className={cn(maxWidth, "mx-auto px-6 pt-4")}>
-        <nav className="flex items-center gap-1.5 text-xs text-slate-500" aria-label="Breadcrumb">
+        <nav className="flex items-center gap-1.5 text-xs text-neutral-500" aria-label="Breadcrumb">
           {breadcrumbs.map((crumb, idx) => (
             <span key={idx} className="flex items-center gap-1.5">
-              {idx > 0 && <span className="text-slate-300">/</span>}
+              {idx > 0 && <span className="text-muted-foreground">/</span>}
               {crumb.href ? (
-                <Link href={crumb.href} className="hover:text-blue-600 transition-colors">
+                <Link href={crumb.href} className="hover:text-[hsl(var(--interactive-blue))] transition-colors">
                   {crumb.label}
                 </Link>
               ) : (
-                <span className="text-slate-600 font-medium">{crumb.label}</span>
+                <span className="text-neutral-600 font-medium">{crumb.label}</span>
               )}
             </span>
           ))}
@@ -49,11 +49,11 @@ export default function CalcPageHeader({
 
           {/* Left: title + subtitle + trust chips */}
           <div className="flex-1">
-            <div className="border-l-4 border-blue-600 pl-4 mb-5">
-              <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2 leading-tight">
+            <div className="border-l-4 border-primary pl-4 mb-5">
+              <h1 className="text-2xl md:text-3xl font-bold text-neutral-900 mb-2 leading-tight">
                 {title}
               </h1>
-              <p className="text-sm text-slate-500 max-w-2xl leading-relaxed">
+              <p className="text-sm text-neutral-500 max-w-2xl leading-relaxed">
                 {subtitle}
               </p>
             </div>
@@ -63,7 +63,7 @@ export default function CalcPageHeader({
               {trustChips.map(({ icon: Icon, text }) => (
                 <span
                   key={text}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-100"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 bg-persian-blue-50 text-primary text-xs font-medium rounded-full border border-persian-blue-100"
                 >
                   <Icon className="h-3 w-3" />
                   {text}
@@ -74,7 +74,7 @@ export default function CalcPageHeader({
 
           {/* Right: badge */}
           <div className="flex-shrink-0">
-            <span className="inline-block px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded-full">
+            <span className="inline-block px-3 py-1.5 bg-primary text-primary-foreground text-xs font-semibold rounded-full">
               {badge}
             </span>
           </div>
