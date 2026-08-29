@@ -63,6 +63,15 @@ export interface RAGChunk {
   source_type: string;
   page?: number;
   score: number;
+  /**
+   * Which statute this chunk was written under: "ita_2025" (Income Tax Act,
+   * 2025 + IT Rules 2026 PDFs) or "ita_1961" (ICAI study material, which
+   * teaches under the old Act — see taxTopicGraph.json _meta and CLAUDE.md:
+   * "ICAI still teaches ITA 1961; ITA 2025 applicable for CA exams from May
+   * 2027"). Undefined for chunks ingested before this field existed — see
+   * scripts/backfill_law_version.py to tag them without re-embedding.
+   */
+  law_version?: "ita_2025" | "ita_1961";
 }
 
 export interface RAGResult {
@@ -244,6 +253,7 @@ async function searchQdrant(
     source_type: String(r.payload?.source_type || ""),
     page: r.payload?.page as number | undefined,
     score: r.score,
+    law_version: r.payload?.law_version as "ita_2025" | "ita_1961" | undefined,
   }));
 }
 
@@ -323,6 +333,27 @@ function composeDeterministicAnswer(
 
 // ─── Answer generation ───────────────────────────────────────────────────────
 
+// The single most load-bearing fact in this prompt. Do not soften or remove
+// it: an earlier draft of an unrelated social-media post (campaign 26,
+// 2026-07-14, corrected same day by Vicky — see CLAUDE.md Pending Actions)
+// cited ITA 2025's renumbered sections for a filing season still governed by
+// ITA 1961 in full, on the wrong assumption that "the newer Act" = "the
+// current law." Whether ITA 2025 or ITA 1961 governs depends entirely on
+// which income year is being discussed, not on which Act was passed more
+// recently. This is a fixed statutory transition date, not a "today's date"
+// fact, so it does not need runtime recomputation.
+const LAW_TRANSITION_RULE =
+  "STATUTE TRANSITION RULE (fixed fact, do not override with assumptions): " +
+  "The Income Tax Act, 1961 (ITA 1961) governs all income earned before 1 April 2026 — " +
+  "this covers every Assessment Year up to and including AY 2026-27 (i.e. FY 2025-26 income and earlier). " +
+  "The Income Tax Act, 2025 (ITA 2025) governs only income earned from 1 April 2026 onward " +
+  "(FY 2026-27 / \"Tax Year 2026-27\" under the new Act's own terminology), first filed as AY 2027-28 in 2027. " +
+  "ITA 2025 is NOT simply \"the current law that replaced ITA 1961\" — for any question about filing a return, " +
+  "TDS, or tax due for income already earned (which as of most filing seasons through 2027 means FY 2025-26 or earlier), " +
+  "ITA 1961 is the ACTUAL governing law, even though ITA 2025 has since been passed. " +
+  "Determine which Act applies from the financial year the user's question concerns — never default to ITA 2025 " +
+  "just because it is the newer statute.";
+
 function buildPrompt(
   question: string,
   chunks: RAGChunk[],
@@ -331,7 +362,10 @@ function buildPrompt(
   // Truncate context to stay within token limits
   let context = "";
   for (const chunk of chunks) {
-    const addition = `\n\n[Source: ${chunk.source}${chunk.page ? `, p.${chunk.page}` : ""}]\n${chunk.text}`;
+    const lawTag = chunk.law_version
+      ? `, law: ${chunk.law_version === "ita_2025" ? "ITA 2025" : "ITA 1961"}`
+      : "";
+    const addition = `\n\n[Source: ${chunk.source}${chunk.page ? `, p.${chunk.page}` : ""}${lawTag}]\n${chunk.text}`;
     if ((context + addition).length > MAX_CONTEXT_CHARS) break;
     context += addition;
   }
@@ -351,7 +385,9 @@ function buildPrompt(
 
   return `You are an expert Indian tax advisor for AiTaxBot. Answer the user's question using ONLY the provided legal excerpts and verified facts below.
 
-LEGAL EXCERPTS FROM OFFICIAL DOCUMENTS:
+${LAW_TRANSITION_RULE}
+
+LEGAL EXCERPTS FROM OFFICIAL DOCUMENTS (each tagged with which Act it was written under):
 ${context}
 
 VERIFIED KEY FACTS FROM TAX TOPIC GRAPH:
@@ -362,7 +398,7 @@ USER QUESTION: ${question}
 INSTRUCTIONS:
 1. Answer directly and specifically — no vague generalisations.
 2. Always cite the specific section/rule (e.g., "Section 80C, ITA 1961" or "Section 123, ITA 2025") when stating a rule.
-3. If ITA 2025 and ITA 1961 sections differ, mention both (ITA 2025 is current law; ITA 1961 sections are referenced by many users).
+3. Apply the STATUTE TRANSITION RULE above to decide which Act's section numbers are the ones that actually govern the year the question is about. If ITA 2025 and ITA 1961 sections differ, state the ACTUAL governing section first and clearly, then mention the other Act's numbering as a cross-reference only (e.g., "renumbered as Section 123 under ITA 2025, applicable from FY 2026-27 onward").
 4. Use ₹ symbol and Indian number formatting (lakhs, crores).
 5. If the answer depends on Old vs New Regime, state both clearly.
 6. If you are uncertain or the documents don't cover the question, say so explicitly — do not fabricate.
