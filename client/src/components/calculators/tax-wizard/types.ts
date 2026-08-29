@@ -28,10 +28,30 @@ export interface BasicDetails {
   email: string;
 }
 
+/**
+ * Salary breakup, more granular than TaxCalculator.tsx's existing combined
+ * "Basic Salary + DA (annual)" field — this session's request specifically
+ * asked for Basic and DA broken out separately. Standard deduction u/s
+ * 16(ia), entertainment allowance u/s 16(ii), and old-vs-new regime handling
+ * are NOT collected here: they're auto-computed downstream from regime
+ * choice, matching TaxCalculator.tsx's existing behaviour (see
+ * standardDeductionAmount in TaxCalculator.tsx) - asking for them here would
+ * just be asking the user to do the app's job.
+ */
+export interface SalaryDetails {
+  basicSalary: string;
+  dearnessAllowance: string;
+  hraReceived: string;
+  lta: string;
+  otherAllowances: string;
+  professionalTax: string;
+}
+
 export interface WizardState {
   basicDetails: BasicDetails;
   financialYear: string; // matches TaxCalculator.tsx's existing values: "2024-25" | "2025-26" | "2026-27"
   incomeHeads: Record<IncomeHeadKey, boolean>;
+  salary: SalaryDetails;
 }
 
 export const INCOME_HEAD_LABELS: Record<IncomeHeadKey, { label: string; hint: string }> = {
@@ -68,5 +88,29 @@ export function createEmptyWizardState(): WizardState {
       capitalGains: false,
       otherSources: false,
     },
+    salary: {
+      basicSalary: "",
+      dearnessAllowance: "",
+      hraReceived: "",
+      lta: "",
+      otherAllowances: "",
+      professionalTax: "",
+    },
   };
+}
+
+/** Parses a wizard numeric-string field to a safe non-negative number. */
+export function toAmount(value: string): number {
+  const n = parseFloat(value);
+  return Number.isFinite(n) && n > 0 ? n : 0;
+}
+
+export function computeGrossSalary(salary: SalaryDetails): number {
+  return (
+    toAmount(salary.basicSalary) +
+    toAmount(salary.dearnessAllowance) +
+    toAmount(salary.hraReceived) +
+    toAmount(salary.lta) +
+    toAmount(salary.otherAllowances)
+  );
 }

@@ -4,51 +4,71 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import BasicDetailsStep, { isBasicDetailsValid } from "./steps/BasicDetailsStep";
 import FYAndHeadsStep, { hasAtLeastOneIncomeHead } from "./steps/FYAndHeadsStep";
+import SalaryStep, { isSalaryStepValid } from "./steps/SalaryStep";
 import { createEmptyWizardState, type WizardState } from "./types";
 
 /**
- * Step 1 of the multi-PR wizard rebuild — see types.ts for the full plan
- * and why this isn't wired into the live calculator route yet.
+ * Multi-PR wizard rebuild — see types.ts for the full plan and why this
+ * isn't wired into the live calculator route yet.
  *
- * Steps implemented so far: Basic Details, FY/AY + Income Head picker.
- * Steps landing in follow-up PRs: Salary, House Property, Business
+ * Steps implemented so far: Basic Details, FY/AY + Income Head picker,
+ * Salary. Steps landing in follow-up PRs: House Property, Business
  * (44AD/44ADA/44AE), Capital Gains (equity/MF), Other Sources, Deductions,
  * Result — each one only shown if its income head was selected in step 2.
+ *
+ * The step LIST is dynamic, not a fixed array: getActiveSteps() below
+ * recomputes it from state.incomeHeads on every render, so toggling a head
+ * on/off in step 2 immediately adds or removes its step from the flow.
  */
 
-type StepId = "basicDetails" | "fyAndHeads";
+type StepId = "basicDetails" | "fyAndHeads" | "salary";
 
-const STEPS: { id: StepId; label: string }[] = [
-  { id: "basicDetails", label: "Basic Details" },
-  { id: "fyAndHeads", label: "Year & Income Type" },
-];
+function getActiveSteps(incomeHeads: WizardState["incomeHeads"]): { id: StepId; label: string }[] {
+  const steps: { id: StepId; label: string }[] = [
+    { id: "basicDetails", label: "Basic Details" },
+    { id: "fyAndHeads", label: "Year & Income Type" },
+  ];
+  if (incomeHeads.salary) steps.push({ id: "salary", label: "Salary" });
+  // Future heads append here, in the same order as FYAndHeadsStep's
+  // checklist: houseProperty, business, capitalGains, otherSources.
+  return steps;
+}
 
 export default function TaxWizard() {
   const [state, setState] = useState<WizardState>(createEmptyWizardState());
   const [stepIndex, setStepIndex] = useState(0);
-  const currentStep = STEPS[stepIndex];
+
+  const steps = getActiveSteps(state.incomeHeads);
+  // Guards against stepIndex pointing past the end if the user went Back to
+  // step 2 and unchecked a head whose step they'd already moved past.
+  const safeStepIndex = Math.min(stepIndex, steps.length - 1);
+  const currentStep = steps[safeStepIndex];
 
   const canGoNext =
     currentStep.id === "basicDetails"
       ? isBasicDetailsValid(state.basicDetails)
       : currentStep.id === "fyAndHeads"
       ? hasAtLeastOneIncomeHead(state.incomeHeads)
+      : currentStep.id === "salary"
+      ? isSalaryStepValid(state.salary)
       : false;
+
+  const isLastStep = safeStepIndex === steps.length - 1;
 
   function goNext() {
     if (!canGoNext) return;
-    if (stepIndex < STEPS.length - 1) {
-      setStepIndex(stepIndex + 1);
+    if (!isLastStep) {
+      setStepIndex(safeStepIndex + 1);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
-      // Next step in the plan (Salary/House Property/... sub-steps) lands
-      // here in a follow-up PR. For now, this is as far as the wizard goes.
+      // Next head's step (House Property/Business/...) lands here in a
+      // follow-up PR. For now, this is as far as the wizard goes.
     }
   }
 
   function goBack() {
-    if (stepIndex > 0) {
-      setStepIndex(stepIndex - 1);
+    if (safeStepIndex > 0) {
+      setStepIndex(safeStepIndex - 1);
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }
@@ -60,11 +80,11 @@ export default function TaxWizard() {
           2026-08-29); this wizard's whole per-step chrome should not repeat
           that mistake. */}
       <div className="flex items-center gap-2 mb-6" role="tablist" aria-label="Wizard progress">
-        {STEPS.map((step, idx) => (
+        {steps.map((step, idx) => (
           <div key={step.id} className="flex items-center gap-2 flex-1">
             <div
               className={`h-1.5 flex-1 rounded-full transition-colors ${
-                idx <= stepIndex ? "bg-primary" : "bg-neutral-200"
+                idx <= safeStepIndex ? "bg-primary" : "bg-neutral-200"
               }`}
               aria-hidden="true"
             />
@@ -72,7 +92,7 @@ export default function TaxWizard() {
         ))}
       </div>
       <p className="text-xs font-medium text-neutral-500 mb-4">
-        Step {stepIndex + 1} of {STEPS.length} — {currentStep.label}
+        Step {safeStepIndex + 1} of {steps.length} — {currentStep.label}
       </p>
 
       {currentStep.id === "basicDetails" && (
@@ -91,19 +111,26 @@ export default function TaxWizard() {
         />
       )}
 
+      {currentStep.id === "salary" && (
+        <SalaryStep
+          value={state.salary}
+          onChange={(salary) => setState((s) => ({ ...s, salary }))}
+        />
+      )}
+
       <div className="flex items-center justify-between mt-8 pt-4 border-t border-border">
         <Button
           type="button"
           variant="outline"
           onClick={goBack}
-          disabled={stepIndex === 0}
+          disabled={safeStepIndex === 0}
           className="gap-1"
         >
           <ChevronLeft className="h-4 w-4" />
           Back
         </Button>
         <Button type="button" onClick={goNext} disabled={!canGoNext} className="gap-1">
-          {stepIndex < STEPS.length - 1 ? "Continue" : "Continue (more steps coming soon)"}
+          {!isLastStep ? "Continue" : "Continue (more steps coming soon)"}
           <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
