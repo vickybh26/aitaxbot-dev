@@ -28,6 +28,10 @@ const PrivacyPolicy = lazy(() => import("@/pages/privacy-policy"));
 const TermsOfService = lazy(() => import("@/pages/terms-of-service"));
 const Calculators = lazy(() => import("@/pages/Calculators"));
 const IncomeTaxCalculator = lazy(() => import("@/pages/IncomeTaxCalculator"));
+// Preview-only route for the step-by-step wizard rebuild — see
+// client/src/components/calculators/tax-wizard/types.ts. Not linked from
+// any nav; visit directly to review progress.
+const IncomeTaxCalculatorWizard = lazy(() => import("@/pages/IncomeTaxCalculatorWizard"));
 const HRACalculator = lazy(() => import("@/pages/HRACalculator"));
 const SIPCalculator = lazy(() => import("@/pages/SIPCalculator"));
 const SWPCalculator = lazy(() => import("@/pages/SWPCalculator"));
@@ -189,6 +193,7 @@ function Router() {
           </Route>
           <Route path="/calculators" component={Calculators} />
           <Route path="/calculators/income-tax" component={IncomeTaxCalculator} />
+          <Route path="/calculators/income-tax-wizard" component={IncomeTaxCalculatorWizard} />
           <Route path="/calculators/hra" component={HRACalculator} />
           <Route path="/calculators/sip" component={SIPCalculator} />
           <Route path="/calculators/swp" component={SWPCalculator} />
