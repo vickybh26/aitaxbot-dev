@@ -75,12 +75,43 @@ export interface HousePropertyDetails {
   selfOccupiedHomeLoanInterest: string;
 }
 
+/**
+ * Business/Profession — presumptive taxation only (44AD/44ADA/44AE), per
+ * this session's explicit scope: "currently we support 44AD, ADA and AE".
+ * A taxpayer picks exactly ONE scheme; running two different presumptive
+ * businesses simultaneously is real but rare for this product's audience,
+ * and adding a second scheme's fields would double the step's complexity
+ * for a case that doesn't come up often — out of scope for this pass.
+ *
+ * 44AD/44ADA share the same digital-vs-cash receipt split (it's what
+ * decides both the presumptive rate AND the turnover-limit extension, per
+ * the real ITR-3 Schedule BP: 6% digital / 8% cash for 44AD, 50% flat for
+ * 44ADA, and in both cases the limit extends if cash receipts are <=5% of
+ * total turnover). 44AE has a completely different shape (per-vehicle,
+ * per-month), so it gets its own fields.
+ */
+export type BusinessScheme = "44AD" | "44ADA" | "44AE" | "";
+
+export interface BusinessDetails {
+  scheme: BusinessScheme;
+  // 44AD / 44ADA
+  digitalReceipts: string; // via bank/cheque/ECS/prescribed electronic modes
+  cashReceipts: string;
+  // 44AE — aggregate across vehicles, not per-vehicle (see HousePropertyDetails
+  // for the same aggregate-not-itemised design choice and why).
+  vehicleCount: string;
+  isHeavyVehicle: boolean; // > 12 tonnes gross vehicle weight
+  avgTonnageMT: string; // only used when isHeavyVehicle
+  monthsHeld: string; // 1-12, average across vehicles if count > 1
+}
+
 export interface WizardState {
   basicDetails: BasicDetails;
   financialYear: string; // matches TaxCalculator.tsx's existing values: "2024-25" | "2025-26" | "2026-27"
   incomeHeads: Record<IncomeHeadKey, boolean>;
   salary: SalaryDetails;
   houseProperty: HousePropertyDetails;
+  business: BusinessDetails;
 }
 
 export const SELF_OCCUPIED_INTEREST_CAP = 200000;
@@ -134,6 +165,15 @@ export function createEmptyWizardState(): WizardState {
       municipalTaxesPaid: "",
       letOutHomeLoanInterest: "",
       selfOccupiedHomeLoanInterest: "",
+    },
+    business: {
+      scheme: "",
+      digitalReceipts: "",
+      cashReceipts: "",
+      vehicleCount: "1",
+      isHeavyVehicle: false,
+      avgTonnageMT: "",
+      monthsHeld: "12",
     },
   };
 }
@@ -197,5 +237,100 @@ export function computeHousePropertyIncome(hp: HousePropertyDetails): HousePrope
     selfOccupiedInterestCapped,
     selfOccupiedIncome,
     totalIncome: letOutIncome + selfOccupiedIncome,
+  };
+}
+
+// 44AE flat rates, straight from Schedule BP of a real filed ITR-3
+// (Form_pdf_912974760290826.pdf, section 63): Rs.1,000/tonne/month for a
+// goods carriage over 12MT gross vehicle weight, else a flat Rs.7,500/month
+// regardless of tonnage.
+export const HEAVY_VEHICLE_RATE_PER_TON_PER_MONTH = 1000;
+export const LIGHT_VEHICLE_FLAT_RATE_PER_MONTH = 7500;
+export const MAX_VEHICLES_WITHOUT_AUDIT_44AE = 10;
+
+export interface BusinessComputation {
+  totalTurnover: number;
+  cashPercentage: number; // of total turnover, 0-100
+  turnoverLimit: number; // depends on scheme + whether cash <= 5% of turnover
+  exceedsLimit: boolean;
+  presumptiveIncome: number;
+  auditWarning: string | null; // null when no warning applies
+}
+
+/**
+ * Computes presumptive income for whichever scheme is selected. Mirrors
+ * Schedule BP sections 61 (44AD), 62 (44ADA), 63 (44AE) of a real filed
+ * ITR-3 exactly — the digital/cash split, the specific presumptive rates,
+ * and the turnover-limit extension rule (limit is extended by 50% if cash
+ * receipts are <=5% of total turnover) are not general tax knowledge
+ * approximations, they're copied from the actual form structure.
+ */
+export function computeBusinessIncome(b: BusinessDetails): BusinessComputation {
+  if (b.scheme === "44AD" || b.scheme === "44ADA") {
+    const digital = toAmount(b.digitalReceipts);
+    const cash = toAmount(b.cashReceipts);
+    const totalTurnover = digital + cash;
+    const cashPercentage = totalTurnover > 0 ? (cash / totalTurnover) * 100 : 0;
+    const cashWithinFivePercent = cashPercentage <= 5;
+
+    if (b.scheme === "44AD") {
+      const turnoverLimit = cashWithinFivePercent ? 30000000 : 20000000; // Rs.3Cr / Rs.2Cr
+      const presumptiveIncome = digital * 0.06 + cash * 0.08;
+      const exceedsLimit = totalTurnover > turnoverLimit;
+      return {
+        totalTurnover,
+        cashPercentage,
+        turnoverLimit,
+        exceedsLimit,
+        presumptiveIncome,
+        auditWarning: exceedsLimit
+          ? "Your turnover is above the 44AD limit for your digital/cash mix — presumptive taxation isn't available; you'd need to maintain full books and a tax audit under Section 44AB."
+          : null,
+      };
+    }
+
+    // 44ADA
+    const turnoverLimit = cashWithinFivePercent ? 7500000 : 5000000; // Rs.75L / Rs.50L
+    const presumptiveIncome = totalTurnover * 0.5;
+    const exceedsLimit = totalTurnover > turnoverLimit;
+    return {
+      totalTurnover,
+      cashPercentage,
+      turnoverLimit,
+      exceedsLimit,
+      presumptiveIncome,
+      auditWarning: exceedsLimit
+        ? "Your gross receipts are above the 44ADA limit for your digital/cash mix — presumptive taxation isn't available; you'd need to maintain full books and a tax audit under Section 44AB."
+        : null,
+    };
+  }
+
+  if (b.scheme === "44AE") {
+    const count = toAmount(b.vehicleCount);
+    const months = Math.min(12, Math.max(0, toAmount(b.monthsHeld)));
+    const perVehiclePerMonth = b.isHeavyVehicle
+      ? toAmount(b.avgTonnageMT) * HEAVY_VEHICLE_RATE_PER_TON_PER_MONTH
+      : LIGHT_VEHICLE_FLAT_RATE_PER_MONTH;
+    const presumptiveIncome = count * months * perVehiclePerMonth;
+    const tooManyVehicles = count > MAX_VEHICLES_WITHOUT_AUDIT_44AE;
+    return {
+      totalTurnover: 0, // 44AE has no turnover-based limit — it's a vehicle-count limit instead
+      cashPercentage: 0,
+      turnoverLimit: 0,
+      exceedsLimit: tooManyVehicles,
+      presumptiveIncome,
+      auditWarning: tooManyVehicles
+        ? `44AE presumptive taxation only applies with up to ${MAX_VEHICLES_WITHOUT_AUDIT_44AE} goods carriages — with more than that, you'd need to maintain full books and a tax audit under Section 44AB.`
+        : null,
+    };
+  }
+
+  return {
+    totalTurnover: 0,
+    cashPercentage: 0,
+    turnoverLimit: 0,
+    exceedsLimit: false,
+    presumptiveIncome: 0,
+    auditWarning: null,
   };
 }

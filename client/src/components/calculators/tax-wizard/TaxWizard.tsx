@@ -6,6 +6,7 @@ import BasicDetailsStep, { isBasicDetailsValid } from "./steps/BasicDetailsStep"
 import FYAndHeadsStep, { hasAtLeastOneIncomeHead } from "./steps/FYAndHeadsStep";
 import SalaryStep, { isSalaryStepValid } from "./steps/SalaryStep";
 import HousePropertyStep, { isHousePropertyStepValid } from "./steps/HousePropertyStep";
+import BusinessStep, { isBusinessStepValid } from "./steps/BusinessStep";
 import { createEmptyWizardState, type WizardState } from "./types";
 
 /**
@@ -13,16 +14,16 @@ import { createEmptyWizardState, type WizardState } from "./types";
  * isn't wired into the live calculator route yet.
  *
  * Steps implemented so far: Basic Details, FY/AY + Income Head picker,
- * Salary, House Property. Steps landing in follow-up PRs: Business
- * (44AD/44ADA/44AE), Capital Gains (equity/MF), Other Sources, Deductions,
- * Result — each one only shown if its income head was selected in step 2.
+ * Salary, House Property, Business. Steps landing in follow-up PRs:
+ * Capital Gains (equity/MF), Other Sources, Deductions, Result — each one
+ * only shown if its income head was selected in step 2.
  *
  * The step LIST is dynamic, not a fixed array: getActiveSteps() below
  * recomputes it from state.incomeHeads on every render, so toggling a head
  * on/off in step 2 immediately adds or removes its step from the flow.
  */
 
-type StepId = "basicDetails" | "fyAndHeads" | "salary" | "houseProperty";
+type StepId = "basicDetails" | "fyAndHeads" | "salary" | "houseProperty" | "business";
 
 function getActiveSteps(incomeHeads: WizardState["incomeHeads"]): { id: StepId; label: string }[] {
   const steps: { id: StepId; label: string }[] = [
@@ -31,8 +32,9 @@ function getActiveSteps(incomeHeads: WizardState["incomeHeads"]): { id: StepId; 
   ];
   if (incomeHeads.salary) steps.push({ id: "salary", label: "Salary" });
   if (incomeHeads.houseProperty) steps.push({ id: "houseProperty", label: "House Property" });
+  if (incomeHeads.business) steps.push({ id: "business", label: "Business" });
   // Future heads append here, in the same order as FYAndHeadsStep's
-  // checklist: business, capitalGains, otherSources.
+  // checklist: capitalGains, otherSources.
   return steps;
 }
 
@@ -55,6 +57,8 @@ export default function TaxWizard() {
       ? isSalaryStepValid(state.salary)
       : currentStep.id === "houseProperty"
       ? isHousePropertyStepValid(state.houseProperty)
+      : currentStep.id === "business"
+      ? isBusinessStepValid(state.business)
       : false;
 
   const isLastStep = safeStepIndex === steps.length - 1;
@@ -126,6 +130,13 @@ export default function TaxWizard() {
         <HousePropertyStep
           value={state.houseProperty}
           onChange={(houseProperty) => setState((s) => ({ ...s, houseProperty }))}
+        />
+      )}
+
+      {currentStep.id === "business" && (
+        <BusinessStep
+          value={state.business}
+          onChange={(business) => setState((s) => ({ ...s, business }))}
         />
       )}
 
