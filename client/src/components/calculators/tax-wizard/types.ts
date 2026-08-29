@@ -134,6 +134,27 @@ export interface CapitalGainsDetails {
   debtFundGains: string; // Slab rate since FA2023, any holding period
 }
 
+/**
+ * Other Sources — dividend and interest income, per this session's scope.
+ * All of it is taxed at slab rate (no special-rate treatment like Capital
+ * Gains), so there's no tax computation to show here, just a running total.
+ *
+ * Interest is split into savingsInterest vs otherInterest rather than one
+ * lump figure, even though both are taxed identically here, because they are
+ * NOT treated identically at deduction time: only savings-account interest
+ * qualifies for Section 80TTA (₹10,000 cap, or Section 80TTB's ₹50,000 cap
+ * for senior citizens) — see section80TTA in TaxCalculator.tsx, which
+ * currently makes the user re-enter this same figure a second time in the
+ * deductions section. Keeping it separate here means a later Deductions step
+ * in this wizard can read state.otherSources.savingsInterest directly and
+ * suggest the correct cap, instead of asking twice.
+ */
+export interface OtherSourcesDetails {
+  dividendIncome: string;
+  savingsInterest: string; // eligible for 80TTA/80TTB later
+  otherInterest: string; // FD/RD/bonds/etc — NOT 80TTA/80TTB-eligible
+}
+
 export interface WizardState {
   basicDetails: BasicDetails;
   financialYear: string; // matches TaxCalculator.tsx's existing values: "2024-25" | "2025-26" | "2026-27"
@@ -142,6 +163,7 @@ export interface WizardState {
   houseProperty: HousePropertyDetails;
   business: BusinessDetails;
   capitalGains: CapitalGainsDetails;
+  otherSources: OtherSourcesDetails;
 }
 
 export const SELF_OCCUPIED_INTEREST_CAP = 200000;
@@ -210,7 +232,16 @@ export function createEmptyWizardState(): WizardState {
       ltcgEquity: "",
       debtFundGains: "",
     },
+    otherSources: {
+      dividendIncome: "",
+      savingsInterest: "",
+      otherInterest: "",
+    },
   };
+}
+
+export function computeOtherSourcesIncome(os: OtherSourcesDetails): number {
+  return toAmount(os.dividendIncome) + toAmount(os.savingsInterest) + toAmount(os.otherInterest);
 }
 
 /** Parses a wizard numeric-string field to a safe non-negative number. */
