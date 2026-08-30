@@ -1,6 +1,7 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { computeGrossSalary, toAmount, type SalaryDetails } from "../types";
+import { Checkbox } from "@/components/ui/checkbox";
+import { computeGrossSalary, computeHRAExemption, toAmount, type SalaryDetails } from "../types";
 
 interface SalaryStepProps {
   value: SalaryDetails;
@@ -13,8 +14,12 @@ export function isSalaryStepValid(value: SalaryDetails): boolean {
   return toAmount(value.basicSalary) > 0;
 }
 
+// Excludes isMetroCity (a boolean, rendered separately as a toggle below,
+// not through this string-input field list).
+type AmountFieldKey = Exclude<keyof SalaryDetails, "isMetroCity">;
+
 interface FieldDef {
-  key: keyof SalaryDetails;
+  key: AmountFieldKey;
   label: string;
   hint?: string;
   required?: boolean;
@@ -30,7 +35,12 @@ const FIELDS: FieldDef[] = [
   {
     key: "hraReceived",
     label: "HRA Received (annual)",
-    hint: "House Rent Allowance from your employer. If you pay rent, we'll work out your exemption for this later.",
+    hint: "House Rent Allowance from your employer. If you pay rent, we'll work out your exemption below.",
+  },
+  {
+    key: "rentPaid",
+    label: "Rent Paid (annual)",
+    hint: "Needed to work out your HRA exemption — leave blank if you don't pay rent or don't receive HRA.",
   },
   {
     key: "lta",
@@ -51,8 +61,10 @@ const FIELDS: FieldDef[] = [
 
 export default function SalaryStep({ value, onChange }: SalaryStepProps) {
   const grossSalary = computeGrossSalary(value);
+  const hraExemption = computeHRAExemption(value);
+  const showMetroToggle = toAmount(value.rentPaid) > 0 && toAmount(value.hraReceived) > 0;
 
-  function update(key: keyof SalaryDetails, raw: string) {
+  function update(key: AmountFieldKey, raw: string) {
     // Digits and a single decimal point only — matches the numeric-input
     // discipline from the main calculator's inputMode fix (PR #6).
     const cleaned = raw.replace(/[^\d.]/g, "");
@@ -89,6 +101,35 @@ export default function SalaryStep({ value, onChange }: SalaryStepProps) {
           {hint && <p className="text-xs text-neutral-500 mt-1">{hint}</p>}
         </div>
       ))}
+
+      {showMetroToggle && (
+        <div className="space-y-2">
+          <button
+            type="button"
+            onClick={() => onChange({ ...value, isMetroCity: !value.isMetroCity })}
+            aria-pressed={value.isMetroCity}
+            className={`w-full text-left flex items-start gap-3 p-3 rounded-lg border transition-colors ${
+              value.isMetroCity ? "border-primary bg-primary-light" : "border-border bg-white"
+            }`}
+          >
+            <Checkbox checked={value.isMetroCity} className="mt-0.5 pointer-events-none" />
+            <span>
+              <span className="block text-sm font-medium text-neutral-900">
+                You live in Delhi, Mumbai, Kolkata, or Chennai
+              </span>
+              <span className="block text-xs text-neutral-500 mt-0.5">
+                These 4 metro cities get a 50% HRA exemption limit instead of 40% elsewhere.
+              </span>
+            </span>
+          </button>
+          <div className="rounded-lg border border-border bg-neutral-50 p-3 flex items-center justify-between">
+            <span className="text-sm text-neutral-700">HRA Exemption (Old Regime only)</span>
+            <span className="text-sm font-semibold tabular-figures money">
+              ₹{Math.round(hraExemption).toLocaleString("en-IN")}
+            </span>
+          </div>
+        </div>
+      )}
 
       <div className="rounded-lg border border-border bg-neutral-50 p-4 flex items-center justify-between">
         <span className="text-sm font-medium text-neutral-700">Gross Salary (before deductions)</span>

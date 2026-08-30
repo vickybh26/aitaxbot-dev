@@ -64,7 +64,7 @@ export default function DeductionsStep({ value, otherSources, ageGroup, onChange
     {
       key: "section80G",
       label: "Section 80G (Donations)",
-      hint: "Some donations qualify for only 50% deduction — talk to your CA if you're unsure which applies.",
+      hint: "Some donations qualify for only 50% deduction — talk to your CA if you're unsure which applies. Also capped at 10% of your adjusted income overall; we'll apply that on the result page.",
     },
   ];
 

@@ -10,23 +10,20 @@ import BusinessStep, { isBusinessStepValid } from "./steps/BusinessStep";
 import CapitalGainsStep, { isCapitalGainsStepValid } from "./steps/CapitalGainsStep";
 import OtherSourcesStep, { isOtherSourcesStepValid } from "./steps/OtherSourcesStep";
 import DeductionsStep, { isDeductionsStepValid } from "./steps/DeductionsStep";
+import ResultStep from "./steps/ResultStep";
 import { createEmptyWizardState, type WizardState } from "./types";
 
 /**
- * Multi-PR wizard rebuild — see types.ts for the full plan and why this
- * isn't wired into the live calculator route yet.
- *
- * Steps implemented so far: Basic Details, FY/AY + Income Head picker,
- * Salary, House Property, Business, Capital Gains, Other Sources,
- * Deductions. Only the Result screen remains before the final cutover PR.
+ * Multi-PR wizard rebuild — see types.ts for the full plan. Every income
+ * head plus Deductions plus the Result screen are now built: this is the
+ * LAST increment before a separate cutover PR swaps the live
+ * /calculators/income-tax route over to this component.
  *
  * The step LIST is dynamic, not a fixed array: getActiveSteps() below
  * recomputes it from state.incomeHeads on every render, so toggling a head
  * on/off in step 2 immediately adds or removes its step from the flow.
- * Deductions is the first step that is NOT gated by an income head — it's
- * unconditionally appended at the end, since Chapter VI-A deductions (80C,
- * 80D, etc.) can apply to any taxpayer regardless of which income heads
- * they have.
+ * Deductions and Result are NOT gated by an income head — both are
+ * unconditionally appended at the end, in that order.
  */
 
 type StepId =
@@ -37,7 +34,8 @@ type StepId =
   | "business"
   | "capitalGains"
   | "otherSources"
-  | "deductions";
+  | "deductions"
+  | "result";
 
 function getActiveSteps(incomeHeads: WizardState["incomeHeads"]): { id: StepId; label: string }[] {
   const steps: { id: StepId; label: string }[] = [
@@ -49,7 +47,8 @@ function getActiveSteps(incomeHeads: WizardState["incomeHeads"]): { id: StepId; 
   if (incomeHeads.business) steps.push({ id: "business", label: "Business" });
   if (incomeHeads.capitalGains) steps.push({ id: "capitalGains", label: "Capital Gains" });
   if (incomeHeads.otherSources) steps.push({ id: "otherSources", label: "Other Sources" });
-  steps.push({ id: "deductions", label: "Deductions" }); // unconditional — see comment above
+  steps.push({ id: "deductions", label: "Deductions" }); // unconditional
+  steps.push({ id: "result", label: "Result" }); // unconditional, always last
   return steps;
 }
 
@@ -80,19 +79,17 @@ export default function TaxWizard() {
       ? isOtherSourcesStepValid(state.otherSources)
       : currentStep.id === "deductions"
       ? isDeductionsStepValid()
+      : currentStep.id === "result"
+      ? true // nothing to validate — this is the terminal display step
       : false;
 
-  const isLastStep = safeStepIndex === steps.length - 1;
-
   function goNext() {
+    // The Continue button is hidden entirely on the "result" step (the only
+    // step where there's nowhere left to go), so this never fires past the
+    // end of the steps array.
     if (!canGoNext) return;
-    if (!isLastStep) {
-      setStepIndex(safeStepIndex + 1);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } else {
-      // Next head's step (House Property/Business/...) lands here in a
-      // follow-up PR. For now, this is as far as the wizard goes.
-    }
+    setStepIndex(safeStepIndex + 1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function goBack() {
@@ -186,6 +183,8 @@ export default function TaxWizard() {
         />
       )}
 
+      {currentStep.id === "result" && <ResultStep state={state} />}
+
       <div className="flex items-center justify-between mt-8 pt-4 border-t border-border">
         <Button
           type="button"
@@ -197,10 +196,12 @@ export default function TaxWizard() {
           <ChevronLeft className="h-4 w-4" />
           Back
         </Button>
-        <Button type="button" onClick={goNext} disabled={!canGoNext} className="gap-1">
-          {!isLastStep ? "Continue" : "Continue (more steps coming soon)"}
-          <ChevronRight className="h-4 w-4" />
-        </Button>
+        {currentStep.id !== "result" && (
+          <Button type="button" onClick={goNext} disabled={!canGoNext} className="gap-1">
+            Continue
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        )}
       </div>
     </Card>
   );

@@ -15,7 +15,13 @@
  * client/src/pages/IncomeTaxCalculatorWizard.tsx for the preview route.
  */
 
-import { computeSpecialRateTax, type AgeGroup } from "@shared/taxLiability";
+import {
+  computeSpecialRateTax,
+  computeTaxLiability,
+  type AgeGroup,
+  type TaxRegime,
+  type TaxLiabilityResult,
+} from "@shared/taxLiability";
 
 export type IncomeHeadKey =
   | "salary"
@@ -47,6 +53,14 @@ export interface SalaryDetails {
   lta: string;
   otherAllowances: string;
   professionalTax: string;
+  // Needed to compute HRA exemption (Section 10(13A)/Rule 2A) at all — added
+  // after the fact, once the Result step's aggregation needed it. Without
+  // these, HRA exemption cannot be computed and hraReceived would just sit
+  // fully taxable, silently omitting one of the largest deductions salaried
+  // taxpayers actually have. Mirrors TaxCalculator.tsx's existing
+  // rentPaid/isMetroCity fields exactly.
+  rentPaid: string;
+  isMetroCity: boolean;
 }
 
 /**
@@ -177,13 +191,18 @@ export interface DeductionsDetails {
   section80D: string; // Health insurance premium — capped Rs.25,000/Rs.50,000 by age (simplified, see below)
   section80E: string; // Student loan interest — uncapped
   section80CCD1B: string; // Additional NPS (own contribution) — capped Rs.50,000
-  section80G: string; // Donations — treated as fully deductible here (simplified; real rule varies 50%/100% by donee)
+  section80G: string; // Donations — real rule varies 50%/100% by donee (out of scope); the 10%-of-adjusted-GTI qualifying limit IS applied, but only in the Result step's aggregate computation, since it needs the full income picture this step alone doesn't have — see computeWizardTaxSummary
 }
 
 export const SECTION_80C_CAP = 150000;
 export const SECTION_80CCD1B_CAP = 50000;
-export const SECTION_80D_CAP_BELOW60 = 25000;
-export const SECTION_80D_CAP_SENIOR = 50000;
+// ₹50,000 self+family (₹1,00,000 if senior) — matches TaxCalculator.tsx's
+// existing section80DCap logic exactly (that comment explains the full
+// self+parents breakdown this aggregate figure approximates; using a
+// different pair of numbers here would silently disagree with the live
+// calculator on the exact same input).
+export const SECTION_80D_CAP_BELOW60 = 50000;
+export const SECTION_80D_CAP_SENIOR = 100000;
 export const SECTION_80TTA_CAP = 10000;
 export const SECTION_80TTB_CAP = 50000; // senior citizens only
 
@@ -244,6 +263,8 @@ export function createEmptyWizardState(): WizardState {
       lta: "",
       otherAllowances: "",
       professionalTax: "",
+      rentPaid: "",
+      isMetroCity: false,
     },
     houseProperty: {
       numberOfProperties: "1",
@@ -300,6 +321,27 @@ export function computeGrossSalary(salary: SalaryDetails): number {
     toAmount(salary.lta) +
     toAmount(salary.otherAllowances)
   );
+}
+
+/**
+ * HRA exemption under Section 10(13A) / Rule 2A — least of: actual HRA
+ * received, rent paid minus 10% of salary, and 50%/40% of salary for
+ * metro/non-metro. "Salary" here means Basic + DA specifically, not gross
+ * salary — matches TaxCalculator.tsx's existing hraSalaryBase logic exactly
+ * (that file's own comment explains why using gross salary over-exempts
+ * allowance-heavy packages). Old Regime only; New Regime callers should
+ * simply not call this.
+ */
+export function computeHRAExemption(salary: SalaryDetails): number {
+  const hraReceived = toAmount(salary.hraReceived);
+  const rentPaid = toAmount(salary.rentPaid);
+  const basicPlusDA = toAmount(salary.basicSalary) + toAmount(salary.dearnessAllowance);
+
+  if (hraReceived <= 0 || rentPaid <= 0 || basicPlusDA <= 0) return 0;
+
+  const rentExcess = Math.max(0, rentPaid - basicPlusDA * 0.1);
+  const salaryPercentage = salary.isMetroCity ? 0.5 : 0.4;
+  return Math.min(hraReceived, rentExcess, basicPlusDA * salaryPercentage);
 }
 
 export interface HousePropertyComputation {
@@ -462,7 +504,7 @@ export interface DeductionsComputation {
   section80D: number; // capped by age
   section80E: number; // uncapped
   section80CCD1B: number; // capped
-  section80G: number; // uncapped here (simplified)
+  section80G: number; // raw, uncapped — the true 10%-of-adjusted-GTI cap is applied in computeWizardTaxSummary
   section80TTAorTTB: number; // auto-derived, capped by age — not a user input
   total: number;
 }
@@ -498,5 +540,123 @@ export function computeDeductions(
     section80G,
     section80TTAorTTB,
     total: section80C + section80D + section80E + section80CCD1B + section80G + section80TTAorTTB,
+  };
+}
+
+// ─── Final aggregation: every step's data -> an actual Old vs New regime
+// comparison, via the same shared/taxLiability.ts engine TaxCalculator.tsx
+// uses. The formula here (slab income -> deductions -> taxable income ->
+// computeTaxLiability with special-rate gains passed separately) mirrors
+// TaxCalculator.tsx's own computation exactly, verified by reading that
+// file's calculateTax() function line by line — see the Result step's
+// commit message for the specific test values cross-checked against it.
+//
+// Two places this wizard is deliberately MORE accurate than the existing
+// flat calculator, not just a restructuring of the same math:
+//   1. Professional tax (s.16(iii)) is applied as an Old-Regime deduction.
+//      TaxCalculator.tsx collects no such field at all and never applies it.
+//   2. House Property income differs by regime: New Regime disallows the
+//      self-occupied home-loan-interest relief (s.24(b) proviso is an
+//      Old-Regime-only concession) while let-out property's own income
+//      computation is unaffected in either regime. TaxCalculator.tsx has no
+//      self-occupied/let-out split at all, so it cannot make this
+//      distinction — it always uses one lump housePropertyIncome figure
+//      for both regimes.
+// Both are correct per the underlying law; they're additions this wizard's
+// more granular per-head data collection makes possible, not disagreements
+// with the existing calculator's math on any input it can actually express.
+
+export interface RegimeSummary {
+  regime: TaxRegime;
+  grossTotalIncome: number; // every head, INCLUDING special-rate LTCG/STCG — display/effective-rate only
+  slabIncome: number; // every head EXCLUDING special-rate LTCG/STCG — what deductions apply against
+  standardDeduction: number;
+  hraExemption: number;
+  professionalTaxDeduction: number;
+  ltaExemption: number;
+  chapterVIADeductions: number; // 80C+80D+80E+80CCD1B+80G(capped)+80TTA/TTB — Old Regime only, else 0
+  totalDeductions: number;
+  taxableIncome: number;
+  liability: TaxLiabilityResult;
+  takeHome: number;
+  effectiveRate: number; // %, of grossTotalIncome
+}
+
+export function computeRegimeSummary(state: WizardState, regime: TaxRegime): RegimeSummary {
+  const grossSalary = computeGrossSalary(state.salary);
+
+  const standardDeductionAmount = grossSalary > 0 ? (regime === "old" ? 50000 : 75000) : 0;
+  const standardDeduction = Math.min(standardDeductionAmount, grossSalary);
+
+  const professionalTaxDeduction = regime === "old" ? toAmount(state.salary.professionalTax) : 0;
+  const hraExemption = regime === "old" ? computeHRAExemption(state.salary) : 0;
+  const ltaExemption = regime === "old" ? toAmount(state.salary.lta) : 0;
+
+  const hpComputation = computeHousePropertyIncome(state.houseProperty);
+  const housePropertyIncome = regime === "old" ? hpComputation.totalIncome : hpComputation.letOutIncome;
+
+  const businessIncome = computeBusinessIncome(state.business).presumptiveIncome;
+  const debtFundGains = toAmount(state.capitalGains.debtFundGains);
+  const otherSourcesIncome = computeOtherSourcesIncome(state.otherSources);
+
+  const slabIncome = grossSalary + housePropertyIncome + businessIncome + debtFundGains + otherSourcesIncome;
+
+  const ltcgEquity = toAmount(state.capitalGains.ltcgEquity);
+  const stcgEquity = toAmount(state.capitalGains.stcgEquity);
+  const grossTotalIncome = slabIncome + ltcgEquity + stcgEquity;
+
+  let chapterVIADeductions = 0;
+  if (regime === "old") {
+    const ded = computeDeductions(state.deductions, state.otherSources, state.ageGroup);
+    // 10%-of-adjusted-GTI qualifying limit on 80G — same formula as
+    // TaxCalculator.tsx's adjustedGTI, computed here (not in DeductionsStep)
+    // because it needs this full cross-head income picture.
+    const adjustedGTI = Math.max(0, grossTotalIncome - standardDeduction);
+    const section80GCapped = Math.min(ded.section80G, adjustedGTI * 0.1);
+    chapterVIADeductions =
+      ded.section80C + ded.section80D + ded.section80E + ded.section80CCD1B + section80GCapped + ded.section80TTAorTTB;
+  }
+
+  const totalDeductions = standardDeduction + professionalTaxDeduction + hraExemption + ltaExemption + chapterVIADeductions;
+  const taxableIncome = Math.max(0, slabIncome - totalDeductions);
+
+  const liability = computeTaxLiability(taxableIncome, regime, state.financialYear, state.ageGroup, {
+    ltcgEquity,
+    stcgEquity,
+  });
+
+  const takeHome = grossTotalIncome - liability.totalTax;
+  const effectiveRate = grossTotalIncome > 0 ? (liability.totalTax / grossTotalIncome) * 100 : 0;
+
+  return {
+    regime,
+    grossTotalIncome,
+    slabIncome,
+    standardDeduction,
+    hraExemption,
+    professionalTaxDeduction,
+    ltaExemption,
+    chapterVIADeductions,
+    totalDeductions,
+    taxableIncome,
+    liability,
+    takeHome,
+    effectiveRate,
+  };
+}
+
+export interface WizardTaxSummary {
+  old: RegimeSummary;
+  new: RegimeSummary;
+  recommendedRegime: TaxRegime;
+}
+
+export function computeWizardTaxSummary(state: WizardState): WizardTaxSummary {
+  const oldRegime = computeRegimeSummary(state, "old");
+  const newRegime = computeRegimeSummary(state, "new");
+  return {
+    old: oldRegime,
+    new: newRegime,
+    recommendedRegime: newRegime.liability.totalTax <= oldRegime.liability.totalTax ? "new" : "old",
   };
 }
