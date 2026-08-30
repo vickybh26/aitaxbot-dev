@@ -3,6 +3,44 @@ import { randomUUID } from "crypto";
 import fs from "fs";
 import path from "path";
 
+// NOT import.meta.dirname: esbuild bundles this whole file into dist/index.js
+// (see package.json's build script — "esbuild server/index.ts --bundle
+// --outdir=dist"), so import.meta.dirname there resolves to dist/, not
+// server/, and dist/fonts/ doesn't exist. Both "npm run dev" (tsx
+// server/index.ts) and "npm start" (node dist/index.js) are run via npm
+// scripts from the repo root, so process.cwd() reliably points there in
+// both dev and production — checked against a real `node dist/index.js`
+// run, not just tsc --noEmit, before relying on it (see this fix's commit
+// message for that verification).
+const FONT_DIR = path.resolve(process.cwd(), "server", "fonts");
+
+/**
+ * pdfkit's built-in "Helvetica"/"Helvetica-Bold" standard fonts have no
+ * glyph for the Indian Rupee sign (₹, U+20B9) and silently substitute a
+ * wrong character (a superscript "1") wherever ₹ appears — confirmed by
+ * reproducing it in isolation with plain pdfkit before this fix. Every PDF
+ * generated in this file prints rupee amounts, so this was a real, live
+ * bug affecting every downloaded tax computation and rent receipt PDF, not
+ * a hypothetical one.
+ *
+ * Fix: register Noto Sans (SIL Open Font License — safe to bundle and
+ * redistribute in a deployed app, unlike Arial, which is proprietary and
+ * was only used for local one-off verification, never checked into this
+ * repo) as "NotoSans"/"NotoSans-Bold", and use those names everywhere below
+ * instead of "Helvetica"/"Helvetica-Bold". Re-registering Noto Sans under
+ * the literal names "Helvetica"/"Helvetica-Bold" was tried first and does
+ * NOT reliably work — pdfkit appears to treat "Helvetica" as already
+ * resolved to its own built-in font from PDFDocument's construction, so a
+ * later .font("Helvetica") call keeps using the built-in one even after
+ * re-registering that name; genuinely new font names avoid that ambiguity
+ * entirely. Call once per PDFDocument instance, immediately after
+ * construction.
+ */
+function registerRupeeSafeFonts(doc: PDFKit.PDFDocument): void {
+  doc.registerFont("NotoSans", path.join(FONT_DIR, "NotoSans-Regular.ttf"));
+  doc.registerFont("NotoSans-Bold", path.join(FONT_DIR, "NotoSans-Bold.ttf"));
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // INTERFACES
 // ─────────────────────────────────────────────────────────────────────────────
@@ -157,6 +195,7 @@ function generateDetailedComparisonPDF(data: TaxComputationData): Promise<Buffer
         Subject: "Income Tax Comparison Statement",
       },
     });
+    registerRupeeSafeFonts(doc);
 
     doc.on("data", (c: Buffer) => chunks.push(c));
     doc.on("end", () => resolve(Buffer.concat(chunks)));
@@ -188,33 +227,33 @@ function generateDetailedComparisonPDF(data: TaxComputationData): Promise<Buffer
 
     // ── HEADER ──────────────────────────────────────────────────────────────
     doc.rect(L, y, PW, 52).fill(DARK_BLUE);
-    doc.fillColor("#FFFFFF").font("Helvetica-Bold").fontSize(20)
+    doc.fillColor("#FFFFFF").font("NotoSans-Bold").fontSize(20)
        .text("AiTaxBot", L + 10, y + 8);
-    doc.font("Helvetica").fontSize(9).fillColor("#93C5FD")
+    doc.font("NotoSans").fontSize(9).fillColor("#93C5FD")
        .text("www.aitaxbot.co.in  |  AI-Powered Tax Calculator", L + 10, y + 32);
 
     const compDate = new Date(data.computationDate);
     const dateStr = compDate.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
-    doc.fillColor("#FFFFFF").font("Helvetica-Bold").fontSize(11)
+    doc.fillColor("#FFFFFF").font("NotoSans-Bold").fontSize(11)
        .text("INCOME TAX COMPARISON STATEMENT", L + 140, y + 10, { width: PW - 150, align: "right" });
-    doc.font("Helvetica").fontSize(9).fillColor("#93C5FD")
+    doc.font("NotoSans").fontSize(9).fillColor("#93C5FD")
        .text(`AY ${data.assessmentYear}  |  FY ${data.financialYear}  |  Date: ${dateStr}`, L + 140, y + 28, { width: PW - 150, align: "right" });
     y += 62;
 
     // ── CLIENT INFO + TAX SUMMARY STRIP ─────────────────────────────────────
     doc.rect(L, y, PW, 28).fill("#F0F9FF");
-    doc.fillColor(DARK_BLUE).font("Helvetica-Bold").fontSize(10)
+    doc.fillColor(DARK_BLUE).font("NotoSans-Bold").fontSize(10)
        .text(`Name: `, L + 8, y + 9, { continued: true })
-       .font("Helvetica").fillColor("#111827")
+       .font("NotoSans").fillColor("#111827")
        .text(data.personalInfo.name, { continued: true })
-       .font("Helvetica-Bold").fillColor(DARK_BLUE)
+       .font("NotoSans-Bold").fillColor(DARK_BLUE)
        .text(`   Age Group: `, { continued: true })
-       .font("Helvetica").fillColor("#111827")
+       .font("NotoSans").fillColor("#111827")
        .text(data.personalInfo.ageGroup === "below60" ? "Below 60" : data.personalInfo.ageGroup === "60to80" ? "Senior (60-80)" : "Super Senior (80+)", { continued: true });
     if (data.personalInfo.pan) {
-      doc.font("Helvetica-Bold").fillColor(DARK_BLUE)
+      doc.font("NotoSans-Bold").fillColor(DARK_BLUE)
          .text(`   PAN: `, { continued: true })
-         .font("Helvetica").fillColor("#111827")
+         .font("NotoSans").fillColor("#111827")
          .text(data.personalInfo.pan);
     } else {
       doc.text("");
@@ -225,16 +264,16 @@ function generateDetailedComparisonPDF(data: TaxComputationData): Promise<Buffer
     const recBg = rec === "new" ? GREEN_BG : AMBER_BG;
     const recFg = rec === "new" ? GREEN : AMBER;
     doc.rect(L, y, PW, 30).fill(recBg);
-    doc.fillColor(recFg).font("Helvetica-Bold").fontSize(11)
+    doc.fillColor(recFg).font("NotoSans-Bold").fontSize(11)
        .text(`✅  RECOMMENDED: ${rec === "new" ? "NEW REGIME" : "OLD REGIME"}`, L + 10, y + 9, { continued: true });
-    doc.font("Helvetica").fontSize(10).fillColor(recFg)
+    doc.font("NotoSans").fontSize(10).fillColor(recFg)
        .text(`   |   Potential Tax Savings: ${fmtCur(savings)}   |   Monthly TDS Savings: ${fmtCur(savings / 12)}`);
     y += 38;
 
     // ── QUICK COMPARISON TABLE ────────────────────────────────────────────
     // Header
     doc.rect(L, y, PW, 20).fill(DARK_BLUE);
-    doc.fillColor("#FFFFFF").font("Helvetica-Bold").fontSize(9)
+    doc.fillColor("#FFFFFF").font("NotoSans-Bold").fontSize(9)
        .text("TAX STATISTICS", L + 6, y + 6)
        .text("OLD REGIME", COL_OLD, y + 6, { width: C2, align: "center" })
        .text("NEW REGIME", COL_NEW, y + 6, { width: C3, align: "center" });
@@ -280,7 +319,7 @@ function generateDetailedComparisonPDF(data: TaxComputationData): Promise<Buffer
       doc.rect(L, y, 1, ROW_H).fill("#E2E8F0");
       doc.rect(L + PW, y, 1, ROW_H).fill("#E2E8F0");
 
-      const fnt = bold ? "Helvetica-Bold" : "Helvetica";
+      const fnt = bold ? "NotoSans-Bold" : "NotoSans";
       const oldColor = bold ? (rec === "old" ? GREEN : "#DC2626") : "#111827";
       const newColor = bold ? (rec === "new" ? GREEN : "#DC2626") : "#111827";
 
@@ -295,12 +334,12 @@ function generateDetailedComparisonPDF(data: TaxComputationData): Promise<Buffer
         // Draw value left-aligned with a small gap, then "✓" badge at right edge
         doc.fillColor(newColor).font(fnt).fontSize(9)
            .text(fmt(newVal as number), COL_NEW, y + 4, { width: C3 - 28, align: "right" });
-        doc.fillColor(GREEN).font("Helvetica-Bold").fontSize(7.5)
+        doc.fillColor(GREEN).font("NotoSans-Bold").fontSize(7.5)
            .text("✓ Best", COL_NEW + C3 - 26, y + 5, { width: 26, align: "right" });
       } else if (bold && label === "NET TAX PAYABLE" && rec === "old") {
         doc.fillColor(newColor).font(fnt).fontSize(9)
            .text(fmt(newVal as number), COL_NEW, y + 4, { width: C3, align: "right" });
-        doc.fillColor(GREEN).font("Helvetica-Bold").fontSize(7.5)
+        doc.fillColor(GREEN).font("NotoSans-Bold").fontSize(7.5)
            .text("✓ Best", COL_OLD + C2 - 26, y + 5, { width: 26, align: "right" });
       } else {
         doc.fillColor(newColor).font(fnt).fontSize(9)
@@ -323,7 +362,7 @@ function generateDetailedComparisonPDF(data: TaxComputationData): Promise<Buffer
     // ── DETAILED COMPUTATION TABLE ────────────────────────────────────────────
     // Section header
     doc.rect(L, y, PW, 20).fill(DARK_BLUE);
-    doc.fillColor("#FFFFFF").font("Helvetica-Bold").fontSize(9)
+    doc.fillColor("#FFFFFF").font("NotoSans-Bold").fontSize(9)
        .text("DETAILED TAX COMPUTATION", L + 6, y + 6)
        .text("OLD REGIME", COL_OLD, y + 6, { width: C2, align: "center" })
        .text("NEW REGIME", COL_NEW, y + 6, { width: C3, align: "center" });
@@ -331,7 +370,7 @@ function generateDetailedComparisonPDF(data: TaxComputationData): Promise<Buffer
 
     // Sub-header
     doc.rect(L, y, PW, 14).fill("#E2E8F0");
-    doc.fillColor(GRAY).font("Helvetica").fontSize(7.5)
+    doc.fillColor(GRAY).font("NotoSans").fontSize(7.5)
        .text("Particulars", L + 6, y + 3)
        .text("Amount (₹)", COL_OLD, y + 3, { width: C2, align: "right" })
        .text("Amount (₹)", COL_NEW, y + 3, { width: C3, align: "right" });
@@ -351,7 +390,7 @@ function generateDetailedComparisonPDF(data: TaxComputationData): Promise<Buffer
         y = 36;
         // Re-draw column headers on new page
         doc.rect(L, y, PW, 14).fill(DARK_BLUE);
-        doc.fillColor("#FFFFFF").font("Helvetica-Bold").fontSize(8)
+        doc.fillColor("#FFFFFF").font("NotoSans-Bold").fontSize(8)
            .text("Particulars (continued)", L + 6, y + 3)
            .text("Old Regime", COL_OLD, y + 3, { width: C2, align: "center" })
            .text("New Regime", COL_NEW, y + 3, { width: C3, align: "center" });
@@ -372,7 +411,7 @@ function generateDetailedComparisonPDF(data: TaxComputationData): Promise<Buffer
       doc.rect(L + C1 + C2 + 10, y, 1, ROW_H).fill("#E2E8F0");
 
       const indent = (options.indent || 0) * 10;
-      const fnt = options.bold || options.sectionHeader ? "Helvetica-Bold" : "Helvetica";
+      const fnt = options.bold || options.sectionHeader ? "NotoSans-Bold" : "NotoSans";
       const labelColor = options.sectionHeader ? DARK_BLUE : "#374151";
 
       doc.font(fnt).fontSize(8.5).fillColor(labelColor)
@@ -498,7 +537,7 @@ function generateDetailedComparisonPDF(data: TaxComputationData): Promise<Buffer
     if (y > 650) { doc.addPage(); y = 36; }
 
     doc.rect(L, y, PW, 18).fill(DARK_BLUE);
-    doc.fillColor("#FFFFFF").font("Helvetica-Bold").fontSize(9)
+    doc.fillColor("#FFFFFF").font("NotoSans-Bold").fontSize(9)
        .text("ACTIONABLE SUGGESTIONS  (Old Regime Optimisation)", L + 6, y + 5);
     y += 22;
 
@@ -512,9 +551,9 @@ function generateDetailedComparisonPDF(data: TaxComputationData): Promise<Buffer
     suggestions.slice(0, 5).forEach((s, i) => {
       const bg = i % 2 === 0 ? "#FFFFFF" : "#F8FAFC";
       doc.rect(L, y, PW, 22).fill(bg);
-      doc.font("Helvetica-Bold").fontSize(8.5).fillColor(MID_BLUE).text(`Sec ${s.section}`, L + 6, y + 4, { width: 55 });
-      doc.font("Helvetica").fontSize(8.5).fillColor("#374151").text(s.desc, L + 65, y + 4, { width: PW - 130 });
-      doc.font("Helvetica-Bold").fontSize(8).fillColor(GREEN).text(s.limit, L + PW - 120, y + 8, { width: 115, align: "right" });
+      doc.font("NotoSans-Bold").fontSize(8.5).fillColor(MID_BLUE).text(`Sec ${s.section}`, L + 6, y + 4, { width: 55 });
+      doc.font("NotoSans").fontSize(8.5).fillColor("#374151").text(s.desc, L + 65, y + 4, { width: PW - 130 });
+      doc.font("NotoSans-Bold").fontSize(8).fillColor(GREEN).text(s.limit, L + PW - 120, y + 8, { width: 115, align: "right" });
       y += 22;
     });
 
@@ -523,10 +562,10 @@ function generateDetailedComparisonPDF(data: TaxComputationData): Promise<Buffer
     // ── FOOTER ────────────────────────────────────────────────────────────────
     doc.rect(L, y, PW, 1).fill(DARK_BLUE);
     y += 8;
-    doc.font("Helvetica-Bold").fontSize(8).fillColor(DARK_BLUE)
+    doc.font("NotoSans-Bold").fontSize(8).fillColor(DARK_BLUE)
        .text("Generated by AiTaxBot  |  www.aitaxbot.co.in", L, y, { width: PW, align: "center" });
     y += 12;
-    doc.font("Helvetica").fontSize(7).fillColor(GRAY)
+    doc.font("NotoSans").fontSize(7).fillColor(GRAY)
        .text("Disclaimer: This computation is for informational purposes only. Please consult a qualified tax professional before filing your ITR. All figures are rounded to the nearest rupee.", L, y, { width: PW, align: "center" });
 
     doc.end();
@@ -541,6 +580,7 @@ function generateLegacyPDF(data: TaxComputationData): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     const chunks: Buffer[] = [];
     const doc = new PDFDocument({ margin: 50, size: "A4" });
+    registerRupeeSafeFonts(doc);
     doc.on("data", (c: Buffer) => chunks.push(c));
     doc.on("end", () => resolve(Buffer.concat(chunks)));
     doc.on("error", reject);
@@ -549,22 +589,22 @@ function generateLegacyPDF(data: TaxComputationData): Promise<Buffer> {
     const PW = doc.page.width - 100;
     let y = 40;
 
-    doc.fontSize(22).font("Helvetica-Bold").fillColor("#1E40AF")
+    doc.fontSize(22).font("NotoSans-Bold").fillColor("#1E40AF")
        .text("AiTaxBot", { align: "center" });
     y += 30;
-    doc.fontSize(10).font("Helvetica").fillColor("#666666")
+    doc.fontSize(10).font("NotoSans").fillColor("#666666")
        .text("www.aitaxbot.co.in | AI-Powered Tax Calculator", { align: "center" });
     y += 25;
     doc.moveTo(50, y).lineTo(545, y).strokeColor("#1E40AF").lineWidth(2).stroke();
     y += 20;
     doc.fillColor("#000000").lineWidth(1);
-    doc.fontSize(14).font("Helvetica-Bold").text("INCOME TAX COMPUTATION STATEMENT", { align: "center" });
+    doc.fontSize(14).font("NotoSans-Bold").text("INCOME TAX COMPUTATION STATEMENT", { align: "center" });
     y += 30;
-    doc.fontSize(12).font("Helvetica-Bold").text(`Assessment Year: ${data.assessmentYear}`, { align: "center" });
+    doc.fontSize(12).font("NotoSans-Bold").text(`Assessment Year: ${data.assessmentYear}`, { align: "center" });
     y += 30;
 
     const colR = 350;
-    doc.fontSize(10).font("Helvetica");
+    doc.fontSize(10).font("NotoSans");
     doc.text("Name", L, y); doc.text(`: ${data.personalInfo.name}`, L + 100, y);
     doc.text("Previous Year", colR, y); doc.text(`: ${data.financialYear}`, colR + 100, y); y += 15;
     doc.text("Age Group", L, y);
@@ -573,22 +613,22 @@ function generateLegacyPDF(data: TaxComputationData): Promise<Buffer> {
     doc.text(`: ${(data.regime || "new") === "new" ? "New Regime (115BAC)" : "Old Regime"}`, colR + 100, y); y += 30;
 
     doc.moveTo(L, y).lineTo(L + PW, y).stroke(); y += 10;
-    doc.fontSize(10).font("Helvetica");
+    doc.fontSize(10).font("NotoSans");
 
     const colA = L + PW - 150;
 
     if (data.salary) {
-      doc.font("Helvetica-Bold").text("▶ Income from Salaries", L, y); y += 18;
-      doc.font("Helvetica").text("Gross Salary", L + 15, y);
+      doc.font("NotoSans-Bold").text("▶ Income from Salaries", L, y); y += 18;
+      doc.font("NotoSans").text("Gross Salary", L + 15, y);
       doc.text(fmt(data.salary.grossSalary), colA, y, { width: 80, align: "right" }); y += 15;
       doc.text(`Less: Standard Deduction u/s 16(ia)`, L + 15, y);
       doc.text(`(${fmt(data.salary.standardDeduction)})`, colA, y, { width: 80, align: "right" }); y += 15;
-      doc.font("Helvetica-Bold").text("Net Income from Salary", L + 15, y);
+      doc.font("NotoSans-Bold").text("Net Income from Salary", L + 15, y);
       doc.text(fmt(data.salary.netSalary), colA, y, { width: 80, align: "right" }); y += 25;
     }
 
     if (data.deductions && data.deductions.totalDeductions > 0 && data.regime === "old") {
-      doc.font("Helvetica-Bold").text("▶ Deductions under Chapter VI-A", L, y); y += 18;
+      doc.font("NotoSans-Bold").text("▶ Deductions under Chapter VI-A", L, y); y += 18;
       const d = data.deductions;
       const sections: Array<[string, number | undefined]> = [
         ["Section 80C (PPF, ELSS, LIC, etc.)", d.section80C],
@@ -603,19 +643,19 @@ function generateLegacyPDF(data: TaxComputationData): Promise<Buffer> {
       ];
       sections.forEach(([label, val]) => {
         if (val && val > 0) {
-          doc.font("Helvetica").text(label, L + 15, y);
+          doc.font("NotoSans").text(label, L + 15, y);
           doc.text(fmt(val), colA, y, { width: 80, align: "right" }); y += 15;
         }
       });
-      doc.font("Helvetica-Bold").text("Total Deductions under Chapter VI-A", L + 15, y);
+      doc.font("NotoSans-Bold").text("Total Deductions under Chapter VI-A", L + 15, y);
       doc.text(fmt(d.totalDeductions), colA, y, { width: 80, align: "right" }); y += 25;
     }
 
     doc.moveTo(L, y).lineTo(L + PW, y).stroke(); y += 10;
-    doc.font("Helvetica-Bold").fontSize(11).text("▶ Total Taxable Income", L, y);
+    doc.font("NotoSans-Bold").fontSize(11).text("▶ Total Taxable Income", L, y);
     doc.text(fmt(data.taxBreakdown.taxableIncome), colA, y, { width: 80, align: "right" }); y += 25;
 
-    doc.font("Helvetica").fontSize(10);
+    doc.font("NotoSans").fontSize(10);
     doc.text("Tax on Total Income", L, y);
     doc.text(fmt(data.taxBreakdown.taxOnIncome), colA, y, { width: 80, align: "right" }); y += 15;
     if (data.taxBreakdown.surcharge > 0) {
@@ -624,17 +664,17 @@ function generateLegacyPDF(data: TaxComputationData): Promise<Buffer> {
     }
     doc.text("Add: Health & Education Cess (4%)", L + 15, y);
     doc.text(fmt(data.taxBreakdown.cess), colA, y, { width: 80, align: "right" }); y += 15;
-    doc.font("Helvetica-Bold").text("Net Tax Payable", L + 15, y);
+    doc.font("NotoSans-Bold").text("Net Tax Payable", L + 15, y);
     doc.text(fmt(data.taxBreakdown.totalTax), colA, y, { width: 80, align: "right" }); y += 30;
 
     const compDate = new Date(data.computationDate);
-    doc.fontSize(9).font("Helvetica").fillColor("#333333")
+    doc.fontSize(9).font("NotoSans").fillColor("#333333")
        .text(`Date: ${compDate.toLocaleDateString("en-IN")}`, L, y);
     y += 50;
     doc.moveTo(L, y).lineTo(L + PW, y).strokeColor("#1E40AF").lineWidth(1).stroke(); y += 12;
-    doc.fontSize(9).font("Helvetica-Bold").fillColor("#1E40AF").text("Generated by AiTaxBot | www.aitaxbot.co.in", { align: "center" });
+    doc.fontSize(9).font("NotoSans-Bold").fillColor("#1E40AF").text("Generated by AiTaxBot | www.aitaxbot.co.in", { align: "center" });
     y += 10;
-    doc.fontSize(7).font("Helvetica").fillColor("#999999").text("Disclaimer: This computation is for informational purposes only. Please consult a qualified tax professional for ITR filing.", { align: "center" });
+    doc.fontSize(7).font("NotoSans").fillColor("#999999").text("Disclaimer: This computation is for informational purposes only. Please consult a qualified tax professional for ITR filing.", { align: "center" });
 
     doc.end();
   });
@@ -736,7 +776,7 @@ function drawReceiptPage(doc: PDFKit.PDFDocument, data: RentReceiptData, pageInd
   let y = M;
 
   // ── Header ───────────────────────────────────────────────────────────────
-  doc.fontSize(14).font("Helvetica-Bold").fillColor("#1E3A8A")
+  doc.fontSize(14).font("NotoSans-Bold").fillColor("#1E3A8A")
      .text("RENT RECEIPT", M, y, { width: W, align: "center" });
   y += 22;
   doc.moveTo(M, y).lineTo(M + W, y).strokeColor("#1E3A8A").lineWidth(1).stroke();
@@ -744,9 +784,9 @@ function drawReceiptPage(doc: PDFKit.PDFDocument, data: RentReceiptData, pageInd
 
   // ── Receipt meta row ─────────────────────────────────────────────────────
   doc.roundedRect(M, y, W, 30, 4).fill("#F1F5F9");
-  doc.fontSize(9).font("Helvetica-Bold").fillColor("#1E3A8A")
+  doc.fontSize(9).font("NotoSans-Bold").fillColor("#1E3A8A")
      .text(`Receipt No: ${data.receiptNumber}`, M + 10, y + 10);
-  doc.fontSize(9).font("Helvetica-Bold").fillColor("#1E3A8A")
+  doc.fontSize(9).font("NotoSans-Bold").fillColor("#1E3A8A")
      .text(`Date: ${data.receiptDate}`, PW - M - 170, y + 10, { width: 160, align: "right" });
   y += 42;
 
@@ -756,18 +796,18 @@ function drawReceiptPage(doc: PDFKit.PDFDocument, data: RentReceiptData, pageInd
 
   doc.roundedRect(M, y, W, 72, 4).fill("#EFF6FF").stroke("#BFDBFE");
   y += 12;
-  doc.fontSize(10).font("Helvetica").fillColor("#1e293b")
+  doc.fontSize(10).font("NotoSans").fillColor("#1e293b")
      .text("Received with thanks from", M + 12, y);
-  doc.font("Helvetica-Bold").fillColor("#1E3A8A")
+  doc.font("NotoSans-Bold").fillColor("#1E3A8A")
      .text(` ${data.tenantName}`, M + 12 + 148, y, { continued: false });
   y += 16;
-  doc.font("Helvetica").fillColor("#1e293b")
+  doc.font("NotoSans").fillColor("#1e293b")
      .text("the sum of ", M + 12, y, { continued: true })
-     .font("Helvetica-Bold").fillColor("#1E3A8A")
+     .font("NotoSans-Bold").fillColor("#1E3A8A")
      .text(`${amtFmt} (${amtWords})`, { continued: true })
-     .font("Helvetica").fillColor("#1e293b")
+     .font("NotoSans").fillColor("#1e293b")
      .text(" towards rent for the period ", { continued: true })
-     .font("Helvetica-Bold").fillColor("#1E3A8A")
+     .font("NotoSans-Bold").fillColor("#1E3A8A")
      .text(`${data.rentPeriodFrom} to ${data.rentPeriodTo}.`, { continued: false });
   y += 30;
 
@@ -778,10 +818,10 @@ function drawReceiptPage(doc: PDFKit.PDFDocument, data: RentReceiptData, pageInd
   const colW = W / 2 - 10;
 
   const drawField = (label: string, value: string, x: number, cy: number, w: number): number => {
-    doc.fontSize(7.5).font("Helvetica-Bold").fillColor("#64748B")
+    doc.fontSize(7.5).font("NotoSans-Bold").fillColor("#64748B")
        .text(label.toUpperCase(), x, cy);
     cy += 11;
-    doc.fontSize(9.5).font("Helvetica").fillColor("#1e293b")
+    doc.fontSize(9.5).font("NotoSans").fillColor("#1e293b")
        .text(value || "—", x, cy, { width: w, lineBreak: false });
     return cy + 18;
   };
@@ -807,26 +847,26 @@ function drawReceiptPage(doc: PDFKit.PDFDocument, data: RentReceiptData, pageInd
 
   // ── Signature block ───────────────────────────────────────────────────────
   const sigX = PW - M - 180;
-  doc.fontSize(9).font("Helvetica").fillColor("#64748B")
+  doc.fontSize(9).font("NotoSans").fillColor("#64748B")
      .text("Landlord Signature", sigX, y, { width: 170, align: "center" });
   y += 14;
   doc.moveTo(sigX, y).lineTo(sigX + 170, y).strokeColor("#94A3B8").lineWidth(0.5).stroke();
   y += 8;
-  doc.fontSize(9).font("Helvetica-Bold").fillColor("#1e293b")
+  doc.fontSize(9).font("NotoSans-Bold").fillColor("#1e293b")
      .text(data.landlordName, sigX, y, { width: 170, align: "center" });
   y += 30;
 
   // ── Stamp duty note ───────────────────────────────────────────────────────
   if (data.rentAmount > 5000) {
     doc.roundedRect(M, y, W, 26, 3).fill("#FFFBEB").stroke("#FDE68A");
-    doc.fontSize(7.5).font("Helvetica").fillColor("#92400E")
+    doc.fontSize(7.5).font("NotoSans").fillColor("#92400E")
        .text("⚠  Revenue Stamp: A ₹1 revenue stamp is required on the physical copy of this receipt as rent exceeds ₹5,000/month (per Indian Stamp Act).", M + 10, y + 8, { width: W - 20 });
     y += 34;
   }
 
   if (data.landlordPan) {
     doc.roundedRect(M, y, W, 22, 3).fill("#F0FDF4").stroke("#BBF7D0");
-    doc.fontSize(7.5).font("Helvetica").fillColor("#166534")
+    doc.fontSize(7.5).font("NotoSans").fillColor("#166534")
        .text("✓  Landlord PAN included as required for HRA documentation when annual rent exceeds ₹1,00,000 (Income Tax Rule 26C).", M + 10, y + 7, { width: W - 20 });
     y += 30;
   }
@@ -834,13 +874,14 @@ function drawReceiptPage(doc: PDFKit.PDFDocument, data: RentReceiptData, pageInd
   // ── Footer ────────────────────────────────────────────────────────────────
   doc.moveTo(M, y + 6).lineTo(M + W, y + 6).strokeColor("#CBD5E1").lineWidth(0.5).stroke();
   y += 14;
-  doc.fontSize(6.5).font("Helvetica").fillColor("#CBD5E1")
+  doc.fontSize(6.5).font("NotoSans").fillColor("#CBD5E1")
      .text("This receipt is a computer-generated document. It is not affiliated with any government body.", M, y, { width: W, align: "center" });
 }
 
 export async function generateRentReceiptPDF(receipts: RentReceiptData[]): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({ size: "A4", margin: 0, bufferPages: true });
+    registerRupeeSafeFonts(doc);
     const chunks: Buffer[] = [];
     doc.on("data", (chunk: Buffer) => chunks.push(chunk));
     doc.on("end", () => resolve(Buffer.concat(chunks)));
