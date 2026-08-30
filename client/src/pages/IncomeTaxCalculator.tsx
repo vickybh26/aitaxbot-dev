@@ -1,10 +1,8 @@
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'wouter';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { trackPageView } from '@/lib/analytics';
-import { useAuth } from '@/contexts/AuthContext';
 import FindCABanner from '@/components/FindCABanner';
-import TaxDownloadModal from '@/components/TaxDownloadModal';
 import {
   generateCalculatorSchema,
   generateBreadcrumbSchema,
@@ -15,7 +13,7 @@ import { FAQSchema } from '@/components/faq-schema';
 import AuthorBox from '@/components/AuthorBox';
 import { ResponsiveAd, RectangleAd } from '@/components/AdBanner';
 import CalcPageHeader from '@/components/CalcPageHeader';
-import TaxCalculator from '@/components/calculators/TaxCalculator';
+import TaxWizard from '@/components/calculators/tax-wizard/TaxWizard';
 
 const incomeTaxFAQs = [
   {
@@ -45,29 +43,23 @@ const incomeTaxFAQs = [
 ];
 
 export default function IncomeTaxCalculatorPage() {
-  const { user } = useAuth();
-  const [showDownloadModal, setShowDownloadModal] = useState(false);
-  const [computationSummary, setComputationSummary] = useState("");
-
   useEffect(() => {
     trackPageView('/calculators/income-tax', 'Income Tax Calculator India FY 2026-27 — New vs Old Regime | AiTaxBot');
     // The Ctrl+P interception and the window.print override that used to sit
     // here have been removed along with the sitewide print blackout. Printing
     // is now handled by a proper print stylesheet in index.css: site chrome is
     // stripped, the computation is kept, and a "not a filed return" line is
-    // appended. The Download PDF button is still the better artefact and
-    // remains the promoted path — it just no longer needs to be the only one.
+    // appended.
+    //
+    // The guest lead-capture download flow (TaxDownloadModal, handleCalculated,
+    // handleGuestDownloadRequest) that used to live here was removed in the
+    // 2026-08-30 wizard cutover: TaxWizard's own ResultStep uses
+    // ResultAuthGate for the sign-in gate and doesn't call back up to this
+    // page for a download modal. TaxDownloadModal.tsx and
+    // /api/leads/capture still exist and are still used elsewhere (e.g.
+    // TaxDownloadModal is not otherwise removed from the codebase), just no
+    // longer wired to this page.
   }, []);
-
-  function handleCalculated(summaryText: string) {
-    // Only update the summary — no auto-popup
-    setComputationSummary(summaryText);
-  }
-
-  // Called by TaxCalculator when Download PDF is clicked and user is NOT logged in
-  function handleGuestDownloadRequest() {
-    setShowDownloadModal(true);
-  }
 
   const calculatorSchema = generateCalculatorSchema({
     name: "Income Tax Calculator FY 2026-27 (AY 2027-28)",
@@ -114,13 +106,14 @@ export default function IncomeTaxCalculatorPage() {
           badge="FY 2026-27 ✓"
         />
 
-        {/* Calculator */}
-        <section className="py-12 px-6">
+        {/* Calculator — step-by-step wizard, cutover 2026-08-30 (was the flat
+            single-page TaxCalculator form; see git history for that
+            component, still present at
+            client/src/components/calculators/TaxCalculator.tsx but no
+            longer routed to from any live page). */}
+        <section className="py-8 px-4 sm:py-12 sm:px-6">
           <div className="max-w-6xl mx-auto">
-            <TaxCalculator
-              onCalculated={handleCalculated}
-              onGuestDownload={handleGuestDownloadRequest}
-            />
+            <TaxWizard />
           </div>
         </section>
 
@@ -522,14 +515,6 @@ export default function IncomeTaxCalculatorPage() {
         <div className="max-w-3xl mx-auto px-4 pb-10">
           <FindCABanner context="filing your ITR" />
         </div>
-
-        {/* Tax Download Lead Capture Modal */}
-        <TaxDownloadModal
-          open={showDownloadModal}
-          onClose={() => setShowDownloadModal(false)}
-          summaryText={computationSummary}
-          source="Income Tax Calculator"
-        />
 
       </div>
     </>
