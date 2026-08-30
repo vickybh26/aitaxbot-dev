@@ -62,11 +62,11 @@ export function SegmentedToggle({
               // short labels never wrap regardless, longer ones now wrap to a
               // second line instead of overflowing horizontally.
               "rounded-lg font-semibold text-center leading-tight transition-all duration-150",
-              "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
+              "focus:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--interactive-blue))]",
               size === "sm" ? "px-3 py-1.5 text-xs" : "px-4 py-2 text-sm",
               fullWidth && "flex-1 min-w-0",
               active
-                ? "bg-white text-blue-600 shadow-sm"
+                ? "bg-white text-primary shadow-sm"
                 : "bg-transparent text-slate-500 hover:text-slate-700"
             )}
           >
