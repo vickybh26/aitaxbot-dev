@@ -143,6 +143,7 @@ export default function TaxWizard() {
         <SalaryStep
           value={state.salary}
           onChange={(salary) => setState((s) => ({ ...s, salary }))}
+          financialYear={state.financialYear}
         />
       )}
 
