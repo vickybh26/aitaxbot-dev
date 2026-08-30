@@ -1,6 +1,13 @@
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import { useTrackToolUse } from "@/hooks/useTrackToolUse";
+import { getClientTaxAdvice, type TaxAdviceResult } from "@/lib/geminiAIService";
 import ResultAuthGate from "@/components/ResultAuthGate";
+import { Button } from "@/components/ui/button";
+import { AlertTriangle, Download, Info, Loader2, Sparkles, TrendingDown } from "lucide-react";
 import { computeWizardTaxSummary, type RegimeSummary, type WizardState } from "../types";
+import { buildTaxAdviceInput, buildTaxComputationData } from "../resultExport";
 
 interface ResultStepProps {
   state: WizardState;
@@ -102,11 +109,110 @@ function RegimeCard({ label, summary, isRecommended }: { label: string; summary:
 }
 
 export default function ResultStep({ state }: ResultStepProps) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user, userProfile } = useAuth();
+  const { toast } = useToast();
+  const trackTool = useTrackToolUse();
+  const [aiAdvice, setAiAdvice] = useState<TaxAdviceResult | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+
   const summary = computeWizardTaxSummary(state);
   const recommended = summary[summary.recommendedRegime];
   const other = summary[summary.recommendedRegime === "old" ? "new" : "old"];
   const savings = Math.max(0, other.liability.totalTax - recommended.liability.totalTax);
+
+  // Both effects below must run on every render regardless of the
+  // isAuthenticated branch taken further down (Rules of Hooks) — each one
+  // guards itself internally instead of living after an early return.
+
+  // Activation metric: records that this user actually reached a result, not
+  // just that they opened the calculator. Debounced + idempotent per tool
+  // inside useTrackToolUse, so firing it once per mount here is enough — see
+  // that hook's own doc comment. This is the same event the founder's
+  // returning-user/activation KPI on /admin is computed from; the wizard
+  // cutover shipped without this call, which would have silently zeroed out
+  // that metric for every income-tax calculation going forward.
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const recLabel = summary.recommendedRegime === "new" ? "New Regime" : "Old Regime";
+    const rs = (n: number) => `₹${Math.round(n).toLocaleString("en-IN")}`;
+    trackTool("Income Tax Calculator", `${recLabel}: ${rs(recommended.liability.totalTax)} tax`, {
+      toolKey: "income-tax",
+      route: "/calculators/income-tax",
+      kind: "calculator",
+      headline: {
+        label: `Your tax · ${recLabel}`,
+        value: rs(recommended.liability.totalTax),
+        hint: savings > 0 ? `${rs(savings)} less than the other regime` : undefined,
+      },
+      details: [
+        { label: "Gross income", value: rs(summary.old.grossTotalIncome) },
+        { label: "Old Regime tax", value: rs(summary.old.liability.totalTax) },
+        { label: "New Regime tax", value: rs(summary.new.liability.totalTax) },
+      ],
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, recommended.liability.totalTax, summary.recommendedRegime]);
+
+  // AI tax-saving tips — fetched once per visit to this step, matching how
+  // TaxCalculator.tsx fetched them once per Calculate click rather than on
+  // every keystroke. getClientTaxAdvice() already has its own 3-tier
+  // fallback (client Gemini -> server -> local rule-based), so this never
+  // blocks or breaks the page even if AI is unavailable.
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    let cancelled = false;
+    setAiLoading(true);
+    setAiAdvice(null);
+    getClientTaxAdvice(buildTaxAdviceInput(state, summary))
+      .then((data) => {
+        if (!cancelled) setAiAdvice(data);
+      })
+      .catch(() => {
+        if (!cancelled) setAiAdvice(null);
+      })
+      .finally(() => {
+        if (!cancelled) setAiLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated]);
+
+  async function handleDownloadPDF() {
+    setIsGeneratingPDF(true);
+    try {
+      const displayName =
+        user?.displayName ||
+        [userProfile?.firstName, userProfile?.lastName].filter(Boolean).join(" ").trim() ||
+        state.basicDetails.name;
+      const payload = buildTaxComputationData(state, summary, displayName);
+      const response = await fetch("/api/tax-computation/generate-pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!response.ok) throw new Error("Failed to generate PDF");
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `Tax_Computation_AY${payload.assessmentYear}_${new Date().toISOString().split("T")[0]}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast({ title: "PDF Downloaded", description: "Detailed tax computation downloaded successfully!" });
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast({ title: "Error", description: "Failed to generate PDF. Please try again.", variant: "destructive" });
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  }
 
   if (!isAuthenticated) {
     return (
@@ -143,6 +249,116 @@ export default function ResultStep({ state }: ResultStepProps) {
         <RegimeCard label="Old Regime" summary={summary.old} isRecommended={summary.recommendedRegime === "old"} />
         <RegimeCard label="New Regime" summary={summary.new} isRecommended={summary.recommendedRegime === "new"} />
       </div>
+
+      <Button
+        type="button"
+        variant="outline"
+        onClick={handleDownloadPDF}
+        disabled={isGeneratingPDF}
+        className="w-full gap-2"
+      >
+        {isGeneratingPDF ? (
+          <>
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Generating…
+          </>
+        ) : (
+          <>
+            <Download className="h-4 w-4" />
+            Download PDF
+          </>
+        )}
+      </Button>
+
+      {aiLoading ? (
+        <div className="rounded-lg border border-primary/30 bg-primary-light p-4 flex items-center gap-3 text-primary">
+          <Sparkles className="h-4 w-4 animate-pulse" />
+          <span className="text-sm font-medium">AI Tax Advisor is analysing your profile…</span>
+          <Loader2 className="h-4 w-4 animate-spin ml-auto" />
+        </div>
+      ) : aiAdvice && aiAdvice.tips?.length > 0 ? (
+        <div className="rounded-lg border border-primary/30 bg-primary-light p-4 space-y-4">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <div className="bg-primary rounded-lg p-1.5">
+                <Sparkles className="h-4 w-4 text-primary-foreground" />
+              </div>
+              <div>
+                <h3 className="font-bold text-neutral-900 text-sm">AI Tax Advisor</h3>
+                <p className="text-neutral-500 text-xs">AI powered · personalised for you</p>
+              </div>
+            </div>
+            {aiAdvice.maxPossibleSaving > 0 && (
+              <div className="text-right shrink-0">
+                <div className="text-[10px] text-neutral-500">Potential extra savings</div>
+                <div className="text-base font-bold text-green-600 tabular-figures money">
+                  {formatINR(aiAdvice.maxPossibleSaving)}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="bg-white rounded-lg p-3 border border-border">
+            <p className="text-sm text-neutral-700 italic">"{aiAdvice.summary}"</p>
+          </div>
+
+          <div>
+            <div className="flex justify-between text-xs text-neutral-600 mb-1">
+              <span>Tax Optimisation Score</span>
+              <span className="font-bold">{aiAdvice.savingsScore}/100</span>
+            </div>
+            <div className="h-2 bg-white rounded-full overflow-hidden border border-border">
+              <div
+                className={`h-full rounded-full transition-all duration-700 ${
+                  aiAdvice.savingsScore >= 80 ? "bg-green-500" : aiAdvice.savingsScore >= 50 ? "bg-amber-500" : "bg-red-500"
+                }`}
+                style={{ width: `${aiAdvice.savingsScore}%` }}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            {aiAdvice.tips.map((tip, i) => (
+              <div
+                key={i}
+                className={`bg-white rounded-lg p-3 border ${
+                  tip.priority === "high" ? "border-red-200" : tip.priority === "medium" ? "border-amber-200" : "border-border"
+                }`}
+              >
+                <div className="flex items-start gap-2">
+                  <div className="mt-0.5 shrink-0">
+                    {tip.priority === "high" ? (
+                      <AlertTriangle className="h-4 w-4 text-red-500" />
+                    ) : tip.priority === "medium" ? (
+                      <TrendingDown className="h-4 w-4 text-amber-500" />
+                    ) : (
+                      <Info className="h-4 w-4 text-primary" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <p className="text-sm font-semibold text-neutral-900">{tip.title}</p>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {tip.section && (
+                          <span className="text-[10px] bg-primary-light text-primary px-1.5 py-0.5 rounded font-medium">
+                            {tip.section}
+                          </span>
+                        )}
+                        {tip.potentialSaving && tip.potentialSaving > 0 && (
+                          <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-bold">
+                            Save {formatINR(tip.potentialSaving)}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <p className="text-xs text-neutral-600 mt-1 leading-relaxed">{tip.detail}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null}
 
       <p className="text-xs text-neutral-500">
         This is an estimate based on the figures you entered. Marginal relief, surcharge, and cess are
