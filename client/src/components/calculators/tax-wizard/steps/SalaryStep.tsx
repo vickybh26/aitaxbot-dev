@@ -82,10 +82,22 @@ export default function SalaryStep({ value, onChange }: SalaryStepProps) {
 
       {FIELDS.map(({ key, label, hint, required }) => (
         <div key={key}>
-          <Label htmlFor={`salary-${key}`}>
-            {label}
-            {required && <span className="text-destructive"> *</span>}
-          </Label>
+          <div className="flex items-center justify-between gap-2">
+            <Label htmlFor={`salary-${key}`}>
+              {label}
+              {required && <span className="text-destructive"> *</span>}
+            </Label>
+            {key === "hraReceived" && (
+              <a
+                href="/calculators/hra"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-primary hover:underline underline-offset-2 shrink-0"
+              >
+                Don't know this? Use the HRA Calculator →
+              </a>
+            )}
+          </div>
           <div className="relative mt-1">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 text-sm">₹</span>
             <Input
@@ -128,6 +140,14 @@ export default function SalaryStep({ value, onChange }: SalaryStepProps) {
               ₹{Math.round(hraExemption).toLocaleString("en-IN")}
             </span>
           </div>
+          <a
+            href="/calculators/hra"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block text-xs text-primary hover:underline underline-offset-2 text-right"
+          >
+            See the full HRA breakdown & formula →
+          </a>
         </div>
       )}
 
