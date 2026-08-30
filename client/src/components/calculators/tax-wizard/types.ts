@@ -580,6 +580,20 @@ export interface RegimeSummary {
   liability: TaxLiabilityResult;
   takeHome: number;
   effectiveRate: number; // %, of grossTotalIncome
+  // Per-head income figures, exposed so downstream consumers (PDF export, AI
+  // tax advice) can read the exact numbers this regime's tax was computed
+  // from instead of re-deriving them a second time — see the resultExport.ts
+  // doc comment for why that duplication specifically is a risk here.
+  grossSalary: number;
+  housePropertyIncome: number; // can be negative (loss); old regime includes self-occupied interest relief, new regime doesn't
+  businessIncome: number;
+  debtFundGains: number;
+  otherSourcesIncome: number;
+  ltcgEquity: number;
+  stcgEquity: number;
+  // The exact capped figure for every Chapter VI-A line, including the
+  // 10%-of-adjusted-GTI cap actually applied to 80G — all zero on New Regime.
+  deductionsBreakdown: DeductionsComputation;
 }
 
 export function computeRegimeSummary(state: WizardState, regime: TaxRegime): RegimeSummary {
@@ -606,6 +620,15 @@ export function computeRegimeSummary(state: WizardState, regime: TaxRegime): Reg
   const grossTotalIncome = slabIncome + ltcgEquity + stcgEquity;
 
   let chapterVIADeductions = 0;
+  let deductionsBreakdown: DeductionsComputation = {
+    section80C: 0,
+    section80D: 0,
+    section80E: 0,
+    section80CCD1B: 0,
+    section80G: 0,
+    section80TTAorTTB: 0,
+    total: 0,
+  };
   if (regime === "old") {
     const ded = computeDeductions(state.deductions, state.otherSources, state.ageGroup);
     // 10%-of-adjusted-GTI qualifying limit on 80G — same formula as
@@ -615,6 +638,10 @@ export function computeRegimeSummary(state: WizardState, regime: TaxRegime): Reg
     const section80GCapped = Math.min(ded.section80G, adjustedGTI * 0.1);
     chapterVIADeductions =
       ded.section80C + ded.section80D + ded.section80E + ded.section80CCD1B + section80GCapped + ded.section80TTAorTTB;
+    // section80G here is the CAPPED figure actually applied — deliberately
+    // overwriting ded.section80G (raw) so anything reading
+    // deductionsBreakdown later never has to know about the cap formula.
+    deductionsBreakdown = { ...ded, section80G: section80GCapped, total: chapterVIADeductions };
   }
 
   const totalDeductions = standardDeduction + professionalTaxDeduction + hraExemption + ltaExemption + chapterVIADeductions;
@@ -642,6 +669,14 @@ export function computeRegimeSummary(state: WizardState, regime: TaxRegime): Reg
     liability,
     takeHome,
     effectiveRate,
+    grossSalary,
+    housePropertyIncome,
+    businessIncome,
+    debtFundGains,
+    otherSourcesIncome,
+    ltcgEquity,
+    stcgEquity,
+    deductionsBreakdown,
   };
 }
 
