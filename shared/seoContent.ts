@@ -14,7 +14,22 @@
  * page's real FAQ/intro copy changes, update the corresponding entry here too;
  * this file is a static snapshot for crawlers, not a live import of the React
  * component, so the two CAN drift if only one side is edited.
+ *
+ * Blog posts (SEO_CONTENT_BY_PATH's other ~36 entries) are the one exception
+ * to "static snapshot" above: BLOG_SEO_CONTENT below is GENERATED from
+ * client/src/data/blogPosts.ts at import time, every time, rather than
+ * hand-duplicated here. Until 2026-08-30 blog posts had no entry in this file
+ * at all — every one of them (900-2,458 words of real written content each)
+ * served the identical generic client/index.html shell to any crawler that
+ * doesn't execute JS, which is exactly the "Thin Content" pattern this whole
+ * file exists to fix, just never extended past the 20 hand-written routes
+ * below. Generating from blogPosts.ts (not copying) means a title/FAQ edit to
+ * a blog post can never drift out of sync here the way a hand-copied entry
+ * could — see the resultExport.ts-vs-generatePDF() duplication note elsewhere
+ * in this codebase for why that specific failure mode is treated as a real
+ * risk here, not a hypothetical one.
  */
+import { blogPosts, type BlogPost } from "@/data/blogPosts";
 
 export interface SeoFaq {
   question: string;
@@ -344,7 +359,98 @@ export const SEO_CONTENT: SeoPageContent[] = [
       { question: "Can AiTaxBot file my ITR for me?", answer: "AiTaxBot provides calculation tools and guidance, not filing services. For actual tax filing, please consult a qualified Chartered Accountant or file directly through the Income Tax Department's e-filing portal." },
     ],
   },
+  {
+    // Added 2026-08-30: AdSense explicitly checks Privacy Policy / Terms of
+    // Service accessibility (see the adsense-ops persona notes), and this
+    // page previously had zero entry in SEO_CONTENT_BY_PATH — a non-JS
+    // crawler saw only the generic, stale client/index.html shell instead of
+    // any of this page's real, DPDPA-specific content.
+    path: "/privacy-policy",
+    title: "Privacy Policy - AiTaxBot | How We Protect Your Data",
+    description: "AiTaxBot Privacy Policy — learn how we collect, use, store, and protect your personal information in compliance with India's Digital Personal Data Protection Act 2023.",
+    canonical: "https://www.aitaxbot.co.in/privacy-policy",
+    h1: "Privacy Policy",
+    intro: "AiTaxBot (\"we\", \"us\", \"our\") is committed to protecting your privacy. This policy explains what personal data we collect, why we collect it, how we use and store it, and your rights as a Data Principal under India's Digital Personal Data Protection Act, 2023 (DPDPA). It applies to both aitaxbot.co.in and www.aitaxbot.co.in.",
+    faqs: [
+      { question: "What law governs AiTaxBot's privacy practices?", answer: "AiTaxBot's data collection, use, and storage practices are governed by India's Digital Personal Data Protection Act, 2023 (DPDPA). The full policy on this page explains what is collected, why, and what rights you have as a Data Principal under that Act." },
+      { question: "Can I delete my AiTaxBot account and data?", answer: "Yes — AiTaxBot provides a self-service \"Delete My Account\" option that removes your account data. See the full Privacy Policy for exactly what is deleted and any retention exceptions." },
+    ],
+  },
+  {
+    path: "/terms-of-service",
+    title: "Terms of Service & Disclaimer - AiTaxBot",
+    description: "AiTaxBot Terms of Service and Disclaimer. Read our usage guidelines, financial disclaimer, CA directory terms, and legal agreement before using our free tax tools.",
+    canonical: "https://www.aitaxbot.co.in/terms-of-service",
+    h1: "Terms of Service & Disclaimer",
+    intro: "AiTaxBot provides tax calculators, financial tools, and educational content for informational and educational purposes only. Results from these calculators do not constitute professional tax, legal, or financial advice, and AiTaxBot is not a registered tax consultant, investment adviser, or financial planner under any Indian regulation. These Terms of Service, governed by Indian law, set out the full usage guidelines, financial disclaimer, and CA directory terms that apply when you use the platform.",
+    faqs: [
+      { question: "Is AiTaxBot a registered tax consultant or financial adviser?", answer: "No. AiTaxBot is not a registered tax consultant, investment adviser, or financial planner under any Indian regulation. Its calculators and content are for informational and educational purposes only and do not constitute professional tax, legal, or financial advice." },
+      { question: "What law governs AiTaxBot's Terms of Service?", answer: "AiTaxBot's Terms of Service and Disclaimer are governed by Indian law. The full terms cover usage guidelines, the financial disclaimer, and the terms that apply to CAs listed in AiTaxBot's directory." },
+    ],
+  },
 ];
 
-export const SEO_CONTENT_BY_PATH: Record<string, SeoPageContent> =
-  Object.fromEntries(SEO_CONTENT.map((p) => [p.path, p]));
+/**
+ * Strips the light markdown (bold, links) blogPosts.ts's content_md uses —
+ * this content is going into a plain-text <p>/<h3> block, not a markdown
+ * renderer, so literal "**"/"[]()" characters would otherwise show up as-is
+ * in the raw HTML a crawler reads.
+ */
+function stripMarkdown(md: string): string {
+  return md
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1") // [text](url) -> text
+    .replace(/\*\*(.+?)\*\*/g, "$1") // **bold** -> bold
+    .replace(/__(.+?)__/g, "$1") // __bold__ -> bold
+    .trim();
+}
+
+/**
+ * Builds a SeoPageContent from a blog post's own metaTitle/metaDescription
+ * and bodySections — no new prose invented here, unlike the hand-written
+ * entries above. Every paragraph of every "intro"-type section is joined
+ * into one flowing paragraph (lowest-risk choice: injectSeoContent() renders
+ * page.intro as a single <p>, and every hand-written entry above is already
+ * single-paragraph, so this doesn't change that template's behaviour for the
+ * 20 existing routes).
+ *
+ * A "faq" section is NOT one {question, answer} pair per section the way the
+ * CLAUDE.md doc for this file's BlogPost interface describes it — every one
+ * of the 36 posts, checked directly against this file rather than trusting
+ * that doc, uses exactly one faq section per post holding an `items` array
+ * of {q, a} pairs (confirmed live: this mismatch crashed the dev server on
+ * first run with "Cannot read properties of undefined (reading 'replace')"
+ * — trusting the doc over the actual data would have shipped that crash).
+ */
+function blogPostToSeoContent(post: BlogPost): SeoPageContent {
+  const intro = post.bodySections
+    .filter((s: { type: string }) => s.type === "intro")
+    .map((s: { content_md: string }) => stripMarkdown(s.content_md).replace(/\n+/g, " "))
+    .join(" ");
+
+  const faqs: SeoFaq[] = post.bodySections
+    .filter((s: { type: string; items?: unknown }) => s.type === "faq" && Array.isArray(s.items))
+    .flatMap((s: { items: { q: string; a: string }[] }) =>
+      s.items.map((item) => ({
+        question: item.q,
+        answer: stripMarkdown(item.a),
+      }))
+    );
+
+  return {
+    path: `/blog/${post.slug}`,
+    title: post.metaTitle,
+    description: post.metaDescription,
+    canonical: `https://www.aitaxbot.co.in/blog/${post.slug}`,
+    h1: post.metaTitle, // matches client/src/pages/BlogPost.tsx, which renders post.metaTitle as both <title> and <h1>
+    intro,
+    faqs,
+  };
+}
+
+export const BLOG_SEO_CONTENT: SeoPageContent[] = blogPosts
+  .filter((p) => p.status === "published")
+  .map(blogPostToSeoContent);
+
+export const SEO_CONTENT_BY_PATH: Record<string, SeoPageContent> = Object.fromEntries(
+  [...SEO_CONTENT, ...BLOG_SEO_CONTENT].map((p) => [p.path, p])
+);
