@@ -103,7 +103,7 @@ export const blogPosts = ([
         type: "cta",
         content_md: "**Next step:** Estimate your risk profile and compare after-tax returns with our free tools on **[aitaxbot.co.in](https://www.aitaxbot.co.in)**. Start with the Risk Profiler and Tax-Adjusted Return Calculator.",
         internal_links: [
-          {"label": "Income Tax Calculator", "href": "/tax-calculator"},
+          {"label": "Income Tax Calculator", "href": "/calculators/income-tax"},
           {"label": "SIP Calculator", "href": "/calculators/sip"},
           {"label": "Dashboard", "href": "/dashboard"}
         ]
@@ -199,7 +199,7 @@ export const blogPosts = ([
         internal_links: [
           {"label": "SIP Calculator", "href": "/calculators/sip"},
           {"label": "SWP Calculator", "href": "/calculators/swp"},
-          {"label": "Tax Calculator", "href": "/tax-calculator"}
+          {"label": "Tax Calculator", "href": "/calculators/income-tax"}
         ]
       },
       {
@@ -916,7 +916,7 @@ export const blogPosts = ([
         internal_links: [
           {"label": "SIP Calculator", "href": "/calculators/sip"},
           {"label": "SWP Calculator", "href": "/calculators/swp"},
-          {"label": "Tax Calculator", "href": "/tax-calculator"}
+          {"label": "Tax Calculator", "href": "/calculators/income-tax"}
         ]
       },
       {
@@ -1007,7 +1007,7 @@ export const blogPosts = ([
         content_md: "Calculate your HRA exemption instantly with our **HRA Calculator**.",
         internal_links: [
           {"label": "HRA Calculator", "href": "/calculators/hra"},
-          {"label": "Tax Calculator", "href": "/tax-calculator"}
+          {"label": "Tax Calculator", "href": "/calculators/income-tax"}
         ]
       },
       {
@@ -1096,7 +1096,7 @@ export const blogPosts = ([
         type: "cta",
         content_md: "Compare tax savings across all three options with our **Tax Calculator**.",
         internal_links: [
-          {"label": "Tax Calculator", "href": "/tax-calculator"},
+          {"label": "Tax Calculator", "href": "/calculators/income-tax"},
           {"label": "SIP Calculator", "href": "/calculators/sip"}
         ]
       },
@@ -1192,7 +1192,7 @@ export const blogPosts = ([
         content_md: "Simplify your GST compliance with our **Accounting & Invoicing** module featuring automated GST calculations.",
         internal_links: [
           {"label": "Accounting Module", "href": "/accounting"},
-          {"label": "Tax Calculator", "href": "/tax-calculator"}
+          {"label": "Tax Calculator", "href": "/calculators/income-tax"}
         ]
       },
       {
@@ -1292,7 +1292,7 @@ export const blogPosts = ([
         type: "cta",
         content_md: "Calculate your emergency fund target and track your progress with our financial planning tools.",
         internal_links: [
-          {"label": "Tax Calculator", "href": "/tax-calculator"},
+          {"label": "Tax Calculator", "href": "/calculators/income-tax"},
           {"label": "SIP Calculator", "href": "/calculators/sip"}
         ]
       },
@@ -1399,7 +1399,7 @@ export const blogPosts = ([
         content_md: "Compare returns and plan your SIPs with our calculators.",
         internal_links: [
           {"label": "SIP Calculator", "href": "/calculators/sip"},
-          {"label": "Tax Calculator", "href": "/tax-calculator"}
+          {"label": "Tax Calculator", "href": "/calculators/income-tax"}
         ]
       },
       {
@@ -1504,7 +1504,7 @@ export const blogPosts = ([
         type: "cta",
         content_md: "Calculate your capital gains tax liability with our **Tax Calculator**.",
         internal_links: [
-          {"label": "Tax Calculator", "href": "/tax-calculator"},
+          {"label": "Tax Calculator", "href": "/calculators/income-tax"},
           {"label": "SIP Calculator", "href": "/calculators/sip"}
         ]
       },
@@ -1607,7 +1607,7 @@ export const blogPosts = ([
         internal_links: [
           {"label": "SIP Calculator", "href": "/calculators/sip"},
           {"label": "SWP Calculator", "href": "/calculators/swp"},
-          {"label": "Tax Calculator", "href": "/tax-calculator"}
+          {"label": "Tax Calculator", "href": "/calculators/income-tax"}
         ]
       },
       {
