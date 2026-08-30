@@ -17,12 +17,12 @@ import HRACalculator from '@/components/calculators/HRACalculator';
 
 const hraFAQs = [
   {
-    question: "What are the 4 metro cities for HRA calculation in India?",
-    answer: "Under Section 10(13A) (Schedule II, Table Sl. No. 2 under ITA 2025), only four cities qualify as metro cities for HRA purposes: Mumbai, Delhi (NCT), Kolkata, and Chennai. Metro city employees can claim up to 50% of basic salary as HRA exemption cap. All other cities (including Bangalore, Hyderabad, Pune, Ahmedabad) are classified as non-metro with a 40% cap. This distinction is critical — claiming the wrong percentage is one of the most common HRA mistakes."
+    question: "How many metro cities are there for HRA calculation in India?",
+    answer: "Eight, from FY 2026-27 onwards: Mumbai, Delhi (NCT), Kolkata, Chennai, Hyderabad, Bengaluru, Pune, and Ahmedabad (Section 10(13A) / Schedule III, Table Sl. No. 11 under ITA 2025, limits prescribed in Rule 279 of the IT Rules 2026). Metro city employees can claim up to 50% of basic salary as the HRA exemption cap; every other city is non-metro at 40%. For FY 2025-26 and earlier, only the original four cities (Mumbai, Delhi, Kolkata, Chennai) qualified — Hyderabad, Bengaluru, Pune, and Ahmedabad were added by this rule. Using the old 4-city list for FY 2026-27 income under-claims your exemption in the four newly-added cities."
   },
   {
     question: "Can I claim HRA and home loan interest deduction together?",
-    answer: "Yes — this is one of the biggest myths in Indian taxation. You can claim both HRA exemption (Section 10(13A) / Schedule II, Table Sl. No. 2 under ITA 2025) and home loan interest deduction (Section 24(b) / Section 22(2) under ITA 2025) simultaneously. This works when you are living in rented accommodation in your city of employment and own a property in a different city, or if you haven't yet moved into your purchased flat. Both claims must be genuine and supported by proper documentation (rent agreement, rent receipts, home loan documents)."
+    answer: "Yes — this is one of the biggest myths in Indian taxation. You can claim both HRA exemption (Section 10(13A) / Schedule III, Table Sl. No. 11 under ITA 2025) and home loan interest deduction (Section 24(b) / Section 22(2) under ITA 2025) simultaneously. This works when you are living in rented accommodation in your city of employment and own a property in a different city, or if you haven't yet moved into your purchased flat. Both claims must be genuine and supported by proper documentation (rent agreement, rent receipts, home loan documents)."
   },
   {
     question: "How is HRA exemption calculated — what is the three-part formula?",
@@ -38,7 +38,7 @@ const hraFAQs = [
   },
   {
     question: "Can self-employed people claim HRA exemption?",
-    answer: "No, HRA exemption under Section 10(13A) (Schedule II, Table Sl. No. 2 under ITA 2025) is available only to salaried employees who receive HRA as part of their salary structure. Self-employed individuals, professionals, and business owners cannot claim HRA exemption, even if they pay rent for their residence. However, they can claim rent paid as a business expense or use it under other provisions depending on their business structure."
+    answer: "No, HRA exemption under Section 10(13A) (Schedule III, Table Sl. No. 11 under ITA 2025) is available only to salaried employees who receive HRA as part of their salary structure. Self-employed individuals, professionals, and business owners cannot claim HRA exemption, even if they pay rent for their residence. However, they can claim rent paid as a business expense or use it under other provisions depending on their business structure."
   }
 ];
 
@@ -104,17 +104,18 @@ export default function HRACalculatorPage() {
           <div className="max-w-6xl mx-auto">
             <div className="bg-red-50 border border-red-200 rounded-xl p-6">
               <h3 className="text-lg font-bold text-red-800 mb-2">
-                ⚠️ Common HRA Misconception — Metro vs Non-Metro Cities
+                ⚠️ Common HRA Misconception — Using the Old 4-City List for FY 2026-27
               </h3>
               <p className="text-red-700 mb-2">
-                Many employees believe <strong>Hyderabad and Bangalore are metro cities for HRA calculation</strong>.
-                They are not. Under the Income Tax Act Section 10(13A), <strong>only four cities are classified as metro:
-                Mumbai, Delhi (NCT), Kolkata, and Chennai</strong>.
+                Many employees still assume only <strong>Mumbai, Delhi, Kolkata, and Chennai</strong> count as metro
+                cities for HRA. That was true for FY 2025-26 and earlier — but from <strong>FY 2026-27 onwards</strong>,
+                Rule 279 of the notified IT Rules 2026 expanded the metro list to <strong>eight cities</strong>, adding
+                Hyderabad, Bengaluru, Pune, and Ahmedabad.
               </p>
               <p className="text-red-700">
-                Bangalore, Hyderabad, Pune, and all other cities are <strong>non-metro</strong> — capped at
-                <strong> 40% of basic salary</strong>, not 50%. Claiming 50% for these cities is an error that commonly
-                triggers ITR assessments and tax notices. Double-check your city classification in our calculator.
+                If you're in one of these four newly-added cities and still use <strong>40% of basic salary</strong>{" "}
+                for FY 2026-27 income, you're <strong>under-claiming</strong> your exemption — the correct cap is now{" "}
+                <strong>50%</strong>. Double-check your city classification and the financial year in our calculator below.
               </p>
             </div>
           </div>
@@ -171,8 +172,8 @@ export default function HRACalculatorPage() {
                   <div>
                     <p className="font-semibold text-slate-900">50% (Metro) or 40% (Non-Metro) of Basic Salary</p>
                     <p className="text-sm text-slate-600">
-                      50% of basic salary for metro cities (Mumbai, Delhi, Kolkata, Chennai),
-                      or 40% for all other non-metro cities.
+                      50% of basic salary for the 8 metro cities (Mumbai, Delhi, Kolkata, Chennai, Hyderabad,
+                      Bengaluru, Pune, Ahmedabad — see below), or 40% for all other non-metro cities.
                     </p>
                   </div>
                 </div>
@@ -186,7 +187,7 @@ export default function HRACalculatorPage() {
             <h2 className="text-2xl font-bold text-slate-900 mb-2">Metro vs Non-Metro Cities — Updated for FY 2026-27</h2>
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
               <p className="text-sm text-blue-900 font-semibold">
-                🆕 Rule Change from FY 2026-27 (IT Rules 2026, Rule 280): The list of metro cities for HRA has expanded from 4 to 8.
+                🆕 Rule Change from FY 2026-27 (IT Rules 2026, Rule 279): The list of metro cities for HRA has expanded from 4 to 8.
                 Bengaluru, Hyderabad, Pune and Ahmedabad are now metro cities — qualifying for 50% HRA cap instead of 40%.
                 This change applies to FY 2026-27 onwards. For FY 2025-26 and earlier, only the original 4 cities applied.
               </p>
@@ -203,7 +204,7 @@ export default function HRACalculatorPage() {
                   ))}
                 </div>
                 <p className="text-xs text-green-700 mt-3 bg-green-100 rounded p-2">
-                  Source: IT Rules 2026, Rule 280 — effective April 1, 2026. HRA exemption cap = 50% of basic salary for these 8 cities.
+                  Source: IT Rules 2026, Rule 279 — effective April 1, 2026. HRA exemption cap = 50% of basic salary for these 8 cities.
                 </p>
               </div>
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
@@ -303,7 +304,7 @@ export default function HRACalculatorPage() {
                 <span className="text-blue-600 text-lg font-bold shrink-0">1</span>
                 <div>
                   <p className="font-semibold text-slate-900 text-sm">Bengaluru/Hyderabad/Pune/Ahmedabad are NOW metro from FY 2026-27 — use 50%</p>
-                  <p className="text-slate-600 text-sm mt-1">IT Rules 2026 (Rule 280) expanded the metro list from 4 to 8 cities. If you're in Bengaluru, Hyderabad, Pune or Ahmedabad, you now qualify for the 50% HRA cap from FY 2026-27 — a meaningful boost to your exemption. Make sure your employer has updated their payroll system.</p>
+                  <p className="text-slate-600 text-sm mt-1">IT Rules 2026 (Rule 279) expanded the metro list from 4 to 8 cities. If you're in Bengaluru, Hyderabad, Pune or Ahmedabad, you now qualify for the 50% HRA cap from FY 2026-27 — a meaningful boost to your exemption. Make sure your employer has updated their payroll system.</p>
                 </div>
               </div>
               <div className="flex gap-3 p-4 bg-amber-50 border border-amber-100 rounded-lg">

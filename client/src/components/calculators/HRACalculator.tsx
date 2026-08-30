@@ -109,8 +109,10 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
 
     const { annualBasic, annualHra, annualRent } = getAnnualValues();
 
-    // HRA exemption calculation as per Schedule II (Table: Sl. No. 2) of Income Tax Act, 2025
-    // (formerly Section 10(13A) of the Income Tax Act, 1961)
+    // HRA exemption calculation as per Schedule III (Table: Sl. No. 11), limits
+    // prescribed in Rule 279 of the notified IT Rules 2026, Income Tax Act, 2025
+    // (formerly Section 10(13A) / Rule 2A of the Income Tax Act, 1961) — verified
+    // directly against En-Notified-IT-Rules-2026-20-03-2026.pdf, p.1776.
     const rule1 = annualHra;
     const rule2 = Math.max(0, annualRent - (annualBasic * 0.10));
     const rule3 = cityType === "metro" ? annualBasic * 0.50 : annualBasic * 0.40;
@@ -305,7 +307,7 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
                     HRA exemption is available <strong>only if you opt for the Old Tax Regime</strong>. Under the New Regime (default from FY 2023-24), your entire HRA received is added to taxable salary with no exemption.
                   </p>
                   <p className="text-xs text-amber-600 mt-1">
-                    <span className="font-medium">Applicable section:</span> Section 10(13A) read with Rule 2A — Income Tax Act, 1961 (FY up to 2025-26) · Schedule II, Table Sl. No. 2 — Income Tax Act, 2025 (FY 2026-27 onward)
+                    <span className="font-medium">Applicable section:</span> Section 10(13A) read with Rule 2A — Income Tax Act, 1961 (FY up to 2025-26) · Schedule III, Table Sl. No. 11, limits under Rule 279 of the IT Rules 2026 — Income Tax Act, 2025 (FY 2026-27 onward)
                   </p>
                 </div>
               </div>
