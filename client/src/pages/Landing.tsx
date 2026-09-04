@@ -34,6 +34,7 @@ import { generateHomePageSchema } from "@/lib/structuredData";
 import { blogPosts } from "@/data/blogPosts";
 import { useTranslation } from "@/lib/i18n";
 import TaxCalculator from "@/components/calculators/TaxCalculator";
+import KeyDates from "@/components/KeyDates";
 import HRACalculator from "@/components/calculators/HRACalculator";
 import SIPCalculator from "@/components/calculators/SIPCalculator";
 import SWPCalculator from "@/components/calculators/SWPCalculator";
@@ -362,7 +363,10 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                   ))}
                 </div>
               </div>
-              <div className="lg:pl-4"><SavingsCard /></div>
+              <div className="lg:pl-4 space-y-5">
+                <SavingsCard />
+                <KeyDates />
+              </div>
             </div>
           </div>
         </section>
@@ -646,6 +650,48 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                   <div className="px-5 pb-5 pt-3 text-sm text-slate-600 leading-relaxed border-t border-slate-100">{a}</div>
                 </details>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* How the numbers are checked — visual structure ported from
+            Lovable's index.tsx `method` section (2026-09-04); copy is ours,
+            not theirs. Their "Private by default" card read "Calculations
+            run in your browser. Nothing is retained unless you sign in and
+            save it." — same false-implication shape as the FAQ answer this
+            session already corrected elsewhere (auto-persists on every
+            calculation once signed in, no separate "save" step), so this
+            card states it the same accurate way instead of repeating it. */}
+        <section className="py-4">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="bento p-8 sm:p-10">
+              <h2 className="font-display text-2xl font-bold text-slate-900">How the numbers are checked</h2>
+              <div className="mt-7 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                <div>
+                  <h3 className="font-display text-base font-bold text-slate-900">Reviewed by CAs</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                    Each computation is signed off against the bare Act and the current Finance Act before it ships.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-display text-base font-bold text-slate-900">Both Acts supported</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                    Income Tax Act 1961 and the Income Tax Act 2025 run side by side through the transition years.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-display text-base font-bold text-slate-900">Working shown</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                    Slabs, surcharge, marginal relief and cess appear as separate lines you can audit.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-display text-base font-bold text-slate-900">Private by default</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                    Calculations run in your browser as a guest. Once you sign in, your result and figures are saved to your account automatically so your dashboard can show your history.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </section>

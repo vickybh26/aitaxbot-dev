@@ -44,19 +44,25 @@ export default function Footer() {
   return (
     <>
       {/* Disclaimer */}
-      <div className="py-4 border-t border-slate-100 bg-white">
+      <div className="py-4 border-t border-rule bg-white">
         <div className="max-w-7xl mx-auto px-4">
-          <p className="text-xs text-slate-400 leading-relaxed">
+          <p className="text-xs text-ink/45 leading-relaxed">
             Calculations are indicative only — not professional tax advice. AiTaxBot is not affiliated with the Income Tax Department or CBDT.{" "}
-            <Link href="/privacy-policy" className="underline hover:text-slate-600">Privacy Policy</Link>
+            <Link href="/privacy-policy" className="underline hover:text-ink/70">Privacy Policy</Link>
             {" · "}
-            <Link href="/about" className="underline hover:text-slate-600">About Us</Link>
+            <Link href="/about" className="underline hover:text-ink/70">About Us</Link>
           </p>
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="bg-slate-900 text-white pt-12 pb-8 px-6">
+      {/* Footer — bg-ink (was bg-slate-900, a cool gray-black; ink is the
+          same warm navy used everywhere else, matching Lovable's footer
+          exactly rather than a separate near-black). All 5 columns kept —
+          "For CAs" in particular is the CA-directory supply-side entry
+          point (see its own comment below); Lovable's simpler 3-column
+          footer has no direct equivalent to drop in its place, so this is
+          a re-skin of real content, not a content cut to match. */}
+      <footer className="bg-ink text-paper pt-12 pb-8 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 mb-10">
 
@@ -76,7 +82,7 @@ export default function Footer() {
                   />
                 </picture>
               </Link>
-              <p className="text-slate-400 text-sm leading-relaxed mb-4">
+              <p className="text-paper/65 text-sm leading-relaxed mb-4">
                 AI-powered tax tools for India. CA-reviewed, IT Act 2025 ready.
               </p>
               <div className="flex gap-2">
@@ -85,7 +91,7 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="LinkedIn"
-                  className="bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg p-2 transition-colors"
+                  className="bg-paper/10 hover:bg-paper/15 text-paper/80 rounded-lg p-2 transition-colors"
                 >
                   <Linkedin className="h-4 w-4" />
                 </a>
@@ -94,7 +100,7 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Instagram"
-                  className="bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg p-2 transition-colors"
+                  className="bg-paper/10 hover:bg-paper/15 text-paper/80 rounded-lg p-2 transition-colors"
                 >
                   <Instagram className="h-4 w-4" />
                 </a>
@@ -103,13 +109,13 @@ export default function Footer() {
 
             {/* Calculators column */}
             <div>
-              <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">
+              <h4 className="text-xs font-bold uppercase tracking-widest text-paper/50 mb-4">
                 Calculators
               </h4>
               <ul className="space-y-2.5">
                 {calculators.map(([name, href]) => (
                   <li key={href}>
-                    <Link href={href} className="text-sm text-slate-400 hover:text-white transition-colors">
+                    <Link href={href} className="text-sm text-paper/65 hover:text-paper transition-colors">
                       {name}
                     </Link>
                   </li>
@@ -119,13 +125,13 @@ export default function Footer() {
 
             {/* Tools & Services column */}
             <div>
-              <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">
+              <h4 className="text-xs font-bold uppercase tracking-widest text-paper/50 mb-4">
                 Tools &amp; Services
               </h4>
               <ul className="space-y-2.5">
                 {tools.map(([name, href]) => (
                   <li key={href}>
-                    <Link href={href} className="text-sm text-slate-400 hover:text-white transition-colors">
+                    <Link href={href} className="text-sm text-paper/65 hover:text-paper transition-colors">
                       {name}
                     </Link>
                   </li>
@@ -135,48 +141,48 @@ export default function Footer() {
 
             {/* For CAs column — the supply-side entry point for the directory */}
             <div>
-              <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">
+              <h4 className="text-xs font-bold uppercase tracking-widest text-paper/50 mb-4">
                 For CAs
               </h4>
               <ul className="space-y-2.5">
                 {forCAs.map(([name, href]) => (
                   <li key={href}>
-                    <Link href={href} className="text-sm text-slate-400 hover:text-white transition-colors">
+                    <Link href={href} className="text-sm text-paper/65 hover:text-paper transition-colors">
                       {name}
                     </Link>
                   </li>
                 ))}
               </ul>
-              <p className="mt-3 text-xs text-slate-500 leading-relaxed">
+              <p className="mt-3 text-xs text-paper/50 leading-relaxed">
                 Free listing. No platform fee, no commission.
               </p>
             </div>
 
             {/* Company column */}
             <div>
-              <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">
+              <h4 className="text-xs font-bold uppercase tracking-widest text-paper/50 mb-4">
                 Company
               </h4>
               <ul className="space-y-2.5">
                 {company.map(([name, href]) => (
                   <li key={href}>
-                    <Link href={href} className="text-sm text-slate-400 hover:text-white transition-colors">
+                    <Link href={href} className="text-sm text-paper/65 hover:text-paper transition-colors">
                       {name}
                     </Link>
                   </li>
                 ))}
               </ul>
-              <div className="mt-6 p-3 bg-slate-800 rounded-lg">
+              <div className="mt-6 p-3 bg-paper/10 rounded-lg">
                 {/* One address, on the canonical domain. There used to be two —
                     info@aitaxbot.in and admin@aitaxbot.co.in — with no
                     indication of which to use for what. On a page where people
                     are deciding whether to trust you with financial data, a
                     second address on a different TLD reads as either a typo or
                     a different organisation. */}
-                <p className="text-xs text-slate-400 mb-1">Email us</p>
+                <p className="text-xs text-paper/65 mb-1">Email us</p>
                 <a
                   href="mailto:admin@aitaxbot.co.in"
-                  className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                  className="text-xs text-credit hover:text-credit/80 transition-colors"
                 >
                   admin@aitaxbot.co.in
                 </a>
@@ -185,11 +191,11 @@ export default function Footer() {
           </div>
 
           {/* Bottom bar */}
-          <div className="border-t border-slate-800 pt-6 flex flex-col md:flex-row items-center justify-between gap-3">
-            <p className="text-xs text-slate-500">
+          <div className="border-t border-paper/15 pt-6 flex flex-col md:flex-row items-center justify-between gap-3">
+            <p className="text-xs text-paper/50">
               © {new Date().getFullYear()} AiTaxBot. Not affiliated with CBDT or the Income Tax Department of India.
             </p>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-paper/50">
               FY 2026-27 / AY 2027-28 Compliant · IT Act 2025 Ready
             </p>
           </div>

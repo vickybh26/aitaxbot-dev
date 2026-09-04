@@ -63,6 +63,7 @@ export default {
         credit: "hsl(var(--success-green))",
         debit: "hsl(var(--destructive))",
         rule: "hsl(var(--border))",
+        notice: "hsl(var(--warning-orange))",
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
