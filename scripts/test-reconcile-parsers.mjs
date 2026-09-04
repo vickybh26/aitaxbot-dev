@@ -127,6 +127,11 @@ const CASES = [
     // SFT-005 purchase of time deposits ₹13,54,000 must appear as a
     // high-value transaction — it is not income, but it must not vanish.
     expectHighValueContains: 1354000,
+    // This AIS prints its financial year but no assessment year. null is the
+    // correct answer for the AY — deriving "2026-27" from the FY would be the
+    // parser inventing a figure the document does not contain.
+    expectFinancialYear: "2025-26",
+    expectAssessmentYear: null,
   },
   {
     file: "mummy-26as.pdf",
@@ -138,6 +143,9 @@ const CASES = [
       // the 2026-07-18 fix, producing "No TDS credits found in 26AS".
       tdsNonSalary: 14918,
     },
+    // TRACES prints both years in the header block.
+    expectFinancialYear: "2025-26",
+    expectAssessmentYear: "2026-27",
   },
   {
     file: "papa-ais.pdf",
@@ -260,6 +268,30 @@ async function main() {
         ? `   ✅ other-income ${c.expectOtherIncomeContains} captured (catch-all working)`
         : `   ❌ other-income ${c.expectOtherIncomeContains} DROPPED — got ${JSON.stringify(parsed.otherIncomeItems)}`);
       if (!hit) failures++;
+    }
+
+    // Tax period. The FY used to be hardcoded to "2025-26" in four prompts and
+    // in the call to combineForm16s(), which silently mislabelled documents
+    // from any other year and computed their liability on the wrong slabs.
+    // It is now read off each document — so assert the document actually
+    // states it. `expectAssessmentYear: null` means "this document type does
+    // not print an AY"; the parser must return null there rather than
+    // inventing one by deriving it from the FY.
+    for (const field of ["financialYear", "assessmentYear"]) {
+      const expectKey = field === "financialYear" ? "expectFinancialYear" : "expectAssessmentYear";
+      const got = parsed[field];
+      if (c[expectKey] === undefined) {
+        // No verified expectation for this fixture yet — report what the
+        // document says so it can be asserted next time, rather than guessing
+        // a value into the test.
+        console.log(`   ℹ️  ${field}: ${JSON.stringify(got)} (not asserted — verify against the PDF, then add ${expectKey})`);
+        continue;
+      }
+      const ok = got === c[expectKey];
+      console.log(ok
+        ? `   ✅ ${field}: ${JSON.stringify(got)}`
+        : `   ❌ ${field}: got ${JSON.stringify(got)}, expected ${JSON.stringify(c[expectKey])}`);
+      if (!ok) failures++;
     }
   }
 

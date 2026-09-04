@@ -45,10 +45,11 @@ router.post("/query", async (req: Request, res: Response) => {
       return r.apiError(429, "RATE_LIMITED", "Too many requests. Please wait a moment before asking again.");
     }
 
-    const { question, sessionId, source } = req.body as {
+    const { question, sessionId, source, financialYear } = req.body as {
       question?: string;
       sessionId?: string;
       source?: string;
+      financialYear?: string;
     };
 
     if (!question || question.trim().length < 5) {
@@ -59,10 +60,16 @@ router.post("/query", async (req: Request, res: Response) => {
       return r.apiError(400, "QUESTION_TOO_LONG", "Question too long (maximum 1000 characters).");
     }
 
+    // financialYear is optional and deliberately NOT defaulted here: an absent
+    // year means "search both statutes and let the prompt's transition rule
+    // decide", which is safer than this route guessing a year for a caller
+    // that never stated one. Validated in governingLawFor(); a malformed value
+    // is logged and ignored rather than rejected, since it is not required.
     const result = await runRAGQuery({
       question: question.trim(),
       sessionId: sessionId || undefined,
       source: source || "api",
+      financialYear: typeof financialYear === "string" ? financialYear.trim() : undefined,
     });
     // Per-step timeouts: embed 10s + search 8s + generate 25s (in ragService.ts)
 

@@ -106,6 +106,13 @@ export interface OtherIncomeItem {
 }
 
 export interface ExtractedAIS {
+  /**
+   * The tax period the document itself states, read off the PDF rather than
+   * assumed. See resolveTaxPeriod() for why this is extracted per-document
+   * instead of being asked of the user or hardcoded.
+   */
+  financialYear: string | null;   // canonical "YYYY-YY", e.g. "2025-26"
+  assessmentYear: string | null;  // canonical "YYYY-YY", e.g. "2026-27"
   salaryIncome: number | null;
   interestFromSavings: number | null;
   interestFromFD: number | null;
@@ -163,6 +170,9 @@ export interface NonSalaryTDSSection {
 }
 
 export interface Extracted26AS {
+  /** Tax period stated on the document itself — see resolveTaxPeriod(). */
+  financialYear: string | null;
+  assessmentYear: string | null;
   tdsSalary: number | null;         // Part I TDS deposited on salary (section 192)
   tdsNonSalary: number | null;      // Part I TDS on non-salary (194S etc.) — aggregate total
   nonSalarySections: NonSalaryTDSSection[] | null; // same total, broken out by section code —
@@ -179,6 +189,9 @@ export interface Extracted26AS {
 }
 
 export interface ExtractedForm16 {
+  /** Tax period stated on the document itself — see resolveTaxPeriod(). */
+  financialYear: string | null;
+  assessmentYear: string | null;
   // Part A
   employerName: string | null;
   employerTAN: string | null;
@@ -276,6 +289,12 @@ export interface ReconciliationReport {
   documentsProvided?: DocumentsProvided;
   /** Uploaded documents from which nothing could be extracted — see ParseFailures. */
   parseFailures?: ParseFailures;
+  /**
+   * Which tax year this report was computed for, read off the uploaded
+   * documents. Optional for backwards compatibility with reports generated
+   * before the year was extracted rather than hardcoded.
+   */
+  taxPeriod?: TaxPeriodResolution;
   /** Whether our figures account for every section the AIS declares — see CoverageReport. */
   coverage?: CoverageReport;
   checks: ReconciliationCheck[];
@@ -295,6 +314,150 @@ export interface ReconciliationReport {
     estimatedShortfall: number | null;     // null when not computable (e.g. regime mismatch)
   };
   recommendedITRForm: ITRFormResult;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Tax period (FY / AY) resolution
+//
+// The reconciliation tool has no year selector — by design. Asking the user
+// which year their documents cover invites a self-report that contradicts the
+// files they just uploaded, and the documents already state it: Form 16 Part A
+// names its assessment year, 26AS is headed with one, and the AIS states its
+// financial year. So we read it off each document and cross-check.
+//
+// This replaces a hardcoded "2025-26" that was previously passed into
+// combineForm16s() and asserted in all three parser prompts. That was wrong in
+// two directions: it silently mislabelled FY 2024-25 documents, and it
+// computed their liability against the wrong year's slabs. It also becomes
+// load-bearing from April 2026, when the FY the documents cover is what
+// decides whether ITA 1961 or ITA 2025 governs at all.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Normalise any Indian tax-year label to canonical "YYYY-YY".
+ * Accepts "2025-26", "2025-2026", "FY 2025-26", "2025 – 26", "2025/26".
+ * Returns null for anything that isn't two consecutive years — a label like
+ * "2025-28" is a misread, and guessing at it would be worse than admitting
+ * we don't know.
+ *
+ * Only years 2000-2099 are recognised (`20\d{2}`); a wider pattern would start
+ * matching rupee amounts and PAN-adjacent digit runs, which is a worse failure
+ * than not reading a year printed in the 22nd century.
+ *
+ * NOTE the alternation order in the end-year group: `\d{4}` MUST come before
+ * `\d{2}`. Regex alternation is first-match-wins, so `\d{2}|\d{4}` matches
+ * just "20" of "2026" in "2025-2026" and the consecutive-year check then
+ * rejects the whole label. Verified by unit test — do not reorder.
+ */
+function normalizeYearLabel(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  const m = String(raw).match(/(20\d{2})\s*[-–—/]\s*(\d{4}|\d{2})/);
+  if (!m) return null;
+  const start = parseInt(m[1], 10);
+  const endRaw = parseInt(m[2], 10);
+  const end = endRaw < 100 ? Math.floor(start / 100) * 100 + endRaw : endRaw;
+  // Handle a century rollover in the 2-digit form (e.g. "2099-00").
+  const endAdjusted = end < start ? end + 100 : end;
+  if (endAdjusted !== start + 1) return null;
+  return `${start}-${String((start + 1) % 100).padStart(2, "0")}`;
+}
+
+/** AY 2026-27 → FY 2025-26. The assessment year is always the FY plus one. */
+function ayToFy(ay: string | null | undefined): string | null {
+  const n = normalizeYearLabel(ay);
+  if (!n) return null;
+  const start = parseInt(n.slice(0, 4), 10) - 1;
+  return `${start}-${String((start + 1) % 100).padStart(2, "0")}`;
+}
+
+/** FY 2025-26 → AY 2026-27. */
+function fyToAy(fy: string | null | undefined): string | null {
+  const n = normalizeYearLabel(fy);
+  if (!n) return null;
+  const start = parseInt(n.slice(0, 4), 10) + 1;
+  return `${start}-${String((start + 1) % 100).padStart(2, "0")}`;
+}
+
+/**
+ * Collapse one document's stated FY and/or AY into a single canonical FY.
+ * Documents state one, the other, or both; when both are present and
+ * disagree, we trust neither and return null rather than picking a winner.
+ */
+function documentFinancialYear(doc: {
+  financialYear: string | null;
+  assessmentYear: string | null;
+}): string | null {
+  const fromFy = normalizeYearLabel(doc.financialYear);
+  const fromAy = ayToFy(doc.assessmentYear);
+  if (fromFy && fromAy) return fromFy === fromAy ? fromFy : null;
+  return fromFy ?? fromAy ?? null;
+}
+
+export interface TaxPeriodResolution {
+  /** The FY the report is computed for. Never null — see `assumed`. */
+  financialYear: string;
+  assessmentYear: string;
+  /** True when no uploaded document stated a readable year and we fell back. */
+  assumed: boolean;
+  /** Per-document FY as stated, for display and for the conflict message. */
+  perDocument: Array<{ document: string; financialYear: string }>;
+  /** True when two uploaded documents state different financial years. */
+  conflict: boolean;
+}
+
+/**
+ * Fallback FY used only when NO uploaded document states a readable year.
+ * Deliberately a named constant rather than an inline literal: it is a guess,
+ * every use of it is flagged to the user via `assumed`, and it needs to be
+ * findable when the default rolls over each filing season.
+ */
+const FALLBACK_FINANCIAL_YEAR = "2025-26";
+
+function resolveTaxPeriod(
+  ais: { financialYear: string | null; assessmentYear: string | null },
+  form26as: { financialYear: string | null; assessmentYear: string | null },
+  form16Employers: Array<{ financialYear: string | null; assessmentYear: string | null }>,
+  provided: DocumentsProvided,
+): TaxPeriodResolution {
+  const perDocument: Array<{ document: string; financialYear: string }> = [];
+
+  const push = (label: string, doc: { financialYear: string | null; assessmentYear: string | null }) => {
+    const fy = documentFinancialYear(doc);
+    if (fy) perDocument.push({ document: label, financialYear: fy });
+  };
+
+  if (provided.ais) push("AIS", ais);
+  if (provided.form26as) push("Form 26AS", form26as);
+  form16Employers.forEach((e, i) =>
+    push(form16Employers.length > 1 ? `Form 16 (${i + 1})` : "Form 16", e)
+  );
+
+  const distinct = [...new Set(perDocument.map((d) => d.financialYear))];
+
+  if (distinct.length === 0) {
+    return {
+      financialYear: FALLBACK_FINANCIAL_YEAR,
+      assessmentYear: fyToAy(FALLBACK_FINANCIAL_YEAR)!,
+      assumed: true,
+      perDocument,
+      conflict: false,
+    };
+  }
+
+  // On conflict, take the most frequently stated year so the report still
+  // computes something sensible — but flag it HIGH so the user knows the
+  // documents disagree and the figures may be mixing two tax years.
+  const counts = new Map<string, number>();
+  for (const d of perDocument) counts.set(d.financialYear, (counts.get(d.financialYear) ?? 0) + 1);
+  const financialYear = [...counts.entries()].sort((a, b) => b[1] - a[1])[0][0];
+
+  return {
+    financialYear,
+    assessmentYear: fyToAy(financialYear)!,
+    assumed: false,
+    perDocument,
+    conflict: distinct.length > 1,
+  };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -431,6 +594,10 @@ function parse26ASFromText(text: string): Extracted26AS {
   console.log("[parse26AS] Parsing TRACES 26AS from text");
 
   const result: Extracted26AS = {
+    // Same dead-code caveat as nonSalarySections below: the year is extracted
+    // by parse26ASWithGemini, not by this legacy text path.
+    financialYear: null,
+    assessmentYear: null,
     tdsSalary: null,
     tdsNonSalary: null,
     nonSalarySections: null, // dead-code path (see file header) — not extended, live parsing is parse26ASWithGemini below
@@ -536,6 +703,8 @@ function parseForm16FromText(text: string): ExtractedForm16 {
   console.log("[parseForm16] Parsing Form 16 from text");
 
   const result: ExtractedForm16 = {
+    // Legacy text path — the year is extracted by parseForm16WithGemini.
+    financialYear: null, assessmentYear: null,
     employerName: null, employerTAN: null, employeePAN: null,
     tdsDeposited: null, grossSalary: null, salaryU17_1: null,
     perquisites: null, hraExempt: null, standardDeduction: null,
@@ -754,8 +923,12 @@ async function parseAISWithGemini(pdfBuffer: Buffer): Promise<Partial<ExtractedA
     return {};
   }
 
+  // NOTE: this prompt deliberately does NOT tell the model which year the
+  // document covers. It used to assert "for FY 2025-26", which both biased the
+  // model on genuinely older documents and made the tool structurally unable to
+  // notice it had been handed the wrong year. We ask for the year instead.
   const prompt = `This is an Annual Information Statement (AIS) from the Indian Income Tax Department Insight portal.
-It shows financial data reported to the IT department for FY 2025-26.
+It shows financial data reported to the IT department for a single financial year.
 
 Read EVERY page carefully. The document has sections:
 - Part B1: TDS/TCS (salary TDS-192, contract receipts TDS-194C, interest TDS-194A, crypto VDA TDS-194S, etc.)
@@ -796,6 +969,8 @@ code didn't match exactly is the single worst failure mode here.
 Extract these values. Use null ONLY if that category genuinely has no rows
 in the document. Return ONLY this JSON (no markdown, no text before/after):
 {
+  "financialYear": "<the financial year this AIS covers, exactly as printed on the document, e.g. '2025-26'. The AIS states it near the top, often as 'Financial Year' or 'F.Y.'. Use null if genuinely not printed anywhere — do NOT guess or infer it from transaction dates>",
+  "assessmentYear": "<the assessment year if the document states one, e.g. '2026-27'. Use null if not printed. Note AY is always one year after FY — do NOT compute one from the other, only report what is actually printed>",
   "salaryIncome": <total salary from TDS-192 / "Salary (TDS Annexure II)" AMOUNT column, number>,
   "interestFromSavings": <Part B2 SFT ONLY. Sum of EVERY SFT row whose description indicates savings-bank interest — heading "Interest from savings bank", description "Interest income ... Savings", typically SFT-016(SB). Sum across ALL banks. number>,
   "interestFromFD": <Part B2 SFT ONLY — never add TDS-194A from Part B1. Sum of EVERY SFT row whose description indicates term-deposit / fixed-deposit interest — heading "Interest from deposit", description "Interest income ... Term Deposit", typically SFT-016(TD) or SFT-016(FD). Sum across ALL banks. number>,
@@ -937,8 +1112,17 @@ B1, B2 and B7 in the named fields above.`;
       console.warn("[parseAISWithGemini] No sectionTotals returned — coverage cannot be verified for this document");
     }
 
+    // Normalise the year labels here rather than downstream: the model returns
+    // whatever the document printed ("F.Y. 2025-26", "2025-2026"), and every
+    // consumer wants the canonical form.
+    const financialYear = normalizeYearLabel(parsed.financialYear);
+    const assessmentYear = normalizeYearLabel(parsed.assessmentYear);
+    console.log(`[parseAISWithGemini] Stated period — FY: ${financialYear ?? "not stated"}, AY: ${assessmentYear ?? "not stated"}`);
+
     return {
       ...parsed,
+      financialYear,
+      assessmentYear,
       highValueTransactions: highValueTransactions.length ? highValueTransactions : null,
       otherIncomeItems: otherIncomeItems.length ? otherIncomeItems : null,
       sectionsSeen: sectionsSeen.length ? sectionsSeen : null,
@@ -956,6 +1140,7 @@ B1, B2 and B7 in the named fields above.`;
 
 async function parse26ASWithGemini(pdfBuffer: Buffer): Promise<Extracted26AS> {
   const empty: Extracted26AS = {
+    financialYear: null, assessmentYear: null,
     tdsSalary: null, tdsNonSalary: null, nonSalarySections: null, advanceTaxPaid: null,
     selfAssessmentTax: null, totalTdsCredits: null, tcsPaid: null,
   };
@@ -964,7 +1149,8 @@ async function parse26ASWithGemini(pdfBuffer: Buffer): Promise<Extracted26AS> {
     return empty;
   }
 
-  const prompt = `This is an Annual Tax Statement / Annual Information Statement (Form 26AS or ATS) downloaded from TRACES for FY 2025-26 / AY 2026-27.
+  // As with the AIS prompt: no year is asserted here — it is extracted below.
+  const prompt = `This is an Annual Tax Statement / Annual Information Statement (Form 26AS or ATS) downloaded from TRACES for a single assessment year.
 
 The document has sections like:
 - PART-I or PART A: TDS details. This section can appear in TWO different layouts — check for BOTH:
@@ -997,6 +1183,8 @@ Sum up:
 
 Return ONLY this JSON (no markdown, no text before/after the JSON):
 {
+  "assessmentYear": "<the assessment year printed on the statement, e.g. '2026-27'. TRACES prints this prominently in the header, usually labelled 'Assessment Year'. Use null if genuinely absent — do NOT guess or derive it from transaction dates>",
+  "financialYear": "<the financial year if the statement separately prints one, e.g. '2025-26'. Use null if only the assessment year is shown — do NOT compute it yourself>",
   "tdsSalary": <number or null>,
   "tdsNonSalary": <number or null>,
   "nonSalarySections": [{ "section": "<e.g. 194J>", "amount": <number> }, ...] or [],
@@ -1046,7 +1234,13 @@ Return ONLY this JSON (no markdown, no text before/after the JSON):
     const sectionsTotal = nonSalarySections.reduce((sum, s) => sum + s.amount, 0);
     const tdsNonSalary = parsed.tdsNonSalary ?? (nonSalarySections.length ? sectionsTotal : null);
 
+    const financialYear = normalizeYearLabel(parsed.financialYear);
+    const assessmentYear = normalizeYearLabel(parsed.assessmentYear);
+    console.log(`[parse26ASWithGemini] Stated period — FY: ${financialYear ?? "not stated"}, AY: ${assessmentYear ?? "not stated"}`);
+
     return {
+      financialYear,
+      assessmentYear,
       tdsSalary: parsed.tdsSalary ?? null,
       tdsNonSalary,
       nonSalarySections: nonSalarySections.length ? nonSalarySections : null,
@@ -1069,6 +1263,7 @@ Return ONLY this JSON (no markdown, no text before/after the JSON):
 
 async function parseForm16WithGemini(pdfBuffer: Buffer): Promise<ExtractedForm16> {
   const empty: ExtractedForm16 = {
+    financialYear: null, assessmentYear: null,
     employerName: null, employerTAN: null, employeePAN: null, tdsDeposited: null,
     grossSalary: null, salaryU17_1: null, perquisites: null, hraExempt: null,
     standardDeduction: null, professionalTax: null, netSalary: null,
@@ -1081,7 +1276,9 @@ async function parseForm16WithGemini(pdfBuffer: Buffer): Promise<ExtractedForm16
     return empty;
   }
 
-  const prompt = `This is Form 16 (TDS Certificate) issued by an employer for FY 2025-26 / AY 2026-27.
+  // As with the AIS and 26AS prompts: no year is asserted here — it is
+  // extracted below and cross-checked against the other documents.
+  const prompt = `This is Form 16 (TDS Certificate) issued by an employer for a single financial year.
 
 PART A contains:
 - Employer name, TAN, Employee PAN
@@ -1115,6 +1312,8 @@ AND: Whether opting out of sub-section (1A) of section 115BAC: YES or NO
 
 Extract all values and return ONLY this JSON (no markdown):
 {
+  "financialYear": "<the financial year printed on the form, e.g. '2025-26'. Form 16 Part A prints both 'Financial Year' and 'Assessment Year' in its header block. Use null if genuinely absent — do NOT guess or derive it from the quarterly TDS dates>",
+  "assessmentYear": "<the assessment year printed on the form, e.g. '2026-27'. Use null if absent. Report only what is printed — do NOT compute one year from the other>",
   "employerName": "<full name>",
   "employerTAN": "<TAN>",
   "employeePAN": "<PAN>",
@@ -1159,7 +1358,13 @@ Extract all values and return ONLY this JSON (no markdown):
     if (!match) { console.warn("[parseForm16WithGemini] No JSON found"); return empty; }
     const parsed = JSON.parse(match[0]);
     console.log("[parseForm16WithGemini] Parsed:", JSON.stringify(parsed));
+    const financialYear = normalizeYearLabel(parsed.financialYear);
+    const assessmentYear = normalizeYearLabel(parsed.assessmentYear);
+    console.log(`[parseForm16WithGemini] Stated period — FY: ${financialYear ?? "not stated"}, AY: ${assessmentYear ?? "not stated"}`);
+
     return {
+      financialYear,
+      assessmentYear,
       employerName: parsed.employerName ?? null,
       employerTAN: parsed.employerTAN ?? null,
       employeePAN: parsed.employeePAN ?? null,
@@ -1280,6 +1485,11 @@ function combineForm16s(
   }
 
   const combined: ExtractedForm16 = {
+    // The resolved period for the whole report, not a per-employer value —
+    // resolveTaxPeriod() has already cross-checked every uploaded document by
+    // the time this runs, and flags any disagreement between them.
+    financialYear,
+    assessmentYear: fyToAy(financialYear),
     employerName: employers.map((e) => e.employerName).filter(Boolean).join("  +  ") || null,
     employerTAN: n === 1 ? employers[0]?.employerTAN ?? null : null,
     employeePAN: employers.find((e) => e.employeePAN)?.employeePAN ?? null,
@@ -1915,6 +2125,11 @@ async function generateAIInsights(
   mismatches: ReconciliationMismatch[],
   multiEmployerFlags?: MultiEmployerFlags,
   provided: DocumentsProvided = { ais: true, form26as: true, form16: true },
+  taxPeriod: TaxPeriodResolution = {
+    financialYear: FALLBACK_FINANCIAL_YEAR,
+    assessmentYear: fyToAy(FALLBACK_FINANCIAL_YEAR)!,
+    assumed: true, perDocument: [], conflict: false,
+  },
 ): Promise<{ insights: string; actionItems: string[]; itrImpact: string }> {
   // Two distinct fallback reasons — do not conflate them. Reusing one message for
   // both "no API key" and "the API call itself failed" is what caused the live
@@ -1959,7 +2174,19 @@ async function generateAIInsights(
     ? `\nIMPORTANT DOCUMENT CONTEXT: The taxpayer uploaded ONLY their ${providedNames[0]} — no other documents. Treat any figure shown as "N/A" for the missing documents (${missingNames.join(", ")}) as UNKNOWN, not zero. Your job for this response: (1) summarise clearly what this one document shows, (2) list the specific things from THIS document that must not be missed when filing the ITR (incomes to declare, TDS credits to claim, deductions visible), and (3) tell them what the missing documents (${missingNames.join(", ")}) would add and why cross-checking all three before filing matters. Do NOT invent or guess figures for the missing documents.`
     : `\nIMPORTANT DOCUMENT CONTEXT: The taxpayer uploaded ${providedNames.join(" and ")} but NOT ${missingNames.join(" or ")}. Treat "N/A" figures from the missing document(s) as UNKNOWN, not zero. Compare the uploaded documents against each other, call out what shouldn't be missed when filing based on what IS available, and note what the missing document(s) would add.`;
 
-  const prompt = `You are an expert Indian Chartered Accountant helping taxpayer file ITR for FY 2025-26 (AY 2026-27).
+  // The year comes from the uploaded documents (resolveTaxPeriod), not a
+  // hardcoded literal — the same prompt has to serve a FY 2024-25 document set
+  // correctly, and from April 2026 the year is also what decides which Act
+  // governs at all.
+  const prompt = `You are an expert Indian Chartered Accountant helping taxpayer file ITR for FY ${taxPeriod.financialYear} (AY ${taxPeriod.assessmentYear}).${
+    taxPeriod.assumed
+      ? `\nNOTE: none of the uploaded documents stated their tax year, so FY ${taxPeriod.financialYear} is an assumption. Say so explicitly in your insights and tell the taxpayer to confirm the year on their documents.`
+      : ""
+  }${
+    taxPeriod.conflict
+      ? `\nWARNING: the uploaded documents state DIFFERENT tax years (${taxPeriod.perDocument.map(d => `${d.document}: FY ${d.financialYear}`).join("; ")}). Lead your insights with this problem — the figures below may be mixing two tax years, and the taxpayer must re-upload matching documents before relying on any of it.`
+      : ""
+  }
 
 GROUND TRUTH — CURRENT LAW (do not contradict these, even if your training data suggests otherwise; tax rules changed in recent Budgets and your recollection may be out of date):
 - Standard deduction u/s 16(ia), New Tax Regime (115BAC), FY 2024-25 AND FY 2025-26: ₹75,000 (raised from ₹50,000 by Budget 2024, effective FY 2024-25 onwards — this is NOT an error to flag or correct).
@@ -2002,7 +2229,7 @@ ${multiEmployerFlags && multiEmployerFlags.employerCount > 1
 
 Respond ONLY in this JSON (no markdown, no leading/trailing text):
 {
-  "insights": "<2-3 paragraphs explaining what the numbers mean, key ITR filing points, and whether ITR-1 or ITR-2 is needed. Mention specific Indian tax laws and AY 2026-27 context.>",
+  "insights": "<2-3 paragraphs explaining what the numbers mean, key ITR filing points, and whether ITR-1 or ITR-2 is needed. Mention specific Indian tax laws and AY ${taxPeriod.assessmentYear} context.>",
   "actionItems": ["<specific action 1>", "<specific action 2>", "<specific action 3>", "<specific action 4>"],
   "itrImpact": "<1 paragraph on which ITR form to use, which schedules to fill, and the key things to declare>"
 }`;
@@ -2049,6 +2276,7 @@ function buildReconcileShadowQuestion(
   f16: ExtractedForm16,
   mismatches: ReconciliationMismatch[],
   provided: DocumentsProvided,
+  taxPeriod: TaxPeriodResolution,
 ): string {
   const parts: string[] = [];
   if (f16.grossSalary != null) parts.push(`gross salary ${fmt(f16.grossSalary)}`);
@@ -2076,7 +2304,7 @@ function buildReconcileShadowQuestion(
   ].filter(Boolean).join(", ");
 
   return (
-    `A salaried Indian taxpayer is filing ITR for FY 2025-26 (AY 2026-27) using ${docNames}. ` +
+    `A salaried Indian taxpayer is filing ITR for FY ${taxPeriod.financialYear} (AY ${taxPeriod.assessmentYear}) using ${docNames}. ` +
     (parts.length ? `Their figures: ${parts.join("; ")}. ` : "") +
     (issueTitles.length ? `Issues found in reconciliation: ${issueTitles.join("; ")}. ` : "") +
     `What should they verify, declare, and resolve before filing, and which ITR form applies?`
@@ -2084,6 +2312,7 @@ function buildReconcileShadowQuestion(
 }
 
 const EMPTY_AIS: ExtractedAIS = {
+  financialYear: null, assessmentYear: null,
   salaryIncome: null, interestFromSavings: null, interestFromFD: null,
   dividendIncome: null, securitiesTransactions: null, mutualFundTransactions: null,
   cryptoIncome: null, lrsRemittance: null, taxPaidSelfAssessment: null,
@@ -2094,6 +2323,7 @@ const EMPTY_AIS: ExtractedAIS = {
 };
 
 const EMPTY_26AS: Extracted26AS = {
+  financialYear: null, assessmentYear: null,
   tdsSalary: null, tdsNonSalary: null, nonSalarySections: null,
   advanceTaxPaid: null, selfAssessmentTax: null, totalTdsCredits: null, tcsPaid: null,
 };
@@ -2130,7 +2360,21 @@ export async function reconcileTaxDocuments(
     Promise.all(form16PdfBuffers.map((buf) => parseForm16WithGemini(buf))),
   ]);
 
-  const { combined: form16, flags: multiEmployerFlags } = combineForm16s(form16Employers, "2025-26");
+  // ── Step 2.5: Resolve which tax year these documents actually cover ───────
+  // Read off the documents themselves rather than assumed — see
+  // resolveTaxPeriod(). Must run before combineForm16s, which needs the FY to
+  // pick the right slab table for its liability estimate.
+  const taxPeriod = resolveTaxPeriod(aisPartial as ExtractedAIS, form26as, form16Employers, provided);
+  console.log(
+    `[reconcileTaxDocuments] Tax period resolved: FY ${taxPeriod.financialYear} / AY ${taxPeriod.assessmentYear}` +
+    (taxPeriod.assumed ? " (ASSUMED — no document stated a year)" : "") +
+    (taxPeriod.conflict ? ` (CONFLICT — ${taxPeriod.perDocument.map(d => `${d.document}: ${d.financialYear}`).join(", ")})` : "")
+  );
+
+  const { combined: form16, flags: multiEmployerFlags } = combineForm16s(
+    form16Employers,
+    taxPeriod.financialYear
+  );
 
   // ── Step 3: Fallback — try text regex for AIS if Gemini returned nothing ──
   let aisFinal = aisPartial;
@@ -2141,6 +2385,8 @@ export async function reconcileTaxDocuments(
   }
 
   const ais: ExtractedAIS = {
+    financialYear: aisFinal.financialYear ?? null,
+    assessmentYear: aisFinal.assessmentYear ?? null,
     salaryIncome: aisFinal.salaryIncome ?? null,
     interestFromSavings: aisFinal.interestFromSavings ?? null,
     interestFromFD: aisFinal.interestFromFD ?? null,
@@ -2290,9 +2536,41 @@ export async function reconcileTaxDocuments(
     });
   }
 
+  // Documents that disagree about which year they cover are a HIGH-severity
+  // issue for the same reason parse failures are: the report still computes a
+  // plausible-looking number, but it is silently mixing two tax years, and the
+  // user is the only one who can fix it by uploading the right files. Reported
+  // via the same unshift-before-determineOverallStatus route so it also forces
+  // the verdict away from CLEAN.
+  if (taxPeriod.conflict) {
+    const stated = taxPeriod.perDocument
+      .map((d) => `${d.document} covers FY ${d.financialYear}`)
+      .join("; ");
+    mismatches.unshift({
+      id: "tax-year-conflict",
+      category: "Mismatched Tax Years",
+      severity: "HIGH",
+      title: "Your documents are from different tax years",
+      description:
+        `${stated}. This report has been computed for FY ${taxPeriod.financialYear} ` +
+        `(AY ${taxPeriod.assessmentYear}), so any figure taken from a document covering a ` +
+        `different year is being compared against the wrong year's income.`,
+      aisValue: null, form16Value: null, form26asValue: null, difference: null,
+      ruleExplanation:
+        "AIS, Form 26AS and Form 16 are each issued for one specific financial year. Reconciling " +
+        "documents from different years compares unrelated income and TDS, and the tax slabs, " +
+        "rebate thresholds and standard deduction can all differ between those years.",
+      suggestedAction:
+        `Re-download every document for the SAME year from the income tax portal and upload them ` +
+        `again. If you meant to file for FY ${taxPeriod.financialYear}, replace any document above ` +
+        `that covers a different year.`,
+    });
+  }
+
   // determineOverallStatus only looks at mismatches, so unshifting the
-  // parse-failure issues above is what actually forces the verdict away
-  // from CLEAN — it can no longer report "Ready to File" on unread data.
+  // parse-failure and tax-year issues above is what actually forces the
+  // verdict away from CLEAN — it can no longer report "Ready to File" on
+  // unread data, or on documents that cover different years.
   const overallStatus = determineOverallStatus(mismatches);
   const summary = anyParseFailure
     ? `⚠️ ${failedDocNames.join(" and ")} could not be read — this report is INCOMPLETE. Figures shown as "N/A" for ${failedDocNames.join(" / ")} are unknown, not zero. Re-upload before relying on this.`
@@ -2300,7 +2578,7 @@ export async function reconcileTaxDocuments(
 
   // ── Step 6: AI insights ───────────────────────────────────────────────────
   const { insights, actionItems, itrImpact } = await generateAIInsights(
-    ais, form26as, form16, mismatches, multiEmployerFlags, provided
+    ais, form26as, form16, mismatches, multiEmployerFlags, provided, taxPeriod
   );
 
   // ── Step 6.5: Shadow-compare production insights against the RAG pipeline ─
@@ -2313,7 +2591,7 @@ export async function reconcileTaxDocuments(
     !insights.startsWith("Upload all three documents") &&
     !insights.startsWith("AI-powered insights are temporarily unavailable");
   if (insightsAreReal) {
-    const q = buildReconcileShadowQuestion(ais, form26as, form16, mismatches, provided);
+    const q = buildReconcileShadowQuestion(ais, form26as, form16, mismatches, provided, taxPeriod);
     const productionText = [
       insights,
       actionItems.length ? "Action items: " + actionItems.join(" | ") : "",
@@ -2323,6 +2601,9 @@ export async function reconcileTaxDocuments(
       question: q,
       productionAnswer: productionText,
       source: "reconcile-insights",
+      // Read off the uploaded documents, not assumed — decides which statute
+      // the RAG side is allowed to retrieve from.
+      financialYear: taxPeriod.financialYear,
     });
   }
 
@@ -2342,6 +2623,7 @@ export async function reconcileTaxDocuments(
     extractedData: { ais, form26as, form16, form16Employers },
     documentsProvided: provided,
     parseFailures,
+    taxPeriod,
     ...(coverage && { coverage }),
     checks,
     mismatches,

@@ -437,6 +437,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           question: q,
           productionAnswer: productionText,
           source: "calculator-advice",
+          // Same FY the question text above is built from — keep them in sync.
+          financialYear: input.financialYear || "2025-26",
         });
       }
     } catch (error) {

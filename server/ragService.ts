@@ -55,6 +55,19 @@ export interface RAGQuery {
   question: string;
   sessionId?: string;       // anonymous browser session (no PII)
   source?: string;          // e.g. "calculator_page", "blog", "api"
+  /**
+   * The financial year the question is about, canonical "YYYY-YY"
+   * (e.g. "2025-26"). Decides which statute governs — see
+   * governingLawFor() — and therefore which knowledge-base chunks are
+   * eligible to answer it.
+   *
+   * Callers that genuinely know the year should always pass it: the wizard
+   * has it in state, and the reconciliation tool reads it off the uploaded
+   * documents. When omitted, the pipeline keeps its previous behaviour
+   * (search both statutes, let the prompt's transition rule sort it out)
+   * rather than guessing a year on the user's behalf.
+   */
+  financialYear?: string;
 }
 
 export interface RAGChunk {
@@ -207,23 +220,30 @@ async function embedText(text: string): Promise<number[]> {
 
 async function searchQdrant(
   vector: number[],
-  conceptFilter?: string[]
+  conceptFilter?: string[],
+  lawVersion?: "ita_2025" | "ita_1961"
 ): Promise<RAGChunk[]> {
-  const searchParams: any = {
-    vector,
-    limit: TOP_K,
-    with_payload: true,
-  };
-
-  // Optionally filter by concept tags stored in payload
-  if (conceptFilter && conceptFilter.length > 0) {
-    searchParams.filter = {
-      should: conceptFilter.map(concept => ({
+  const buildParams = (opts: { law: boolean; concepts: boolean }): any => {
+    const params: any = { vector, limit: TOP_K, with_payload: true };
+    const filter: any = {};
+    // Hard exclusion of the wrong statute's chunks. Verified 2026-08-31 that
+    // all 3023 points carry law_version (1725 ita_1961 / 1298 ita_2025, 0
+    // untagged) and that a keyword index exists on it, so this filter neither
+    // silently drops untagged chunks nor forces a slow unindexed scan.
+    if (opts.law && lawVersion) {
+      filter.must = [{ key: "law_version", match: { value: lawVersion } }];
+    }
+    // Concept tags stay a soft OR. Verified empirically that Qdrant ANDs a
+    // `must` clause with `(should1 OR should2 ...)` in the same filter object.
+    if (opts.concepts && conceptFilter && conceptFilter.length > 0) {
+      filter.should = conceptFilter.map(concept => ({
         key: "concepts",
         match: { value: concept },
-      })),
-    };
-  }
+      }));
+    }
+    if (Object.keys(filter).length > 0) params.filter = filter;
+    return params;
+  };
 
   // Filtered search requires a keyword payload index on "concepts" (created
   // 2026-07-24 — every filtered search 400'd with "Bad Request" before that,
@@ -232,19 +252,27 @@ async function searchQdrant(
   // semantic search instead of failing the query: worse ranking, still useful.
   let results;
   try {
-    results = await qdrant.search(COLLECTION, searchParams);
+    results = await qdrant.search(COLLECTION, buildParams({ law: true, concepts: true }));
   } catch (err) {
-    if (searchParams.filter) {
-      console.warn(
-        "[RAG] Filtered Qdrant search failed — retrying without concept filter. " +
-        "If this recurs, recreate the keyword payload index on 'concepts':",
-        err instanceof Error ? err.message : err
-      );
-      const { filter: _dropped, ...unfiltered } = searchParams;
-      results = await qdrant.search(COLLECTION, unfiltered);
-    } else {
-      throw err;
-    }
+    console.warn(
+      "[RAG] Filtered Qdrant search failed — retrying unfiltered. If this " +
+      "recurs, recreate the keyword payload indexes on 'concepts' / 'law_version':",
+      err instanceof Error ? err.message : err
+    );
+    results = await qdrant.search(COLLECTION, buildParams({ law: false, concepts: false }));
+  }
+
+  // A law filter that narrows the candidate set to nothing is worse than no
+  // law filter: the caller turns an empty result into "I couldn't find
+  // anything in my knowledge base", which is a strictly worse answer than a
+  // cross-statute one the prompt's transition rule can still frame correctly.
+  // Only the era filter is dropped here — concepts are kept.
+  if (results.length === 0 && lawVersion) {
+    console.warn(
+      `[RAG] No chunks matched law_version=${lawVersion} for this query — ` +
+      `retrying without the statute filter (answer will rely on the prompt's transition rule).`
+    );
+    results = await qdrant.search(COLLECTION, buildParams({ law: false, concepts: true }));
   }
 
   return results.map(r => ({
@@ -354,10 +382,30 @@ const LAW_TRANSITION_RULE =
   "Determine which Act applies from the financial year the user's question concerns — never default to ITA 2025 " +
   "just because it is the newer statute.";
 
+/**
+ * Which statute governs a given financial year.
+ *
+ * The transition is the same fixed fact LAW_TRANSITION_RULE states in prose:
+ * income earned from 1 April 2026 (i.e. FY 2026-27) onward falls under ITA
+ * 2025; everything earlier stays under ITA 1961. Encoded here so retrieval can
+ * act on it deterministically rather than relying on the model to apply the
+ * prose rule to chunks it was handed from both eras.
+ *
+ * Returns null for an unparseable or absent year — callers must treat null as
+ * "search both statutes", never as a default to one of them.
+ */
+export function governingLawFor(financialYear?: string): "ita_2025" | "ita_1961" | null {
+  if (!financialYear) return null;
+  const m = financialYear.match(/^(20\d{2})-\d{2}$/);
+  if (!m) return null;
+  return parseInt(m[1], 10) >= 2026 ? "ita_2025" : "ita_1961";
+}
+
 function buildPrompt(
   question: string,
   chunks: RAGChunk[],
-  concepts: Set<string>
+  concepts: Set<string>,
+  financialYear?: string
 ): string {
   // Truncate context to stay within token limits
   let context = "";
@@ -383,10 +431,22 @@ function buildPrompt(
     })
     .join("\n");
 
+  // When the caller knows the year (wizard state, or read off the uploaded
+  // documents), say so explicitly. The prose transition rule still applies —
+  // this just removes the model's need to infer the year from the question
+  // text, which is where the ITA-2025 anachronism kept creeping back in.
+  const law = governingLawFor(financialYear);
+  const yearAnchor = law
+    ? `\nTHE YEAR THIS QUESTION IS ABOUT: FY ${financialYear}. Applying the transition rule above, ` +
+      `the governing statute is therefore the ${law === "ita_2025" ? "Income Tax Act, 2025" : "Income Tax Act, 1961"}. ` +
+      `State that governing Act's provisions as the operative ones. You may still mention the other Act's ` +
+      `numbering as a cross-reference, but never present it as the law that applies to FY ${financialYear}.\n`
+    : "";
+
   return `You are an expert Indian tax advisor for AiTaxBot. Answer the user's question using ONLY the provided legal excerpts and verified facts below.
 
 ${LAW_TRANSITION_RULE}
-
+${yearAnchor}
 LEGAL EXCERPTS FROM OFFICIAL DOCUMENTS (each tagged with which Act it was written under):
 ${context}
 
@@ -411,9 +471,10 @@ ANSWER:`;
 async function generateAnswer(
   question: string,
   chunks: RAGChunk[],
-  concepts: Set<string>
+  concepts: Set<string>,
+  financialYear?: string
 ): Promise<{ answer: string; confidence: "high" | "medium" | "low" }> {
-  const prompt = buildPrompt(question, chunks, concepts);
+  const prompt = buildPrompt(question, chunks, concepts, financialYear);
   const apiKey = process.env.GOOGLE_API_KEY || "";
 
   // Direct REST call — same pattern as embedText, avoids @google/genai SDK
@@ -493,10 +554,18 @@ async function logComparison(
 // ─── Main RAG pipeline ───────────────────────────────────────────────────────
 
 export async function runRAGQuery(input: RAGQuery): Promise<RAGResult> {
-  const { question, sessionId, source } = input;
+  const { question, sessionId, source, financialYear } = input;
 
   if (!question?.trim()) {
     throw new Error("Question is required");
+  }
+
+  // null when the caller didn't supply a year (or supplied an unparseable
+  // one) — searchQdrant then leaves the statute filter off entirely rather
+  // than defaulting to an era.
+  const lawVersion = governingLawFor(financialYear) ?? undefined;
+  if (financialYear && !lawVersion) {
+    console.warn(`[RAG] Ignoring unparseable financialYear "${financialYear}" — expected "YYYY-YY".`);
   }
 
   // Step 1: Extract concepts from query
@@ -537,7 +606,7 @@ export async function runRAGQuery(input: RAGQuery): Promise<RAGResult> {
 
   // Step 5: Search Qdrant (timeout: 8s)
   const chunks = await withTimeout(
-    searchQdrant(queryVector, [...allConcepts]),
+    searchQdrant(queryVector, [...allConcepts], lawVersion),
     TIMEOUT_SEARCH_MS,
     "Qdrant search"
   );
@@ -559,7 +628,7 @@ export async function runRAGQuery(input: RAGQuery): Promise<RAGResult> {
 
   // Step 6: Generate answer (timeout: 25s)
   const { answer, confidence } = await withTimeout(
-    generateAnswer(question, chunks, allConcepts),
+    generateAnswer(question, chunks, allConcepts, financialYear),
     TIMEOUT_GENERATE_MS,
     "Gemini generation"
   );
@@ -610,21 +679,24 @@ export async function runProductionShadowComparison(opts: {
   question: string;          // synthesized, PII-free description of the taxpayer situation
   productionAnswer: string;  // the ad-hoc Gemini analysis actually shown to the user
   source: string;            // e.g. "reconcile-insights", "calculator-advice"
+  /** FY the situation concerns — from wizard state or the uploaded documents. */
+  financialYear?: string;
 }): Promise<void> {
-  const { question, productionAnswer, source } = opts;
+  const { question, productionAnswer, source, financialYear } = opts;
   try {
     const initialConcepts = extractConcepts(question);
     const allConcepts = expandConceptGraph(initialConcepts);
+    const lawVersion = governingLawFor(financialYear) ?? undefined;
 
     const expandedQuery = buildExpandedQuery(question, allConcepts);
     const queryVector = await withTimeout(embedText(expandedQuery), TIMEOUT_EMBED_MS, "Gemini embedding");
-    const chunks = await withTimeout(searchQdrant(queryVector, [...allConcepts]), TIMEOUT_SEARCH_MS, "Qdrant search");
+    const chunks = await withTimeout(searchQdrant(queryVector, [...allConcepts], lawVersion), TIMEOUT_SEARCH_MS, "Qdrant search");
 
     let ragAnswer: string;
     if (chunks.length === 0) {
       ragAnswer = "[RAG pipeline found no relevant knowledge-base chunks for this situation]";
     } else {
-      const generated = await withTimeout(generateAnswer(question, chunks, allConcepts), TIMEOUT_GENERATE_MS, "Gemini generation");
+      const generated = await withTimeout(generateAnswer(question, chunks, allConcepts, financialYear), TIMEOUT_GENERATE_MS, "Gemini generation");
       ragAnswer = generated.answer;
     }
 
