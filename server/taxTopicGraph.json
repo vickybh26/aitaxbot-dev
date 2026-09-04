@@ -19,7 +19,7 @@
       "label": "Standard Deduction",
       "keywords": ["standard deduction", "flat deduction", "75000", "75,000", "50000", "50,000"],
       "triggers": ["regime_choice"],
-      "sections_ita2025": ["Section 16(ia)"],
+      "sections_ita2025": ["Section 19"],
       "sections_ita1961": ["Section 16(ia)"],
       "key_facts": ["New Regime: Rs.75,000 FY 2025-26 onwards", "Old Regime: Rs.75,000 FY 2024-25 onwards"]
     },
@@ -28,7 +28,7 @@
       "label": "HRA Exemption",
       "keywords": ["HRA", "house rent allowance", "rent", "rented", "paying rent", "metro", "non-metro"],
       "triggers": ["metro_cities", "regime_choice", "form_16"],
-      "sections_ita2025": ["Schedule III [Table: Sl. No. 11]", "Rule 279"],
+      "sections_ita2025": ["Section 11", "Schedule III [Table: Sl. No. 11]", "Rule 279"],
       "sections_ita1961": ["Section 10(13A)", "Rule 2A"],
       "key_facts": ["8 metro cities from FY 2026-27: Mumbai, Kolkata, Delhi, Chennai, Hyderabad, Pune, Ahmedabad, Bengaluru. For FY 2025-26 and earlier only Mumbai, Delhi, Kolkata, Chennai qualified", "Metro: 50% of salary; any other place: 40%", "Exemption is the LEAST of: (a) actual HRA received, (b) rent paid minus 10% of salary, (c) 50%/40% of salary", "'Salary' here means basic salary plus dearness allowance if provided for under the terms of employment, and excludes all other allowances and perquisites", "Available only under the Old Regime; not claimable under the default New Regime"]
     },
@@ -64,7 +64,7 @@
       "label": "Old vs New Tax Regime",
       "keywords": ["old regime", "new regime", "which regime", "regime choice", "115BAC", "default regime"],
       "triggers": ["standard_deduction", "section_80c", "section_80d", "hra", "lta", "nps_80ccd1b"],
-      "sections_ita2025": ["Section 171"],
+      "sections_ita2025": ["Section 202"],
       "sections_ita1961": ["Section 115BAC"],
       "key_facts": [
         "New Regime is DEFAULT from FY 2023-24 onwards",
