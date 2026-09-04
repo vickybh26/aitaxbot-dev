@@ -188,8 +188,8 @@ function SavingsCard() {
   const pct = ((salary - 300000) / (5000000 - 300000)) * 100;
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden"
-      style={{ boxShadow: "0 12px 32px rgba(0,0,0,0.10),0 4px 8px rgba(0,0,0,0.08)" }}>
+    <div className="bg-white rounded-[1.75rem] border border-slate-200 overflow-hidden"
+      style={{ boxShadow: "0 20px 44px -16px rgba(15,42,74,0.28)" }}>
       <div className="flex items-center justify-between px-5 py-4 bg-slate-50 border-b border-slate-200">
         <div className="flex items-center gap-2">
           <Calculator className="h-4 w-4 text-blue-600" />
@@ -211,7 +211,7 @@ function SavingsCard() {
           />
           <div className="flex justify-between text-xs text-slate-500 mt-1.5"><span>₹3L</span><span>₹50L</span></div>
         </div>
-        <div className="rounded-xl border border-slate-200 overflow-hidden divide-y divide-slate-100">
+        <div className="rounded-2xl border border-slate-200 overflow-hidden divide-y divide-slate-100">
           {([
             { label: "New Regime", value: result.newTax, better: result.newBetter },
             { label: "Old Regime", value: result.oldTax, better: !result.newBetter },
@@ -225,13 +225,13 @@ function SavingsCard() {
             </div>
           ))}
         </div>
-        <div className="rounded-xl p-5 text-white" style={{ background: `linear-gradient(135deg,${SUCCESS} 0%,hsl(161 94% 38%) 100%)` }}>
+        <div className="rounded-2xl p-5 text-white" style={{ background: `linear-gradient(135deg,${SUCCESS} 0%,hsl(161 94% 38%) 100%)` }}>
           <div className="text-xs font-bold uppercase tracking-widest opacity-80 mb-1.5">You save vs the other regime</div>
           <div className="text-4xl font-black tabular-nums leading-none tracking-tight">{inr(animSaving)}</div>
           <div className="text-xs mt-2 opacity-80">Assumes ₹1.5L 80C claimed (Old Regime) · FY 2026-27</div>
         </div>
         <Link href="/calculators/income-tax"
-          className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-persian-blue-700 hover:bg-persian-blue-800 text-white text-sm font-semibold transition-colors">
+          className="flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl bg-persian-blue-700 hover:bg-persian-blue-800 text-white text-sm font-semibold transition-colors">
           <Calculator className="h-4 w-4" />See full computation<ArrowRight className="h-4 w-4" />
         </Link>
       </div>
@@ -286,7 +286,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
         <script type="application/ld+json">{JSON.stringify(generateHomePageSchema())}</script>
       </Helmet>
 
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-paper">
 
         {/* Trust Ribbon */}
         <div className="bg-slate-900 text-slate-300 text-xs py-2.5 overflow-x-auto">
@@ -306,7 +306,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
         </div>
 
         {/* Hero */}
-        <section className="relative bg-white overflow-hidden">
+        <section className="relative bg-paper overflow-hidden">
           <div className="absolute inset-0 opacity-[0.025] pointer-events-none" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, #94A3B8 1px, transparent 0)", backgroundSize: "24px 24px" }} />
           <div className="relative max-w-7xl mx-auto px-4 py-16 lg:py-24">
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
@@ -316,7 +316,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                     FY 2026-27 · AY 2027-28 · IT Act 2025 Ready
                   </span>
                 </div>
-                <h1 className="text-4xl md:text-5xl font-bold text-slate-900 leading-[1.1] tracking-tight mb-5">
+                <h1 className="font-display text-4xl md:text-5xl font-extrabold text-slate-900 leading-[1.1] tracking-tight mb-5">
                   {t("hero.headline").split("\n")[0]}
                   <span className="block mt-2 text-blue-600">{t("hero.headline").split("\n")[1] ?? "Indian Taxpayers"}</span>
                 </h1>
@@ -368,9 +368,9 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
         </section>
 
         {/* Stat Spine */}
-        <div className="border-t border-b border-slate-200 bg-slate-50">
+        <div className="py-2">
           <div className="max-w-7xl mx-auto px-4">
-            <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-slate-200">
+            <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-slate-200 rounded-[1.75rem] border border-slate-200 bg-white shadow-[0_12px_34px_-18px_rgba(15,42,74,0.25)]">
               {[
                 { val: `₹${s1.count}L`,  label: "Zero tax limit",     sub: "New Regime FY 2026-27",     ref: s1.ref },
                 { val: `₹${s2.count}K`,  label: "Standard deduction", sub: "For salaried employees",    ref: s2.ref },
@@ -378,7 +378,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                 { val: `${s4.count} min`,       label: "Time to clarity",    sub: "ITR complexity decoded",    ref: s4.ref },
               ].map(({ val, label, sub, ref }) => (
                 <div key={label} ref={ref} className="text-center px-6 py-8">
-                  <div className="text-3xl font-black text-slate-900 tracking-tight mb-1">{val}</div>
+                  <div className="font-display tabular-figures text-3xl font-extrabold text-slate-900 tracking-tight mb-1">{val}</div>
                   <div className="text-sm font-semibold text-slate-700 mb-0.5">{label}</div>
                   <div className="text-xs text-slate-500">{sub}</div>
                 </div>
@@ -429,7 +429,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
             <div className="flex items-center justify-between mb-8">
               <div>
                 <p className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-2">Tax Guides &amp; Blog</p>
-                <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Latest from AiTaxBot</h2>
+                <h2 className="font-display text-2xl font-extrabold text-slate-900 tracking-tight">Latest from AiTaxBot</h2>
               </div>
               <Link href="/blog" className="hidden sm:flex items-center gap-1.5 text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">
                 View all {blogPosts.length} guides <ArrowRight className="h-4 w-4" />
@@ -438,7 +438,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {latestBlogPosts.map(post => (
                 <Link key={post.slug} href={`/blog/${post.slug}`}
-                  className="group block bg-white rounded-2xl border border-slate-200 hover:border-blue-200 hover:shadow-md p-6 transition-all duration-200">
+                  className="group block bg-white rounded-[1.5rem] border border-slate-200 hover:border-blue-200 hover:shadow-[0_16px_34px_-18px_rgba(15,42,74,0.4)] p-6 transition-all duration-200">
                   <div className="flex items-center gap-2 mb-3">
                     <span className="text-xs bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full font-semibold border border-blue-100">{post.tag}</span>
                     <span className="text-xs text-slate-500 flex items-center gap-1"><Clock className="h-3 w-3" />{post.readTime}</span>
@@ -461,14 +461,14 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
           <div className="max-w-7xl mx-auto px-4">
             <div className="text-center mb-10">
               <p className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-3">All Tools</p>
-              <h2 className="text-3xl font-bold text-slate-900 tracking-tight mb-3">Everything you need for taxes &amp; investments</h2>
+              <h2 className="font-display text-3xl font-extrabold text-slate-900 tracking-tight mb-3">Everything you need for taxes &amp; investments</h2>
               <p className="text-slate-500 max-w-xl mx-auto text-sm">Calculators, document tools, CA directory — all free, all built for India.</p>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {TOOLS.map(({ icon: Icon, name, desc, href, badge }: any) => (
                 <Link key={href} href={href}
-                  className="group flex gap-4 p-5 bg-white rounded-2xl border border-slate-200 hover:border-persian-blue-300 hover:shadow-md transition-all duration-200">
-                  <div className="w-11 h-11 rounded-xl bg-persian-blue-50 flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                  className="group flex gap-4 p-5 bg-white rounded-[1.5rem] border border-slate-200 hover:border-persian-blue-300 hover:shadow-[0_16px_34px_-18px_rgba(15,42,74,0.4)] transition-all duration-200">
+                  <div className="w-11 h-11 rounded-2xl bg-persian-blue-50 flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
                     <Icon className="h-5 w-5 text-persian-blue-700" />
                   </div>
                   <div className="min-w-0">

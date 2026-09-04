@@ -25,6 +25,14 @@
     --ring: 214 52% 25%;
     --radius: 0.5rem;
 
+    /* Warm paper — homepage-only background, see Landing.tsx's bg-paper.
+       Scoped there deliberately: every other surface in the product (forms,
+       tables, admin panels, the calculator results themselves) stays on the
+       plain white --background above, which nothing here touches. Value
+       matches the Lovable "Warm Ledger" concept Vicky approved 2026-09-04. */
+    --paper: 40 33% 97%;         /* #FAF8F4 */
+    --paper-foreground: 214 52% 25%; /* reuses --primary-blue's hue for text on paper */
+
     /* ───────────────────────────────────────────────────────────────────
        AiTaxBot palette — "Trust Navy + Profit Green" (2026-07 redesign)
        Direction chosen from the ui-ux-pro-max fintech/tax database.
@@ -121,6 +129,19 @@
   .money {
     font-variant-numeric: tabular-nums;
     font-feature-settings: "tnum" 1;
+  }
+
+  /* Display headline font — Sora, opt-in via .font-display.
+     Scoped to Landing.tsx's hero/section headings, not the global h1-h6
+     rule above: IBM Plex Sans stays the site-wide default (it was chosen
+     deliberately for tabular-figure alignment in financial tables, see the
+     rule above's neighbouring comment), so this doesn't cascade into forms,
+     admin panels, or calculator result tables that were never reviewed
+     against Sora. Falls back to IBM Plex Sans, never straight to a system
+     font, so a slow Sora load never mismatches the rest of the page. */
+  .font-display {
+    font-family: 'Sora', 'IBM Plex Sans', sans-serif;
+    letter-spacing: -0.02em;
   }
 
   /* Accessibility: never remove focus rings — keyboard users need them.
