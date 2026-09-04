@@ -9,8 +9,16 @@ interface LayoutProps {
 }
 
 export default function Layout({ children, showModal }: LayoutProps) {
+  // bg-paper (warm cream, index.css) instead of bg-white — the "Warm Ledger"
+  // direction ported from Lovable 2026-09-04. Set once here at the app-shell
+  // level rather than per-page: every nested surface (Card, bg-white
+  // sections, bg-slate-50 panels) already declares its own explicit
+  // background, so they render as bright cards on top of this canvas — the
+  // standard pattern, not a risk. The print stylesheet (index.css, @media
+  // print) independently forces `background: #fff !important` on html/body,
+  // so printed output is unaffected regardless of this token's value.
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-paper flex flex-col">
       {/* Skip link. On a calculator page a keyboard user previously had to tab
           through the logo, six nav links, a dropdown, a CTA and the login link
           before reaching the first form field — on every single page load.

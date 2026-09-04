@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import BasicDetailsStep, { isBasicDetailsValid } from "./steps/BasicDetailsStep";
@@ -100,24 +99,32 @@ export default function TaxWizard() {
   }
 
   return (
-    <Card className="p-6 max-w-xl mx-auto">
+    // .bento — exact card treatment ported from Lovable 2026-09-04 (rounded
+    // 2rem, soft ink-tinted shadow; see index.css). Replaces the old flat
+    // `<Card className="p-6">`. The step-by-step flow itself (as opposed to
+    // Lovable's single all-fields-at-once page) is unchanged — that's a
+    // deliberate, already-shipped product decision (commit 6a026cc: cut
+    // production over to this wizard specifically to cut mobile scroll
+    // before the first input), not a "look" this port is meant to undo.
+    <div className="bento max-w-xl mx-auto p-6 sm:p-7">
       {/* Progress indicator — compact by design. The old calculator's
           legal-citation box alone cost 488px of mobile scroll (measured
           2026-08-29); this wizard's whole per-step chrome should not repeat
-          that mistake. */}
+          that mistake. Track/fill colours now bg-secondary/bg-ink, matching
+          Lovable's progress bar exactly instead of the old neutral-200/blue. */}
       <div className="flex items-center gap-2 mb-6" role="tablist" aria-label="Wizard progress">
         {steps.map((step, idx) => (
           <div key={step.id} className="flex items-center gap-2 flex-1">
             <div
               className={`h-1.5 flex-1 rounded-full transition-colors ${
-                idx <= safeStepIndex ? "bg-primary" : "bg-neutral-200"
+                idx <= safeStepIndex ? "bg-ink" : "bg-secondary"
               }`}
               aria-hidden="true"
             />
           </div>
         ))}
       </div>
-      <p className="text-xs font-medium text-neutral-500 mb-4">
+      <p className="field-label mb-4">
         Step {safeStepIndex + 1} of {steps.length} — {currentStep.label}
       </p>
 
@@ -186,24 +193,27 @@ export default function TaxWizard() {
 
       {currentStep.id === "result" && <ResultStep state={state} />}
 
-      <div className="flex items-center justify-between mt-8 pt-4 border-t border-border">
+      <div className="flex items-center justify-between mt-8 pt-4 border-t border-rule">
         <Button
           type="button"
           variant="outline"
           onClick={goBack}
           disabled={safeStepIndex === 0}
-          className="gap-1"
+          className="gap-1 rounded-full border-rule"
         >
           <ChevronLeft className="h-4 w-4" />
           Back
         </Button>
         {currentStep.id !== "result" && (
-          <Button type="button" onClick={goNext} disabled={!canGoNext} className="gap-1">
+          // default variant = bg-primary/text-primary-foreground, which now
+          // resolves to bg-ink/text-paper exactly (index.css, 2026-09-04) —
+          // only rounded-full is added here to get Lovable's pill shape.
+          <Button type="button" onClick={goNext} disabled={!canGoNext} className="gap-1 rounded-full">
             Continue
             <ChevronRight className="h-4 w-4" />
           </Button>
         )}
       </div>
-    </Card>
+    </div>
   );
 }

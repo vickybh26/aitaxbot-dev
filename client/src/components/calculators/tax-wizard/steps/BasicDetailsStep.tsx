@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+import { Field, TextInput } from "@/components/calc/Field";
 import type { BasicDetails } from "../types";
 
 interface BasicDetailsStepProps {
@@ -61,60 +60,54 @@ export default function BasicDetailsStep({ value, onChange }: BasicDetailsStepPr
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="text-lg font-semibold text-neutral-900">Let's start with the basics</h2>
-        <p className="text-sm text-neutral-500 mt-1">
+        <h2 className="font-display text-lg font-bold">Let's start with the basics</h2>
+        <p className="text-sm text-ink/65 mt-1">
           {isAuthenticated
             ? "Pulled from your account — feel free to correct anything."
             : "Just enough to personalise your result. Nothing is saved unless you sign in later."}
         </p>
       </div>
 
-      <div>
-        <Label htmlFor="wizard-name">Full Name</Label>
-        <Input
+      <Field label="Full Name">
+        <TextInput
           id="wizard-name"
           value={value.name}
-          onChange={(e) => onChange({ ...value, name: e.target.value })}
+          onChange={(v) => onChange({ ...value, name: v })}
           placeholder="e.g., Rohit Sharma"
-          className="mt-1"
           autoComplete="name"
         />
-      </div>
+      </Field>
 
-      <div>
-        <Label htmlFor="wizard-mobile">Mobile Number</Label>
-        <Input
+      <Field label="Mobile Number">
+        <TextInput
           id="wizard-mobile"
           type="tel"
           inputMode="numeric"
           value={value.mobile}
-          onChange={(e) => onChange({ ...value, mobile: e.target.value.replace(/\D/g, "").slice(0, 10) })}
+          onChange={(v) => onChange({ ...value, mobile: v.replace(/\D/g, "").slice(0, 10) })}
           placeholder="e.g., 9876543210"
-          className="mt-1"
           autoComplete="tel"
           maxLength={10}
         />
         {mobileTouched && !mobileValid && (
-          <p className="text-xs text-destructive mt-1">Enter a valid 10-digit Indian mobile number.</p>
+          <p className="text-xs text-debit mt-1.5">Enter a valid 10-digit Indian mobile number.</p>
         )}
-      </div>
+      </Field>
 
-      <div>
-        <Label htmlFor="wizard-email">Email Address</Label>
-        <Input
+      <Field label="Email Address">
+        <TextInput
           id="wizard-email"
           type="email"
           inputMode="email"
           value={value.email}
-          onChange={(e) => onChange({ ...value, email: e.target.value })}
+          onChange={(v) => onChange({ ...value, email: v })}
           placeholder="e.g., name@example.com"
-          className="mt-1"
           autoComplete="email"
         />
         {emailTouched && !emailValid && (
-          <p className="text-xs text-destructive mt-1">Enter a valid email address.</p>
+          <p className="text-xs text-debit mt-1.5">Enter a valid email address.</p>
         )}
-      </div>
+      </Field>
     </div>
   );
 }

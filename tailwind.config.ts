@@ -53,6 +53,16 @@ export default {
           DEFAULT: "hsl(var(--paper))",
           foreground: "hsl(var(--paper-foreground))",
         },
+        /* Aliases matching Lovable's exact class names 1:1 (bg-ink, text-ink,
+           bg-credit, border-rule, ...) so component code ported from there
+           needs no manual className translation — just point at the same
+           tokens this file already wires: --primary is the exact ink value,
+           --success-green the exact credit value, --border the exact rule
+           value (see index.css, 2026-09-04 "Warm Ledger" port). */
+        ink: "hsl(var(--primary))",
+        credit: "hsl(var(--success-green))",
+        debit: "hsl(var(--destructive))",
+        rule: "hsl(var(--border))",
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",

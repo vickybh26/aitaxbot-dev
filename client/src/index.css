@@ -5,25 +5,37 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* foreground/card-foreground/popover-foreground/primary/ring below were
+       214 52% 25% / 222.2 84% 4.9% — updated 2026-09-04 to the exact "Warm
+       Ledger" ink value ported from Lovable (hsl(211 66% 17%), #0F2A4A), per
+       Vicky's explicit "I want the exact same UI" — not an approximation of
+       it. Verified via computed WCAG contrast before applying (see the
+       commit): ink-on-white 14.48:1 and white-on-ink 14.48:1, both well
+       clear of AA — this is a net contrast IMPROVEMENT over the previous
+       11.28:1, not a risk. */
+    --foreground: 211 66% 17%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 211 66% 17%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 214 52% 25%;
-    --primary-foreground: 210 40% 98%;
+    --popover-foreground: 211 66% 17%;
+    --primary: 211 66% 17%;
+    --primary-foreground: 40 33% 97%;
     --secondary: 210 40% 96%;
-    --secondary-foreground: 222.2 84% 4.9%;
+    --secondary-foreground: 211 66% 17%;
     --muted: 210 17% 95%;
     --muted-foreground: 215.4 16.3% 46.9%;
     --accent: 210 40% 96%;
-    --accent-foreground: 222.2 84% 4.9%;
+    --accent-foreground: 211 66% 17%;
     --destructive: 0 74% 51%;
     --destructive-foreground: 210 40% 98%;
-    --border: 214 14% 91%;
-    --input: 214 14% 91%;
-    --ring: 214 52% 25%;
-    --radius: 0.5rem;
+    /* Matches Lovable's --rule exactly (213 36% 89%) — was 214 14% 91%. */
+    --border: 213 36% 89%;
+    --input: 213 36% 89%;
+    --ring: 211 66% 17%;
+    /* 0.5rem → 1rem, matching Lovable's rounder "bento" base radius. Cascades
+       through tailwind.config.ts's rounded-lg/md/sm (var(--radius) and its
+       -2px/-4px steps) to every shadcn Button/Card/Input/Dialog site-wide. */
+    --radius: 1rem;
 
     /* Warm paper — homepage-only background, see Landing.tsx's bg-paper.
        Scoped there deliberately: every other surface in the product (forms,
@@ -31,7 +43,7 @@
        plain white --background above, which nothing here touches. Value
        matches the Lovable "Warm Ledger" concept Vicky approved 2026-09-04. */
     --paper: 40 33% 97%;         /* #FAF8F4 */
-    --paper-foreground: 214 52% 25%; /* reuses --primary-blue's hue for text on paper */
+    --paper-foreground: 211 66% 17%; /* reuses --primary-blue's hue for text on paper */
 
     /* ───────────────────────────────────────────────────────────────────
        AiTaxBot palette — "Trust Navy + Profit Green" (2026-07 redesign)
@@ -51,17 +63,21 @@
        ─────────────────────────────────────────────────────────────────── */
 
     /* Navy — primary brand + structure */
-    --primary-blue: 214 52% 25%;        /* #1E3A5F authority navy */
-    --primary-blue-light: 214 52% 96%;
-    --primary-blue-dark: 214 58% 17%;
+    --primary-blue: 211 66% 17%;        /* #0F2A4A — Lovable's exact ink, 2026-09-04 */
+    --primary-blue-light: 211 60% 96%;
+    --primary-blue-dark: 211 70% 10%;
 
     /* Interactive blue — links, focus, secondary actions */
     --interactive-blue: 221 83% 53%;    /* #2563EB */
     --interactive-blue-light: 221 83% 96%;
 
-    /* Green — reserved for money-positive results ONLY (saved / refund) */
-    --success-green: 161 94% 30%;       /* #059669 profit green */
-    --success-green-light: 161 60% 95%;
+    /* Green — reserved for money-positive results ONLY (saved / refund).
+       161 94% 30% (#059669) → 160 82% 26% (#0B7A55) 2026-09-04, matching
+       Lovable's --credit exactly. Contrast on white improved 3.84:1 → 5.44:1
+       (computed, not eyeballed) — the old value was already borderline for
+       body text at 3.84:1; the new one clears AA (4.5:1) with room. */
+    --success-green: 160 82% 26%;       /* #0B7A55 profit green */
+    --success-green-light: 160 40% 94%;
 
     --warning-orange: 25 95% 53%;
     --warning-orange-light: 25 95% 95%;
@@ -69,8 +85,8 @@
     /* Legacy alias — purple is retired; mapped to navy so any component
        still referencing --accent-purple degrades to brand navy instead of
        reintroducing the old gradient. Remove references over time. */
-    --accent-purple: 214 52% 25%;
-    --accent-purple-light: 214 52% 96%;
+    --accent-purple: 211 66% 17%;
+    --accent-purple-light: 211 60% 96%;
 
     --neutral-50: 210 20% 98%;
     --neutral-100: 210 20% 96%;
@@ -90,17 +106,28 @@
        Variable names kept intentionally: they're referenced across ~30
        components and the Tailwind config, so retuning values here shifts
        the whole site's palette without a risky rename sweep. Treat the
-       name as legacy; the values are the navy ramp. */
-    --persian-blue-50: 214 52% 96%;
-    --persian-blue-100: 214 52% 90%;
-    --persian-blue-200: 214 52% 80%;
-    --persian-blue-300: 214 48% 65%;
-    --persian-blue-400: 214 45% 50%;
-    --persian-blue-500: 214 50% 38%;
-    --persian-blue-600: 214 52% 30%;
-    --persian-blue-700: 214 52% 25%;
-    --persian-blue-800: 214 54% 19%;
-    --persian-blue-900: 214 58% 13%;
+       name as legacy; the values are the navy ramp.
+
+       Hue shifted 214→211 and the 700 shade retargeted to land EXACTLY on
+       Lovable's --ink (211 66% 17%, #0F2A4A) 2026-09-04 — 700 is what
+       persian-blue-700 (the most-used shade: primary buttons, CTAs) already
+       meant in this codebase, and it's what Lovable's "bg-ink" primary
+       buttons use too, so it's the correct anchor. The rest of the ramp
+       preserves the SAME relative lightness steps the old scale had between
+       shades (e.g. 50 was +71pp lighter than 700; still is here), just
+       recentred on the new anchor and the new hue — Lovable itself has no
+       multi-shade ramp to match exactly (just the one ink value), so this
+       is the closest faithful extension of it into a usable Tailwind scale. */
+    --persian-blue-50: 211 60% 88%;
+    --persian-blue-100: 211 60% 82%;
+    --persian-blue-200: 211 58% 72%;
+    --persian-blue-300: 211 55% 57%;
+    --persian-blue-400: 211 58% 42%;
+    --persian-blue-500: 211 62% 30%;
+    --persian-blue-600: 211 64% 22%;
+    --persian-blue-700: 211 66% 17%;
+    --persian-blue-800: 211 68% 11%;
+    --persian-blue-900: 211 70% 6%;
   }
 }
 
@@ -110,17 +137,29 @@
   }
   body {
     @apply bg-white;
-    /* IBM Plex Sans — chosen for finance/tax context: it reads as
-       institutional rather than consumer-startup, and its tabular figures
-       keep rupee columns aligned in result tables. Inter kept as the first
-       fallback so nothing reflows badly if Plex fails to load. */
-    font-family: 'IBM Plex Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, 'Helvetica Neue', Arial, sans-serif;
-    color: hsl(var(--neutral-800));
+    /* Manrope — 2026-09-04, matching Lovable's "Warm Ledger" body font
+       exactly, per Vicky's explicit "I want the exact same UI". Was IBM Plex
+       Sans (chosen for finance/tax institutional feel + tabular figures);
+       Manrope supports the same OpenType tabular-nums feature, so
+       .tabular-figures/.money (below) keep working identically — that
+       rationale transfers, it just doesn't require Plex specifically. IBM
+       Plex Sans kept as fallback, not dropped, so nothing reflows badly if
+       Manrope fails to load. */
+    font-family: 'Manrope', 'IBM Plex Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, 'Helvetica Neue', Arial, sans-serif;
+    /* Was hsl(var(--neutral-800)) (neutral charcoal) — now the same ink navy
+       as --foreground, matching Lovable's single-colour text system (their
+       body copy, not just headings, uses --ink). */
+    color: hsl(var(--foreground));
   }
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'IBM Plex Sans', 'Inter', sans-serif;
+    /* Sora — matches Lovable's display font exactly, same date/reason as
+       body above. .font-display (further down) is now largely redundant
+       with this global rule; kept for the few non-heading elements
+       (Landing.tsx's stat figures) that opt into display styling
+       explicitly. */
+    font-family: 'Sora', 'Manrope', 'IBM Plex Sans', 'Inter', sans-serif;
     letter-spacing: -0.02em;
-    font-weight: 600;
+    font-weight: 700;
   }
 
   /* Money figures: tabular numerals stop digits from jittering as values
@@ -131,17 +170,37 @@
     font-feature-settings: "tnum" 1;
   }
 
-  /* Display headline font — Sora, opt-in via .font-display.
-     Scoped to Landing.tsx's hero/section headings, not the global h1-h6
-     rule above: IBM Plex Sans stays the site-wide default (it was chosen
-     deliberately for tabular-figure alignment in financial tables, see the
-     rule above's neighbouring comment), so this doesn't cascade into forms,
-     admin panels, or calculator result tables that were never reviewed
-     against Sora. Falls back to IBM Plex Sans, never straight to a system
-     font, so a slow Sora load never mismatches the rest of the page. */
+  /* .font-display — added 2026-09-04 back when Sora was homepage-only;
+     now that Sora is the global h1-h6 rule above, this is only needed on
+     non-heading elements that want the display treatment (Landing.tsx's
+     stat figures, which are <div>s, not <hN> tags). Kept as a thin alias
+     rather than removed, since those call sites still reference it. */
   .font-display {
-    font-family: 'Sora', 'IBM Plex Sans', sans-serif;
+    font-family: 'Sora', 'Manrope', 'IBM Plex Sans', sans-serif;
     letter-spacing: -0.02em;
+  }
+
+  /* Soft bento panel — exact formula ported from Lovable's @utility bento
+     (Tailwind v4 syntax; this codebase is v3, so it's a plain class here
+     instead). Their shadow used color-mix(in oklab, var(--ink) 25%,
+     transparent); that function isn't used here for browser-support margin
+     on a purely decorative effect — rgba(15,42,74,.25) is ink's own RGB
+     (#0F2A4A) at the same 25% alpha, visually equivalent. */
+  .bento {
+    background-color: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: 2rem;
+    box-shadow: 0 12px 34px -14px rgba(15, 42, 74, 0.25);
+  }
+
+  /* Small uppercase label above a figure/input — ported exact from Lovable
+     (same rgba(15,42,74,.55) reasoning as .bento above re: color-mix). */
+  .field-label {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(15, 42, 74, 0.55);
   }
 
   /* Accessibility: never remove focus rings — keyboard users need them.

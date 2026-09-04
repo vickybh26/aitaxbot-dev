@@ -17,7 +17,6 @@
 import { useState } from "react";
 import { Lock, LogIn, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import AuthModal from "@/components/AuthModal";
 
 interface ResultAuthGateProps {
@@ -44,36 +43,41 @@ interface ResultAuthGateProps {
 export default function ResultAuthGate({ toolName, headline }: ResultAuthGateProps) {
   const [modalTab, setModalTab] = useState<"login" | "signup" | null>(null);
 
+  // Bento card, dark-ink headline band — this is the single most-seen result
+  // view on the whole site (see the comment on `headline` above: 82% of
+  // signups in the 2026-08-01 audit never got past this gate), so it gets
+  // the same dark "ink" verdict treatment as the signed-in result card
+  // (tax-wizard/steps/ResultStep.tsx's RegimeCard), 2026-09-04.
   return (
-    <Card className="border-2 border-blue-100 bg-gradient-to-br from-blue-50 via-persian-blue-50 to-blue-50">
+    <div className="bento overflow-hidden">
       {headline && (
-        <div className="px-6 pt-8 pb-6 text-center border-b border-blue-100">
-          <div className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">
+        <div className="bg-ink px-6 pt-8 pb-6 text-center text-paper">
+          <div className="field-label !text-paper/55 mb-1">
             {headline.label}
           </div>
-          <div className="text-4xl sm:text-5xl font-bold text-slate-900 tabular-nums">
+          <div className="font-display tabular-figures text-4xl sm:text-5xl font-extrabold">
             {headline.value}
           </div>
           {headline.hint && (
-            <div className="text-xs text-slate-500 mt-2">{headline.hint}</div>
+            <div className="text-xs text-paper/65 mt-2">{headline.hint}</div>
           )}
         </div>
       )}
-      <CardContent className={headline ? "py-8 px-6 text-center" : "py-10 px-6 text-center"}>
-        <div className="mx-auto w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mb-4">
-          <Lock className="h-5 w-5 text-white" />
+      <div className={headline ? "py-8 px-6 text-center" : "py-10 px-6 text-center"}>
+        <div className="mx-auto w-12 h-12 bg-credit rounded-full flex items-center justify-center mb-4">
+          <Lock className="h-5 w-5 text-ink" />
         </div>
-        <h3 className="text-lg font-bold text-slate-800 mb-1">
+        <h3 className="font-display text-lg font-bold text-ink mb-1">
           {headline ? "See the full breakdown" : "Sign in to see your result"}
         </h3>
-        <p className="text-sm text-slate-600 mb-6 max-w-sm mx-auto">
+        <p className="text-sm text-ink/65 mb-6 max-w-sm mx-auto">
           {headline
             ? `Sign in free to see how this was calculated — slab-by-slab breakdown, old vs new regime comparison, and a downloadable PDF. Your inputs stay right here, nothing resets.`
             : `Your ${toolName} result is ready. Sign in or create a free AiTaxBot account to view it — your inputs stay right here, nothing resets.`}
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Button
-            className="w-full sm:w-auto bg-persian-blue-700 hover:bg-persian-blue-800"
+            className="w-full sm:w-auto rounded-full"
             onClick={() => setModalTab("signup")}
             data-testid="button-gate-signup"
           >
@@ -82,7 +86,7 @@ export default function ResultAuthGate({ toolName, headline }: ResultAuthGatePro
           </Button>
           <Button
             variant="outline"
-            className="w-full sm:w-auto"
+            className="w-full sm:w-auto rounded-full border-rule"
             onClick={() => setModalTab("login")}
             data-testid="button-gate-signin"
           >
@@ -94,11 +98,11 @@ export default function ResultAuthGate({ toolName, headline }: ResultAuthGatePro
             is saved to the account automatically so it's on the dashboard next
             visit. Saying "not saved unless you choose to" would misdescribe
             that, so the copy states plainly what happens and what doesn't. */}
-        <p className="text-xs text-slate-500 mt-4">
+        <p className="text-xs text-ink/55 mt-4">
           Free forever. Signing in saves your latest result to your dashboard —
           you can clear it any time.
         </p>
-      </CardContent>
+      </div>
 
       {modalTab && (
         <AuthModal
@@ -108,6 +112,6 @@ export default function ResultAuthGate({ toolName, headline }: ResultAuthGatePro
           toolName={toolName}
         />
       )}
-    </Card>
+    </div>
   );
 }

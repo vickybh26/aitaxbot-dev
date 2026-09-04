@@ -146,11 +146,12 @@
     <!-- Google Fonts loaded non-blocking to eliminate render-blocking -->
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap"></noscript>
-    <!-- Sora — display font for the homepage hero/section headings only
-         (.font-display in index.css), 2026-09-04. Not the site-wide default;
-         see index.css for why IBM Plex Sans stays that. -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&display=swap"></noscript>
+    <!-- Sora + Manrope — the site-wide "Warm Ledger" font pairing ported from
+         Lovable 2026-09-04 (Sora on h1-h6, Manrope as the body default; see
+         index.css). IBM Plex Sans stays loaded above as the fallback in both
+         font stacks, not removed. -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap"></noscript>
     <meta property="og:title" content="AiTaxBot - Free ITR Filing &amp; Income Tax Calculator India FY 2026-27 | AY 2027-28">
     <meta property="og:description" content="Free income tax calculator, old vs new regime comparison, HRA, SIP, SWP, NPS calculators. Built for India.">
     <meta property="og:image" content="/apple-touch-icon.png">
