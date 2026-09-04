@@ -83,8 +83,30 @@ const TOOLS = [
   { icon: FileText,   name: "Rent Receipt Generator", desc: "Generate stamped, AO-ready rent receipts as PDFs instantly.",       href: "/tools/rent-receipt"       },
   { icon: Layers,     name: "AIS · 26AS · Form 16",   desc: "AI spots mismatches across all three documents before notices.",    href: "/tools/ais-26as-form16", badge: "New" },
   { icon: UserCheck,  name: "Find a Verified CA",     desc: "Free introductions — capital gains, NRI filing, notice response.",  href: "/find-ca"                  },
-  { icon: BookOpen,   name: "Tax Guides & Blog",      desc: "34 in-depth articles on ITR, HRA, capital gains, and IT Act 2025.", href: "/blog"                     },
+  { icon: BookOpen,   name: "Tax Guides & Blog",      desc: `${blogPosts.length} in-depth articles on ITR, HRA, capital gains, and IT Act 2025.`, href: "/blog"                     },
 ] as const;
+
+/**
+ * The ITR deadline shown in the banner and the reconciliation CTA.
+ *
+ * Computed, not hardcoded. The previous literal "July 31, 2026" was still on
+ * the page in September 2026 — by then it was both in the past AND wrong for
+ * the FY 2026-27 / AY 2027-28 framing used everywhere else on this page (that
+ * AY's regular deadline is 31 Jul 2027). A hardcoded date on a tax site goes
+ * stale silently and reads as an abandoned product.
+ *
+ * ITR calendar for a non-audit individual:
+ *   FY ends 31 Mar -> regular return due 31 Jul of the AY
+ *                  -> belated/revised return due 31 Dec of the AY
+ * So from 1 Aug to 31 Dec the only live deadline is the belated one for the
+ * year just ended, which is exactly what a visitor in that window needs.
+ */
+function itrDeadline(now: Date = new Date()): { label: string; date: string } {
+  const y = now.getFullYear();
+  // getMonth() is 0-indexed: 6 = July.
+  if (now.getMonth() <= 6) return { label: "ITR Deadline", date: `July 31, ${y}` };
+  return { label: "Belated ITR Deadline", date: `December 31, ${y}` };
+}
 
 function slab(income: number, tiers: [number, number][]): number {
   let tax = 0, prev = 0;
@@ -222,7 +244,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
   useEffect(() => { trackPageView("/", "Home - AiTaxBot"); }, []);
 
   const { data: marketNewsData, isLoading: newsLoading } = useQuery<{ news: NewsItem[] }>({
-    queryKey: ["/api/market-news"],
+    queryKey: ["/api/tax-news"],
     refetchInterval: () => document.visibilityState === "visible" ? 7200000 : false,
     refetchOnWindowFocus: false,
   });
@@ -235,9 +257,17 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
   const calcCountDisplay = calcCount > 0 ? calcCount.toLocaleString("en-IN") + "+" : "10,000+";
   const closeModal = () => setActiveModal?.(null);
 
+  // Recomputed on each render; the banner therefore rolls over on its own
+  // rather than needing an annual edit that nobody remembers to make.
+  const deadline = itrDeadline();
+
   const s1 = useCountUp(12);
   const s2 = useCountUp(75);
-  const s3 = useCountUp(18);
+  // 11, not 18: nine calculators (income-tax, hra, sip, swp, pf, nps,
+  // home-loan, vehicle-loan, trading-tax) plus two document tools
+  // (rent-receipt, ais-26as-form16) — see the routes in App.tsx. The old "18+"
+  // was contradicted by the nine cards rendered further down the same page.
+  const s3 = useCountUp(11);
   const s4 = useCountUp(5);
 
   return (
@@ -265,7 +295,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
             <span className="text-slate-700">·</span>
             <span className="flex items-center gap-1.5"><Zap className="h-3.5 w-3.5 text-blue-400 flex-shrink-0" />IT Act 2025 &amp; IT Act 1961 ready</span>
             <span className="text-slate-700">·</span>
-            <span className="flex items-center gap-1.5 text-orange-300 font-semibold"><Clock className="h-3.5 w-3.5 text-orange-400 flex-shrink-0" />ITR Deadline: July 31, 2026</span>
+            <span className="flex items-center gap-1.5 text-orange-300 font-semibold"><Clock className="h-3.5 w-3.5 text-orange-400 flex-shrink-0" />{deadline.label}: {deadline.date}</span>
             <span className="text-slate-700">·</span>
             {/* Was "Runs in browser — data never stored", which is not true for
                 a signed-in user: every calculation persists a saved result via
@@ -291,20 +321,33 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                   <span className="block mt-2 text-blue-600">{t("hero.headline").split("\n")[1] ?? "Indian Taxpayers"}</span>
                 </h1>
                 <p className="text-base lg:text-lg text-slate-600 mb-8 leading-relaxed max-w-xl">{t("hero.subheadline")}</p>
-                <div className="flex flex-wrap gap-3 mb-8">
+                {/* ONE primary action. This was three same-height buttons —
+                    Calculate, AIS Reconciliation, Find a CA — which split the
+                    hero three ways at the exact moment the funnel is weakest:
+                    /calculators/income-tax is the front door (391 of 464 views
+                    in the 2026-08-01 audit vs 67 for this page), yet 101 of 123
+                    registered users never completed a single calculation. The
+                    two demoted destinations are also the two with the least to
+                    show a first-time visitor — the reconciliation tool had 0
+                    lifetime uses and the CA directory has 1 listed CA — so they
+                    stay reachable as quiet links rather than competing for the
+                    click that activation actually depends on. */}
+                <div className="mb-8">
                   <Link href="/calculators/income-tax" data-testid="button-calculate-tax"
                     className="inline-flex items-center gap-2 bg-persian-blue-700 hover:bg-persian-blue-800 text-white font-semibold px-6 py-3.5 rounded-xl transition-colors text-sm">
                     <Calculator className="h-4 w-4" />{t("hero.cta")}
                   </Link>
-                  <Link href="/tools/ais-26as-form16" data-testid="button-ais-recon"
-                    className="inline-flex items-center gap-2 border border-slate-300 hover:border-slate-400 text-slate-700 hover:bg-slate-50 font-semibold px-5 py-3.5 rounded-xl transition-colors text-sm">
-                    <Layers className="h-4 w-4" />AIS Reconciliation
-                    <span className="text-[10px] font-bold text-blue-600 bg-blue-50 border border-blue-100 px-1.5 py-0.5 rounded-full">New</span>
-                  </Link>
-                  <Link href="/find-ca" data-testid="button-find-ca-hero"
-                    className="inline-flex items-center gap-2 border border-slate-300 hover:border-slate-400 text-slate-700 hover:bg-slate-50 font-semibold px-5 py-3.5 rounded-xl transition-colors text-sm">
-                    <UserCheck className="h-4 w-4" />Find a CA
-                  </Link>
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 -ml-1">
+                    <Link href="/tools/ais-26as-form16" data-testid="button-ais-recon"
+                      className="inline-flex items-center gap-1.5 px-1 py-3 text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">
+                      <Layers className="h-4 w-4 text-slate-400" />AIS Reconciliation
+                      <span className="text-[10px] font-bold text-blue-600 bg-blue-50 border border-blue-100 px-1.5 py-0.5 rounded-full">New</span>
+                    </Link>
+                    <Link href="/find-ca" data-testid="button-find-ca-hero"
+                      className="inline-flex items-center gap-1.5 px-1 py-3 text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">
+                      <UserCheck className="h-4 w-4 text-slate-400" />Find a CA
+                    </Link>
+                  </div>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {[
@@ -345,7 +388,16 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
         </div>
 
         {/* Tax News */}
-        {(newsLoading || (marketNewsData?.news?.length ?? 0) > 0) && (
+        {/* Hide the whole section unless the feed has enough genuinely relevant
+            items to look deliberate. Measured 2026-09-04: newsdata.io returned
+            10 items for the tax query and only ONE was Indian tax news — the
+            rest were Guidewire earnings, US Social Security, a Michigan land
+            sale, UiPath, and Premier League TV money. country=in does not
+            reliably filter to Indian publishers and the q match is loose, so
+            the server now drops off-topic items (server/routes.ts, tax-news).
+            That is the right call for accuracy but can leave one lonely card
+            under a "CA-reviewed" badge, which looks more broken than absent. */}
+        {(newsLoading || (marketNewsData?.news?.length ?? 0) >= 3) && (
           <section className="py-10 border-t border-slate-100">
             <div className="max-w-7xl mx-auto px-4">
               <div className="flex items-center gap-2 mb-5">
@@ -518,7 +570,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                 <div className="space-y-2.5 mb-4">
                   <div className="flex items-center gap-2 text-sm text-slate-700"><CheckCircle2 className="h-4 w-4 text-green-500" />ICAI-verified Chartered Accountants</div>
                   <div className="flex items-center gap-2 text-sm text-slate-700"><CheckCircle2 className="h-4 w-4 text-green-500" />Free introduction — no platform fees</div>
-                  <div className="flex items-center gap-2 text-sm text-orange-700"><Clock className="h-4 w-4 text-orange-500" />Deadline: July 31, 2026 — act now</div>
+                  <div className="flex items-center gap-2 text-sm text-orange-700"><Clock className="h-4 w-4 text-orange-500" />{deadline.label}: {deadline.date} — act now</div>
                 </div>
                 <Link href="/find-ca"
                   className="inline-flex items-center gap-2 bg-persian-blue-700 hover:bg-persian-blue-800 text-white font-semibold px-6 py-3.5 rounded-xl transition-colors text-sm">
@@ -584,7 +636,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                 { q: "Is income up to ₹12 lakh really tax-free in FY 2026-27?", a: "Yes — under the New Regime for FY 2026-27, the rebate under Section 87A has been enhanced so that taxpayers with net taxable income up to ₹12 lakh pay zero tax. The ₹75,000 standard deduction means a salaried person earning up to ₹12.75 lakh pays no tax." },
                 { q: "What is the 87A rebate and am I eligible?", a: "Section 87A gives a full rebate on tax if your net taxable income is within the specified limit (₹12 lakh under New Regime for FY 2026-27). Our calculator automatically applies this rebate and shows you whether you qualify." },
                 { q: "Can I switch between Old and New Regime every year?", a: "Salaried individuals with no business income can choose their regime every year at the time of filing. If you have business or professional income, you can switch only once. Our calculator shows you both options so you can decide each year." },
-                { q: "Is the data I enter in the calculator saved anywhere?", a: "No. AiTaxBot calculators run entirely in your browser. Your income and deduction details are never sent to our servers or stored in any database." },
+                { q: "Is the data I enter in the calculator saved anywhere?", a: "It depends on whether you are signed in. As a guest, the calculation runs entirely in your browser and nothing is sent to us. Once you sign in, we save the result and the figures you entered to your account, so your dashboard can show your history — that is what makes saved calculations work. We never store the documents you upload to the reconciliation tool, and you can delete your account and everything in it at any time from your profile." },
                 { q: "How is AY (Assessment Year) different from FY (Financial Year)?", a: "Financial Year (FY) is when you earn the income — e.g., FY 2026-27 runs April 2026 to March 2027. Assessment Year (AY) is when you file and pay tax on that income — so AY 2027-28 corresponds to FY 2026-27." },
               ].map(({ q, a }, i) => (
                 <details key={i} className="group rounded-xl border border-slate-200 bg-white open:border-blue-200 transition-all">
@@ -610,14 +662,9 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
                 <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0"><Mail className="h-5 w-5 text-blue-600" /></div>
                 <div>
                   <p className="text-xs text-slate-500 mb-0.5">Email</p>
-                  <div className="flex flex-col">
-                    <a href="mailto:info@aitaxbot.in" className="text-sm font-semibold text-slate-800 hover:text-blue-600 transition-colors">
-                      info@aitaxbot.in
-                    </a>
-                    <a href="mailto:admin@aitaxbot.co.in" className="text-sm font-semibold text-slate-800 hover:text-blue-600 transition-colors">
-                      admin@aitaxbot.co.in
-                    </a>
-                  </div>
+                  <a href="mailto:admin@aitaxbot.co.in" className="text-sm font-semibold text-slate-800 hover:text-blue-600 transition-colors">
+                    admin@aitaxbot.co.in
+                  </a>
                 </div>
               </div>
               <a href="tel:+917899869036" className="flex items-center gap-3 p-4 bg-white rounded-xl border border-slate-200 hover:border-green-200 hover:shadow-sm transition-all group">

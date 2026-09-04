@@ -158,7 +158,7 @@ export default function TermsOfService() {
                 <li>You grant AiTaxBot a non-exclusive, royalty-free licence to display your profile publicly on the platform</li>
                 <li>AiTaxBot reserves the right to remove any profile that contains false information, violates professional conduct rules, or generates user complaints</li>
                 <li>Profile listing is free and carries no exclusivity or priority placement</li>
-                <li>You may request removal of your profile at any time by emailing <a href="mailto:info@aitaxbot.in" className="text-blue-600 hover:underline">info@aitaxbot.in</a></li>
+                <li>You may request removal of your profile at any time by emailing <a href="mailto:admin@aitaxbot.co.in" className="text-blue-600 hover:underline">admin@aitaxbot.co.in</a></li>
               </ul>
             </section>
 
@@ -276,7 +276,7 @@ export default function TermsOfService() {
               <div className="bg-slate-50 rounded-lg p-6">
                 <p className="text-slate-800 font-semibold mb-2">AiTaxBot</p>
                 <p className="text-slate-700 mb-1">
-                  📧 <a href="mailto:info@aitaxbot.in" className="text-blue-600 hover:underline">info@aitaxbot.in</a>
+                  📧 <a href="mailto:admin@aitaxbot.co.in" className="text-blue-600 hover:underline">admin@aitaxbot.co.in</a>
                 </p>
                 <p className="text-slate-700 mb-1">
                   🌐 <a href="https://www.aitaxbot.co.in" className="text-blue-600 hover:underline">www.aitaxbot.co.in</a>

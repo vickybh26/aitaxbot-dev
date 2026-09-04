@@ -56,7 +56,7 @@ export default function Contact() {
     <>
       <Helmet>
         <title>Contact Us - AiTaxBot Support & Inquiries</title>
-        <meta name="description" content="Get in touch with AiTaxBot for tax calculator support, questions, or feedback. Email: info@aitaxbot.in | Phone: +91 78998 69036 | Bengaluru, India" />
+        <meta name="description" content="Get in touch with AiTaxBot for tax calculator support, questions, or feedback. Email: admin@aitaxbot.co.in | Phone: +91 78998 69036 | Bengaluru, India" />
         <meta name="keywords" content="contact aitaxbot, tax calculator support, customer support India, tax help" />
         <link rel="canonical" href="https://www.aitaxbot.co.in/contact" />
         
@@ -94,22 +94,17 @@ export default function Contact() {
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold text-slate-900 mb-2">Email</h3>
-                    <div className="flex flex-col space-y-1">
-                      <a 
-                        href="mailto:info@aitaxbot.in" 
-                        className="text-persian-blue-600 hover:text-persian-blue-700 transition-colors"
-                        data-testid="link-email"
-                      >
-                        info@aitaxbot.in
-                      </a>
-                      <a 
-                        href="mailto:admin@aitaxbot.co.in" 
-                        className="text-persian-blue-600 hover:text-persian-blue-700 transition-colors"
-                        data-testid="link-admin-email"
-                      >
-                        admin@aitaxbot.co.in
-                      </a>
-                    </div>
+                    {/* One address, on the canonical domain — same decision as
+                        Footer.tsx. Two addresses on different TLDs read as a
+                        typo or a second organisation on a page where people are
+                        deciding whether to trust us with financial data. */}
+                    <a 
+                      href="mailto:admin@aitaxbot.co.in" 
+                      className="text-persian-blue-600 hover:text-persian-blue-700 transition-colors"
+                      data-testid="link-email"
+                    >
+                      admin@aitaxbot.co.in
+                    </a>
                   </div>
                 </div>
 

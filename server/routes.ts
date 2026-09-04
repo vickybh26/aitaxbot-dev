@@ -1898,14 +1898,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         throw new Error(data.message || "Failed to fetch news");
       }
       
-      const formattedNews = data.results?.slice(0, 10).map((item: any) => ({
+      // Second line of defence on relevance. newsdata's `country=in` filters by
+      // PUBLISHER, not story subject, so an Indian outlet's wire copy about
+      // Nasdaq, NVIDIA or the Toronto exchange still matches the query. This
+      // feed sits on the homepage directly under a "CA-reviewed" trust badge,
+      // where one Canadian mining headline costs more credibility than four
+      // relevant ones earn — so drop anything with no Indian tax/policy term in
+      // its title or snippet rather than padding the row.
+      const TAX_TERMS = /\b(income[- ]tax|tax(es|ation|payer|payers)?|ITR|CBDT|GST|TDS|TCS|capital gains|deduction|exemption|rebate|surcharge|cess|budget|finance ministry|finance act|filing|refund|assessee|assessment year|80C|87A|slab)\b/i;
+      const isRelevant = (item: any) =>
+        TAX_TERMS.test(`${item.title ?? ""} ${item.description ?? ""}`);
+
+      const relevant = (data.results ?? []).filter(isRelevant);
+      const dropped = (data.results?.length ?? 0) - relevant.length;
+      if (dropped > 0) {
+        console.log(`[tax-news] Filtered out ${dropped} off-topic item(s) of ${data.results?.length}`);
+      }
+
+      const formattedNews = relevant.slice(0, 10).map((item: any) => ({
         title: item.title || "Tax Update",
         link: item.link || "#",
         source: item.source_id || item.source_name || "Tax News",
         date: item.pubDate ? new Date(item.pubDate).toLocaleDateString() : new Date().toLocaleDateString(),
         snippet: item.description || item.content?.substring(0, 150) || "",
         thumbnail: item.image_url || null // Explicitly null instead of undefined
-      })) || [];
+      }));
 
       // Update cache with successful response
       taxNewsCache = {

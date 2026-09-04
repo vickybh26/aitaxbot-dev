@@ -111,7 +111,7 @@ export default function Profile() {
       toast({ title: "Account deleted", description: "Your account and data have been removed." });
       setLocation('/');
     } catch {
-      toast({ title: "Error", description: "Could not delete your account. Please try again or email info@aitaxbot.in.", variant: "destructive" });
+      toast({ title: "Error", description: "Could not delete your account. Please try again or email admin@aitaxbot.co.in.", variant: "destructive" });
       setDeleting(false);
     }
   };
