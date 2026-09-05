@@ -104,7 +104,7 @@ export default function NRONREComparison() {
               Home
             </Link>
             <ChevronRight size={16} />
-            <Link href="/nri-corner" className="hover:underline">
+            <Link href="/nri" className="hover:underline">
               NRI Corner
             </Link>
             <ChevronRight size={16} />

@@ -243,7 +243,7 @@ export default function NRIIncomeTaxCalculator() {
               Home
             </Link>
             <ChevronRight size={16} />
-            <Link href="/nri-corner" className="hover:text-white transition">
+            <Link href="/nri" className="hover:text-white transition">
               NRI Corner
             </Link>
             <ChevronRight size={16} />
@@ -929,19 +929,19 @@ export default function NRIIncomeTaxCalculator() {
                 icon: "📊",
                 title: "DTAA Calculator",
                 description: "Calculate tax relief under Double Taxation Avoidance Agreement",
-                link: "/calculators/dtaa",
+                link: "/nri/dtaa-calculator",
               },
               {
                 icon: "🏦",
                 title: "NRO vs NRE Comparison",
                 description: "Compare NRO and NRE accounts for tax planning",
-                link: "/nri-corner/nro-vs-nre",
+                link: "/nri/nro-nre-comparison",
               },
               {
                 icon: "💰",
                 title: "Repatriation Planner",
                 description: "Plan your international fund transfers efficiently",
-                link: "/nri-corner/repatriation-planner",
+                link: "/nri/repatriation-planner",
               },
               {
                 icon: "🧮",

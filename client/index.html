@@ -143,15 +143,21 @@
     <!-- Google Fonts - Inter + Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Google Fonts loaded non-blocking to eliminate render-blocking -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap"></noscript>
+    <!-- Google Fonts. Previously loaded via a preload+onload swap
+         ("this.rel='stylesheet'") to avoid render-blocking, but that onload
+         attribute is an inline event handler, and server/index.ts sets CSP's
+         script-src-attr to 'none' — so the browser silently refused to run
+         it. The rel never flipped from "preload" to "stylesheet", so these
+         fonts never actually applied; every page was rendering on the
+         fallback stack (Inter/system-ui) the whole time. Found via a
+         sitewide audit 2026-09-05. Plain stylesheet links reintroduce a
+         small render-blocking cost but actually work under this CSP. -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap">
     <!-- Sora + Manrope — the site-wide "Warm Ledger" font pairing ported from
          Lovable 2026-09-04 (Sora on h1-h6, Manrope as the body default; see
          index.css). IBM Plex Sans stays loaded above as the fallback in both
          font stacks, not removed. -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap"></noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap">
     <meta property="og:title" content="AiTaxBot - Free ITR Filing &amp; Income Tax Calculator India FY 2026-27 | AY 2027-28">
     <meta property="og:description" content="Free income tax calculator, old vs new regime comparison, HRA, SIP, SWP, NPS calculators. Built for India.">
     <meta property="og:image" content="/apple-touch-icon.png">
