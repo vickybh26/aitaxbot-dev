@@ -202,21 +202,6 @@ export default function Header({ showModal }: HeaderProps = {}) {
               )}
             </div>
 
-            {/* Tax Calculator CTA */}
-            <Link
-              href="/calculators/income-tax"
-              onClick={() => trackButtonClick("Income Tax Calculator", "Header Navigation")}
-              /* Brand navy, matching every other primary button (<Button> resolves
-                 to .bg-primary = --primary-blue). This was bg-blue-600, i.e. the
-                 interactive-blue reserved for links and secondary actions — which
-                 is also what "Find a CA" and "Login" use in this same bar, so the
-                 site's main CTA was colour-coded as a link. */
-              className="bg-ink hover:bg-credit text-paper text-sm px-4 py-2 rounded-full font-medium transition-colors whitespace-nowrap"
-              data-testid="button-header-tax-calculator"
-            >
-              Compute tax
-            </Link>
-
             {/* The हिंदी / EN switcher used to sit here and has been removed.
                 It was given prime position in both the desktop and mobile bars,
                 but only 3 files ever called t() — 18 call sites against ~18,850
@@ -279,7 +264,7 @@ export default function Header({ showModal }: HeaderProps = {}) {
               <Link
                 href={getLoginUrl()}
                 onClick={() => trackButtonClick("Login", "Header Navigation")}
-                className={navLink}
+                className="bg-ink hover:bg-credit text-paper text-sm px-4 py-2 rounded-full font-medium transition-colors whitespace-nowrap"
                 data-testid="link-header-login"
               >
                 {t("nav.login")}
@@ -333,13 +318,6 @@ export default function Header({ showModal }: HeaderProps = {}) {
             <Link href="/contact" onClick={() => setMobileMenuOpen(false)} aria-current={mobileNavLink("/contact")["aria-current"]} className={`py-2.5 text-sm font-medium block ${mobileNavLink("/contact").className}`}>Contact</Link>
 
             <div className="pt-3 border-t border-rule space-y-2">
-              <Link
-                href="/calculators/income-tax"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block bg-ink text-paper text-center text-sm font-medium px-4 py-3 rounded-full hover:bg-credit transition-colors"
-              >
-                Compute tax
-              </Link>
               {isAuthenticated ? (
                 <>
                   <Link href="/profile" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 py-2 text-sm text-ink/75">
@@ -362,7 +340,7 @@ export default function Header({ showModal }: HeaderProps = {}) {
                 <Link
                   href={getLoginUrl()}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block border border-rule text-ink/75 text-center text-sm font-medium px-4 py-3 rounded-full hover:bg-secondary transition-colors"
+                  className="block bg-ink text-paper text-center text-sm font-medium px-4 py-3 rounded-full hover:bg-credit transition-colors"
                 >
                   {t("nav.login")}
                 </Link>
