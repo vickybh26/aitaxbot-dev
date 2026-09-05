@@ -75,10 +75,12 @@ export default function Header({ showModal }: HeaderProps = {}) {
     window.location.href = "/";
   };
 
+  // Matches Lovable's exact nav-link/dropdown-item treatment (ink/rule
+  // tokens, rounded-2xl panels) — 2026-09-05.
   const navLink =
-    "text-slate-600 hover:text-slate-900 font-medium transition-colors text-sm";
+    "text-ink/70 hover:text-ink font-medium transition-colors text-sm";
   const dropItem =
-    "flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors";
+    "flex items-center gap-2 px-4 py-2.5 text-sm text-ink/75 hover:bg-secondary hover:text-ink transition-colors rounded-xl";
 
   /**
    * Active-state props for a mobile drawer link.
@@ -93,7 +95,7 @@ export default function Header({ showModal }: HeaderProps = {}) {
     const active = currentPath === href;
     return {
       "aria-current": active ? ("page" as const) : undefined,
-      className: active ? "text-persian-blue-700 font-semibold" : "text-slate-700",
+      className: active ? "text-ink font-semibold" : "text-ink/75",
     };
   };
 
@@ -174,7 +176,7 @@ export default function Header({ showModal }: HeaderProps = {}) {
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform ${moreOpen ? "rotate-180" : ""}`} />
               </button>
               {moreOpen && (
-                <div id="header-more-menu" role="menu" className="absolute top-full left-0 mt-2 w-56 bg-white border border-slate-200 rounded-xl shadow-lg py-1.5 z-50">
+                <div id="header-more-menu" role="menu" className="absolute top-full left-0 mt-3 w-60 rounded-2xl border border-rule bg-card p-2 shadow-[0_18px_40px_-18px] shadow-ink/30 z-50">
                   <Link href="/tools/ais-26as-form16" onClick={() => { trackButtonClick("AIS Reconciliation", "Header More"); setMoreOpen(false); }} className={dropItem}>
                     AIS Reconciliation
                   </Link>
@@ -209,7 +211,7 @@ export default function Header({ showModal }: HeaderProps = {}) {
                  interactive-blue reserved for links and secondary actions — which
                  is also what "Find a CA" and "Login" use in this same bar, so the
                  site's main CTA was colour-coded as a link. */
-              className="bg-persian-blue-700 hover:bg-persian-blue-800 text-white text-sm px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap"
+              className="bg-ink hover:bg-credit text-paper text-sm px-4 py-2 rounded-full font-medium transition-colors whitespace-nowrap"
               data-testid="button-header-tax-calculator"
             >
               Tax Calculator
@@ -231,7 +233,7 @@ export default function Header({ showModal }: HeaderProps = {}) {
               <div ref={userRef} className="relative">
                 <button
                   onClick={() => setUserOpen((o) => !o)}
-                  className="flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+                  className="flex items-center gap-1.5 text-sm font-medium text-ink/70 hover:text-ink transition-colors"
                   aria-expanded={userOpen}
                   aria-haspopup="menu"
                   aria-controls="header-user-menu"
@@ -244,15 +246,15 @@ export default function Header({ showModal }: HeaderProps = {}) {
                   <ChevronDown className={`w-3.5 h-3.5 transition-transform ${userOpen ? "rotate-180" : ""}`} />
                 </button>
                 {userOpen && (
-                  <div id="header-user-menu" role="menu" className="absolute top-full right-0 mt-2 w-48 bg-white border border-slate-200 rounded-xl shadow-lg py-1.5 z-50">
+                  <div id="header-user-menu" role="menu" className="absolute top-full right-0 mt-3 w-52 rounded-2xl border border-rule bg-card p-2 shadow-[0_18px_40px_-18px] shadow-ink/30 z-50">
                     {isAuthenticated && (
                       <Link href="/dashboard" onClick={() => { trackButtonClick("Dashboard", "User Menu"); setUserOpen(false); }} className={dropItem} data-testid="link-header-dashboard">
-                        <LayoutDashboard className="w-4 h-4 text-slate-500" />
+                        <LayoutDashboard className="w-4 h-4 text-ink/50" />
                         Dashboard
                       </Link>
                     )}
                     <Link href="/profile" onClick={() => setUserOpen(false)} className={dropItem} data-testid="link-header-profile">
-                      <User className="w-4 h-4 text-slate-500" />
+                      <User className="w-4 h-4 text-ink/50" />
                       {t("nav.profile")}
                     </Link>
                     {adminLevel !== null && (
@@ -261,7 +263,7 @@ export default function Header({ showModal }: HeaderProps = {}) {
                         {t("nav.adminPanel")}
                       </Link>
                     )}
-                    <div className="border-t border-slate-100 my-1" />
+                    <div className="border-t border-rule my-1" />
                     <button
                       onClick={() => { handleLogout(); setUserOpen(false); }}
                       className={`${dropItem} w-full text-red-600 hover:bg-red-50`}
@@ -289,7 +291,7 @@ export default function Header({ showModal }: HeaderProps = {}) {
           <div className="md:hidden flex items-center gap-2">
             {/* Language switcher removed — see the note in the desktop nav above. */}
             <button
-              className="p-2 text-slate-600 hover:text-slate-900 transition-colors"
+              className="p-2 text-ink/70 hover:text-ink transition-colors"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               data-testid="button-mobile-menu"
               aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
@@ -303,7 +305,7 @@ export default function Header({ showModal }: HeaderProps = {}) {
 
       {/* ── Mobile Navigation ── */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-white border-t border-slate-200 shadow-lg">
+        <div className="md:hidden bg-card border-t border-rule shadow-lg">
           <div className="px-5 py-4 space-y-1">
             {isAuthenticated && (
               <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} aria-current={mobileNavLink("/dashboard")["aria-current"]} className={`flex items-center gap-2 py-2.5 text-sm font-medium ${mobileNavLink("/dashboard").className}`}>
@@ -330,17 +332,17 @@ export default function Header({ showModal }: HeaderProps = {}) {
             <Link href="/about" onClick={() => setMobileMenuOpen(false)} aria-current={mobileNavLink("/about")["aria-current"]} className={`py-2.5 text-sm font-medium block ${mobileNavLink("/about").className}`}>About</Link>
             <Link href="/contact" onClick={() => setMobileMenuOpen(false)} aria-current={mobileNavLink("/contact")["aria-current"]} className={`py-2.5 text-sm font-medium block ${mobileNavLink("/contact").className}`}>Contact</Link>
 
-            <div className="pt-3 border-t border-slate-100 space-y-2">
+            <div className="pt-3 border-t border-rule space-y-2">
               <Link
                 href="/calculators/income-tax"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block bg-persian-blue-700 text-white text-center text-sm font-medium px-4 py-3 rounded-lg hover:bg-persian-blue-800 transition-colors"
+                className="block bg-ink text-paper text-center text-sm font-medium px-4 py-3 rounded-full hover:bg-credit transition-colors"
               >
                 Tax Calculator
               </Link>
               {isAuthenticated ? (
                 <>
-                  <Link href="/profile" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 py-2 text-sm text-slate-700">
+                  <Link href="/profile" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 py-2 text-sm text-ink/75">
                     <User className="w-4 h-4" />{t("nav.profile")}
                   </Link>
                   {adminLevel !== null && (
@@ -360,7 +362,7 @@ export default function Header({ showModal }: HeaderProps = {}) {
                 <Link
                   href={getLoginUrl()}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block border border-slate-300 text-slate-700 text-center text-sm font-medium px-4 py-3 rounded-lg hover:bg-slate-50 transition-colors"
+                  className="block border border-rule text-ink/75 text-center text-sm font-medium px-4 py-3 rounded-full hover:bg-secondary transition-colors"
                 >
                   {t("nav.login")}
                 </Link>

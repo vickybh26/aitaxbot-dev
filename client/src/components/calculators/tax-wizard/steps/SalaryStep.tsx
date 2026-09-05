@@ -1,6 +1,4 @@
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Field, StringMoneyInput, ToggleCard } from "@/components/calc/Field";
 import { computeGrossSalary, computeHRAExemption, toAmount, type SalaryDetails } from "../types";
 
 interface SalaryStepProps {
@@ -90,71 +88,54 @@ export default function SalaryStep({ value, onChange, financialYear }: SalarySte
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="text-lg font-semibold text-neutral-900">Your salary, broken down</h2>
-        <p className="text-sm text-neutral-500 mt-1">
+        <h2 className="font-display text-lg font-bold">Your salary, broken down</h2>
+        <p className="text-sm text-ink/65 mt-1">
           Only Basic Salary is required — leave anything that doesn't apply to you blank.
         </p>
       </div>
 
       {FIELDS.map(({ key, label, hint, required }) => (
-        <div key={key}>
-          <div className="flex items-center justify-between gap-2">
-            <Label htmlFor={`salary-${key}`}>
-              {label}
-              {required && <span className="text-destructive"> *</span>}
-            </Label>
+        <Field
+          key={key}
+          label={required ? `${label} *` : label}
+          hint={key !== "hraReceived" ? hint : undefined}
+        >
+          <>
             {key === "hraReceived" && (
-              <a
-                href="/calculators/hra"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-primary hover:underline underline-offset-2 shrink-0"
-              >
-                Don't know this? Use the HRA Calculator →
-              </a>
+              <div className="flex items-center justify-end mb-1.5">
+                <a
+                  href="/calculators/hra"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-credit hover:underline underline-offset-2 shrink-0"
+                >
+                  Don't know this? Use the HRA Calculator →
+                </a>
+              </div>
             )}
-          </div>
-          <div className="relative mt-1">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 text-sm">₹</span>
-            <Input
-              id={`salary-${key}`}
-              type="text"
-              inputMode="decimal"
-              value={value[key]}
-              onChange={(e) => update(key, e.target.value)}
-              placeholder="0"
-              className="pl-7"
-            />
-          </div>
-          {hint && <p className="text-xs text-neutral-500 mt-1">{hint}</p>}
-        </div>
+            <StringMoneyInput id={`salary-${key}`} value={value[key]} onChange={(v) => update(key, v)} />
+            {key === "hraReceived" && hint && (
+              <p className="mt-1.5 text-xs text-ink/55">{hint}</p>
+            )}
+          </>
+        </Field>
       ))}
 
       {showMetroToggle && (
         <div className="space-y-2">
-          <button
-            type="button"
+          <ToggleCard
+            checked={value.isMetroCity}
             onClick={() => onChange({ ...value, isMetroCity: !value.isMetroCity })}
-            aria-pressed={value.isMetroCity}
-            className={`w-full text-left flex items-start gap-3 p-3 rounded-lg border transition-colors ${
-              value.isMetroCity ? "border-primary bg-primary-light" : "border-border bg-white"
-            }`}
-          >
-            <Checkbox checked={value.isMetroCity} className="mt-0.5 pointer-events-none" />
-            <span>
-              <span className="block text-sm font-medium text-neutral-900">
-                You live in {metroCityList.slice(0, -1).join(", ")}, or {metroCityList[metroCityList.length - 1]}
-              </span>
-              <span className="block text-xs text-neutral-500 mt-0.5">
-                {metroCitiesApply8CityRule
-                  ? `These ${metroCityList.length} metro cities (expanded from 4 under IT Rules 2026, Rule 279, effective FY 2026-27) get a 50% HRA exemption limit instead of 40% elsewhere.`
-                  : `These ${metroCityList.length} metro cities get a 50% HRA exemption limit instead of 40% elsewhere. (Hyderabad, Bengaluru, Pune, and Ahmedabad are added to this list only from FY 2026-27 onwards.)`}
-              </span>
-            </span>
-          </button>
-          <div className="rounded-lg border border-border bg-neutral-50 p-3 flex items-center justify-between">
-            <span className="text-sm text-neutral-700">HRA Exemption (Old Regime only)</span>
-            <span className="text-sm font-semibold tabular-figures money">
+            title={<>You live in {metroCityList.slice(0, -1).join(", ")}, or {metroCityList[metroCityList.length - 1]}</>}
+            hint={
+              metroCitiesApply8CityRule
+                ? `These ${metroCityList.length} metro cities (expanded from 4 under IT Rules 2026, Rule 279, effective FY 2026-27) get a 50% HRA exemption limit instead of 40% elsewhere.`
+                : `These ${metroCityList.length} metro cities get a 50% HRA exemption limit instead of 40% elsewhere. (Hyderabad, Bengaluru, Pune, and Ahmedabad are added to this list only from FY 2026-27 onwards.)`
+            }
+          />
+          <div className="rounded-2xl border border-rule bg-paper p-3 flex items-center justify-between">
+            <span className="text-sm text-ink/70">HRA Exemption (Old Regime only)</span>
+            <span className="text-sm font-semibold tabular-figures text-credit">
               ₹{Math.round(hraExemption).toLocaleString("en-IN")}
             </span>
           </div>
@@ -162,20 +143,20 @@ export default function SalaryStep({ value, onChange, financialYear }: SalarySte
             href="/calculators/hra"
             target="_blank"
             rel="noopener noreferrer"
-            className="block text-xs text-primary hover:underline underline-offset-2 text-right"
+            className="block text-xs text-credit hover:underline underline-offset-2 text-right"
           >
             See the full HRA breakdown & formula →
           </a>
         </div>
       )}
 
-      <div className="rounded-lg border border-border bg-neutral-50 p-4 flex items-center justify-between">
-        <span className="text-sm font-medium text-neutral-700">Gross Salary (before deductions)</span>
-        <span className="text-base font-bold text-primary tabular-figures money">
+      <div className="rounded-2xl border border-rule bg-paper p-4 flex items-center justify-between">
+        <span className="text-sm font-medium text-ink/70">Gross Salary (before deductions)</span>
+        <span className="font-display text-base font-bold text-ink tabular-figures">
           ₹{grossSalary.toLocaleString("en-IN")}
         </span>
       </div>
-      <p className="text-xs text-neutral-500">
+      <p className="text-xs text-ink/55">
         Standard deduction (₹75,000 New Regime / ₹50,000 Old Regime) and professional tax are applied
         automatically when we compute your result — you don't need to work those out yourself.
       </p>

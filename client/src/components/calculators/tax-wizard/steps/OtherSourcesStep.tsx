@@ -1,5 +1,4 @@
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+import { Field, StringMoneyInput } from "@/components/calc/Field";
 import { computeOtherSourcesIncome, toAmount, type OtherSourcesDetails } from "../types";
 
 interface OtherSourcesStepProps {
@@ -45,39 +44,26 @@ export default function OtherSourcesStep({ value, onChange }: OtherSourcesStepPr
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="text-lg font-semibold text-neutral-900">Dividend and interest income</h2>
-        <p className="text-sm text-neutral-500 mt-1">
+        <h2 className="font-display text-lg font-bold">Dividend and interest income</h2>
+        <p className="text-sm text-ink/65 mt-1">
           All taxed at your regular slab rate — there's no special rate here.
         </p>
       </div>
 
       {FIELDS.map(({ key, label, hint }) => (
-        <div key={key}>
-          <Label htmlFor={`os-${key}`}>{label}</Label>
-          <div className="relative mt-1">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 text-sm">₹</span>
-            <Input
-              id={`os-${key}`}
-              type="text"
-              inputMode="decimal"
-              value={value[key]}
-              onChange={(e) => update(key, e.target.value)}
-              placeholder="0"
-              className="pl-7"
-            />
-          </div>
-          <p className="text-xs text-neutral-500 mt-1">{hint}</p>
-        </div>
+        <Field key={key} label={label} hint={hint}>
+          <StringMoneyInput id={`os-${key}`} value={value[key]} onChange={(v) => update(key, v)} />
+        </Field>
       ))}
 
-      <div className="rounded-lg border border-border bg-neutral-50 p-4 flex items-center justify-between">
-        <span className="text-sm font-medium text-neutral-700">Total Other Sources Income</span>
-        <span className="text-base font-bold text-primary tabular-figures money">
+      <div className="rounded-2xl border border-rule bg-paper p-4 flex items-center justify-between">
+        <span className="text-sm font-medium text-ink/70">Total Other Sources Income</span>
+        <span className="font-display text-base font-bold text-ink tabular-figures">
           ₹{Math.round(total).toLocaleString("en-IN")}
         </span>
       </div>
       {toAmount(value.savingsInterest) > 0 && (
-        <p className="text-xs text-neutral-500">
+        <p className="text-xs text-ink/55">
           This is added to your income now — the 80TTA/80TTB deduction on your ₹
           {toAmount(value.savingsInterest).toLocaleString("en-IN")} savings interest comes off your total
           later, in the deductions step.

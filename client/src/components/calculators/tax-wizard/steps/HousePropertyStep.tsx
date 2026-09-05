@@ -1,5 +1,4 @@
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+import { CountInput, Field, StringMoneyInput } from "@/components/calc/Field";
 import {
   computeHousePropertyIncome,
   toAmount,
@@ -48,145 +47,83 @@ export default function HousePropertyStep({ value, onChange }: HousePropertyStep
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="text-lg font-semibold text-neutral-900">Your house property</h2>
-        <p className="text-sm text-neutral-500 mt-1">
+        <h2 className="font-display text-lg font-bold">Your house property</h2>
+        <p className="text-sm text-ink/65 mt-1">
           Self-occupied and rented-out properties are taxed differently — tell us the split.
         </p>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="hp-total">How many properties do you own?</Label>
-          <Input
-            id="hp-total"
-            type="text"
-            inputMode="numeric"
-            value={value.numberOfProperties}
-            onChange={(e) => updateCount("numberOfProperties", e.target.value)}
-            className="mt-1"
-          />
-        </div>
-        <div>
-          <Label htmlFor="hp-letout">...and how many are rented out?</Label>
-          <Input
-            id="hp-letout"
-            type="text"
-            inputMode="numeric"
-            value={value.numberOfLetOut}
-            onChange={(e) => updateCount("numberOfLetOut", e.target.value)}
-            className="mt-1"
-          />
-        </div>
+        <Field label="How many properties do you own?">
+          <CountInput id="hp-total" value={value.numberOfProperties} onChange={(v) => updateCount("numberOfProperties", v)} />
+        </Field>
+        <Field label="...and how many are rented out?">
+          <CountInput id="hp-letout" value={value.numberOfLetOut} onChange={(v) => updateCount("numberOfLetOut", v)} />
+        </Field>
       </div>
       {letOutCount > totalProperties && (
-        <p className="text-xs text-destructive -mt-3">
+        <p className="text-xs text-debit -mt-3">
           Rented-out count can't exceed the total number of properties.
         </p>
       )}
 
       {letOutCount > 0 && (
-        <div className="space-y-4 rounded-lg border border-border p-4">
-          <p className="text-sm font-medium text-neutral-900">
+        <div className="bento space-y-4 p-4">
+          <p className="text-sm font-medium text-ink">
             Rented-out {letOutCount === 1 ? "property" : `${letOutCount} properties`} (combined)
           </p>
 
-          <div>
-            <Label htmlFor="hp-rent">Total Annual Rent Received *</Label>
-            <div className="relative mt-1">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 text-sm">₹</span>
-              <Input
-                id="hp-rent"
-                type="text"
-                inputMode="decimal"
-                value={value.annualRentReceived}
-                onChange={(e) => updateText("annualRentReceived", e.target.value)}
-                placeholder="0"
-                className="pl-7"
-              />
-            </div>
-          </div>
+          <Field label="Total Annual Rent Received *">
+            <StringMoneyInput id="hp-rent" value={value.annualRentReceived} onChange={(v) => updateText("annualRentReceived", v)} />
+          </Field>
 
-          <div>
-            <Label htmlFor="hp-municipal">Municipal Taxes Paid</Label>
-            <div className="relative mt-1">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 text-sm">₹</span>
-              <Input
-                id="hp-municipal"
-                type="text"
-                inputMode="decimal"
-                value={value.municipalTaxesPaid}
-                onChange={(e) => updateText("municipalTaxesPaid", e.target.value)}
-                placeholder="0"
-                className="pl-7"
-              />
-            </div>
-            <p className="text-xs text-neutral-500 mt-1">
-              Property tax paid to your municipal corporation — reduces the taxable rent.
-            </p>
-          </div>
+          <Field
+            label="Municipal Taxes Paid"
+            hint="Property tax paid to your municipal corporation — reduces the taxable rent."
+          >
+            <StringMoneyInput id="hp-municipal" value={value.municipalTaxesPaid} onChange={(v) => updateText("municipalTaxesPaid", v)} />
+          </Field>
 
-          <div>
-            <Label htmlFor="hp-letout-interest">Home Loan Interest (on rented-out property)</Label>
-            <div className="relative mt-1">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 text-sm">₹</span>
-              <Input
-                id="hp-letout-interest"
-                type="text"
-                inputMode="decimal"
-                value={value.letOutHomeLoanInterest}
-                onChange={(e) => updateText("letOutHomeLoanInterest", e.target.value)}
-                placeholder="0"
-                className="pl-7"
-              />
-            </div>
-            <p className="text-xs text-neutral-500 mt-1">
-              No upper limit for a rented-out property — the full interest is deductible.
-            </p>
-          </div>
+          <Field
+            label="Home Loan Interest (on rented-out property)"
+            hint="No upper limit for a rented-out property — the full interest is deductible."
+          >
+            <StringMoneyInput id="hp-letout-interest" value={value.letOutHomeLoanInterest} onChange={(v) => updateText("letOutHomeLoanInterest", v)} />
+          </Field>
         </div>
       )}
 
       {selfOccupiedCount > 0 && (
-        <div className="space-y-3 rounded-lg border border-border p-4">
-          <p className="text-sm font-medium text-neutral-900">
+        <div className="bento space-y-3 p-4">
+          <p className="text-sm font-medium text-ink">
             Self-occupied {selfOccupiedCount === 1 ? "property" : `${selfOccupiedCount} properties`} (combined)
           </p>
-          <div>
-            <Label htmlFor="hp-selfoccupied-interest">Home Loan Interest (self-occupied)</Label>
-            <div className="relative mt-1">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 text-sm">₹</span>
-              <Input
-                id="hp-selfoccupied-interest"
-                type="text"
-                inputMode="decimal"
-                value={value.selfOccupiedHomeLoanInterest}
-                onChange={(e) => updateText("selfOccupiedHomeLoanInterest", e.target.value)}
-                placeholder="0"
-                className="pl-7"
-              />
-            </div>
-            <p className="text-xs text-neutral-500 mt-1">
-              Capped at ₹{SELF_OCCUPIED_INTEREST_CAP.toLocaleString("en-IN")}/year in total — we'll apply
-              the cap automatically.
-              {selfOccupiedCount > 2 &&
-                " Note: only 2 self-occupied properties can have nil value; any beyond that are treated as let-out for tax purposes — talk to a CA if this applies to you."}
-            </p>
-          </div>
+          <Field
+            label="Home Loan Interest (self-occupied)"
+            hint={
+              `Capped at ₹${SELF_OCCUPIED_INTEREST_CAP.toLocaleString("en-IN")}/year in total — we'll apply the cap automatically.` +
+              (selfOccupiedCount > 2
+                ? " Note: only 2 self-occupied properties can have nil value; any beyond that are treated as let-out for tax purposes — talk to a CA if this applies to you."
+                : "")
+            }
+          >
+            <StringMoneyInput id="hp-selfoccupied-interest" value={value.selfOccupiedHomeLoanInterest} onChange={(v) => updateText("selfOccupiedHomeLoanInterest", v)} />
+          </Field>
         </div>
       )}
 
-      <div className="rounded-lg border border-border bg-neutral-50 p-4 flex items-center justify-between">
-        <span className="text-sm font-medium text-neutral-700">Income from House Property</span>
+      <div className="rounded-2xl border border-rule bg-paper p-4 flex items-center justify-between">
+        <span className="text-sm font-medium text-ink/70">Income from House Property</span>
         <span
-          className={`text-base font-bold tabular-figures money ${
-            result.totalIncome < 0 ? "text-destructive" : "text-primary"
+          className={`font-display text-base font-bold tabular-figures ${
+            result.totalIncome < 0 ? "text-debit" : "text-ink"
           }`}
         >
           {formatSignedINR(result.totalIncome)}
         </span>
       </div>
       {result.totalIncome < 0 && (
-        <p className="text-xs text-neutral-500">
+        <p className="text-xs text-ink/55">
           A negative figure is a loss — it reduces your total taxable income (up to ₹2,00,000 can be
           set off against other income each year).
         </p>

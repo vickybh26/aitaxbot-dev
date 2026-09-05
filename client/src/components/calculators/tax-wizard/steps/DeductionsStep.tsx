@@ -1,5 +1,4 @@
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+import { Field, StringMoneyInput } from "@/components/calc/Field";
 import type { AgeGroup } from "@shared/taxLiability";
 import {
   computeDeductions,
@@ -38,7 +37,6 @@ interface FieldDef {
 export default function DeductionsStep({ value, otherSources, ageGroup, onChange }: DeductionsStepProps) {
   const result = computeDeductions(value, otherSources, ageGroup);
   const section80DCap = ageGroup === "below60" ? SECTION_80D_CAP_BELOW60 : SECTION_80D_CAP_SENIOR;
-  const savingsInterestCap = ageGroup === "below60" ? SECTION_80TTA_CAP : SECTION_80TTB_CAP;
 
   const FIELDS: FieldDef[] = [
     {
@@ -75,50 +73,37 @@ export default function DeductionsStep({ value, otherSources, ageGroup, onChange
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="text-lg font-semibold text-neutral-900">Deductions</h2>
-        <p className="text-sm text-neutral-500 mt-1">
+        <h2 className="font-display text-lg font-bold">Deductions</h2>
+        <p className="text-sm text-ink/65 mt-1">
           These only reduce your tax under the Old Regime — the New Regime doesn't allow them. We'll
           show you both results at the end. Leave anything blank that doesn't apply to you.
         </p>
       </div>
 
       {toAmount(otherSources.savingsInterest) > 0 && (
-        <div className="rounded-lg border border-border bg-neutral-50 p-3 flex items-center justify-between">
-          <span className="text-sm text-neutral-700">
+        <div className="rounded-2xl border border-rule bg-paper p-3 flex items-center justify-between">
+          <span className="text-sm text-ink/70">
             Section 80TTA/80TTB (Savings Interest) — applied automatically
           </span>
-          <span className="text-sm font-semibold tabular-figures money">
+          <span className="text-sm font-semibold tabular-figures text-ink">
             ₹{Math.round(result.section80TTAorTTB).toLocaleString("en-IN")}
           </span>
         </div>
       )}
 
       {FIELDS.map(({ key, label, hint }) => (
-        <div key={key}>
-          <Label htmlFor={`ded-${key}`}>{label}</Label>
-          <div className="relative mt-1">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 text-sm">₹</span>
-            <Input
-              id={`ded-${key}`}
-              type="text"
-              inputMode="decimal"
-              value={value[key]}
-              onChange={(e) => update(key, e.target.value)}
-              placeholder="0"
-              className="pl-7"
-            />
-          </div>
-          <p className="text-xs text-neutral-500 mt-1">{hint}</p>
-        </div>
+        <Field key={key} label={label} hint={hint}>
+          <StringMoneyInput id={`ded-${key}`} value={value[key]} onChange={(v) => update(key, v)} />
+        </Field>
       ))}
 
-      <div className="rounded-lg border border-border bg-neutral-50 p-4 flex items-center justify-between">
-        <span className="text-sm font-medium text-neutral-700">Total Deductions (Old Regime)</span>
-        <span className="text-base font-bold text-primary tabular-figures money">
+      <div className="rounded-2xl border border-rule bg-paper p-4 flex items-center justify-between">
+        <span className="text-sm font-medium text-ink/70">Total Deductions (Old Regime)</span>
+        <span className="font-display text-base font-bold text-ink tabular-figures">
           ₹{Math.round(result.total).toLocaleString("en-IN")}
         </span>
       </div>
-      <p className="text-xs text-neutral-500">
+      <p className="text-xs text-ink/55">
         Home loan interest isn't listed here — it already reduced your House Property income in that
         step, so it's not counted twice.
       </p>
