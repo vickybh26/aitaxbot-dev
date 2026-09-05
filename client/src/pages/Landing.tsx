@@ -139,63 +139,65 @@ function RegimeComparisonCard() {
   return (
     <div className="bento p-6 sm:p-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="font-display text-xl font-bold sm:text-2xl">Regime comparison</h2>
+        <h2 className="font-display text-xl font-bold sm:text-2xl">Income Tax Calculator</h2>
         <span className="rounded-full bg-secondary px-4 py-1.5 text-xs font-semibold text-ink/70">
           FY 2026-27 · AY 2027-28
         </span>
       </div>
-      <div className="mt-7 grid gap-6 md:grid-cols-2">
-        <div className="space-y-5">
-          <div>
-            <label htmlFor="savings-income" className="field-label mb-2 block">
-              Annual gross income
-            </label>
-            <div className="rounded-2xl bg-paper px-5 py-4">
-              <div className="tabular-figures font-display text-3xl font-bold leading-none">{inr(salary)}</div>
-              <input
-                id="savings-income"
-                type="range"
-                min={300000}
-                max={5000000}
-                step={50000}
-                value={salary}
-                onChange={(e) => setSalary(+e.target.value)}
-                className="mt-4 h-1.5 w-full cursor-pointer appearance-none rounded-full bg-secondary accent-credit"
-              />
-              <div className="mt-2 flex justify-between text-[11px] font-medium text-ink/45">
-                <span>₹3,00,000</span>
-                <span>₹50,00,000</span>
-              </div>
-            </div>
-          </div>
-          <div className="rounded-2xl bg-paper p-5">
-            <div className="mb-3 flex items-center justify-between">
-              <span className="text-sm font-medium">Old regime tax</span>
-              <span className="tabular-figures font-display text-lg font-bold">{inr(result.oldTax)}</span>
-            </div>
-            <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
-              <div className="h-full rounded-full bg-ink transition-[width] duration-500" style={{ width: `${oldPct}%` }} />
+      {/* A flat 4-item grid, not two independently-stacked columns — with
+          two nested columns the "Old regime tax" and "New regime tax" boxes
+          landed at different heights whenever the credit card above them
+          was taller than the income-slider box (it always is). Grid auto-
+          placement puts item 3 and item 4 in the same row, so they share a
+          top edge regardless of how tall row 1's two items are. */}
+      <div className="mt-7 grid gap-x-6 gap-y-4 md:grid-cols-2">
+        <div>
+          <label htmlFor="savings-income" className="field-label mb-2 block">
+            Annual gross income
+          </label>
+          <div className="rounded-2xl bg-paper px-5 py-4">
+            <div className="tabular-figures font-display text-3xl font-bold leading-none">{inr(salary)}</div>
+            <input
+              id="savings-income"
+              type="range"
+              min={300000}
+              max={5000000}
+              step={50000}
+              value={salary}
+              onChange={(e) => setSalary(+e.target.value)}
+              className="mt-4 h-1.5 w-full cursor-pointer appearance-none rounded-full bg-secondary accent-credit"
+            />
+            <div className="mt-2 flex justify-between text-[11px] font-medium text-ink/45">
+              <span>₹3,00,000</span>
+              <span>₹50,00,000</span>
             </div>
           </div>
         </div>
-        <div className="flex flex-col justify-between gap-4">
-          <div className="rounded-[1.5rem] bg-credit p-7 text-paper">
-            <span className="mb-2 block text-[11px] font-bold uppercase tracking-[0.14em] text-paper/80">
-              Difference in your favour
-            </span>
-            <div className="tabular-figures font-display text-4xl font-extrabold leading-none">{inr(animSaving)}</div>
-            <p className="mt-2 text-sm text-paper/85">
-              By choosing the {result.newBetter ? "new" : "old"} regime · assumes ₹1,50,000 under 80C
-            </p>
+        <div className="rounded-[1.5rem] bg-credit p-7 text-paper">
+          <span className="mb-2 block text-[11px] font-bold uppercase tracking-[0.14em] text-paper/80">
+            Difference in your favour
+          </span>
+          <div className="tabular-figures font-display text-4xl font-extrabold leading-none">{inr(animSaving)}</div>
+          <p className="mt-2 text-sm text-paper/85">
+            By choosing the {result.newBetter ? "new" : "old"} regime · assumes ₹1,50,000 under 80C
+          </p>
+        </div>
+        <div className="rounded-2xl bg-paper p-5">
+          <div className="mb-3 flex items-center justify-between">
+            <span className="text-sm font-medium">Old regime tax</span>
+            <span className="tabular-figures font-display text-lg font-bold">{inr(result.oldTax)}</span>
           </div>
-          <div className="rounded-2xl bg-paper p-5">
-            <div className="mb-3 flex items-center justify-between">
-              <span className="text-sm font-medium text-credit">New regime tax</span>
-              <span className="tabular-figures font-display text-lg font-bold text-credit">{inr(result.newTax)}</span>
-            </div>
-            <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
-              <div className="h-full rounded-full bg-credit transition-[width] duration-500" style={{ width: `${newPct}%` }} />
-            </div>
+          <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
+            <div className="h-full rounded-full bg-ink transition-[width] duration-500" style={{ width: `${oldPct}%` }} />
+          </div>
+        </div>
+        <div className="rounded-2xl bg-paper p-5">
+          <div className="mb-3 flex items-center justify-between">
+            <span className="text-sm font-medium text-credit">New regime tax</span>
+            <span className="tabular-figures font-display text-lg font-bold text-credit">{inr(result.newTax)}</span>
+          </div>
+          <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
+            <div className="h-full rounded-full bg-credit transition-[width] duration-500" style={{ width: `${newPct}%` }} />
           </div>
         </div>
       </div>
