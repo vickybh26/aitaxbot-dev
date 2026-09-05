@@ -34,7 +34,7 @@ export function LoadingState({
   return (
     <div className={`flex items-center justify-center space-x-2 ${className}`} data-testid="loading-state">
       {getIcon()}
-      <span className="text-neutral-600 animate-pulse">{message}</span>
+      <span className="text-ink/65 animate-pulse">{message}</span>
     </div>
   );
 }
@@ -43,10 +43,10 @@ export function LoadingState({
 export function CalculatorSkeleton() {
   return (
     <div className="space-y-4 p-6">
-      <div className="h-4 bg-neutral-200 rounded animate-pulse w-3/4"></div>
-      <div className="h-10 bg-neutral-200 rounded animate-pulse"></div>
-      <div className="h-4 bg-neutral-200 rounded animate-pulse w-1/2"></div>
-      <div className="h-10 bg-neutral-200 rounded animate-pulse"></div>
+      <div className="h-4 bg-secondary rounded animate-pulse w-3/4"></div>
+      <div className="h-10 bg-secondary rounded animate-pulse"></div>
+      <div className="h-4 bg-secondary rounded animate-pulse w-1/2"></div>
+      <div className="h-10 bg-secondary rounded animate-pulse"></div>
       <div className="h-12 bg-primary/20 rounded animate-pulse"></div>
     </div>
   );
@@ -55,11 +55,11 @@ export function CalculatorSkeleton() {
 export function CardSkeleton() {
   return (
     <div className="p-6 space-y-4">
-      <div className="w-16 h-16 bg-neutral-200 rounded-xl animate-pulse"></div>
-      <div className="h-6 bg-neutral-200 rounded animate-pulse w-3/4"></div>
-      <div className="h-4 bg-neutral-200 rounded animate-pulse"></div>
-      <div className="h-4 bg-neutral-200 rounded animate-pulse w-2/3"></div>
-      <div className="h-10 bg-neutral-200 rounded animate-pulse"></div>
+      <div className="w-16 h-16 bg-secondary rounded-xl animate-pulse"></div>
+      <div className="h-6 bg-secondary rounded animate-pulse w-3/4"></div>
+      <div className="h-4 bg-secondary rounded animate-pulse"></div>
+      <div className="h-4 bg-secondary rounded animate-pulse w-2/3"></div>
+      <div className="h-10 bg-secondary rounded animate-pulse"></div>
     </div>
   );
 }

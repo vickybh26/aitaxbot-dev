@@ -51,7 +51,7 @@ const DEFAULTS = {
     rate: 9.25,
     label: "Four-Wheeler",
     emoji: "🚗",
-    color: "from-persian-blue-600 to-persian-blue-700",
+    color: "from-ink to-credit",
     accent: "blue",
     typical: "Typical range: ₹5,00,000 – ₹40,00,000 (hatchback to SUV)",
     rateNote: "Car loan rates: 8.5–12% p.a. Top PSU banks start at 8.35%",
@@ -139,11 +139,11 @@ export default function VehicleLoanCalculator() {
   const d = DEFAULTS[vehicleType];
   const loanAmount = Math.max(0, onRoadPrice - downPayment);
   const downPct = onRoadPrice > 0 ? ((downPayment / onRoadPrice) * 100).toFixed(1) : "0";
-  const accentBtn = vehicleType === "four-wheeler" ? "bg-persian-blue-700 hover:bg-persian-blue-800" : "bg-orange-500 hover:bg-orange-600";
-  const accentBg = vehicleType === "four-wheeler" ? "bg-blue-50 border-blue-200 text-blue-700" : "bg-orange-50 border-orange-200 text-orange-600";
+  const accentBtn = vehicleType === "four-wheeler" ? "bg-ink hover:bg-credit" : "bg-orange-500 hover:bg-orange-600";
+  const accentBg = vehicleType === "four-wheeler" ? "bg-secondary border-rule text-ink" : "bg-orange-50 border-orange-200 text-orange-600";
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+    <div className="bg-card rounded-xl shadow-sm border border-rule overflow-hidden">
       {/* Vehicle type toggle */}
       <div className={`bg-gradient-to-r ${d.color} p-6`}>
         <div className="flex gap-3 mb-4">
@@ -153,8 +153,8 @@ export default function VehicleLoanCalculator() {
               onClick={() => switchVehicle(type)}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-sm transition-all ${
                 vehicleType === type
-                  ? "bg-white text-slate-900 shadow-md"
-                  : "bg-white/20 text-white hover:bg-white/30"
+                  ? "bg-card text-ink shadow-md"
+                  : "bg-card/20 text-white hover:bg-card/30"
               }`}
             >
               <span>{DEFAULTS[type].emoji}</span>
@@ -181,14 +181,14 @@ export default function VehicleLoanCalculator() {
 
         {/* Rate Type Toggle */}
         <div className="flex items-center gap-3">
-          <span className="text-sm font-medium text-slate-700">Interest Rate Type:</span>
-          <div className="flex bg-white border border-slate-200 rounded-lg p-0.5 gap-0.5">
+          <span className="text-sm font-medium text-ink/80">Interest Rate Type:</span>
+          <div className="flex bg-card border border-rule rounded-lg p-0.5 gap-0.5">
             <button
               onClick={() => { setRateType("reducing"); setResult(null); }}
               className={`px-4 py-1.5 rounded-md text-sm font-semibold transition-all ${
                 rateType === "reducing"
                   ? "bg-green-600 text-white shadow-sm"
-                  : "text-slate-600 hover:text-slate-900"
+                  : "text-ink/65 hover:text-ink"
               }`}
             >
               Reducing Balance
@@ -198,7 +198,7 @@ export default function VehicleLoanCalculator() {
               className={`px-4 py-1.5 rounded-md text-sm font-semibold transition-all ${
                 rateType === "flat"
                   ? "bg-red-500 text-white shadow-sm"
-                  : "text-slate-600 hover:text-slate-900"
+                  : "text-ink/65 hover:text-ink"
               }`}
             >
               Flat Rate
@@ -238,7 +238,7 @@ export default function VehicleLoanCalculator() {
           {/* Inputs */}
           <div className="space-y-4">
             <div>
-              <Label className="text-sm font-medium text-slate-700">On-Road Price (₹)</Label>
+              <Label className="text-sm font-medium text-ink/80">On-Road Price (₹)</Label>
               <Input
                 type="number"
                 inputMode="numeric"
@@ -246,11 +246,11 @@ export default function VehicleLoanCalculator() {
                 onChange={e => setOnRoadPrice(Number(e.target.value))}
                 className="mt-1"
               />
-              <p className="text-xs text-slate-500 mt-1">Include ex-showroom + RTO + insurance + accessories</p>
+              <p className="text-xs text-ink/55 mt-1">Include ex-showroom + RTO + insurance + accessories</p>
             </div>
             <div>
-              <Label className="text-sm font-medium text-slate-700">
-                Down Payment (₹) <span className="text-slate-500 font-normal">— {downPct}% of price</span>
+              <Label className="text-sm font-medium text-ink/80">
+                Down Payment (₹) <span className="text-ink/55 font-normal">— {downPct}% of price</span>
               </Label>
               <Input
                 type="number"
@@ -259,7 +259,7 @@ export default function VehicleLoanCalculator() {
                 onChange={e => setDownPayment(Number(e.target.value))}
                 className="mt-1"
               />
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-ink/55 mt-1">
                 {vehicleType === "two-wheeler"
                   ? "Banks offer up to 90% financing on two-wheelers"
                   : "Banks offer up to 85–90% financing on cars"}
@@ -267,7 +267,7 @@ export default function VehicleLoanCalculator() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label className="text-sm font-medium text-slate-700">Tenure (Years)</Label>
+                <Label className="text-sm font-medium text-ink/80">Tenure (Years)</Label>
                 <Input
                   type="number"
                   inputMode="numeric"
@@ -277,10 +277,10 @@ export default function VehicleLoanCalculator() {
                   min={1}
                   max={vehicleType === "two-wheeler" ? 5 : 7}
                 />
-                <p className="text-xs text-slate-500 mt-1">Max {vehicleType === "two-wheeler" ? "5" : "7"} years</p>
+                <p className="text-xs text-ink/55 mt-1">Max {vehicleType === "two-wheeler" ? "5" : "7"} years</p>
               </div>
               <div>
-                <Label className="text-sm font-medium text-slate-700">
+                <Label className="text-sm font-medium text-ink/80">
                   Interest Rate (% p.a.)
                   <span className={`ml-1 text-xs font-normal px-1.5 py-0.5 rounded ${rateType === "reducing" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
                     {rateType === "reducing" ? "Reducing" : "Flat"}
@@ -296,12 +296,12 @@ export default function VehicleLoanCalculator() {
                 />
               </div>
             </div>
-            <p className="text-xs text-slate-500">{d.rateNote}</p>
+            <p className="text-xs text-ink/55">{d.rateNote}</p>
 
-            <div className="bg-slate-50 rounded-lg p-3 text-sm">
-              <div className="flex justify-between text-slate-600">
+            <div className="bg-secondary rounded-lg p-3 text-sm">
+              <div className="flex justify-between text-ink/65">
                 <span>Loan Amount:</span>
-                <span className="font-semibold text-slate-900">{formatINR(loanAmount)}</span>
+                <span className="font-semibold text-ink">{formatINR(loanAmount)}</span>
               </div>
             </div>
 
@@ -321,70 +321,70 @@ export default function VehicleLoanCalculator() {
               <div className="space-y-4">
                 {/* EMI highlight */}
                 <div className={`rounded-xl p-5 text-center border ${accentBg}`}>
-                  <p className="text-sm text-slate-600 mb-1">
+                  <p className="text-sm text-ink/65 mb-1">
                     Your Monthly EMI
                     <span className={`ml-2 text-xs px-1.5 py-0.5 rounded font-semibold ${result.rateType === "reducing" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
                       {result.rateType === "reducing" ? "Reducing Balance" : "Flat Rate"}
                     </span>
                   </p>
-                  <p className={`text-4xl font-bold mb-1 ${vehicleType === "four-wheeler" ? "text-blue-700" : "text-orange-600"}`}>
+                  <p className={`text-4xl font-bold mb-1 ${vehicleType === "four-wheeler" ? "text-ink" : "text-orange-600"}`}>
                     {formatINR(result.emi)}
                   </p>
-                  <p className="text-xs text-slate-500">for {tenure} years at {rate}% p.a. ({result.rateType === "reducing" ? "reducing balance" : "flat rate"})</p>
+                  <p className="text-xs text-ink/55">for {tenure} years at {rate}% p.a. ({result.rateType === "reducing" ? "reducing balance" : "flat rate"})</p>
                 </div>
 
                 {/* Breakdown */}
-                <div className="bg-slate-50 rounded-xl p-4 space-y-2 text-sm">
-                  <h4 className="font-bold text-slate-900 mb-3">Loan Breakdown</h4>
+                <div className="bg-secondary rounded-xl p-4 space-y-2 text-sm">
+                  <h4 className="font-bold text-ink mb-3">Loan Breakdown</h4>
                   <div className="flex justify-between">
-                    <span className="text-slate-600">On-Road Price:</span>
+                    <span className="text-ink/65">On-Road Price:</span>
                     <span className="font-semibold">{formatINR(onRoadPrice)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Down Payment ({result.downPaymentPct.toFixed(1)}%):</span>
+                    <span className="text-ink/65">Down Payment ({result.downPaymentPct.toFixed(1)}%):</span>
                     <span className="font-semibold text-green-700">− {formatINR(downPayment)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Loan Amount:</span>
+                    <span className="text-ink/65">Loan Amount:</span>
                     <span className="font-semibold">{formatINR(result.loanAmount)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Total Interest:</span>
+                    <span className="text-ink/65">Total Interest:</span>
                     <span className="font-semibold text-orange-600">{formatINR(result.totalInterest)}</span>
                   </div>
-                  <div className="flex justify-between border-t border-slate-200 pt-2">
-                    <span className="text-slate-700 font-medium">Total Amount Payable:</span>
+                  <div className="flex justify-between border-t border-rule pt-2">
+                    <span className="text-ink/80 font-medium">Total Amount Payable:</span>
                     <span className="font-bold">{formatINR(result.totalPayment)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Interest as % of loan:</span>
-                    <span className="font-semibold text-slate-700">{((result.totalInterest / result.loanAmount) * 100).toFixed(1)}%</span>
+                    <span className="text-ink/65">Interest as % of loan:</span>
+                    <span className="font-semibold text-ink/80">{((result.totalInterest / result.loanAmount) * 100).toFixed(1)}%</span>
                   </div>
                 </div>
 
                 {/* Side-by-side comparison */}
-                <div className="rounded-xl border border-slate-200 overflow-hidden">
-                  <div className="bg-slate-800 text-white text-xs font-bold px-4 py-2">
+                <div className="rounded-xl border border-rule overflow-hidden">
+                  <div className="bg-ink text-white text-xs font-bold px-4 py-2">
                     📊 Same {rate}% Rate — Reducing vs Flat Comparison
                   </div>
-                  <div className="grid grid-cols-2 divide-x divide-slate-200">
-                    <div className={`p-3 text-xs ${result.rateType === "reducing" ? "bg-green-50" : "bg-white"}`}>
+                  <div className="grid grid-cols-2 divide-x divide-rule">
+                    <div className={`p-3 text-xs ${result.rateType === "reducing" ? "bg-green-50" : "bg-card"}`}>
                       <p className="font-bold text-green-700 mb-2 flex items-center gap-1">
                         ✅ Reducing Balance
                         {result.rateType === "reducing" && <span className="bg-green-600 text-white px-1.5 rounded text-[10px]">Selected</span>}
                       </p>
-                      <div className="space-y-1 text-slate-700">
+                      <div className="space-y-1 text-ink/80">
                         <div className="flex justify-between"><span>EMI:</span><span className="font-bold">{formatINR(result.reducingEmi)}</span></div>
                         <div className="flex justify-between"><span>Total Interest:</span><span className="font-bold text-green-700">{formatINR(result.reducingInterest)}</span></div>
                         <div className="flex justify-between"><span>Total Payable:</span><span className="font-bold">{formatINR(result.reducingTotal)}</span></div>
                       </div>
                     </div>
-                    <div className={`p-3 text-xs ${result.rateType === "flat" ? "bg-red-50" : "bg-white"}`}>
+                    <div className={`p-3 text-xs ${result.rateType === "flat" ? "bg-red-50" : "bg-card"}`}>
                       <p className="font-bold text-red-600 mb-2 flex items-center gap-1">
                         🚨 Flat Rate
                         {result.rateType === "flat" && <span className="bg-red-500 text-white px-1.5 rounded text-[10px]">Selected</span>}
                       </p>
-                      <div className="space-y-1 text-slate-700">
+                      <div className="space-y-1 text-ink/80">
                         <div className="flex justify-between"><span>EMI:</span><span className="font-bold">{formatINR(result.flatEmi)}</span></div>
                         <div className="flex justify-between"><span>Total Interest:</span><span className="font-bold text-red-600">{formatINR(result.flatInterest)}</span></div>
                         <div className="flex justify-between"><span>Total Payable:</span><span className="font-bold">{formatINR(result.flatTotal)}</span></div>
@@ -392,7 +392,7 @@ export default function VehicleLoanCalculator() {
                     </div>
                   </div>
                   {/* Extra interest from flat rate */}
-                  <div className="bg-slate-100 px-4 py-2.5 text-xs text-slate-800 text-center border-t border-slate-200">
+                  <div className="bg-secondary px-4 py-2.5 text-xs text-ink text-center border-t border-rule">
                     <strong>Flat rate costs you {formatINR(result.flatInterest - result.reducingInterest)} more in interest</strong> than reducing balance at the same quoted rate.
                     {result.flatInterest > result.reducingInterest && (
                       <span className="ml-1">({(((result.flatInterest - result.reducingInterest) / result.reducingInterest) * 100).toFixed(0)}% extra)</span>
@@ -407,10 +407,10 @@ export default function VehicleLoanCalculator() {
                 </div>
               </div>
             ) : (
-              <div className="flex items-center justify-center h-full min-h-[260px] bg-slate-50 rounded-xl border border-dashed border-slate-300">
-                <div className="text-center text-slate-500">
+              <div className="flex items-center justify-center h-full min-h-[260px] bg-secondary rounded-xl border border-dashed border-rule">
+                <div className="text-center text-ink/55">
                   <div className="text-5xl mb-3">{d.emoji}</div>
-                  <p className="font-medium text-slate-500">Enter details and click Calculate</p>
+                  <p className="font-medium text-ink/55">Enter details and click Calculate</p>
                   <p className="text-sm mt-1">Compare Reducing vs Flat rate impact</p>
                 </div>
               </div>

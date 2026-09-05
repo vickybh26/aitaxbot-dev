@@ -29,7 +29,7 @@ export function LastUpdated({
         return {
           label: "Data updated",
           icon: <TrendingUp className="w-3 h-3" />,
-          color: "text-blue-600"
+          color: "text-credit"
         };
       case "rates":
         return {
@@ -41,7 +41,7 @@ export function LastUpdated({
         return {
           label: "Last updated",
           icon: <Clock className="w-3 h-3" />,
-          color: "text-neutral-500"
+          color: "text-ink/55"
         };
     }
   };

@@ -125,7 +125,7 @@ export default function Login() {
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-slate-600">Loading...</p>
+          <p className="mt-4 text-ink/65">Loading...</p>
         </div>
       </div>
     );
@@ -139,18 +139,18 @@ export default function Login() {
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
       
-      <div className="bg-gradient-to-br from-blue-50 via-white to-slate-50">
+      <div className="bg-gradient-to-br from-blue-50 via-white to-paper">
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
             <div className="flex items-center justify-center gap-2 mb-4">
-              <Calculator className="h-10 w-10 text-blue-600" />
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-persian-blue-600 to-green-600 bg-clip-text text-transparent">
+              <Calculator className="h-10 w-10 text-credit" />
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-ink to-green-600 bg-clip-text text-transparent">
                 AiTaxBot
               </h1>
             </div>
-            <p className="text-xl text-slate-600">
+            <p className="text-xl text-ink/65">
               India's Smartest Income Tax Filing Platform
             </p>
           </div>
@@ -158,16 +158,16 @@ export default function Login() {
           <div className="grid md:grid-cols-2 gap-8 items-center">
             {/* Features Section */}
             <div className="space-y-6">
-              <h2 className="text-3xl font-bold text-slate-900">
+              <h2 className="text-3xl font-bold text-ink">
                 Complete Financial Management Solution
               </h2>
               
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
-                  <Calculator className="h-6 w-6 text-blue-600 mt-1" />
+                  <Calculator className="h-6 w-6 text-credit mt-1" />
                   <div>
-                    <h3 className="font-semibold text-slate-900">Tax Calculators</h3>
-                    <p className="text-slate-600">
+                    <h3 className="font-semibold text-ink">Tax Calculators</h3>
+                    <p className="text-ink/65">
                       Income Tax, HRA, SIP/SWP calculators with regime comparison
                     </p>
                   </div>
@@ -176,18 +176,18 @@ export default function Login() {
                 <div className="flex items-start gap-3">
                   <FileText className="h-6 w-6 text-green-600 mt-1" />
                   <div>
-                    <h3 className="font-semibold text-slate-900">GST Invoicing & Accounting</h3>
-                    <p className="text-slate-600">
+                    <h3 className="font-semibold text-ink">GST Invoicing & Accounting</h3>
+                    <p className="text-ink/65">
                       Create GST-compliant invoices, manage clients, and generate sales registers
                     </p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <TrendingUp className="h-6 w-6 text-persian-blue-700 mt-1" />
+                  <TrendingUp className="h-6 w-6 text-ink mt-1" />
                   <div>
-                    <h3 className="font-semibold text-slate-900">Market Data & Analytics</h3>
-                    <p className="text-slate-600">
+                    <h3 className="font-semibold text-ink">Market Data & Analytics</h3>
+                    <p className="text-ink/65">
                       Real-time Indian stock market data and investment tools
                     </p>
                   </div>
@@ -244,7 +244,7 @@ export default function Login() {
                       <span className="w-full border-t" />
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-white px-2 text-slate-500">Or continue with</span>
+                      <span className="bg-card px-2 text-ink/55">Or continue with</span>
                     </div>
                   </div>
 
@@ -303,23 +303,23 @@ export default function Login() {
                         minLength={6}
                         data-testid="input-signup-password"
                       />
-                      <p className="text-xs text-slate-500 mt-1">Minimum 6 characters</p>
+                      <p className="text-xs text-ink/55 mt-1">Minimum 6 characters</p>
                     </div>
                     <label className="flex items-start gap-2 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={signupConsent}
                         onChange={(e) => setSignupConsent(e.target.checked)}
-                        className="mt-0.5 h-4 w-4 rounded border-slate-300"
+                        className="mt-0.5 h-4 w-4 rounded border-rule"
                         data-testid="checkbox-signup-consent"
                       />
-                      <span className="text-xs text-slate-600">
+                      <span className="text-xs text-ink/65">
                         I agree to AiTaxBot's{" "}
-                        <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                        <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-credit hover:underline">
                           Privacy Policy
                         </a>{" "}
                         and{" "}
-                        <a href="/terms-of-service" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                        <a href="/terms-of-service" target="_blank" rel="noopener noreferrer" className="text-credit hover:underline">
                           Terms of Service
                         </a>.
                       </span>
@@ -339,7 +339,7 @@ export default function Login() {
                       <span className="w-full border-t" />
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-white px-2 text-slate-500">Or continue with</span>
+                      <span className="bg-card px-2 text-ink/55">Or continue with</span>
                     </div>
                   </div>
 

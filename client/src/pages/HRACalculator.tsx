@@ -79,7 +79,7 @@ export default function HRACalculatorPage() {
         <script type="application/ld+json">{JSON.stringify(organizationSchema)}</script>
       </Helmet>
 
-      <div className="bg-white">
+      <div className="bg-card">
 
         <CalcPageHeader
           title="HRA Exemption Calculator FY 2026-27"
@@ -122,23 +122,23 @@ export default function HRACalculatorPage() {
         </section>
 
         {/* SEO Content */}
-        <section className="py-12 px-6 bg-white">
+        <section className="py-12 px-6 bg-card">
           <div className="max-w-6xl mx-auto">
 
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">Understanding HRA Exemption — Section 10(13A)</h2>
+            <h2 className="text-2xl font-bold text-ink mb-6">Understanding HRA Exemption — Section 10(13A)</h2>
 
             <div className="grid md:grid-cols-2 gap-8 mb-8">
               <div>
-                <h3 className="text-xl font-semibold text-slate-900 mb-3">What is HRA?</h3>
-                <p className="text-slate-600">
+                <h3 className="text-xl font-semibold text-ink mb-3">What is HRA?</h3>
+                <p className="text-ink/65">
                   House Rent Allowance (HRA) is a component of your salary provided by employers to offset
                   accommodation expenses. It is partially or fully exempt from income tax under Section 10(13A)
                   based on a formula involving your basic salary, rent paid, and city of residence.
                 </p>
               </div>
               <div>
-                <h3 className="text-xl font-semibold text-slate-900 mb-3">Who Can Claim HRA?</h3>
-                <p className="text-slate-600">
+                <h3 className="text-xl font-semibold text-ink mb-3">Who Can Claim HRA?</h3>
+                <p className="text-ink/65">
                   Salaried individuals living in rented accommodation can claim HRA exemption. You must receive HRA
                   as an explicit component of your salary structure and actually pay rent to a landlord (or parents,
                   with proper documentation). Self-employed and business owners cannot claim HRA.
@@ -147,46 +147,46 @@ export default function HRACalculatorPage() {
             </div>
 
             {/* HRA Exemption Formula */}
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">The HRA Exemption Formula — 3-Part Minimum Rule</h2>
-            <div className="bg-blue-50 border border-blue-100 rounded-xl p-6 mb-8">
-              <p className="text-slate-700 font-semibold mb-4">
+            <h2 className="text-2xl font-bold text-ink mb-4">The HRA Exemption Formula — 3-Part Minimum Rule</h2>
+            <div className="bg-secondary border border-rule rounded-xl p-6 mb-8">
+              <p className="text-ink/80 font-semibold mb-4">
                 HRA exemption is <strong>the minimum of these three amounts</strong>:
               </p>
               <div className="space-y-3 mb-4">
                 <div className="flex gap-3">
-                  <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">①</div>
+                  <div className="flex-shrink-0 w-8 h-8 bg-ink text-white rounded-full flex items-center justify-center font-bold text-sm">①</div>
                   <div>
-                    <p className="font-semibold text-slate-900">Actual HRA Received</p>
-                    <p className="text-sm text-slate-600">The HRA component paid by your employer in the financial year.</p>
+                    <p className="font-semibold text-ink">Actual HRA Received</p>
+                    <p className="text-sm text-ink/65">The HRA component paid by your employer in the financial year.</p>
                   </div>
                 </div>
                 <div className="flex gap-3">
-                  <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">②</div>
+                  <div className="flex-shrink-0 w-8 h-8 bg-ink text-white rounded-full flex items-center justify-center font-bold text-sm">②</div>
                   <div>
-                    <p className="font-semibold text-slate-900">Rent Paid − 10% of Basic Salary</p>
-                    <p className="text-sm text-slate-600">Total annual rent paid to landlord, minus 10% of your basic salary (both annual figures).</p>
+                    <p className="font-semibold text-ink">Rent Paid − 10% of Basic Salary</p>
+                    <p className="text-sm text-ink/65">Total annual rent paid to landlord, minus 10% of your basic salary (both annual figures).</p>
                   </div>
                 </div>
                 <div className="flex gap-3">
-                  <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">③</div>
+                  <div className="flex-shrink-0 w-8 h-8 bg-ink text-white rounded-full flex items-center justify-center font-bold text-sm">③</div>
                   <div>
-                    <p className="font-semibold text-slate-900">50% (Metro) or 40% (Non-Metro) of Basic Salary</p>
-                    <p className="text-sm text-slate-600">
+                    <p className="font-semibold text-ink">50% (Metro) or 40% (Non-Metro) of Basic Salary</p>
+                    <p className="text-sm text-ink/65">
                       50% of basic salary for the 8 metro cities (Mumbai, Delhi, Kolkata, Chennai, Hyderabad,
                       Bengaluru, Pune, Ahmedabad — see below), or 40% for all other non-metro cities.
                     </p>
                   </div>
                 </div>
               </div>
-              <p className="text-sm text-slate-700 font-semibold bg-slate-50 border-l-4 border-blue-400 pl-3 py-2 rounded-r">
+              <p className="text-sm text-ink/80 font-semibold bg-secondary border-l-4 border-blue-400 pl-3 py-2 rounded-r">
                 The lowest of these three values is your HRA exemption. Most often, component ② (Rent − 10% of basic) is the binding constraint.
               </p>
             </div>
 
             {/* Metro vs Non-Metro */}
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">Metro vs Non-Metro Cities — Updated for FY 2026-27</h2>
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
-              <p className="text-sm text-blue-900 font-semibold">
+            <h2 className="text-2xl font-bold text-ink mb-2">Metro vs Non-Metro Cities — Updated for FY 2026-27</h2>
+            <div className="bg-secondary border border-rule rounded-xl p-4 mb-4">
+              <p className="text-sm text-ink font-semibold">
                 🆕 Rule Change from FY 2026-27 (IT Rules 2026, Rule 279): The list of metro cities for HRA has expanded from 4 to 8.
                 Bengaluru, Hyderabad, Pune and Ahmedabad are now metro cities — qualifying for 50% HRA cap instead of 40%.
                 This change applies to FY 2026-27 onwards. For FY 2025-26 and earlier, only the original 4 cities applied.
@@ -197,7 +197,7 @@ export default function HRACalculatorPage() {
                 <h3 className="text-lg font-bold text-green-800 mb-3">8 Metro Cities (50% cap) — FY 2026-27 onwards</h3>
                 <div className="grid grid-cols-2 gap-2">
                   {["Mumbai", "Delhi (NCT)", "Kolkata", "Chennai", "Bengaluru", "Hyderabad", "Pune", "Ahmedabad"].map(city => (
-                    <div key={city} className="flex gap-2 text-sm text-slate-700">
+                    <div key={city} className="flex gap-2 text-sm text-ink/80">
                       <span className="text-green-600 font-bold">✓</span>
                       <span>{city}</span>
                     </div>
@@ -209,10 +209,10 @@ export default function HRACalculatorPage() {
               </div>
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
                 <h3 className="text-lg font-bold text-amber-800 mb-3">All Other Cities (40% cap)</h3>
-                <p className="text-sm text-slate-700 mb-3">
+                <p className="text-sm text-ink/80 mb-3">
                   Every city not in the 8-metro list qualifies for 40% of basic salary:
                 </p>
-                <ul className="space-y-2 text-sm text-slate-700">
+                <ul className="space-y-2 text-sm text-ink/80">
                   <li className="flex gap-2">
                     <span className="text-amber-600 font-bold">→</span>
                     <span>Chandigarh, Jaipur, Lucknow, Surat</span>
@@ -233,165 +233,165 @@ export default function HRACalculatorPage() {
             </div>
 
             {/* Worked Examples */}
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Worked Examples</h2>
+            <h2 className="text-2xl font-bold text-ink mb-4">Worked Examples</h2>
             <div className="grid md:grid-cols-2 gap-6 mb-8">
 
               {/* Example 1: Mumbai Metro */}
-              <div className="bg-slate-50 border rounded-xl p-6">
-                <h3 className="font-bold text-slate-900 mb-3">Example 1 — Mumbai Metro Employee</h3>
-                <div className="space-y-1 text-sm text-slate-700">
+              <div className="bg-secondary border rounded-xl p-6">
+                <h3 className="font-bold text-ink mb-3">Example 1 — Mumbai Metro Employee</h3>
+                <div className="space-y-1 text-sm text-ink/80">
                   <div className="flex justify-between"><span>Basic Salary (annual):</span><span className="font-semibold">₹6,00,000</span></div>
                   <div className="flex justify-between"><span>HRA received (annual):</span><span className="font-semibold">₹3,00,000</span></div>
                   <div className="flex justify-between"><span>Rent paid (annual):</span><span className="font-semibold">₹2,40,000</span></div>
-                  <div className="border-t border-slate-300 my-2"></div>
+                  <div className="border-t border-rule my-2"></div>
                   <div className="flex justify-between"><span>① Actual HRA:</span><span className="font-semibold">₹3,00,000</span></div>
                   <div className="flex justify-between"><span>② Rent − 10% basic:</span><span className="font-semibold">₹1,80,000</span></div>
                   <div className="flex justify-between"><span>③ 50% of basic (metro):</span><span className="font-semibold">₹3,00,000</span></div>
-                  <div className="border-t border-slate-300 my-2"></div>
+                  <div className="border-t border-rule my-2"></div>
                   <div className="flex justify-between"><span className="font-bold text-green-700">HRA Exempt (min):</span><span className="font-bold text-green-700">₹1,80,000</span></div>
                 </div>
               </div>
 
               {/* Example 2: Hyderabad now Metro FY 2026-27 */}
-              <div className="bg-slate-50 border rounded-xl p-6">
-                <h3 className="font-bold text-slate-900 mb-3">Example 2 — Hyderabad (Now Metro from FY 2026-27!)</h3>
-                <div className="space-y-1 text-sm text-slate-700">
+              <div className="bg-secondary border rounded-xl p-6">
+                <h3 className="font-bold text-ink mb-3">Example 2 — Hyderabad (Now Metro from FY 2026-27!)</h3>
+                <div className="space-y-1 text-sm text-ink/80">
                   <div className="flex justify-between"><span>Basic Salary (annual):</span><span className="font-semibold">₹10,00,000</span></div>
                   <div className="flex justify-between"><span>HRA received (annual):</span><span className="font-semibold">₹5,00,000</span></div>
                   <div className="flex justify-between"><span>Rent paid (annual):</span><span className="font-semibold">₹4,80,000</span></div>
-                  <div className="border-t border-slate-300 my-2"></div>
+                  <div className="border-t border-rule my-2"></div>
                   <div className="flex justify-between"><span>① Actual HRA:</span><span className="font-semibold">₹5,00,000</span></div>
                   <div className="flex justify-between"><span>② Rent − 10% basic:</span><span className="font-semibold">₹3,80,000</span></div>
                   <div className="flex justify-between text-green-700"><span>③ 50% of basic (METRO now!):</span><span className="font-semibold">₹5,00,000</span></div>
-                  <div className="border-t border-slate-300 my-2"></div>
+                  <div className="border-t border-rule my-2"></div>
                   <div className="flex justify-between"><span className="font-bold text-green-700">HRA Exempt (min):</span><span className="font-bold text-green-700">₹3,80,000</span></div>
-                  <div className="text-xs text-blue-700 mt-2">📌 Under old rules (FY 2025-26), ③ would have been 40% = ₹4,00,000. Same result here, but at higher incomes the 50% cap gives more exemption.</div>
+                  <div className="text-xs text-ink mt-2">📌 Under old rules (FY 2025-26), ③ would have been 40% = ₹4,00,000. Same result here, but at higher incomes the 50% cap gives more exemption.</div>
                 </div>
               </div>
 
               {/* Example 3: Rent to Parents */}
-              <div className="bg-slate-50 border rounded-xl p-6">
-                <h3 className="font-bold text-slate-900 mb-3">Example 3 — Rent to Parents Strategy</h3>
-                <div className="space-y-1 text-sm text-slate-700">
+              <div className="bg-secondary border rounded-xl p-6">
+                <h3 className="font-bold text-ink mb-3">Example 3 — Rent to Parents Strategy</h3>
+                <div className="space-y-1 text-sm text-ink/80">
                   <div className="flex justify-between"><span>Rent paid to parents (annual):</span><span className="font-semibold">₹1,80,000</span></div>
-                  <div className="flex justify-between"><span>Child's HRA exemption (formula):</span><span className="font-semibold text-blue-700">₹1,20,000–₹1,80,000</span></div>
-                  <div className="flex justify-between"><span>Tax saved (child, 30% slab):</span><span className="font-semibold text-blue-700">~₹37,000–₹56,000</span></div>
-                  <div className="border-t border-slate-300 my-2"></div>
+                  <div className="flex justify-between"><span>Child's HRA exemption (formula):</span><span className="font-semibold text-ink">₹1,20,000–₹1,80,000</span></div>
+                  <div className="flex justify-between"><span>Tax saved (child, 30% slab):</span><span className="font-semibold text-ink">~₹37,000–₹56,000</span></div>
+                  <div className="border-t border-rule my-2"></div>
                   <div className="flex justify-between"><span>Parents declare rental income:</span><span className="font-semibold">₹1,80,000</span></div>
-                  <div className="flex justify-between"><span>Parents' tax (senior, 0% up to ₹3L):</span><span className="font-semibold text-blue-700">₹0</span></div>
+                  <div className="flex justify-between"><span>Parents' tax (senior, 0% up to ₹3L):</span><span className="font-semibold text-ink">₹0</span></div>
                 </div>
               </div>
 
               {/* Example 4: HRA + Home Loan */}
-              <div className="bg-slate-50 border rounded-xl p-6">
-                <h3 className="font-bold text-slate-900 mb-3">Example 4 — HRA + Home Loan Together</h3>
-                <div className="space-y-1 text-sm text-slate-700">
+              <div className="bg-secondary border rounded-xl p-6">
+                <h3 className="font-bold text-ink mb-3">Example 4 — HRA + Home Loan Together</h3>
+                <div className="space-y-1 text-sm text-ink/80">
                   <div className="flex justify-between"><span>Lives in: Bangalore (rented)</span><span className="font-semibold">Claims HRA</span></div>
                   <div className="flex justify-between"><span>Owns flat in: Pune (rented out)</span><span className="font-semibold">Section 24(b)</span></div>
                   <div className="flex justify-between"><span>Home loan interest:</span><span className="font-semibold">₹2,00,000</span></div>
-                  <div className="border-t border-slate-300 my-2"></div>
-                  <div className="flex justify-between"><span className="font-bold text-persian-blue-800">HRA exemption:</span><span className="font-bold text-persian-blue-800">₹X (formula)</span></div>
-                  <div className="flex justify-between"><span className="font-bold text-persian-blue-800">Home loan deduction:</span><span className="font-bold text-persian-blue-800">₹2,00,000</span></div>
+                  <div className="border-t border-rule my-2"></div>
+                  <div className="flex justify-between"><span className="font-bold text-ink">HRA exemption:</span><span className="font-bold text-ink">₹X (formula)</span></div>
+                  <div className="flex justify-between"><span className="font-bold text-ink">Home loan deduction:</span><span className="font-bold text-ink">₹2,00,000</span></div>
                 </div>
               </div>
 
             </div>
 
             {/* Pro Tips */}
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Pro Tips on HRA — Maximize Your Exemption</h2>
+            <h2 className="text-2xl font-bold text-ink mb-4">Pro Tips on HRA — Maximize Your Exemption</h2>
             <div className="grid md:grid-cols-2 gap-4 mb-8">
-              <div className="flex gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <span className="text-blue-600 text-lg font-bold shrink-0">1</span>
+              <div className="flex gap-3 p-4 bg-secondary border border-rule rounded-lg">
+                <span className="text-credit text-lg font-bold shrink-0">1</span>
                 <div>
-                  <p className="font-semibold text-slate-900 text-sm">Bengaluru/Hyderabad/Pune/Ahmedabad are NOW metro from FY 2026-27 — use 50%</p>
-                  <p className="text-slate-600 text-sm mt-1">IT Rules 2026 (Rule 279) expanded the metro list from 4 to 8 cities. If you're in Bengaluru, Hyderabad, Pune or Ahmedabad, you now qualify for the 50% HRA cap from FY 2026-27 — a meaningful boost to your exemption. Make sure your employer has updated their payroll system.</p>
+                  <p className="font-semibold text-ink text-sm">Bengaluru/Hyderabad/Pune/Ahmedabad are NOW metro from FY 2026-27 — use 50%</p>
+                  <p className="text-ink/65 text-sm mt-1">IT Rules 2026 (Rule 279) expanded the metro list from 4 to 8 cities. If you're in Bengaluru, Hyderabad, Pune or Ahmedabad, you now qualify for the 50% HRA cap from FY 2026-27 — a meaningful boost to your exemption. Make sure your employer has updated their payroll system.</p>
                 </div>
               </div>
               <div className="flex gap-3 p-4 bg-amber-50 border border-amber-100 rounded-lg">
                 <span className="text-amber-600 text-lg font-bold shrink-0">2</span>
                 <div>
-                  <p className="font-semibold text-slate-900 text-sm">Increase your rent agreement to maximize exemption — it's legal</p>
-                  <p className="text-slate-600 text-sm mt-1">Component ② (Rent − 10% basic) is often the binding constraint. Paying higher genuine rent directly increases your HRA exemption. If you're under-renting relatives, adjust to market rate (with proper documentation).</p>
+                  <p className="font-semibold text-ink text-sm">Increase your rent agreement to maximize exemption — it's legal</p>
+                  <p className="text-ink/65 text-sm mt-1">Component ② (Rent − 10% basic) is often the binding constraint. Paying higher genuine rent directly increases your HRA exemption. If you're under-renting relatives, adjust to market rate (with proper documentation).</p>
                 </div>
               </div>
               <div className="flex gap-3 p-4 bg-amber-50 border border-amber-100 rounded-lg">
                 <span className="text-amber-600 text-lg font-bold shrink-0">3</span>
                 <div>
-                  <p className="font-semibold text-slate-900 text-sm">PAN mandatory for landlord if annual rent exceeds ₹1 lakh</p>
-                  <p className="text-slate-600 text-sm mt-1">If annual rent is more than ₹1,00,000, your employer requires landlord's PAN to process HRA exemption. Without it, TDS cannot be waived. Landlord can provide Form 60 self-declaration if no PAN.</p>
+                  <p className="font-semibold text-ink text-sm">PAN mandatory for landlord if annual rent exceeds ₹1 lakh</p>
+                  <p className="text-ink/65 text-sm mt-1">If annual rent is more than ₹1,00,000, your employer requires landlord's PAN to process HRA exemption. Without it, TDS cannot be waived. Landlord can provide Form 60 self-declaration if no PAN.</p>
                 </div>
               </div>
               <div className="flex gap-3 p-4 bg-amber-50 border border-amber-100 rounded-lg">
                 <span className="text-amber-600 text-lg font-bold shrink-0">4</span>
                 <div>
-                  <p className="font-semibold text-slate-900 text-sm">You CAN claim both HRA and home loan deduction together</p>
-                  <p className="text-slate-600 text-sm mt-1">This is valid if you rent where you work and own a property in a different city. Both claims must be genuine and documented. Use our Income Tax Calculator to verify savings across both regimes.</p>
+                  <p className="font-semibold text-ink text-sm">You CAN claim both HRA and home loan deduction together</p>
+                  <p className="text-ink/65 text-sm mt-1">This is valid if you rent where you work and own a property in a different city. Both claims must be genuine and documented. Use our Income Tax Calculator to verify savings across both regimes.</p>
                 </div>
               </div>
               <div className="flex gap-3 p-4 bg-amber-50 border border-amber-100 rounded-lg">
                 <span className="text-amber-600 text-lg font-bold shrink-0">5</span>
                 <div>
-                  <p className="font-semibold text-slate-900 text-sm">Rent to parents is legitimate — get a proper rent agreement</p>
-                  <p className="text-slate-600 text-sm mt-1">You can claim HRA for rent paid to parents. Ensure a written rent agreement exists, pay via bank, maintain receipts, and parents declare this income in their ITR. Parents' lower tax bracket = family saves more tax.</p>
+                  <p className="font-semibold text-ink text-sm">Rent to parents is legitimate — get a proper rent agreement</p>
+                  <p className="text-ink/65 text-sm mt-1">You can claim HRA for rent paid to parents. Ensure a written rent agreement exists, pay via bank, maintain receipts, and parents declare this income in their ITR. Parents' lower tax bracket = family saves more tax.</p>
                 </div>
               </div>
               <div className="flex gap-3 p-4 bg-amber-50 border border-amber-100 rounded-lg">
                 <span className="text-amber-600 text-lg font-bold shrink-0">6</span>
                 <div>
-                  <p className="font-semibold text-slate-900 text-sm">HRA only available under OLD tax regime — new regime gives nothing</p>
-                  <p className="text-slate-600 text-sm mt-1">Section 10(13A) HRA exemption applies only under the Old Tax Regime. Under the New Regime (default from FY 2023-24), your entire HRA is taxable. Always compare both regimes using our Income Tax Calculator.</p>
+                  <p className="font-semibold text-ink text-sm">HRA only available under OLD tax regime — new regime gives nothing</p>
+                  <p className="text-ink/65 text-sm mt-1">Section 10(13A) HRA exemption applies only under the Old Tax Regime. Under the New Regime (default from FY 2023-24), your entire HRA is taxable. Always compare both regimes using our Income Tax Calculator.</p>
                 </div>
               </div>
             </div>
 
             {/* HRA vs Standard Deduction / Regime Comparison */}
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">HRA vs Standard Deduction — New vs Old Regime Impact</h2>
+            <h2 className="text-2xl font-bold text-ink mb-4">HRA vs Standard Deduction — New vs Old Regime Impact</h2>
             <div className="overflow-x-auto mb-8">
               <table className="w-full border-collapse text-sm">
                 <thead>
-                  <tr className="bg-slate-100">
-                    <th className="border border-slate-200 p-3 text-left font-semibold">Feature</th>
-                    <th className="border border-slate-200 p-3 text-center font-semibold text-green-700">Old Regime (with HRA)</th>
-                    <th className="border border-slate-200 p-3 text-center font-semibold text-slate-700">New Regime (no HRA)</th>
+                  <tr className="bg-secondary">
+                    <th className="border border-rule p-3 text-left font-semibold">Feature</th>
+                    <th className="border border-rule p-3 text-center font-semibold text-green-700">Old Regime (with HRA)</th>
+                    <th className="border border-rule p-3 text-center font-semibold text-ink/80">New Regime (no HRA)</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td className="border border-slate-200 p-3 text-slate-700">HRA Exemption</td>
-                    <td className="border border-slate-200 p-3 text-center text-green-700 font-semibold">Available (formula-based)</td>
-                    <td className="border border-slate-200 p-3 text-center text-slate-700">NOT available — HRA fully taxable</td>
+                    <td className="border border-rule p-3 text-ink/80">HRA Exemption</td>
+                    <td className="border border-rule p-3 text-center text-green-700 font-semibold">Available (formula-based)</td>
+                    <td className="border border-rule p-3 text-center text-ink/80">NOT available — HRA fully taxable</td>
                   </tr>
-                  <tr className="bg-slate-50">
-                    <td className="border border-slate-200 p-3 text-slate-700">Home Loan Interest (Section 24(b))</td>
-                    <td className="border border-slate-200 p-3 text-center text-green-700 font-semibold">Available (₹2L limit)</td>
-                    <td className="border border-slate-200 p-3 text-center text-slate-700">NOT available</td>
-                  </tr>
-                  <tr>
-                    <td className="border border-slate-200 p-3 text-slate-700">Section 80C Deductions (PPF, LIC, ELSS)</td>
-                    <td className="border border-slate-200 p-3 text-center text-green-700 font-semibold">Available (₹1.5L limit)</td>
-                    <td className="border border-slate-200 p-3 text-center text-slate-700">NOT available</td>
-                  </tr>
-                  <tr className="bg-slate-50">
-                    <td className="border border-slate-200 p-3 text-slate-700">Standard Deduction</td>
-                    <td className="border border-slate-200 p-3 text-center">₹50,000 (FY 2026-27)</td>
-                    <td className="border border-slate-200 p-3 text-center text-green-700 font-semibold">₹75,000 (FY 2026-27)</td>
+                  <tr className="bg-secondary">
+                    <td className="border border-rule p-3 text-ink/80">Home Loan Interest (Section 24(b))</td>
+                    <td className="border border-rule p-3 text-center text-green-700 font-semibold">Available (₹2L limit)</td>
+                    <td className="border border-rule p-3 text-center text-ink/80">NOT available</td>
                   </tr>
                   <tr>
-                    <td className="border border-slate-200 p-3 text-slate-700">Best For</td>
-                    <td className="border border-slate-200 p-3 text-center text-slate-600">High income, high deductions (HRA + Home Loan)</td>
-                    <td className="border border-slate-200 p-3 text-center text-slate-600">Low income, few deductions</td>
+                    <td className="border border-rule p-3 text-ink/80">Section 80C Deductions (PPF, LIC, ELSS)</td>
+                    <td className="border border-rule p-3 text-center text-green-700 font-semibold">Available (₹1.5L limit)</td>
+                    <td className="border border-rule p-3 text-center text-ink/80">NOT available</td>
+                  </tr>
+                  <tr className="bg-secondary">
+                    <td className="border border-rule p-3 text-ink/80">Standard Deduction</td>
+                    <td className="border border-rule p-3 text-center">₹50,000 (FY 2026-27)</td>
+                    <td className="border border-rule p-3 text-center text-green-700 font-semibold">₹75,000 (FY 2026-27)</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-rule p-3 text-ink/80">Best For</td>
+                    <td className="border border-rule p-3 text-center text-ink/65">High income, high deductions (HRA + Home Loan)</td>
+                    <td className="border border-rule p-3 text-center text-ink/65">Low income, few deductions</td>
                   </tr>
                 </tbody>
               </table>
             </div>
 
             {/* FAQs */}
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Frequently Asked Questions</h2>
+            <h2 className="text-2xl font-bold text-ink mb-4">Frequently Asked Questions</h2>
             <div className="space-y-4">
               {hraFAQs.map((faq, i) => (
                 <div key={i}>
-                  <h4 className="font-semibold text-slate-900 mb-2">{faq.question}</h4>
-                  <p className="text-slate-600">{faq.answer}</p>
+                  <h4 className="font-semibold text-ink mb-2">{faq.question}</h4>
+                  <p className="text-ink/65">{faq.answer}</p>
                 </div>
               ))}
             </div>
@@ -409,29 +409,29 @@ export default function HRACalculatorPage() {
         </div>
 
         {/* Related Calculators */}
-        <section className="py-12 px-6 bg-slate-50">
+        <section className="py-12 px-6 bg-secondary">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">Related Tax & Deduction Calculators</h2>
-            <p className="text-slate-600 mb-6">
+            <h2 className="text-2xl font-bold text-ink mb-2">Related Tax & Deduction Calculators</h2>
+            <p className="text-ink/65 mb-6">
               HRA is a key deduction under the Old Tax Regime. Use these calculators to plan your complete tax strategy.
             </p>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <Link href="/calculators/income-tax">
-                <div className="p-4 bg-white rounded-lg border hover:border-persian-blue-300 hover:shadow transition-all">
-                  <h3 className="font-semibold text-slate-900 mb-1">Income Tax Calculator</h3>
-                  <p className="text-sm text-slate-600">Compare Old vs New regime with all deductions including HRA</p>
+                <div className="p-4 bg-card rounded-lg border hover:border-credit hover:shadow transition-all">
+                  <h3 className="font-semibold text-ink mb-1">Income Tax Calculator</h3>
+                  <p className="text-sm text-ink/65">Compare Old vs New regime with all deductions including HRA</p>
                 </div>
               </Link>
               <Link href="/calculators/nps">
-                <div className="p-4 bg-white rounded-lg border hover:border-persian-blue-300 hover:shadow transition-all">
-                  <h3 className="font-semibold text-slate-900 mb-1">NPS Calculator</h3>
-                  <p className="text-sm text-slate-600">Calculate retirement corpus with ₹50,000 extra deduction</p>
+                <div className="p-4 bg-card rounded-lg border hover:border-credit hover:shadow transition-all">
+                  <h3 className="font-semibold text-ink mb-1">NPS Calculator</h3>
+                  <p className="text-sm text-ink/65">Calculate retirement corpus with ₹50,000 extra deduction</p>
                 </div>
               </Link>
               <Link href="/calculators/pf">
-                <div className="p-4 bg-white rounded-lg border hover:border-green-300 hover:shadow transition-all">
-                  <h3 className="font-semibold text-slate-900 mb-1">PF Calculator</h3>
-                  <p className="text-sm text-slate-600">Calculate EPF + VPF with 80C deduction impact</p>
+                <div className="p-4 bg-card rounded-lg border hover:border-green-300 hover:shadow transition-all">
+                  <h3 className="font-semibold text-ink mb-1">PF Calculator</h3>
+                  <p className="text-sm text-ink/65">Calculate EPF + VPF with 80C deduction impact</p>
                 </div>
               </Link>
               <Link href="/calculators">

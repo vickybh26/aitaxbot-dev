@@ -152,7 +152,7 @@ function effectiveMarginalRate(
 
 function InfoBox({ children }: { children: React.ReactNode }) {
   return (
-    <div className="border-l-4 border-blue-400 bg-blue-50 px-4 py-3 text-sm text-slate-700 rounded-r">
+    <div className="border-l-4 border-blue-400 bg-secondary px-4 py-3 text-sm text-ink/80 rounded-r">
       {children}
     </div>
   );
@@ -160,7 +160,7 @@ function InfoBox({ children }: { children: React.ReactNode }) {
 
 function WarnBox({ children }: { children: React.ReactNode }) {
   return (
-    <div className="border-l-4 border-amber-400 bg-amber-50 px-4 py-3 text-sm text-slate-700 rounded-r flex gap-2">
+    <div className="border-l-4 border-amber-400 bg-amber-50 px-4 py-3 text-sm text-ink/80 rounded-r flex gap-2">
       <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
       <span>{children}</span>
     </div>
@@ -169,7 +169,7 @@ function WarnBox({ children }: { children: React.ReactNode }) {
 
 function RateStatus({ rate, fetching }: { rate: number | null; fetching: boolean }) {
   if (fetching) return (
-    <span className="inline-flex items-center gap-1 text-xs text-blue-500 bg-blue-50 px-2 py-0.5 rounded-full">
+    <span className="inline-flex items-center gap-1 text-xs text-blue-500 bg-secondary px-2 py-0.5 rounded-full">
       <RefreshCw className="w-3 h-3 animate-spin" /> Fetching rate…
     </span>
   );
@@ -179,7 +179,7 @@ function RateStatus({ rate, fetching }: { rate: number | null; fetching: boolean
     </span>
   );
   return (
-    <span className="inline-flex items-center gap-1 text-xs text-slate-500 bg-slate-50 px-2 py-0.5 rounded-full">
+    <span className="inline-flex items-center gap-1 text-xs text-ink/55 bg-secondary px-2 py-0.5 rounded-full">
       <Clock className="w-3 h-3" /> Rate auto-fetches on date entry
     </span>
   );
@@ -188,7 +188,7 @@ function RateStatus({ rate, fetching }: { rate: number | null; fetching: boolean
 // ─── Quick-start empty state ──────────────────────────────────────────────────
 
 const INCOME_TYPES = [
-  { id: "us-stocks" as Tab, icon: TrendingUp, label: "US Stocks & ETFs", desc: "AAPL, TSLA, VOO…", color: "text-persian-blue-700 bg-persian-blue-50 border-persian-blue-200" },
+  { id: "us-stocks" as Tab, icon: TrendingUp, label: "US Stocks & ETFs", desc: "AAPL, TSLA, VOO…", color: "text-ink bg-paper border-rule" },
   { id: "us-dividends" as Tab, icon: DollarSign, label: "US Dividends", desc: "DTAA credit, Form 67", color: "text-cyan-600 bg-cyan-50 border-cyan-200" },
   { id: "indian-fo" as Tab, icon: BarChart2, label: "Indian F&O", desc: "Nifty, Bank Nifty…", color: "text-amber-600 bg-amber-50 border-amber-200" },
   { id: "us-fo" as Tab, icon: Globe, label: "US F&O / Options", desc: "SPY calls, QQQ puts…", color: "text-emerald-600 bg-emerald-50 border-emerald-200" },
@@ -199,11 +199,11 @@ function QuickStart({ onSelect }: { onSelect: (tab: Tab) => void }) {
   return (
     <div className="py-10 px-4 text-center space-y-6">
       <div>
-        <div className="w-14 h-14 bg-persian-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-3">
-          <Zap className="w-7 h-7 text-persian-blue-600" />
+        <div className="w-14 h-14 bg-paper rounded-2xl flex items-center justify-center mx-auto mb-3">
+          <Zap className="w-7 h-7 text-ink" />
         </div>
-        <h3 className="text-lg font-bold text-slate-800">What did you trade this year?</h3>
-        <p className="text-sm text-slate-500 mt-1">Pick a category to get started. You can add more later.</p>
+        <h3 className="text-lg font-bold text-ink">What did you trade this year?</h3>
+        <p className="text-sm text-ink/55 mt-1">Pick a category to get started. You can add more later.</p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-w-2xl mx-auto text-left">
         {INCOME_TYPES.map(t => (
@@ -277,21 +277,21 @@ function USStocksTab({ trades, setTrades, slabRate }: {
 
       {trades.map((t, i) => {
         const r = results[i];
-        const borderColor = r ? (r.gainINR > 0 ? "border-l-green-500" : r.gainINR < 0 ? "border-l-red-400" : "border-l-slate-200") : "border-l-slate-200";
+        const borderColor = r ? (r.gainINR > 0 ? "border-l-green-500" : r.gainINR < 0 ? "border-l-red-400" : "border-l-rule") : "border-l-rule";
 
         return (
-          <div key={t.id} className={`border border-slate-200 border-l-4 ${borderColor} rounded-xl p-4 space-y-4 bg-white shadow-sm`}>
+          <div key={t.id} className={`border border-rule border-l-4 ${borderColor} rounded-xl p-4 space-y-4 bg-card shadow-sm`}>
             {/* Card header */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-slate-700 text-sm">Trade #{i + 1}</span>
+                <span className="font-semibold text-ink/80 text-sm">Trade #{i + 1}</span>
                 {r && (
                   <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${r.isLTCG ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}>
                     {r.isLTCG ? `LTCG · ${r.months}m` : `STCG · ${r.months}m`}
                   </span>
                 )}
               </div>
-              <button onClick={() => remove(t.id)} className="text-slate-300 hover:text-red-400 transition-colors">
+              <button onClick={() => remove(t.id)} className="text-ink/35 hover:text-red-400 transition-colors">
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>
@@ -299,13 +299,13 @@ function USStocksTab({ trades, setTrades, slabRate }: {
             {/* Stock name + quantity */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label className="text-xs text-slate-500">Stock / ETF</Label>
+                <Label className="text-xs text-ink/55">Stock / ETF</Label>
                 <Input aria-label="Stock / ETF" placeholder="e.g. AAPL, VOO, QQQ" value={t.stockName}
                   onChange={e => update(t.id, { stockName: e.target.value })}
                   className="h-9 text-sm mt-1" />
               </div>
               <div>
-                <Label className="text-xs text-slate-500">Quantity (shares)</Label>
+                <Label className="text-xs text-ink/55">Quantity (shares)</Label>
                 <Input aria-label="Quantity (shares)" type="number"
                   inputMode="decimal" min={0.001} step={0.001} value={t.quantity || ""}
                   onChange={e => update(t.id, { quantity: parseFloat(e.target.value) || 0 })}
@@ -316,7 +316,7 @@ function USStocksTab({ trades, setTrades, slabRate }: {
             {/* Buy row */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label className="text-xs text-slate-500">Buy Date</Label>
+                <Label className="text-xs text-ink/55">Buy Date</Label>
                 <Input aria-label="Buy Date" type="date" value={t.buyDate}
                   onChange={e => {
                     const d = e.target.value;
@@ -326,7 +326,7 @@ function USStocksTab({ trades, setTrades, slabRate }: {
                   className="h-9 text-sm mt-1" />
               </div>
               <div>
-                <Label className="text-xs text-slate-500">Buy Price (USD/share)</Label>
+                <Label className="text-xs text-ink/55">Buy Price (USD/share)</Label>
                 <Input aria-label="Buy Price (USD/share)" type="number"
                   inputMode="decimal" min={0} step={0.01} placeholder="0.00" value={t.buyPriceUSD || ""}
                   onChange={e => update(t.id, { buyPriceUSD: parseFloat(e.target.value) || 0 })}
@@ -337,7 +337,7 @@ function USStocksTab({ trades, setTrades, slabRate }: {
             {/* Sell row */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label className="text-xs text-slate-500">Sell Date</Label>
+                <Label className="text-xs text-ink/55">Sell Date</Label>
                 <Input aria-label="Sell Date" type="date" value={t.sellDate}
                   onChange={e => {
                     const d = e.target.value;
@@ -347,7 +347,7 @@ function USStocksTab({ trades, setTrades, slabRate }: {
                   className="h-9 text-sm mt-1" />
               </div>
               <div>
-                <Label className="text-xs text-slate-500">Sell Price (USD/share)</Label>
+                <Label className="text-xs text-ink/55">Sell Price (USD/share)</Label>
                 <Input aria-label="Sell Price (USD/share)" type="number"
                   inputMode="decimal" min={0} step={0.01} placeholder="0.00" value={t.sellPriceUSD || ""}
                   onChange={e => update(t.id, { sellPriceUSD: parseFloat(e.target.value) || 0 })}
@@ -359,13 +359,13 @@ function USStocksTab({ trades, setTrades, slabRate }: {
             <div className="flex items-center gap-3 flex-wrap">
               <RateStatus rate={t.buyRate} fetching={t.fetching} />
               {t.buyRate && t.sellRate && (
-                <span className="text-xs text-slate-500">
+                <span className="text-xs text-ink/55">
                   Buy: ₹{t.buyRate.toFixed(2)} · Sell: ₹{t.sellRate.toFixed(2)}
                 </span>
               )}
               {(t.buyDate || t.sellDate) && (
                 <button onClick={() => fetchRates(t.id, t.buyDate, t.sellDate)}
-                  className="text-xs text-blue-500 hover:text-blue-700 flex items-center gap-1 ml-auto">
+                  className="text-xs text-blue-500 hover:text-credit flex items-center gap-1 ml-auto">
                   <RefreshCw className="w-3 h-3" /> Refresh
                 </button>
               )}
@@ -376,16 +376,16 @@ function USStocksTab({ trades, setTrades, slabRate }: {
               <div className={`rounded-xl p-4 ${r.gainINR >= 0 ? "bg-green-50" : "bg-red-50"}`}>
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <div className="text-xs text-slate-500 mb-1">Capital Gain / Loss</div>
+                    <div className="text-xs text-ink/55 mb-1">Capital Gain / Loss</div>
                     <div className={`text-2xl font-bold ${r.gainINR >= 0 ? "text-green-700" : "text-red-600"}`}>
                       {fmt(r.gainINR)}
                     </div>
-                    <div className="text-xs text-slate-500 mt-1">
+                    <div className="text-xs text-ink/55 mt-1">
                       Cost {fmt(r.costINR)} → Proceeds {fmt(r.proceedsINR)}
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-xs text-slate-500 mb-1">
+                    <div className="text-xs text-ink/55 mb-1">
                       Est. Tax {r.isLTCG ? "(12.5% LTCG + cess)" : `(${slabRate}% slab + cess)`}
                     </div>
                     <div className={`text-2xl font-bold ${r.gainINR >= 0 ? "text-red-600" : "text-green-700"}`}>
@@ -400,18 +400,18 @@ function USStocksTab({ trades, setTrades, slabRate }: {
       })}
 
       <Button variant="outline" size="sm" onClick={addTrade}
-        className="border-2 border-dashed border-slate-200 text-slate-500 hover:border-persian-blue-300 hover:text-persian-blue-700 w-full h-11 transition-colors">
+        className="border-2 border-dashed border-rule text-ink/55 hover:border-credit hover:text-credit w-full h-11 transition-colors">
         <Plus className="w-4 h-4 mr-2" /> Add Trade
       </Button>
 
       {trades.length > 0 && (
-        <div className={`rounded-xl p-4 flex justify-between items-center ${totalGain >= 0 ? "bg-persian-blue-50 border border-persian-blue-100" : "bg-slate-50 border border-slate-200"}`}>
+        <div className={`rounded-xl p-4 flex justify-between items-center ${totalGain >= 0 ? "bg-paper border border-rule" : "bg-secondary border border-rule"}`}>
           <div>
-            <div className="text-xs text-slate-500">Total gain across {trades.length} trade{trades.length > 1 ? "s" : ""}</div>
-            <div className={`text-lg font-bold ${totalGain >= 0 ? "text-persian-blue-800" : "text-red-600"}`}>{fmt(totalGain)}</div>
+            <div className="text-xs text-ink/55">Total gain across {trades.length} trade{trades.length > 1 ? "s" : ""}</div>
+            <div className={`text-lg font-bold ${totalGain >= 0 ? "text-ink" : "text-red-600"}`}>{fmt(totalGain)}</div>
           </div>
           <div className="text-right">
-            <div className="text-xs text-slate-500">Estimated tax (incl. 4% cess)</div>
+            <div className="text-xs text-ink/55">Estimated tax (incl. 4% cess)</div>
             <div className="text-lg font-bold text-red-600">{fmt(totalTax)}</div>
           </div>
         </div>
@@ -469,23 +469,23 @@ function USDividendsTab({ dividends, setDividends, slabRate }: {
       {dividends.map((d, i) => {
         const r = results[i];
         return (
-          <div key={d.id} className="border border-slate-200 border-l-4 border-l-cyan-400 rounded-xl p-4 space-y-4 bg-white shadow-sm">
+          <div key={d.id} className="border border-rule border-l-4 border-l-cyan-400 rounded-xl p-4 space-y-4 bg-card shadow-sm">
             <div className="flex items-center justify-between">
-              <span className="font-semibold text-slate-700 text-sm">Dividend #{i + 1}</span>
-              <button onClick={() => remove(d.id)} className="text-slate-300 hover:text-red-400 transition-colors">
+              <span className="font-semibold text-ink/80 text-sm">Dividend #{i + 1}</span>
+              <button onClick={() => remove(d.id)} className="text-ink/35 hover:text-red-400 transition-colors">
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label className="text-xs text-slate-500">Stock / Fund</Label>
+                <Label className="text-xs text-ink/55">Stock / Fund</Label>
                 <Input aria-label="Stock / Fund" placeholder="e.g. AAPL, VTI" value={d.description}
                   onChange={e => update(d.id, { description: e.target.value })}
                   className="h-9 text-sm mt-1" />
               </div>
               <div>
-                <Label className="text-xs text-slate-500">Pay Date</Label>
+                <Label className="text-xs text-ink/55">Pay Date</Label>
                 <Input aria-label="Pay Date" type="date" value={d.payDate}
                   onChange={e => {
                     const dt = e.target.value;
@@ -498,14 +498,14 @@ function USDividendsTab({ dividends, setDividends, slabRate }: {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label className="text-xs text-slate-500">Gross Dividend (USD)</Label>
+                <Label className="text-xs text-ink/55">Gross Dividend (USD)</Label>
                 <Input aria-label="Gross Dividend (USD)" type="number"
                   inputMode="decimal" min={0} step={0.01} placeholder="0.00" value={d.amountUSD || ""}
                   onChange={e => update(d.id, { amountUSD: parseFloat(e.target.value) || 0 })}
                   className="h-9 text-sm mt-1" />
               </div>
               <div>
-                <Label className="text-xs text-slate-500">US Tax Withheld (USD)</Label>
+                <Label className="text-xs text-ink/55">US Tax Withheld (USD)</Label>
                 <Input aria-label="US Tax Withheld (USD)" type="number"
                   inputMode="decimal" min={0} step={0.01} placeholder="15% or 25% of gross"
                   value={d.withheldUSD || ""}
@@ -518,7 +518,7 @@ function USDividendsTab({ dividends, setDividends, slabRate }: {
               <RateStatus rate={d.rate} fetching={d.fetching} />
               {d.rate && (
                 <button onClick={() => fetchRate(d.id, d.payDate)}
-                  className="text-xs text-blue-500 hover:text-blue-700 flex items-center gap-1 ml-auto">
+                  className="text-xs text-blue-500 hover:text-credit flex items-center gap-1 ml-auto">
                   <RefreshCw className="w-3 h-3" /> Refresh
                 </button>
               )}
@@ -528,15 +528,15 @@ function USDividendsTab({ dividends, setDividends, slabRate }: {
               <div className="bg-cyan-50 rounded-xl p-4">
                 <div className="grid grid-cols-3 gap-3 text-sm">
                   <div>
-                    <div className="text-xs text-slate-500 mb-1">Dividend (INR)</div>
-                    <div className="font-bold text-slate-800 text-lg">{fmt(r.dividendINR)}</div>
+                    <div className="text-xs text-ink/55 mb-1">Dividend (INR)</div>
+                    <div className="font-bold text-ink text-lg">{fmt(r.dividendINR)}</div>
                   </div>
                   <div>
-                    <div className="text-xs text-slate-500 mb-1">DTAA Credit ({r.pctWithheld}% withheld)</div>
+                    <div className="text-xs text-ink/55 mb-1">DTAA Credit ({r.pctWithheld}% withheld)</div>
                     <div className="font-bold text-green-700 text-lg">−{fmt(r.usCreditINR)}</div>
                   </div>
                   <div>
-                    <div className="text-xs text-slate-500 mb-1">Net Tax Payable</div>
+                    <div className="text-xs text-ink/55 mb-1">Net Tax Payable</div>
                     <div className={`font-bold text-lg ${r.netTax > 0 ? "text-red-600" : "text-green-700"}`}>
                       {r.netTax === 0 ? "Nil ✓" : fmt(r.netTax)}
                     </div>
@@ -549,18 +549,18 @@ function USDividendsTab({ dividends, setDividends, slabRate }: {
       })}
 
       <Button variant="outline" size="sm" onClick={add}
-        className="border-2 border-dashed border-slate-200 text-slate-500 hover:border-cyan-300 hover:text-cyan-600 w-full h-11 transition-colors">
+        className="border-2 border-dashed border-rule text-ink/55 hover:border-cyan-300 hover:text-cyan-600 w-full h-11 transition-colors">
         <Plus className="w-4 h-4 mr-2" /> Add Dividend
       </Button>
 
       {dividends.length > 0 && (
         <div className="rounded-xl p-4 flex justify-between items-center bg-cyan-50 border border-cyan-100">
           <div>
-            <div className="text-xs text-slate-500">Total dividends received</div>
+            <div className="text-xs text-ink/55">Total dividends received</div>
             <div className="text-lg font-bold text-cyan-700">{fmt(totalDividendINR)}</div>
           </div>
           <div className="text-right">
-            <div className="text-xs text-slate-500">Net tax after DTAA credit</div>
+            <div className="text-xs text-ink/55">Net tax after DTAA credit</div>
             <div className="text-lg font-bold text-red-600">{fmt(totalNetTax)}</div>
           </div>
         </div>
@@ -604,40 +604,40 @@ function IndianFOTab({ trades, setTrades, slabRate }: {
       </InfoBox>
 
       {trades.map((t, i) => {
-        const borderColor = t.netPL > 0 ? "border-l-amber-400" : t.netPL < 0 ? "border-l-red-400" : "border-l-slate-200";
+        const borderColor = t.netPL > 0 ? "border-l-amber-400" : t.netPL < 0 ? "border-l-red-400" : "border-l-rule";
         return (
-          <div key={t.id} className={`border border-slate-200 border-l-4 ${borderColor} rounded-xl p-4 space-y-3 bg-white shadow-sm`}>
+          <div key={t.id} className={`border border-rule border-l-4 ${borderColor} rounded-xl p-4 space-y-3 bg-card shadow-sm`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-slate-700 text-sm">Entry #{i + 1}</span>
+                <span className="font-semibold text-ink/80 text-sm">Entry #{i + 1}</span>
                 <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-medium">
                   {typeLabel[t.type]}
                 </span>
               </div>
-              <button onClick={() => remove(t.id)} className="text-slate-300 hover:text-red-400 transition-colors">
+              <button onClick={() => remove(t.id)} className="text-ink/35 hover:text-red-400 transition-colors">
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <Label className="text-xs text-slate-500">Description</Label>
+                <Label className="text-xs text-ink/55">Description</Label>
                 <Input aria-label="Description" placeholder="e.g. NIFTY options FY25-26" value={t.description}
                   onChange={e => update(t.id, { description: e.target.value })}
                   className="h-9 text-sm mt-1" />
               </div>
               <div>
-                <Label className="text-xs text-slate-500">Type</Label>
+                <Label className="text-xs text-ink/55">Type</Label>
                 <select value={t.type}
                   onChange={e => update(t.id, { type: e.target.value as IndianFOTrade["type"] })}
-                  className="h-9 text-sm mt-1 w-full border border-slate-200 rounded-md px-2 bg-white">
+                  className="h-9 text-sm mt-1 w-full border border-rule rounded-md px-2 bg-card">
                   <option value="equity-fo">Equity F&O (Non-Speculative)</option>
                   <option value="intraday">Intraday Equity (Speculative)</option>
                   <option value="currency-fo">Currency F&O on NSE (Non-Speculative)</option>
                 </select>
               </div>
               <div>
-                <Label className="text-xs text-slate-500">Net P&L (₹)</Label>
+                <Label className="text-xs text-ink/55">Net P&L (₹)</Label>
                 <Input aria-label="Net P&L (₹)" type="number"
                   inputMode="numeric" step={1} placeholder="Profit is positive, loss is negative"
                   value={t.netPL || ""}
@@ -656,7 +656,7 @@ function IndianFOTab({ trades, setTrades, slabRate }: {
       })}
 
       <Button variant="outline" size="sm" onClick={add}
-        className="border-2 border-dashed border-slate-200 text-slate-500 hover:border-amber-300 hover:text-amber-600 w-full h-11 transition-colors">
+        className="border-2 border-dashed border-rule text-ink/55 hover:border-amber-300 hover:text-amber-600 w-full h-11 transition-colors">
         <Plus className="w-4 h-4 mr-2" /> Add F&O / Intraday Entry
       </Button>
 
@@ -665,12 +665,12 @@ function IndianFOTab({ trades, setTrades, slabRate }: {
           <div className="rounded-xl p-4 bg-amber-50 border border-amber-100">
             <div className="flex justify-between items-start gap-4">
               <div>
-                <div className="text-xs text-slate-500">Net P&L across all F&O</div>
+                <div className="text-xs text-ink/55">Net P&L across all F&O</div>
                 <div className={`text-2xl font-bold mt-0.5 ${totalPL >= 0 ? "text-amber-700" : "text-red-600"}`}>{fmt(totalPL)}</div>
-                <div className="text-xs text-slate-500 mt-1">Turnover: {fmt(totalTurnover)}</div>
+                <div className="text-xs text-ink/55 mt-1">Turnover: {fmt(totalTurnover)}</div>
               </div>
               <div className="text-right">
-                <div className="text-xs text-slate-500">Tax @ {slabRate}% slab + 4% cess</div>
+                <div className="text-xs text-ink/55">Tax @ {slabRate}% slab + 4% cess</div>
                 <div className={`text-2xl font-bold mt-0.5 ${totalPL <= 0 ? "text-green-700" : "text-red-600"}`}>
                   {totalPL <= 0 ? "Nil (loss year)" : fmt(estimatedTax)}
                 </div>
@@ -736,26 +736,26 @@ function USFOTab({ trades, setTrades, slabRate }: {
 
       {trades.map((t, i) => {
         const r = results[i];
-        const borderColor = r ? (r.plINR > 0 ? "border-l-emerald-400" : r.plINR < 0 ? "border-l-red-400" : "border-l-slate-200") : "border-l-slate-200";
+        const borderColor = r ? (r.plINR > 0 ? "border-l-emerald-400" : r.plINR < 0 ? "border-l-red-400" : "border-l-rule") : "border-l-rule";
 
         return (
-          <div key={t.id} className={`border border-slate-200 border-l-4 ${borderColor} rounded-xl p-4 space-y-4 bg-white shadow-sm`}>
+          <div key={t.id} className={`border border-rule border-l-4 ${borderColor} rounded-xl p-4 space-y-4 bg-card shadow-sm`}>
             <div className="flex items-center justify-between">
-              <span className="font-semibold text-slate-700 text-sm">Position #{i + 1}</span>
-              <button onClick={() => remove(t.id)} className="text-slate-300 hover:text-red-400 transition-colors">
+              <span className="font-semibold text-ink/80 text-sm">Position #{i + 1}</span>
+              <button onClick={() => remove(t.id)} className="text-ink/35 hover:text-red-400 transition-colors">
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <Label className="text-xs text-slate-500">Description</Label>
+                <Label className="text-xs text-ink/55">Description</Label>
                 <Input aria-label="Description" placeholder="e.g. SPY Dec Put" value={t.description}
                   onChange={e => update(t.id, { description: e.target.value })}
                   className="h-9 text-sm mt-1" />
               </div>
               <div>
-                <Label className="text-xs text-slate-500">Settlement / Expiry Date</Label>
+                <Label className="text-xs text-ink/55">Settlement / Expiry Date</Label>
                 <Input aria-label="Settlement / Expiry Date" type="date" value={t.date}
                   onChange={e => {
                     const d = e.target.value;
@@ -765,7 +765,7 @@ function USFOTab({ trades, setTrades, slabRate }: {
                   className="h-9 text-sm mt-1" />
               </div>
               <div>
-                <Label className="text-xs text-slate-500">Net P&L (USD)</Label>
+                <Label className="text-xs text-ink/55">Net P&L (USD)</Label>
                 <Input aria-label="Net P&L (USD)" type="number"
                   inputMode="decimal" step={0.01} placeholder="Profit positive, loss negative"
                   value={t.netPLUSD || ""}
@@ -778,7 +778,7 @@ function USFOTab({ trades, setTrades, slabRate }: {
               <RateStatus rate={t.rate} fetching={t.fetching} />
               {t.rate && (
                 <button onClick={() => fetchRate(t.id, t.date)}
-                  className="text-xs text-blue-500 hover:text-blue-700 flex items-center gap-1 ml-auto">
+                  className="text-xs text-blue-500 hover:text-credit flex items-center gap-1 ml-auto">
                   <RefreshCw className="w-3 h-3" /> Refresh
                 </button>
               )}
@@ -788,11 +788,11 @@ function USFOTab({ trades, setTrades, slabRate }: {
               <div className={`rounded-xl p-4 ${r.plINR >= 0 ? "bg-emerald-50" : "bg-red-50"}`}>
                 <div className="flex justify-between items-center">
                   <div>
-                    <div className="text-xs text-slate-500">P&L in INR</div>
+                    <div className="text-xs text-ink/55">P&L in INR</div>
                     <div className={`text-2xl font-bold ${r.plINR >= 0 ? "text-emerald-700" : "text-red-600"}`}>{fmt(r.plINR)}</div>
                   </div>
                   <div className="text-right">
-                    <div className="text-xs text-slate-500">Est. Tax ({slabRate}% + cess)</div>
+                    <div className="text-xs text-ink/55">Est. Tax ({slabRate}% + cess)</div>
                     <div className={`text-2xl font-bold ${r.plINR < 0 ? "text-green-700" : "text-red-600"}`}>
                       {r.plINR < 0 ? "Loss" : fmt(r.tax)}
                     </div>
@@ -805,18 +805,18 @@ function USFOTab({ trades, setTrades, slabRate }: {
       })}
 
       <Button variant="outline" size="sm" onClick={add}
-        className="border-2 border-dashed border-slate-200 text-slate-500 hover:border-emerald-300 hover:text-emerald-600 w-full h-11 transition-colors">
+        className="border-2 border-dashed border-rule text-ink/55 hover:border-emerald-300 hover:text-emerald-600 w-full h-11 transition-colors">
         <Plus className="w-4 h-4 mr-2" /> Add US F&O / Options Position
       </Button>
 
       {trades.length > 0 && (
         <div className="rounded-xl p-4 flex justify-between items-center bg-emerald-50 border border-emerald-100">
           <div>
-            <div className="text-xs text-slate-500">Total P&L (INR)</div>
+            <div className="text-xs text-ink/55">Total P&L (INR)</div>
             <div className={`text-lg font-bold ${totalPLINR >= 0 ? "text-emerald-700" : "text-red-600"}`}>{fmt(totalPLINR)}</div>
           </div>
           <div className="text-right">
-            <div className="text-xs text-slate-500">Estimated tax</div>
+            <div className="text-xs text-ink/55">Estimated tax</div>
             <div className="text-lg font-bold text-red-600">{totalPLINR <= 0 ? "Nil" : fmt(totalTax)}</div>
           </div>
         </div>
@@ -853,33 +853,33 @@ function ForexTab({ trades, setTrades, slabRate }: {
       </WarnBox>
 
       {trades.map((t, i) => {
-        const borderColor = t.netPL > 0 ? "border-l-rose-400" : t.netPL < 0 ? "border-l-red-400" : "border-l-slate-200";
+        const borderColor = t.netPL > 0 ? "border-l-rose-400" : t.netPL < 0 ? "border-l-red-400" : "border-l-rule";
         return (
-          <div key={t.id} className={`border border-slate-200 border-l-4 ${borderColor} rounded-xl p-4 space-y-3 bg-white shadow-sm`}>
+          <div key={t.id} className={`border border-rule border-l-4 ${borderColor} rounded-xl p-4 space-y-3 bg-card shadow-sm`}>
             <div className="flex items-center justify-between">
-              <span className="font-semibold text-slate-700 text-sm">Entry #{i + 1}</span>
-              <button onClick={() => remove(t.id)} className="text-slate-300 hover:text-red-400 transition-colors">
+              <span className="font-semibold text-ink/80 text-sm">Entry #{i + 1}</span>
+              <button onClick={() => remove(t.id)} className="text-ink/35 hover:text-red-400 transition-colors">
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <Label className="text-xs text-slate-500">Description</Label>
+                <Label className="text-xs text-ink/55">Description</Label>
                 <Input aria-label="Description" placeholder="e.g. USD/INR futures NSE" value={t.description}
                   onChange={e => update(t.id, { description: e.target.value })}
                   className="h-9 text-sm mt-1" />
               </div>
               <div>
-                <Label className="text-xs text-slate-500">Type</Label>
+                <Label className="text-xs text-ink/55">Type</Label>
                 <select value={t.type}
                   onChange={e => update(t.id, { type: e.target.value as ForexTrade["type"] })}
-                  className="h-9 text-sm mt-1 w-full border border-slate-200 rounded-md px-2 bg-white">
+                  className="h-9 text-sm mt-1 w-full border border-rule rounded-md px-2 bg-card">
                   <option value="exchange">NSE/BSE Currency F&O (Non-Speculative)</option>
                   <option value="otc">OTC / Retail Forex (Speculative)</option>
                 </select>
               </div>
               <div>
-                <Label className="text-xs text-slate-500">Net P&L (₹)</Label>
+                <Label className="text-xs text-ink/55">Net P&L (₹)</Label>
                 <Input aria-label="Net P&L (₹)" type="number"
                   inputMode="numeric" step={1} placeholder="Profit positive, loss negative"
                   value={t.netPL || ""}
@@ -892,18 +892,18 @@ function ForexTab({ trades, setTrades, slabRate }: {
       })}
 
       <Button variant="outline" size="sm" onClick={add}
-        className="border-2 border-dashed border-slate-200 text-slate-500 hover:border-rose-300 hover:text-rose-600 w-full h-11 transition-colors">
+        className="border-2 border-dashed border-rule text-ink/55 hover:border-rose-300 hover:text-rose-600 w-full h-11 transition-colors">
         <Plus className="w-4 h-4 mr-2" /> Add Forex Entry
       </Button>
 
       {trades.length > 0 && (
         <div className="rounded-xl p-4 flex justify-between items-center bg-rose-50 border border-rose-100">
           <div>
-            <div className="text-xs text-slate-500">Total Forex P&L</div>
+            <div className="text-xs text-ink/55">Total Forex P&L</div>
             <div className={`text-lg font-bold ${totalPL >= 0 ? "text-rose-700" : "text-red-600"}`}>{fmt(totalPL)}</div>
           </div>
           <div className="text-right">
-            <div className="text-xs text-slate-500">Estimated tax</div>
+            <div className="text-xs text-ink/55">Estimated tax</div>
             <div className="text-lg font-bold text-red-600">{totalPL <= 0 ? "Nil" : fmt(tax)}</div>
           </div>
         </div>
@@ -961,8 +961,8 @@ function SummaryTab({ usStocks, usDividends, indianFO, usFO, forex, slabRate }: 
   const itrForm = hasF_O ? "ITR-3" : "ITR-2";
 
   const bars = [
-    { label: "US Stocks LTCG (12.5%)", income: ltcgGain, tax: usStockResults.filter(r => r?.isLTCG).reduce((s, r) => s + (r?.tax ?? 0), 0), color: "bg-persian-blue-600" },
-    { label: "US Stocks STCG (slab)", income: stcgGain, tax: usStockResults.filter(r => !r?.isLTCG && r).reduce((s, r) => s + (r?.tax ?? 0), 0), color: "bg-persian-blue-300" },
+    { label: "US Stocks LTCG (12.5%)", income: ltcgGain, tax: usStockResults.filter(r => r?.isLTCG).reduce((s, r) => s + (r?.tax ?? 0), 0), color: "bg-ink" },
+    { label: "US Stocks STCG (slab)", income: stcgGain, tax: usStockResults.filter(r => !r?.isLTCG && r).reduce((s, r) => s + (r?.tax ?? 0), 0), color: "bg-ink/50" },
     { label: "US Dividends", income: totalDividendINR, tax: dividendTax, color: "bg-cyan-500" },
     { label: "Indian F&O", income: foProfit, tax: foTax, color: "bg-amber-500" },
     { label: "US F&O / Options", income: usFOProfit, tax: usFOTax, color: "bg-emerald-500" },
@@ -971,7 +971,7 @@ function SummaryTab({ usStocks, usDividends, indianFO, usFO, forex, slabRate }: 
 
   if (bars.length === 0) {
     return (
-      <div className="text-center py-16 text-slate-500">
+      <div className="text-center py-16 text-ink/55">
         <FileText className="w-12 h-12 mx-auto mb-3 opacity-30" />
         <p className="text-sm">Add trades in other tabs to see your tax summary here.</p>
       </div>
@@ -981,12 +981,12 @@ function SummaryTab({ usStocks, usDividends, indianFO, usFO, forex, slabRate }: 
   return (
     <div className="space-y-5">
       {/* Hero total */}
-      <div className="rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 p-6 text-white">
-        <div className="text-sm text-slate-500 mb-1">Total Estimated Tax — FY 2025-26</div>
+      <div className="rounded-2xl bg-gradient-to-br from-ink to-ink p-6 text-white">
+        <div className="text-sm text-ink/55 mb-1">Total Estimated Tax — FY 2025-26</div>
         <div className="text-4xl font-bold">{fmt(grandTotal)}</div>
-        <div className="text-sm text-slate-500 mt-1">Includes 4% Health & Education cess · New Regime</div>
+        <div className="text-sm text-ink/55 mt-1">Includes 4% Health & Education cess · New Regime</div>
         <div className="mt-4 flex items-center gap-3">
-          <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold ${itrForm === "ITR-3" ? "bg-amber-500/20 text-amber-300" : "bg-blue-500/20 text-blue-300"}`}>
+          <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold ${itrForm === "ITR-3" ? "bg-amber-500/20 text-amber-300" : "bg-secondary0/20 text-blue-300"}`}>
             <FileText className="w-3.5 h-3.5" /> File {itrForm}
           </span>
           {hasAnyForeign && (
@@ -998,21 +998,21 @@ function SummaryTab({ usStocks, usDividends, indianFO, usFO, forex, slabRate }: 
       </div>
 
       {/* Tax breakdown bars */}
-      <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4">
-        <h4 className="font-semibold text-slate-800 text-sm">Tax Breakdown by Category</h4>
+      <div className="bg-card border border-rule rounded-xl p-5 space-y-4">
+        <h4 className="font-semibold text-ink text-sm">Tax Breakdown by Category</h4>
         {bars.map((b, i) => {
           const pct = grandTotal > 0 ? Math.round((b.tax / grandTotal) * 100) : 0;
           return (
             <div key={i} className="space-y-1.5">
               <div className="flex justify-between items-center text-sm">
-                <span className="text-slate-600">{b.label}</span>
+                <span className="text-ink/65">{b.label}</span>
                 <div className="flex items-center gap-3">
-                  <span className="text-slate-500 text-xs">{fmt(b.income)} income</span>
-                  <span className="font-semibold text-slate-800 w-24 text-right">{fmt(b.tax)}</span>
-                  <span className="text-slate-500 text-xs w-8 text-right">{pct}%</span>
+                  <span className="text-ink/55 text-xs">{fmt(b.income)} income</span>
+                  <span className="font-semibold text-ink w-24 text-right">{fmt(b.tax)}</span>
+                  <span className="text-ink/55 text-xs w-8 text-right">{pct}%</span>
                 </div>
               </div>
-              <div className="w-full bg-slate-100 rounded-full h-2">
+              <div className="w-full bg-secondary rounded-full h-2">
                 <div className={`${b.color} h-2 rounded-full transition-all`} style={{ width: `${pct}%` }} />
               </div>
             </div>
@@ -1021,8 +1021,8 @@ function SummaryTab({ usStocks, usDividends, indianFO, usFO, forex, slabRate }: 
       </div>
 
       {/* Compliance checklist */}
-      <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-3">
-        <h4 className="font-semibold text-slate-800 text-sm">Compliance Checklist</h4>
+      <div className="bg-card border border-rule rounded-xl p-5 space-y-3">
+        <h4 className="font-semibold text-ink text-sm">Compliance Checklist</h4>
         {[
           { ok: true, text: `File ${itrForm} (not ITR-1) — capital gains / foreign income` },
           { ok: hasAnyForeign, text: "Schedule FA: disclose all foreign assets held on 31 December", warn: !hasAnyForeign },
@@ -1031,7 +1031,7 @@ function SummaryTab({ usStocks, usDividends, indianFO, usFO, forex, slabRate }: 
           { ok: indianFO.reduce((s, t) => s + Math.abs(t.netPL), 0) < 10000000, text: "Tax audit: required if Indian F&O turnover > ₹1 crore", warn: indianFO.reduce((s, t) => s + Math.abs(t.netPL), 0) >= 10000000 },
           { ok: true, text: "Advance tax: pay if total tax > ₹10,000 to avoid Sec 234B/C interest" },
         ].map((item, i) => (
-          <div key={i} className={`flex gap-2.5 items-start text-sm ${item.warn ? "text-red-600 font-medium" : "text-slate-600"}`}>
+          <div key={i} className={`flex gap-2.5 items-start text-sm ${item.warn ? "text-red-600 font-medium" : "text-ink/65"}`}>
             {item.warn
               ? <AlertTriangle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
               : <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />}
@@ -1051,12 +1051,12 @@ function SummaryTab({ usStocks, usDividends, indianFO, usFO, forex, slabRate }: 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 const TABS: { id: Tab; label: string; icon: React.ReactNode; short: string; color: string }[] = [
-  { id: "us-stocks", label: "US Stocks & ETFs", icon: <TrendingUp className="w-4 h-4" />, short: "US Stocks", color: "text-persian-blue-700 border-persian-blue-600" },
+  { id: "us-stocks", label: "US Stocks & ETFs", icon: <TrendingUp className="w-4 h-4" />, short: "US Stocks", color: "text-ink border-ink" },
   { id: "us-dividends", label: "US Dividends", icon: <DollarSign className="w-4 h-4" />, short: "Dividends", color: "text-cyan-600 border-cyan-500" },
   { id: "indian-fo", label: "Indian F&O", icon: <BarChart2 className="w-4 h-4" />, short: "India F&O", color: "text-amber-600 border-amber-500" },
   { id: "us-fo", label: "US F&O / Options", icon: <Globe className="w-4 h-4" />, short: "US F&O", color: "text-emerald-600 border-emerald-500" },
   { id: "forex", label: "Forex", icon: <ArrowLeftRight className="w-4 h-4" />, short: "Forex", color: "text-rose-600 border-rose-500" },
-  { id: "summary", label: "Tax Summary", icon: <FileText className="w-4 h-4" />, short: "Summary", color: "text-slate-700 border-slate-600" },
+  { id: "summary", label: "Tax Summary", icon: <FileText className="w-4 h-4" />, short: "Summary", color: "text-ink/80 border-rule" },
 ];
 
 // Compute grand total for the live bar (duplicated from SummaryTab for the header)
@@ -1125,17 +1125,17 @@ export default function TradingTaxCalculator() {
   };
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+    <div className="bg-card border border-rule rounded-xl overflow-hidden shadow-sm">
 
       {/* ── Setup bar ──────────────────────────────────────────────────────── */}
-      <div className="bg-slate-50 border-b border-slate-200 px-5 py-4">
+      <div className="bg-secondary border-b border-rule px-5 py-4">
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-2 shrink-0">
             <Info className="w-4 h-4 text-blue-500" />
-            <span className="text-sm font-medium text-slate-700">Annual income from salary / business</span>
+            <span className="text-sm font-medium text-ink/80">Annual income from salary / business</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-sm text-slate-500">₹</span>
+            <span className="text-sm text-ink/55">₹</span>
             <Input
               type="number"
               inputMode="numeric"
@@ -1148,32 +1148,32 @@ export default function TradingTaxCalculator() {
             />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-500">→</span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold">
+            <span className="text-xs text-ink/55">→</span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 text-ink text-sm font-semibold">
               {slabRate}% marginal slab · {slabBand(annualIncome)}
             </span>
           </div>
-          <span className="text-xs text-slate-500 hidden md:inline">New Regime FY 2026-27 · LTCG on US stocks always 12.5%</span>
+          <span className="text-xs text-ink/55 hidden md:inline">New Regime FY 2026-27 · LTCG on US stocks always 12.5%</span>
         </div>
       </div>
 
       {/* ── Live total bar ─────────────────────────────────────────────────── */}
       {hasAnyData && (
         <div
-          className="border-b border-slate-200 px-5 py-3 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors"
+          className="border-b border-rule px-5 py-3 flex items-center justify-between cursor-pointer hover:bg-secondary transition-colors"
           onClick={() => { setActiveTab("summary"); trackTool("Trading Tax Calculator", `Tax: ₹${Math.round(grandTotal).toLocaleString('en-IN')}`); fetch('/api/stats/track-calculation', { method: 'POST' }).catch(() => {}); }}
         >
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            <span className="text-sm text-slate-600">Running total</span>
+            <span className="text-sm text-ink/65">Running total</span>
           </div>
           <div className="flex items-center gap-3">
             {user ? (
               <span className="text-lg font-bold text-red-600">{fmt(grandTotal)}</span>
             ) : (
-              <span className="text-sm font-semibold text-blue-600">Sign in to view</span>
+              <span className="text-sm font-semibold text-credit">Sign in to view</span>
             )}
-            <span className="text-xs text-slate-500 flex items-center gap-1">
+            <span className="text-xs text-ink/55 flex items-center gap-1">
               View breakdown <ChevronRight className="w-3 h-3" />
             </span>
           </div>
@@ -1181,7 +1181,7 @@ export default function TradingTaxCalculator() {
       )}
 
       {/* ── Tab bar ────────────────────────────────────────────────────────── */}
-      <div className="border-b border-slate-200 overflow-x-auto">
+      <div className="border-b border-rule overflow-x-auto">
         <div className="flex min-w-max">
           {TABS.map(tab => {
             const count = counts[tab.id];
@@ -1193,7 +1193,7 @@ export default function TradingTaxCalculator() {
                 className={`flex items-center gap-1.5 px-4 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition-all ${
                   isActive
                     ? `border-b-2 ${tab.color}`
-                    : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
+                    : "border-transparent text-ink/55 hover:text-ink/80 hover:border-credit"
                 }`}
               >
                 {tab.icon}
@@ -1201,7 +1201,7 @@ export default function TradingTaxCalculator() {
                 <span className="sm:hidden">{tab.short}</span>
                 {count > 0 && (
                   <span className={`text-xs px-1.5 py-0.5 rounded-full font-semibold ${
-                    isActive ? "bg-slate-100 text-slate-700" : "bg-slate-100 text-slate-500"
+                    isActive ? "bg-secondary text-ink/80" : "bg-secondary text-ink/55"
                   }`}>{count}</span>
                 )}
               </button>
@@ -1248,8 +1248,8 @@ export default function TradingTaxCalculator() {
       </div>
 
       {/* ── Footer ─────────────────────────────────────────────────────────── */}
-      <div className="border-t border-slate-100 px-5 py-3 bg-slate-50">
-        <p className="text-xs text-slate-500">
+      <div className="border-t border-rule px-5 py-3 bg-secondary">
+        <p className="text-xs text-ink/55">
           Exchange rates via Frankfurter API (ECB data). Verify against RBI/FBIL reference rates at rbi.org.in for ITR. Estimation only — not tax advice.
         </p>
       </div>

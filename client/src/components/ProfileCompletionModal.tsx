@@ -74,15 +74,15 @@ export default function ProfileCompletionModal({ onClose }: Props) {
 
   return (
     <ModalShell onClose={onClose} labelledBy="profile-modal-title" data-testid="profile-completion-modal">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg relative animate-in fade-in zoom-in-95 duration-200">
+      <div className="bg-card rounded-2xl shadow-2xl w-full max-w-lg relative animate-in fade-in zoom-in-95 duration-200">
 
         {/* Header */}
-        <div className="bg-gradient-to-r from-persian-blue-600 to-persian-blue-700 rounded-t-2xl px-6 py-5 text-white">
+        <div className="bg-gradient-to-r from-ink to-credit rounded-t-2xl px-6 py-5 text-white">
           <button onClick={onClose} className="absolute top-4 right-4 text-white/70 hover:text-white" aria-label="Close">
             <X className="w-5 h-5" />
           </button>
           <div className="flex items-center gap-3 mb-1">
-            <div className="bg-white/20 rounded-full p-2">
+            <div className="bg-card/20 rounded-full p-2">
               <User className="w-5 h-5" />
             </div>
             <h2 id="profile-modal-title" className="text-xl font-bold">Complete your profile</h2>
@@ -90,9 +90,9 @@ export default function ProfileCompletionModal({ onClose }: Props) {
           <p className="text-blue-100 text-sm">Takes 30 seconds — helps us personalise your tax experience.</p>
 
           {/* Progress bar */}
-          <div className="mt-3 h-1.5 bg-white/20 rounded-full overflow-hidden">
+          <div className="mt-3 h-1.5 bg-card/20 rounded-full overflow-hidden">
             <div
-              className="h-full bg-white rounded-full transition-all duration-300"
+              className="h-full bg-card rounded-full transition-all duration-300"
               style={{
                 width: `${
                   (!!form.firstName ? 16 : 0) +
@@ -170,7 +170,7 @@ export default function ProfileCompletionModal({ onClose }: Props) {
             <Button type="button" variant="outline" className="flex-1" onClick={onClose}>
               Skip for now
             </Button>
-            <Button type="submit" className="flex-1 bg-persian-blue-700 hover:bg-persian-blue-800" disabled={saving}>
+            <Button type="submit" className="flex-1 bg-ink hover:bg-credit" disabled={saving}>
               {saving ? "Saving..." : "Save Profile"}
             </Button>
           </div>

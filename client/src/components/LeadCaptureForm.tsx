@@ -85,11 +85,11 @@ export default function LeadCaptureForm({ source, summaryText }: Props) {
   }
 
   return (
-    <div className="mt-6 relative bg-gradient-to-br from-blue-50 via-persian-blue-50 to-blue-50 border border-blue-100 rounded-2xl p-5">
+    <div className="mt-6 relative bg-gradient-to-br from-blue-50 via-paper to-blue-50 border border-rule rounded-2xl p-5">
       {/* Dismiss */}
       <button
         onClick={() => setDismissed(true)}
-        className="absolute top-3 right-3 text-slate-500 hover:text-slate-600 p-1 rounded-full hover:bg-white/60 transition-colors"
+        className="absolute top-3 right-3 text-ink/55 hover:text-ink/65 p-1 rounded-full hover:bg-card/60 transition-colors"
         aria-label="Dismiss"
       >
         <X className="w-4 h-4" />
@@ -97,14 +97,14 @@ export default function LeadCaptureForm({ source, summaryText }: Props) {
 
       {/* Header */}
       <div className="flex items-center gap-2 mb-3">
-        <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+        <div className="w-8 h-8 bg-ink rounded-lg flex items-center justify-center flex-shrink-0">
           <Sparkles className="w-4 h-4 text-white" />
         </div>
         <div>
-          <p className="font-semibold text-slate-800 text-sm leading-tight">
+          <p className="font-semibold text-ink text-sm leading-tight">
             Get your result by email
           </p>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-ink/55">
             + ITR deadline reminder &amp; free CA connect
           </p>
         </div>
@@ -119,30 +119,30 @@ export default function LeadCaptureForm({ source, summaryText }: Props) {
             onChange={(e) => setName(e.target.value)}
             placeholder="Your name"
             required
-            className="flex-1 h-9 px-3 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-slate-500"
+            className="flex-1 h-9 px-3 rounded-lg border border-rule bg-card text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-ink/55"
           />
           <div className="relative flex-1">
-            <Mail className="absolute left-2.5 top-2 w-4 h-4 text-slate-500" />
+            <Mail className="absolute left-2.5 top-2 w-4 h-4 text-ink/55" />
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email address"
               required
-              className="w-full h-9 pl-8 pr-3 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-slate-500"
+              className="w-full h-9 pl-8 pr-3 rounded-lg border border-rule bg-card text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-ink/55"
             />
           </div>
         </div>
 
         {/* WhatsApp (optional) */}
         <div className="relative">
-          <Phone className="absolute left-2.5 top-2 w-4 h-4 text-slate-500" />
+          <Phone className="absolute left-2.5 top-2 w-4 h-4 text-ink/55" />
           <input
             type="tel"
             value={whatsapp}
             onChange={(e) => setWhatsapp(e.target.value)}
             placeholder="WhatsApp number (optional — for filing reminders)"
-            className="w-full h-9 pl-8 pr-3 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-slate-500"
+            className="w-full h-9 pl-8 pr-3 rounded-lg border border-rule bg-card text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-ink/55"
           />
         </div>
 
@@ -153,7 +153,7 @@ export default function LeadCaptureForm({ source, summaryText }: Props) {
         <button
           type="submit"
           disabled={loading || !name.trim() || !email.trim()}
-          className="w-full h-9 bg-persian-blue-700 hover:bg-persian-blue-800 disabled:opacity-50 text-white text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
+          className="w-full h-9 bg-ink hover:bg-credit disabled:opacity-50 text-white text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
         >
           {loading ? (
             <><Loader2 className="w-4 h-4 animate-spin" />Sending…</>
@@ -162,7 +162,7 @@ export default function LeadCaptureForm({ source, summaryText }: Props) {
           )}
         </button>
 
-        <p className="text-xs text-slate-500 text-center">
+        <p className="text-xs text-ink/55 text-center">
           No spam. Unsubscribe anytime. We never share your details.
         </p>
       </form>

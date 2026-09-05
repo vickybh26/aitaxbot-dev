@@ -96,17 +96,17 @@ export default function CARegister() {
 
   if (submitted) {
     return (
-      <div className="bg-gradient-to-br from-blue-50 to-persian-blue-50 flex items-center justify-center p-6">
-        <div className="bg-white rounded-2xl shadow-lg p-10 max-w-md w-full text-center">
+      <div className="bg-gradient-to-br from-blue-50 to-paper flex items-center justify-center p-6">
+        <div className="bg-card rounded-2xl shadow-lg p-10 max-w-md w-full text-center">
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <CheckCircle2 className="w-8 h-8 text-green-600" />
           </div>
-          <h2 className="text-2xl font-bold text-slate-800 mb-2">Profile Submitted!</h2>
-          <p className="text-slate-600 mb-6">
+          <h2 className="text-2xl font-bold text-ink mb-2">Profile Submitted!</h2>
+          <p className="text-ink/65 mb-6">
             Thank you. We'll verify your ICAI membership number and approve your profile within
             <strong> 1–2 business days</strong>. You'll receive a confirmation email once you're live.
           </p>
-          <Link href="/find-ca" className="text-blue-600 hover:underline text-sm">
+          <Link href="/find-ca" className="text-credit hover:underline text-sm">
             View CA Directory →
           </Link>
         </div>
@@ -124,17 +124,17 @@ export default function CARegister() {
         />
       </Helmet>
 
-      <div className="bg-gradient-to-br from-blue-50 to-persian-blue-50 py-12 px-4">
+      <div className="bg-gradient-to-br from-blue-50 to-paper py-12 px-4">
         <div className="max-w-2xl mx-auto">
 
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
+            <div className="inline-flex items-center gap-2 bg-blue-100 text-ink px-4 py-1.5 rounded-full text-sm font-medium mb-4">
               <Shield className="w-4 h-4" />
               Free Listing · ICAI Act Compliant
             </div>
-            <h1 className="text-3xl font-bold text-slate-800 mb-2">Register as a CA</h1>
-            <p className="text-slate-500 max-w-lg mx-auto">
+            <h1 className="text-3xl font-bold text-ink mb-2">Register as a CA</h1>
+            <p className="text-ink/55 max-w-lg mx-auto">
               List your practice on AiTaxBot's free CA directory. Connect with qualified taxpayers
               who are actively looking for help filing their ITR.
             </p>
@@ -153,11 +153,11 @@ export default function CARegister() {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="bg-card rounded-2xl shadow-sm border border-rule p-8 space-y-6">
 
             {/* Personal Details */}
             <div>
-              <h3 className="text-base font-semibold text-slate-700 mb-4 pb-2 border-b">
+              <h3 className="text-base font-semibold text-ink/80 mb-4 pb-2 border-b">
                 1. Personal &amp; ICAI Details
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -180,7 +180,7 @@ export default function CARegister() {
 
             {/* Location */}
             <div>
-              <h3 className="text-base font-semibold text-slate-700 mb-4 pb-2 border-b">
+              <h3 className="text-base font-semibold text-ink/80 mb-4 pb-2 border-b">
                 2. Location
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -194,14 +194,14 @@ export default function CARegister() {
                   <div className="relative mt-1">
                     <select
                       {...register("state")}
-                      className="w-full border border-slate-200 rounded-md px-3 py-2 text-sm appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-rule rounded-md px-3 py-2 text-sm appearance-none bg-card focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="">Select state</option>
                       {INDIAN_STATES.map((s) => (
                         <option key={s} value={s}>{s}</option>
                       ))}
                     </select>
-                    <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-slate-500 pointer-events-none" />
+                    <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-ink/55 pointer-events-none" />
                   </div>
                   {errors.state && <p className="text-red-500 text-xs mt-1">{errors.state.message}</p>}
                 </div>
@@ -210,7 +210,7 @@ export default function CARegister() {
 
             {/* Practice Areas */}
             <div>
-              <h3 className="text-base font-semibold text-slate-700 mb-4 pb-2 border-b">
+              <h3 className="text-base font-semibold text-ink/80 mb-4 pb-2 border-b">
                 3. Areas of Practice *
               </h3>
               <div className="flex flex-wrap gap-2">
@@ -221,8 +221,8 @@ export default function CARegister() {
                     onClick={() => toggleArea(area)}
                     className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-all ${
                       selectedAreas.includes(area)
-                        ? "bg-blue-600 text-white border-blue-600"
-                        : "bg-white text-slate-600 border-slate-200 hover:border-blue-400"
+                        ? "bg-ink text-white border-blue-600"
+                        : "bg-card text-ink/65 border-rule hover:border-blue-400"
                     }`}
                   >
                     {CA_PRACTICE_AREA_LABELS[area]}
@@ -236,7 +236,7 @@ export default function CARegister() {
 
             {/* Languages */}
             <div>
-              <h3 className="text-base font-semibold text-slate-700 mb-4 pb-2 border-b">
+              <h3 className="text-base font-semibold text-ink/80 mb-4 pb-2 border-b">
                 4. Languages *
               </h3>
               <div className="flex flex-wrap gap-2">
@@ -247,8 +247,8 @@ export default function CARegister() {
                     onClick={() => toggleLang(lang)}
                     className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-all ${
                       selectedLangs.includes(lang)
-                        ? "bg-persian-blue-700 text-white border-persian-blue-700"
-                        : "bg-white text-slate-600 border-slate-200 hover:border-persian-blue-400"
+                        ? "bg-ink text-white border-ink"
+                        : "bg-card text-ink/65 border-rule hover:border-credit"
                     }`}
                   >
                     {lang}
@@ -262,7 +262,7 @@ export default function CARegister() {
 
             {/* Experience & Contact */}
             <div>
-              <h3 className="text-base font-semibold text-slate-700 mb-4 pb-2 border-b">
+              <h3 className="text-base font-semibold text-ink/80 mb-4 pb-2 border-b">
                 5. Experience &amp; Contact
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -297,14 +297,14 @@ export default function CARegister() {
                     placeholder="e.g. Practising CA with focus on individual taxation, ITR filing, and NRI tax matters."
                     className="mt-1"
                   />
-                  <p className="text-xs text-slate-500 mt-1">Factual practice description only. No marketing claims.</p>
+                  <p className="text-xs text-ink/55 mt-1">Factual practice description only. No marketing claims.</p>
                   {errors.bio && <p className="text-red-500 text-xs mt-1">{errors.bio.message}</p>}
                 </div>
               </div>
             </div>
 
             {/* Ethics declaration */}
-            <div className="bg-slate-50 rounded-xl p-4">
+            <div className="bg-secondary rounded-xl p-4">
               <div className="flex items-start gap-3">
                 <Checkbox
                   id="agreeToEthics"
@@ -314,7 +314,7 @@ export default function CARegister() {
                   }
                   className="mt-0.5"
                 />
-                <Label htmlFor="agreeToEthics" className="text-sm text-slate-600 cursor-pointer leading-relaxed">
+                <Label htmlFor="agreeToEthics" className="text-sm text-ink/65 cursor-pointer leading-relaxed">
                   I confirm that I am a member of the Institute of Chartered Accountants of India (ICAI),
                   that my ICAI membership number is correct, and that this listing complies with the
                   Chartered Accountants Act, 1949 and the ICAI Code of Ethics. I understand that AiTaxBot
@@ -334,24 +334,24 @@ export default function CARegister() {
               </div>
             )}
 
-            <Button type="submit" disabled={loading} className="w-full bg-persian-blue-700 hover:bg-persian-blue-800 text-white h-11 text-base font-semibold">
+            <Button type="submit" disabled={loading} className="w-full bg-ink hover:bg-credit text-white h-11 text-base font-semibold">
               {loading ? "Submitting…" : "Submit for Review"}
             </Button>
 
-            <p className="text-center text-xs text-slate-500">
+            <p className="text-center text-xs text-ink/55">
               Profile goes live after admin verification of your ICAI membership number (1–2 business days).
               Free listing. No charges. No hidden fees.
             </p>
           </form>
 
           {/* ICAI verify link */}
-          <p className="text-center text-xs text-slate-500 mt-4">
+          <p className="text-center text-xs text-ink/55 mt-4">
             Verify ICAI membership at{" "}
             <a
               href="https://www.icai.org/post.html?post_id=11967"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 hover:underline"
+              className="text-credit hover:underline"
             >
               icai.org Member Search →
             </a>

@@ -48,22 +48,22 @@ export class ErrorBoundary extends Component<Props, State> {
       if (this.props.fallback) return this.props.fallback;
 
       return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 px-4">
-          <div className="max-w-lg w-full bg-white rounded-2xl shadow-sm border border-slate-100 p-8 text-center">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-secondary px-4">
+          <div className="max-w-lg w-full bg-card rounded-2xl shadow-sm border border-rule p-8 text-center">
             <div className="flex justify-center mb-4">
               <AlertTriangle className="w-12 h-12 text-amber-400" />
             </div>
-            <h1 className="text-xl font-bold text-slate-800 mb-2">Something went wrong</h1>
-            <p className="text-slate-500 text-sm mb-6">
+            <h1 className="text-xl font-bold text-ink mb-2">Something went wrong</h1>
+            <p className="text-ink/55 text-sm mb-6">
               AiTaxBot ran into an unexpected error. This has been logged. Try refreshing the page.
             </p>
 
             {this.state.error && (
-              <details className="text-left bg-slate-50 rounded-lg p-4 mb-6 text-xs font-mono text-slate-600 overflow-auto max-h-40">
-                <summary className="cursor-pointer text-slate-500 mb-2">Error details</summary>
+              <details className="text-left bg-secondary rounded-lg p-4 mb-6 text-xs font-mono text-ink/65 overflow-auto max-h-40">
+                <summary className="cursor-pointer text-ink/55 mb-2">Error details</summary>
                 <p className="text-red-600 font-semibold">{this.state.error.message}</p>
                 {this.state.info && (
-                  <pre className="mt-2 text-slate-500 whitespace-pre-wrap text-xs">
+                  <pre className="mt-2 text-ink/55 whitespace-pre-wrap text-xs">
                     {this.state.info.trim()}
                   </pre>
                 )}
@@ -72,15 +72,15 @@ export class ErrorBoundary extends Component<Props, State> {
 
             <button
               onClick={this.handleReset}
-              className="inline-flex items-center gap-2 bg-persian-blue-600 hover:bg-persian-blue-700 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition-colors"
+              className="inline-flex items-center gap-2 bg-ink hover:bg-ink text-white text-sm font-medium px-5 py-2.5 rounded-xl transition-colors"
             >
               <RefreshCw className="w-4 h-4" />
               Reload Page
             </button>
 
-            <p className="text-xs text-slate-500 mt-4">
+            <p className="text-xs text-ink/55 mt-4">
               If this keeps happening,{" "}
-              <a href="/contact" className="underline hover:text-persian-blue-600">contact us</a>.
+              <a href="/contact" className="underline hover:text-ink">contact us</a>.
             </p>
           </div>
         </div>

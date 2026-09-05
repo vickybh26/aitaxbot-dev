@@ -35,7 +35,7 @@ export function SegmentedToggle({
     <div
       role="tablist"
       className={cn(
-        "inline-flex p-1 gap-1 bg-slate-100 rounded-xl",
+        "inline-flex p-1 gap-1 bg-secondary rounded-xl",
         fullWidth && "w-full",
         className
       )}
@@ -66,8 +66,8 @@ export function SegmentedToggle({
               size === "sm" ? "px-3 py-1.5 text-xs" : "px-4 py-2 text-sm",
               fullWidth && "flex-1 min-w-0",
               active
-                ? "bg-white text-primary shadow-sm"
-                : "bg-transparent text-slate-500 hover:text-slate-700"
+                ? "bg-card text-primary shadow-sm"
+                : "bg-transparent text-ink/55 hover:text-ink/80"
             )}
           >
             {opt.label}

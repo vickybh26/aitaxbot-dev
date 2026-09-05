@@ -83,7 +83,7 @@ export default function PFCalculatorPage() {
         <script type="application/ld+json">{JSON.stringify(organizationSchema)}</script>
       </Helmet>
 
-      <div className="bg-white">
+      <div className="bg-card">
 
         <CalcPageHeader
           title="EPF Calculator — Provident Fund Corpus Projection"
@@ -123,15 +123,15 @@ export default function PFCalculatorPage() {
         </section>
 
         {/* Educational Content */}
-        <section className="py-12 px-6 bg-white">
+        <section className="py-12 px-6 bg-card">
           <div className="max-w-6xl mx-auto">
 
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">Understanding PF — Provident Fund in India</h2>
+            <h2 className="text-2xl font-bold text-ink mb-6">Understanding PF — Provident Fund in India</h2>
 
             <div className="grid md:grid-cols-2 gap-8 mb-8">
               <div>
-                <h3 className="text-xl font-semibold text-slate-900 mb-3">What is EPF?</h3>
-                <p className="text-slate-600">
+                <h3 className="text-xl font-semibold text-ink mb-3">What is EPF?</h3>
+                <p className="text-ink/65">
                   The Employee Provident Fund (EPF) is a mandatory savings scheme for salaried employees in organizations
                   with 20+ members. Both you and your employer contribute 12% of Basic Salary + DA. The entire employee
                   contribution and employer's 3.67% go into your EPF account earning 8.25% annual interest. This grows
@@ -139,8 +139,8 @@ export default function PFCalculatorPage() {
                 </p>
               </div>
               <div>
-                <h3 className="text-xl font-semibold text-slate-900 mb-3">Who Benefits Most from PF?</h3>
-                <p className="text-slate-600">
+                <h3 className="text-xl font-semibold text-ink mb-3">Who Benefits Most from PF?</h3>
+                <p className="text-ink/65">
                   Salaried employees in the 20-30% tax bracket get the maximum benefit. Since the returns are tax-free (even
                   better than PPF which is subject to surcharge at high incomes), and employer also contributes, EPF is a
                   powerful wealth builder. Those planning to stay in one organization for 5+ years benefit from service continuity,
@@ -150,77 +150,77 @@ export default function PFCalculatorPage() {
             </div>
 
             {/* EPF vs VPF vs PPF Comparison Table */}
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">EPF vs VPF vs PPF — Quick Comparison</h2>
+            <h2 className="text-2xl font-bold text-ink mb-4">EPF vs VPF vs PPF — Quick Comparison</h2>
             <div className="overflow-x-auto mb-8">
               <table className="w-full border-collapse text-sm">
                 <thead>
-                  <tr className="bg-slate-100">
-                    <th className="border border-slate-200 p-3 text-left font-semibold">Feature</th>
-                    <th className="border border-slate-200 p-3 text-center font-semibold text-emerald-700">EPF</th>
-                    <th className="border border-slate-200 p-3 text-center font-semibold text-teal-700">VPF</th>
-                    <th className="border border-slate-200 p-3 text-center font-semibold text-green-700">PPF</th>
+                  <tr className="bg-secondary">
+                    <th className="border border-rule p-3 text-left font-semibold">Feature</th>
+                    <th className="border border-rule p-3 text-center font-semibold text-emerald-700">EPF</th>
+                    <th className="border border-rule p-3 text-center font-semibold text-teal-700">VPF</th>
+                    <th className="border border-rule p-3 text-center font-semibold text-green-700">PPF</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td className="border border-slate-200 p-3 text-slate-700">Who can invest?</td>
-                    <td className="border border-slate-200 p-3 text-center">Salaried (20+ org)</td>
-                    <td className="border border-slate-200 p-3 text-center">Salaried (beyond 12%)</td>
-                    <td className="border border-slate-200 p-3 text-center">Any resident</td>
+                    <td className="border border-rule p-3 text-ink/80">Who can invest?</td>
+                    <td className="border border-rule p-3 text-center">Salaried (20+ org)</td>
+                    <td className="border border-rule p-3 text-center">Salaried (beyond 12%)</td>
+                    <td className="border border-rule p-3 text-center">Any resident</td>
                   </tr>
-                  <tr className="bg-slate-50">
-                    <td className="border border-slate-200 p-3 text-slate-700">Interest Rate FY 2026-27</td>
-                    <td className="border border-slate-200 p-3 text-center font-semibold">8.25%</td>
-                    <td className="border border-slate-200 p-3 text-center font-semibold">8.25%</td>
-                    <td className="border border-slate-200 p-3 text-center font-semibold">7.1%</td>
-                  </tr>
-                  <tr>
-                    <td className="border border-slate-200 p-3 text-slate-700">Annual Limit</td>
-                    <td className="border border-slate-200 p-3 text-center">12% of Basic+DA</td>
-                    <td className="border border-slate-200 p-3 text-center">No limit</td>
-                    <td className="border border-slate-200 p-3 text-center">₹1.5L within 80C</td>
-                  </tr>
-                  <tr className="bg-slate-50">
-                    <td className="border border-slate-200 p-3 text-slate-700">Employer Contribution</td>
-                    <td className="border border-slate-200 p-3 text-center"><CheckCircle2 className="w-4 h-4 text-green-600 mx-auto" /></td>
-                    <td className="border border-slate-200 p-3 text-center"><XCircle className="w-4 h-4 text-red-400 mx-auto" /></td>
-                    <td className="border border-slate-200 p-3 text-center"><XCircle className="w-4 h-4 text-red-400 mx-auto" /></td>
+                  <tr className="bg-secondary">
+                    <td className="border border-rule p-3 text-ink/80">Interest Rate FY 2026-27</td>
+                    <td className="border border-rule p-3 text-center font-semibold">8.25%</td>
+                    <td className="border border-rule p-3 text-center font-semibold">8.25%</td>
+                    <td className="border border-rule p-3 text-center font-semibold">7.1%</td>
                   </tr>
                   <tr>
-                    <td className="border border-slate-200 p-3 text-slate-700">Tax on Returns</td>
-                    <td className="border border-slate-200 p-3 text-center">Tax-free (EEE)*</td>
-                    <td className="border border-slate-200 p-3 text-center">Tax-free (EEE)*</td>
-                    <td className="border border-slate-200 p-3 text-center">Tax-free (EEE)</td>
+                    <td className="border border-rule p-3 text-ink/80">Annual Limit</td>
+                    <td className="border border-rule p-3 text-center">12% of Basic+DA</td>
+                    <td className="border border-rule p-3 text-center">No limit</td>
+                    <td className="border border-rule p-3 text-center">₹1.5L within 80C</td>
                   </tr>
-                  <tr className="bg-slate-50">
-                    <td className="border border-slate-200 p-3 text-slate-700">Maturity Tax</td>
-                    <td className="border border-slate-200 p-3 text-center">Tax-free (5+ yrs service)</td>
-                    <td className="border border-slate-200 p-3 text-center">Tax-free (5+ yrs service)</td>
-                    <td className="border border-slate-200 p-3 text-center">Fully tax-free</td>
+                  <tr className="bg-secondary">
+                    <td className="border border-rule p-3 text-ink/80">Employer Contribution</td>
+                    <td className="border border-rule p-3 text-center"><CheckCircle2 className="w-4 h-4 text-green-600 mx-auto" /></td>
+                    <td className="border border-rule p-3 text-center"><XCircle className="w-4 h-4 text-red-400 mx-auto" /></td>
+                    <td className="border border-rule p-3 text-center"><XCircle className="w-4 h-4 text-red-400 mx-auto" /></td>
                   </tr>
                   <tr>
-                    <td className="border border-slate-200 p-3 text-slate-700">Lock-in Period</td>
-                    <td className="border border-slate-200 p-3 text-center">Till retirement/5 yrs</td>
-                    <td className="border border-slate-200 p-3 text-center">Same as EPF</td>
-                    <td className="border border-slate-200 p-3 text-center">15 years</td>
+                    <td className="border border-rule p-3 text-ink/80">Tax on Returns</td>
+                    <td className="border border-rule p-3 text-center">Tax-free (EEE)*</td>
+                    <td className="border border-rule p-3 text-center">Tax-free (EEE)*</td>
+                    <td className="border border-rule p-3 text-center">Tax-free (EEE)</td>
                   </tr>
-                  <tr className="bg-slate-50">
-                    <td className="border border-slate-200 p-3 text-slate-700">80C Deduction</td>
-                    <td className="border border-slate-200 p-3 text-center">₹1.5L combined</td>
-                    <td className="border border-slate-200 p-3 text-center">₹1.5L combined w/ EPF</td>
-                    <td className="border border-slate-200 p-3 text-center">₹1.5L combined</td>
+                  <tr className="bg-secondary">
+                    <td className="border border-rule p-3 text-ink/80">Maturity Tax</td>
+                    <td className="border border-rule p-3 text-center">Tax-free (5+ yrs service)</td>
+                    <td className="border border-rule p-3 text-center">Tax-free (5+ yrs service)</td>
+                    <td className="border border-rule p-3 text-center">Fully tax-free</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-rule p-3 text-ink/80">Lock-in Period</td>
+                    <td className="border border-rule p-3 text-center">Till retirement/5 yrs</td>
+                    <td className="border border-rule p-3 text-center">Same as EPF</td>
+                    <td className="border border-rule p-3 text-center">15 years</td>
+                  </tr>
+                  <tr className="bg-secondary">
+                    <td className="border border-rule p-3 text-ink/80">80C Deduction</td>
+                    <td className="border border-rule p-3 text-center">₹1.5L combined</td>
+                    <td className="border border-rule p-3 text-center">₹1.5L combined w/ EPF</td>
+                    <td className="border border-rule p-3 text-center">₹1.5L combined</td>
                   </tr>
                 </tbody>
               </table>
-              <p className="text-xs text-slate-500 mt-2">*Interest on EPF+VPF contributions exceeding ₹2.5L/year is taxable from FY 2021-22 onwards.</p>
+              <p className="text-xs text-ink/55 mt-2">*Interest on EPF+VPF contributions exceeding ₹2.5L/year is taxable from FY 2021-22 onwards.</p>
             </div>
 
             {/* How EPF Contribution Works */}
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">How EPF Contribution Works</h2>
+            <h2 className="text-2xl font-bold text-ink mb-4">How EPF Contribution Works</h2>
             <div className="grid md:grid-cols-2 gap-8 mb-8">
               <div>
-                <h3 className="text-xl font-semibold text-slate-900 mb-4">Contribution Breakdown</h3>
-                <p className="text-slate-600 mb-4">
+                <h3 className="text-xl font-semibold text-ink mb-4">Contribution Breakdown</h3>
+                <p className="text-ink/65 mb-4">
                   PF contribution is calculated on <strong>Basic Salary + Dearness Allowance (DA)</strong>.
                   Both employee and employer contribute 12% each, but the employer's share is split:
                 </p>
@@ -246,20 +246,20 @@ export default function PFCalculatorPage() {
                       <div className="text-sm text-amber-700">Pension fund (capped ₹1,250/month)</div>
                     </div>
                   </div>
-                  <div className="flex items-start gap-3 p-3 bg-slate-100 rounded-lg">
-                    <div className="w-8 h-8 bg-slate-600 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">I</div>
+                  <div className="flex items-start gap-3 p-3 bg-secondary rounded-lg">
+                    <div className="w-8 h-8 bg-ink text-paper rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">I</div>
                     <div>
-                      <div className="font-medium text-slate-900">Employer EDLI: 0.50%</div>
-                      <div className="text-sm text-slate-700">Insurance (paid by employer separately)</div>
+                      <div className="font-medium text-ink">Employer EDLI: 0.50%</div>
+                      <div className="text-sm text-ink/80">Insurance (paid by employer separately)</div>
                     </div>
                   </div>
                 </div>
               </div>
 
               <div>
-                <h3 className="text-xl font-semibold text-slate-900 mb-4">Example Calculation</h3>
-                <div className="bg-slate-50 p-6 rounded-lg border">
-                  <p className="text-slate-900 font-semibold mb-3">If Basic + DA = ₹50,000/month:</p>
+                <h3 className="text-xl font-semibold text-ink mb-4">Example Calculation</h3>
+                <div className="bg-secondary p-6 rounded-lg border">
+                  <p className="text-ink font-semibold mb-3">If Basic + DA = ₹50,000/month:</p>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between py-1.5 border-b">
                       <span>Employee Contribution (12%)</span>
@@ -278,7 +278,7 @@ export default function PFCalculatorPage() {
                       <span>Total to Your PF Account</span>
                       <span className="text-emerald-600">₹7,835/month</span>
                     </div>
-                    <div className="flex justify-between py-1.5 text-slate-500">
+                    <div className="flex justify-between py-1.5 text-ink/55">
                       <span>EPS (goes to pension, not PF)</span>
                       <span>₹1,250/month</span>
                     </div>
@@ -288,42 +288,42 @@ export default function PFCalculatorPage() {
             </div>
 
             {/* Worked Examples */}
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Worked Examples</h2>
+            <h2 className="text-2xl font-bold text-ink mb-4">Worked Examples</h2>
             <div className="grid md:grid-cols-2 gap-6 mb-8">
 
-              <div className="bg-slate-50 border rounded-xl p-6">
-                <h3 className="font-bold text-slate-900 mb-3">Example 1 — Basic Salary ₹30,000</h3>
-                <div className="space-y-1 text-sm text-slate-700">
+              <div className="bg-secondary border rounded-xl p-6">
+                <h3 className="font-bold text-ink mb-3">Example 1 — Basic Salary ₹30,000</h3>
+                <div className="space-y-1 text-sm text-ink/80">
                   <div className="flex justify-between"><span>Basic + DA:</span><span className="font-semibold">₹30,000/month</span></div>
                   <div className="flex justify-between"><span>Monthly EPF Contribution:</span><span className="font-semibold">₹3,600 (12%)</span></div>
                   <div className="flex justify-between"><span>Employer EPF (3.67%):</span><span className="font-semibold">₹1,101</span></div>
                   <div className="flex justify-between"><span>Total Monthly to Account:</span><span className="font-semibold">₹4,701</span></div>
                   <div className="flex justify-between"><span>Investment Period:</span><span className="font-semibold">30 years</span></div>
                   <div className="flex justify-between"><span>Return Assumed:</span><span className="font-semibold">8.25% p.a.</span></div>
-                  <div className="border-t border-slate-300 my-2"></div>
+                  <div className="border-t border-rule my-2"></div>
                   <div className="flex justify-between"><span>Corpus at Age 60:</span><span className="font-bold text-emerald-700">~₹60-70 Lakh</span></div>
-                  <div className="text-xs text-slate-500 mt-2">Note: Assumes no salary increases or VPF additions</div>
+                  <div className="text-xs text-ink/55 mt-2">Note: Assumes no salary increases or VPF additions</div>
                 </div>
               </div>
 
-              <div className="bg-slate-50 border rounded-xl p-6">
-                <h3 className="font-bold text-slate-900 mb-3">Example 2 — Adding VPF ₹5,000/Month</h3>
-                <div className="space-y-1 text-sm text-slate-700">
+              <div className="bg-secondary border rounded-xl p-6">
+                <h3 className="font-bold text-ink mb-3">Example 2 — Adding VPF ₹5,000/Month</h3>
+                <div className="space-y-1 text-sm text-ink/80">
                   <div className="flex justify-between"><span>Mandatory EPF:</span><span className="font-semibold">₹4,701/month</span></div>
                   <div className="flex justify-between"><span>Additional VPF:</span><span className="font-semibold">₹5,000/month</span></div>
                   <div className="flex justify-between"><span>Total Monthly:</span><span className="font-semibold">₹9,701</span></div>
                   <div className="flex justify-between"><span>Investment Period:</span><span className="font-semibold">30 years</span></div>
-                  <div className="border-t border-slate-300 my-2"></div>
+                  <div className="border-t border-rule my-2"></div>
                   <div className="flex justify-between"><span>Corpus with VPF:</span><span className="font-bold text-emerald-700">~₹1.15-1.30 Cr</span></div>
                   <div className="flex justify-between"><span>Additional Gain from VPF:</span><span className="font-bold text-green-700">₹50-60 Lakh</span></div>
-                  <div className="text-xs text-slate-500 mt-2">VPF adds ₹5,000/month, earning 8.25% tax-free for 30 years</div>
+                  <div className="text-xs text-ink/55 mt-2">VPF adds ₹5,000/month, earning 8.25% tax-free for 30 years</div>
                 </div>
               </div>
 
             </div>
 
             {/* PF Withdrawal Guide */}
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">PF Withdrawal Guide & Tax Rules</h2>
+            <h2 className="text-2xl font-bold text-ink mb-4">PF Withdrawal Guide & Tax Rules</h2>
 
             <Card className="mb-8 border-2 border-emerald-200">
               <CardHeader className="bg-emerald-50">
@@ -333,7 +333,7 @@ export default function PFCalculatorPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-6 space-y-4">
-                <p className="text-slate-700">
+                <p className="text-ink/80">
                   To enjoy <strong>tax-free withdrawal</strong> from EPF, you must complete <strong>5 years of continuous service</strong>.
                   This is the most important compliance point for tax planning.
                 </p>
@@ -371,11 +371,11 @@ export default function PFCalculatorPage() {
               </CardHeader>
               <CardContent className="p-6 space-y-6">
                 <div>
-                  <h4 className="font-semibold text-slate-900 mb-3">Complete Withdrawal (Form 19 + Form 10C)</h4>
+                  <h4 className="font-semibold text-ink mb-3">Complete Withdrawal (Form 19 + Form 10C)</h4>
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm border-collapse">
                       <thead>
-                        <tr className="bg-slate-100">
+                        <tr className="bg-secondary">
                           <th className="text-left p-3 font-semibold border">Condition</th>
                           <th className="text-left p-3 font-semibold border">Limit</th>
                           <th className="text-left p-3 font-semibold border">Form Required</th>
@@ -387,7 +387,7 @@ export default function PFCalculatorPage() {
                           <td className="p-3 border">100% of balance</td>
                           <td className="p-3 border">Form 19 + Form 10C/10D</td>
                         </tr>
-                        <tr className="bg-slate-50">
+                        <tr className="bg-secondary">
                           <td className="p-3 border font-medium">Unemployed 1-2 months</td>
                           <td className="p-3 border">75% of balance</td>
                           <td className="p-3 border">Form 19</td>
@@ -397,7 +397,7 @@ export default function PFCalculatorPage() {
                           <td className="p-3 border">100% of balance</td>
                           <td className="p-3 border">Form 19 + Form 10C</td>
                         </tr>
-                        <tr className="bg-slate-50">
+                        <tr className="bg-secondary">
                           <td className="p-3 border font-medium">Pre-retirement (age 54+)</td>
                           <td className="p-3 border">90% of balance</td>
                           <td className="p-3 border">Form 31</td>
@@ -408,11 +408,11 @@ export default function PFCalculatorPage() {
                 </div>
 
                 <div>
-                  <h4 className="font-semibold text-slate-900 mb-3">Partial Withdrawal — Form 31 Advances (Oct 2025 Updated Rules)</h4>
+                  <h4 className="font-semibold text-ink mb-3">Partial Withdrawal — Form 31 Advances (Oct 2025 Updated Rules)</h4>
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm border-collapse">
                       <thead>
-                        <tr className="bg-slate-100">
+                        <tr className="bg-secondary">
                           <th className="text-left p-3 font-semibold border">Purpose</th>
                           <th className="text-center p-3 font-semibold border">Min Service</th>
                           <th className="text-left p-3 font-semibold border">Limit</th>
@@ -424,7 +424,7 @@ export default function PFCalculatorPage() {
                           <td className="p-3 border text-center"><Badge>5 years</Badge></td>
                           <td className="p-3 border">24-36 months Basic+DA or cost</td>
                         </tr>
-                        <tr className="bg-slate-50">
+                        <tr className="bg-secondary">
                           <td className="p-3 border font-medium">Home loan repayment</td>
                           <td className="p-3 border text-center"><Badge>10 years</Badge></td>
                           <td className="p-3 border">36 months Basic+DA or loan balance</td>
@@ -434,7 +434,7 @@ export default function PFCalculatorPage() {
                           <td className="p-3 border text-center"><Badge variant="secondary">No min</Badge></td>
                           <td className="p-3 border">6 months Basic+DA (with doctor cert)</td>
                         </tr>
-                        <tr className="bg-slate-50">
+                        <tr className="bg-secondary">
                           <td className="p-3 border font-medium">Marriage (self/children/siblings)</td>
                           <td className="p-3 border text-center"><Badge>7 years</Badge></td>
                           <td className="p-3 border">50% of account (up to 5 times)</td>
@@ -444,7 +444,7 @@ export default function PFCalculatorPage() {
                           <td className="p-3 border text-center"><Badge>7 years</Badge></td>
                           <td className="p-3 border">50% of account (up to 10 times)</td>
                         </tr>
-                        <tr className="bg-slate-50">
+                        <tr className="bg-secondary">
                           <td className="p-3 border font-medium">Natural calamity/pandemic relief</td>
                           <td className="p-3 border text-center"><Badge variant="secondary">None</Badge></td>
                           <td className="p-3 border">3 months Basic+DA (non-refundable)</td>
@@ -455,13 +455,13 @@ export default function PFCalculatorPage() {
                 </div>
 
                 <div>
-                  <h4 className="font-semibold text-slate-900 mb-3">TDS on Early Withdrawal (Before 5 Years)</h4>
+                  <h4 className="font-semibold text-ink mb-3">TDS on Early Withdrawal (Before 5 Years)</h4>
                   <div className="space-y-2 text-sm">
-                    <div className="flex items-start gap-3 p-3 bg-slate-50 rounded">
+                    <div className="flex items-start gap-3 p-3 bg-secondary rounded">
                       <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
                       <span><strong>Service 5+ years:</strong> No TDS, fully tax-free</span>
                     </div>
-                    <div className="flex items-start gap-3 p-3 bg-slate-50 rounded">
+                    <div className="flex items-start gap-3 p-3 bg-secondary rounded">
                       <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
                       <span><strong>Amount &lt; ₹50,000:</strong> No TDS regardless of service</span>
                     </div>
@@ -479,55 +479,55 @@ export default function PFCalculatorPage() {
             </Card>
 
             {/* Pro Tips */}
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Pro Tips on PF — Maximize Your Retirement Corpus</h2>
+            <h2 className="text-2xl font-bold text-ink mb-4">Pro Tips on PF — Maximize Your Retirement Corpus</h2>
             <div className="grid md:grid-cols-2 gap-4 mb-8">
               <div className="flex gap-3 p-4 bg-amber-50 border border-amber-100 rounded-lg">
                 <span className="text-amber-600 text-lg font-bold shrink-0">1</span>
                 <div>
-                  <p className="font-semibold text-slate-900 text-sm">VPF is the best fixed-income instrument in India</p>
-                  <p className="text-slate-600 text-sm mt-1">8.25% tax-free returns with no contribution limit. No surcharge even at high incomes. Better than PPF (7.1%) or FDs (7% taxable). Maximize VPF within your savings capacity.</p>
+                  <p className="font-semibold text-ink text-sm">VPF is the best fixed-income instrument in India</p>
+                  <p className="text-ink/65 text-sm mt-1">8.25% tax-free returns with no contribution limit. No surcharge even at high incomes. Better than PPF (7.1%) or FDs (7% taxable). Maximize VPF within your savings capacity.</p>
                 </div>
               </div>
               <div className="flex gap-3 p-4 bg-amber-50 border border-amber-100 rounded-lg">
                 <span className="text-amber-600 text-lg font-bold shrink-0">2</span>
                 <div>
-                  <p className="font-semibold text-slate-900 text-sm">Don't withdraw EPF when changing jobs</p>
-                  <p className="text-slate-600 text-sm mt-1">Always transfer your PF to the new employer via UAN portal. Withdrawal breaks service continuity and makes the entire amount taxable (10-30% TDS). The new employer can receive your balance without any hassle.</p>
+                  <p className="font-semibold text-ink text-sm">Don't withdraw EPF when changing jobs</p>
+                  <p className="text-ink/65 text-sm mt-1">Always transfer your PF to the new employer via UAN portal. Withdrawal breaks service continuity and makes the entire amount taxable (10-30% TDS). The new employer can receive your balance without any hassle.</p>
                 </div>
               </div>
               <div className="flex gap-3 p-4 bg-amber-50 border border-amber-100 rounded-lg">
                 <span className="text-amber-600 text-lg font-bold shrink-0">3</span>
                 <div>
-                  <p className="font-semibold text-slate-900 text-sm">Watch the ₹2.5L contribution threshold</p>
-                  <p className="text-slate-600 text-sm mt-1">EPF/VPF interest becomes taxable if your combined annual contributions exceed ₹2.5L. At 30% slab, interest above this threshold is taxed. Plan VPF contributions accordingly to stay under the limit.</p>
+                  <p className="font-semibold text-ink text-sm">Watch the ₹2.5L contribution threshold</p>
+                  <p className="text-ink/65 text-sm mt-1">EPF/VPF interest becomes taxable if your combined annual contributions exceed ₹2.5L. At 30% slab, interest above this threshold is taxed. Plan VPF contributions accordingly to stay under the limit.</p>
                 </div>
               </div>
               <div className="flex gap-3 p-4 bg-amber-50 border border-amber-100 rounded-lg">
                 <span className="text-amber-600 text-lg font-bold shrink-0">4</span>
                 <div>
-                  <p className="font-semibold text-slate-900 text-sm">EPS vs EPF — understand the trade-off</p>
-                  <p className="text-slate-600 text-sm mt-1">EPS is the employer's 8.33% contribution that gives you a monthly pension (capped at ₹1,250). It locks in lower corpus but provides pension security. Choose based on your retirement income needs.</p>
+                  <p className="font-semibold text-ink text-sm">EPS vs EPF — understand the trade-off</p>
+                  <p className="text-ink/65 text-sm mt-1">EPS is the employer's 8.33% contribution that gives you a monthly pension (capped at ₹1,250). It locks in lower corpus but provides pension security. Choose based on your retirement income needs.</p>
                 </div>
               </div>
               <div className="flex gap-3 p-4 bg-amber-50 border border-amber-100 rounded-lg">
                 <span className="text-amber-600 text-lg font-bold shrink-0">5</span>
                 <div>
-                  <p className="font-semibold text-slate-900 text-sm">Nominate your beneficiary in EPFO portal</p>
-                  <p className="text-slate-600 text-sm mt-1">In case of your death, the nomination ensures your family gets the EPF balance without legal complications or delays. Complete the nomination within 3 months of EPF account opening. Update if life situations change.</p>
+                  <p className="font-semibold text-ink text-sm">Nominate your beneficiary in EPFO portal</p>
+                  <p className="text-ink/65 text-sm mt-1">In case of your death, the nomination ensures your family gets the EPF balance without legal complications or delays. Complete the nomination within 3 months of EPF account opening. Update if life situations change.</p>
                 </div>
               </div>
               <div className="flex gap-3 p-4 bg-amber-50 border border-amber-100 rounded-lg">
                 <span className="text-amber-600 text-lg font-bold shrink-0">6</span>
                 <div>
-                  <p className="font-semibold text-slate-900 text-sm">Combine EPF + VPF + NPS for 3-pillar retirement</p>
-                  <p className="text-slate-600 text-sm mt-1">Don't rely on EPF alone. Add VPF for extra corpus, NPS for the ₹50,000 extra deduction under 80CCD(1B), and other investments. This diversified approach reduces risk and maximizes tax efficiency.</p>
+                  <p className="font-semibold text-ink text-sm">Combine EPF + VPF + NPS for 3-pillar retirement</p>
+                  <p className="text-ink/65 text-sm mt-1">Don't rely on EPF alone. Add VPF for extra corpus, NPS for the ₹50,000 extra deduction under 80CCD(1B), and other investments. This diversified approach reduces risk and maximizes tax efficiency.</p>
                 </div>
               </div>
             </div>
 
             {/* EPF Corpus Table */}
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">EPF Corpus Projection Table — How Much Will Your PF Grow? (at 8.25% p.a.)</h2>
-            <p className="text-slate-600 mb-4">
+            <h2 className="text-2xl font-bold text-ink mb-2">EPF Corpus Projection Table — How Much Will Your PF Grow? (at 8.25% p.a.)</h2>
+            <p className="text-ink/65 mb-4">
               EPF earns 8.25% p.a. (FY 2026-27 rate) — tax-free, guaranteed by the government. The table below shows projected corpus
               based on your basic salary, combining both your 12% contribution and employer's 3.67% EPF share (total 15.67% of basic).
             </p>
@@ -545,36 +545,36 @@ export default function PFCalculatorPage() {
                 </thead>
                 <tbody>
                   <tr>
-                    <td className="border border-slate-200 p-3 font-semibold text-slate-800">₹15,000/mo basic</td>
-                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹4.4 L</td>
-                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹8.4 L</td>
-                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹14.4 L</td>
-                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹23.4 L</td>
-                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹37.1 L</td>
+                    <td className="border border-rule p-3 font-semibold text-ink">₹15,000/mo basic</td>
+                    <td className="border border-rule p-3 text-center text-ink/80">₹4.4 L</td>
+                    <td className="border border-rule p-3 text-center text-ink/80">₹8.4 L</td>
+                    <td className="border border-rule p-3 text-center text-ink/80">₹14.4 L</td>
+                    <td className="border border-rule p-3 text-center text-ink/80">₹23.4 L</td>
+                    <td className="border border-rule p-3 text-center text-ink/80">₹37.1 L</td>
                   </tr>
-                  <tr className="bg-slate-50">
-                    <td className="border border-slate-200 p-3 font-semibold text-slate-800">₹25,000/mo basic</td>
-                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹7.3 L</td>
-                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹14.0 L</td>
-                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹24.0 L</td>
-                    <td className="border border-slate-200 p-3 text-center text-blue-700 font-semibold">₹39.1 L</td>
-                    <td className="border border-slate-200 p-3 text-center text-blue-700 font-semibold">₹61.9 L</td>
+                  <tr className="bg-secondary">
+                    <td className="border border-rule p-3 font-semibold text-ink">₹25,000/mo basic</td>
+                    <td className="border border-rule p-3 text-center text-ink/80">₹7.3 L</td>
+                    <td className="border border-rule p-3 text-center text-ink/80">₹14.0 L</td>
+                    <td className="border border-rule p-3 text-center text-ink/80">₹24.0 L</td>
+                    <td className="border border-rule p-3 text-center text-ink font-semibold">₹39.1 L</td>
+                    <td className="border border-rule p-3 text-center text-ink font-semibold">₹61.9 L</td>
                   </tr>
                   <tr>
-                    <td className="border border-slate-200 p-3 font-semibold text-slate-800">₹40,000/mo basic</td>
-                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹11.7 L</td>
-                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹22.3 L</td>
-                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹38.3 L</td>
-                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">₹62.5 L</td>
-                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">₹99.0 L</td>
+                    <td className="border border-rule p-3 font-semibold text-ink">₹40,000/mo basic</td>
+                    <td className="border border-rule p-3 text-center text-ink/80">₹11.7 L</td>
+                    <td className="border border-rule p-3 text-center text-ink/80">₹22.3 L</td>
+                    <td className="border border-rule p-3 text-center text-ink/80">₹38.3 L</td>
+                    <td className="border border-rule p-3 text-center text-green-700 font-bold">₹62.5 L</td>
+                    <td className="border border-rule p-3 text-center text-green-700 font-bold">₹99.0 L</td>
                   </tr>
-                  <tr className="bg-slate-50">
-                    <td className="border border-slate-200 p-3 font-semibold text-slate-800">₹60,000/mo basic</td>
-                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹17.6 L</td>
-                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹33.5 L</td>
-                    <td className="border border-slate-200 p-3 text-center text-slate-700">₹57.5 L</td>
-                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">₹93.8 L</td>
-                    <td className="border border-slate-200 p-3 text-center text-green-700 font-bold">₹1.48 Cr</td>
+                  <tr className="bg-secondary">
+                    <td className="border border-rule p-3 font-semibold text-ink">₹60,000/mo basic</td>
+                    <td className="border border-rule p-3 text-center text-ink/80">₹17.6 L</td>
+                    <td className="border border-rule p-3 text-center text-ink/80">₹33.5 L</td>
+                    <td className="border border-rule p-3 text-center text-ink/80">₹57.5 L</td>
+                    <td className="border border-rule p-3 text-center text-green-700 font-bold">₹93.8 L</td>
+                    <td className="border border-rule p-3 text-center text-green-700 font-bold">₹1.48 Cr</td>
                   </tr>
                 </tbody>
               </table>
@@ -588,12 +588,12 @@ export default function PFCalculatorPage() {
             </div>
 
             {/* FAQs */}
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Frequently Asked Questions</h2>
+            <h2 className="text-2xl font-bold text-ink mb-4">Frequently Asked Questions</h2>
             <div className="space-y-4">
               {pfFAQs.map((faq, i) => (
                 <div key={i}>
-                  <h4 className="font-semibold text-slate-900 mb-2">{faq.question}</h4>
-                  <p className="text-slate-600">{faq.answer}</p>
+                  <h4 className="font-semibold text-ink mb-2">{faq.question}</h4>
+                  <p className="text-ink/65">{faq.answer}</p>
                 </div>
               ))}
             </div>
@@ -611,29 +611,29 @@ export default function PFCalculatorPage() {
         </div>
 
         {/* Related Calculators */}
-        <section className="py-12 px-6 bg-slate-50">
+        <section className="py-12 px-6 bg-secondary">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">Related Tax & Retirement Calculators</h2>
-            <p className="text-slate-600 mb-6">
+            <h2 className="text-2xl font-bold text-ink mb-2">Related Tax & Retirement Calculators</h2>
+            <p className="text-ink/65 mb-6">
               Plan your complete retirement strategy — combine PF with NPS, SIP, and smart tax planning.
             </p>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <Link href="/calculators/nps">
-                <div className="p-4 bg-white rounded-lg border hover:border-emerald-300 hover:shadow transition-all">
-                  <h3 className="font-semibold text-slate-900 mb-1">NPS Calculator</h3>
-                  <p className="text-sm text-slate-600">Calculate NPS corpus and ₹50,000 extra 80CCD(1B) tax saving</p>
+                <div className="p-4 bg-card rounded-lg border hover:border-emerald-300 hover:shadow transition-all">
+                  <h3 className="font-semibold text-ink mb-1">NPS Calculator</h3>
+                  <p className="text-sm text-ink/65">Calculate NPS corpus and ₹50,000 extra 80CCD(1B) tax saving</p>
                 </div>
               </Link>
               <Link href="/calculators/sip">
-                <div className="p-4 bg-white rounded-lg border hover:border-emerald-300 hover:shadow transition-all">
-                  <h3 className="font-semibold text-slate-900 mb-1">SIP Calculator</h3>
-                  <p className="text-sm text-slate-600">Build mutual fund wealth alongside your PF corpus</p>
+                <div className="p-4 bg-card rounded-lg border hover:border-emerald-300 hover:shadow transition-all">
+                  <h3 className="font-semibold text-ink mb-1">SIP Calculator</h3>
+                  <p className="text-sm text-ink/65">Build mutual fund wealth alongside your PF corpus</p>
                 </div>
               </Link>
               <Link href="/calculators/swp">
-                <div className="p-4 bg-white rounded-lg border hover:border-emerald-300 hover:shadow transition-all">
-                  <h3 className="font-semibold text-slate-900 mb-1">SWP Calculator</h3>
-                  <p className="text-sm text-slate-600">Plan post-retirement monthly withdrawals</p>
+                <div className="p-4 bg-card rounded-lg border hover:border-emerald-300 hover:shadow transition-all">
+                  <h3 className="font-semibold text-ink mb-1">SWP Calculator</h3>
+                  <p className="text-sm text-ink/65">Plan post-retirement monthly withdrawals</p>
                 </div>
               </Link>
               <Link href="/calculators">

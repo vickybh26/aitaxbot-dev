@@ -19,11 +19,12 @@ const trustChips = [
 /**
  * Shared header on every calculator/tool page (11 call sites as of
  * 2026-09-04 — see `grep -rl CalcPageHeader client/src/pages`). Re-skinned to
- * the "Warm Ledger" direction ported from Lovable that day: eyebrow pill with
- * a dot, display-font headline, softer badge. Content and prop interface are
- * unchanged — same breadcrumbs, same title/subtitle/badge values passed by
- * every caller, same trust chips — this is a re-skin, not a rewrite, so none
- * of the 11 call sites needed to change.
+ * the ink/paper/credit/rule tokens the homepage now uses everywhere
+ * (2026-09-05) — same eyebrow-pill-with-dot shape as the homepage's "For
+ * individual taxpayers" badge, same font-display headline. Content and prop
+ * interface are unchanged — same breadcrumbs, same title/subtitle/badge
+ * values passed by every caller, same trust chips — this is a re-skin, not
+ * a rewrite, so none of the 11 call sites needed to change.
  */
 export default function CalcPageHeader({
   title,
@@ -36,16 +37,16 @@ export default function CalcPageHeader({
     <header className="bg-paper">
       {/* Breadcrumb strip */}
       <div className={cn(maxWidth, "mx-auto px-6 pt-5")}>
-        <nav className="flex items-center gap-1.5 text-xs text-neutral-500" aria-label="Breadcrumb">
+        <nav className="flex items-center gap-1.5 text-xs text-ink/55" aria-label="Breadcrumb">
           {breadcrumbs.map((crumb, idx) => (
             <span key={idx} className="flex items-center gap-1.5">
-              {idx > 0 && <span className="text-muted-foreground">/</span>}
+              {idx > 0 && <span className="text-ink/25">/</span>}
               {crumb.href ? (
-                <Link href={crumb.href} className="hover:text-[hsl(var(--interactive-blue))] transition-colors">
+                <Link href={crumb.href} className="hover:text-credit transition-colors">
                   {crumb.label}
                 </Link>
               ) : (
-                <span className="text-neutral-600 font-medium">{crumb.label}</span>
+                <span className="text-ink/70 font-medium">{crumb.label}</span>
               )}
             </span>
           ))}
@@ -58,14 +59,14 @@ export default function CalcPageHeader({
 
           {/* Left: eyebrow + title + subtitle + trust chips */}
           <div className="flex-1">
-            <span className="inline-flex items-center gap-2 rounded-full bg-persian-blue-50 px-4 py-1.5 text-xs font-semibold text-persian-blue-700">
-              <span className="h-1.5 w-1.5 rounded-full bg-[hsl(var(--success-green))]" aria-hidden />
+            <span className="inline-flex items-center gap-2 rounded-full bg-secondary px-4 py-1.5 text-xs font-semibold text-ink/70">
+              <span className="h-1.5 w-1.5 rounded-full bg-credit" aria-hidden />
               {badge}
             </span>
-            <h1 className="font-display mt-4 text-2xl md:text-3xl font-extrabold text-neutral-900 mb-2 leading-tight tracking-tight">
+            <h1 className="font-display mt-4 text-2xl md:text-3xl font-extrabold text-ink mb-2 leading-tight tracking-tight">
               {title}
             </h1>
-            <p className="text-sm text-neutral-500 max-w-2xl leading-relaxed">
+            <p className="text-sm text-ink/65 max-w-2xl leading-relaxed">
               {subtitle}
             </p>
 
@@ -74,7 +75,7 @@ export default function CalcPageHeader({
               {trustChips.map(({ icon: Icon, text }) => (
                 <span
                   key={text}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 bg-white text-persian-blue-700 text-xs font-medium rounded-full border border-persian-blue-100"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 bg-card text-ink/70 text-xs font-medium rounded-full border border-rule"
                 >
                   <Icon className="h-3 w-3" />
                   {text}

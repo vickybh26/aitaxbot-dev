@@ -248,7 +248,7 @@ export default function SIPCalculator({ onClose }: SIPCalculatorProps = {}) {
           
           <Button 
             onClick={calculateSIP} 
-            className="w-full h-12 bg-persian-blue-600 hover:bg-persian-blue-700 text-white font-medium"
+            className="w-full h-12 bg-ink hover:bg-ink text-white font-medium"
             data-testid="button-calculate-sip"
           >
             <TrendingUp className="mr-2 h-4 w-4" />Calculate SIP
@@ -256,33 +256,33 @@ export default function SIPCalculator({ onClose }: SIPCalculatorProps = {}) {
         </div>
         
         {/* Results */}
-        <Card className="bg-slate-50 p-6">
-          <h3 className="font-semibold text-slate-900 mb-4">Investment Summary</h3>
+        <Card className="bg-secondary p-6">
+          <h3 className="font-semibold text-ink mb-4">Investment Summary</h3>
           {result && !user ? (
             <ResultAuthGate toolName="SIP Calculator" />
           ) : result && (
             <div className="space-y-4">
-              <Card className="bg-white p-4">
-                <div className="text-sm text-slate-600">Total Investment</div>
-                <div className="text-2xl font-bold text-blue-600" data-testid="text-total-investment">
+              <Card className="bg-card p-4">
+                <div className="text-sm text-ink/65">Total Investment</div>
+                <div className="text-2xl font-bold text-credit" data-testid="text-total-investment">
                   {formatCurrency(result.totalInvestment)}
                 </div>
               </Card>
-              <Card className="bg-white p-4">
-                <div className="text-sm text-slate-600">Expected Returns</div>
+              <Card className="bg-card p-4">
+                <div className="text-sm text-ink/65">Expected Returns</div>
                 <div className="text-2xl font-bold text-green-600" data-testid="text-expected-returns">
                   {formatCurrency(result.totalReturns)}
                 </div>
               </Card>
-              <Card className="bg-white p-4">
-                <div className="text-sm text-slate-600">Maturity Value</div>
-                <div className="text-2xl font-bold text-persian-blue-600" data-testid="text-maturity-value">
+              <Card className="bg-card p-4">
+                <div className="text-sm text-ink/65">Maturity Value</div>
+                <div className="text-2xl font-bold text-ink" data-testid="text-maturity-value">
                   {formatCurrency(result.maturityValue)}
                 </div>
               </Card>
-              <Card className="bg-white p-4">
-                <div className="text-sm text-slate-600">Wealth Gain</div>
-                <div className="text-lg font-bold text-persian-blue-700" data-testid="text-wealth-gain">
+              <Card className="bg-card p-4">
+                <div className="text-sm text-ink/65">Wealth Gain</div>
+                <div className="text-lg font-bold text-ink" data-testid="text-wealth-gain">
                   {result.wealthGain.toFixed(1)}x
                 </div>
               </Card>
@@ -292,8 +292,8 @@ export default function SIPCalculator({ onClose }: SIPCalculatorProps = {}) {
         
         {/* Chart */}
         <div>
-          <h3 className="font-semibold text-slate-900 mb-4">Growth Projection</h3>
-          <Card className="bg-white p-4 border">
+          <h3 className="font-semibold text-ink mb-4">Growth Projection</h3>
+          <Card className="bg-card p-4 border">
             <canvas ref={chartRef} width="400" height="300"></canvas>
           </Card>
         </div>

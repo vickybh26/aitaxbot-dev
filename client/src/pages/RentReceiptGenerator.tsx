@@ -208,7 +208,7 @@ export default function RentReceiptGenerator() {
   });
 
   const inputClass = (err?: string) =>
-    `w-full px-3 py-2.5 text-sm rounded-lg border ${err ? "border-red-400 bg-red-50" : "border-slate-200 bg-white"} focus:outline-none focus:ring-2 focus:ring-persian-blue-300 transition`;
+    `w-full px-3 py-2.5 text-sm rounded-lg border ${err ? "border-red-400 bg-red-50" : "border-rule bg-card"} focus:outline-none focus:ring-2 focus:ring-credit transition`;
 
   return (
     <>
@@ -240,31 +240,31 @@ export default function RentReceiptGenerator() {
             <div className="lg:col-span-2 space-y-5">
 
               {/* Tenant & Landlord */}
-              <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-                <h2 className="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-persian-blue-600" /> Tenant & Landlord Details
+              <div className="bg-card rounded-2xl border border-rule shadow-sm p-6">
+                <h2 className="text-base font-bold text-ink mb-4 flex items-center gap-2">
+                  <FileText className="h-4 w-4 text-ink" /> Tenant & Landlord Details
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="rr-tenantName" className="block text-xs font-semibold text-slate-600 mb-1">Tenant Name *</label>
+                    <label htmlFor="rr-tenantName" className="block text-xs font-semibold text-ink/65 mb-1">Tenant Name *</label>
                     <input id="rr-tenantName" placeholder="Full name of tenant" className={inputClass(errors.tenantName)} {...field("tenantName")} />
                     {errors.tenantName && <p className="text-xs text-red-500 mt-1">{errors.tenantName}</p>}
                   </div>
                   <div>
-                    <label htmlFor="rr-landlordName" className="block text-xs font-semibold text-slate-600 mb-1">Landlord Name *</label>
+                    <label htmlFor="rr-landlordName" className="block text-xs font-semibold text-ink/65 mb-1">Landlord Name *</label>
                     <input id="rr-landlordName" placeholder="Full name of landlord" className={inputClass(errors.landlordName)} {...field("landlordName")} />
                     {errors.landlordName && <p className="text-xs text-red-500 mt-1">{errors.landlordName}</p>}
                   </div>
                   <div>
-                    <label htmlFor="rr-tenantAddress" className="block text-xs font-semibold text-slate-600 mb-1">Tenant Address</label>
+                    <label htmlFor="rr-tenantAddress" className="block text-xs font-semibold text-ink/65 mb-1">Tenant Address</label>
                     <input id="rr-tenantAddress" placeholder="Tenant's current address (optional)" className={inputClass()} {...field("tenantAddress")} />
                   </div>
                   <div>
-                    <label htmlFor="rr-landlordAddress" className="block text-xs font-semibold text-slate-600 mb-1">Landlord Address</label>
+                    <label htmlFor="rr-landlordAddress" className="block text-xs font-semibold text-ink/65 mb-1">Landlord Address</label>
                     <input id="rr-landlordAddress" placeholder="Landlord's address (optional)" className={inputClass()} {...field("landlordAddress")} />
                   </div>
                   <div className="sm:col-span-2">
-                    <label htmlFor="rr-propertyAddress" className="block text-xs font-semibold text-slate-600 mb-1">Property Address *</label>
+                    <label htmlFor="rr-propertyAddress" className="block text-xs font-semibold text-ink/65 mb-1">Property Address *</label>
                     <input id="rr-propertyAddress" placeholder="Full address of the rented property" className={inputClass(errors.propertyAddress)} {...field("propertyAddress")} />
                     {errors.propertyAddress && <p className="text-xs text-red-500 mt-1">{errors.propertyAddress}</p>}
                   </div>
@@ -272,31 +272,31 @@ export default function RentReceiptGenerator() {
               </div>
 
               {/* Rent Details */}
-              <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-                <h2 className="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
-                  <Calculator className="h-4 w-4 text-persian-blue-600" /> Rent & Payment Details
+              <div className="bg-card rounded-2xl border border-rule shadow-sm p-6">
+                <h2 className="text-base font-bold text-ink mb-4 flex items-center gap-2">
+                  <Calculator className="h-4 w-4 text-ink" /> Rent & Payment Details
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="rr-rentAmount" className="block text-xs font-semibold text-slate-600 mb-1">Monthly Rent (₹) *</label>
+                    <label htmlFor="rr-rentAmount" className="block text-xs font-semibold text-ink/65 mb-1">Monthly Rent (₹) *</label>
                     <input id="rr-rentAmount" type="number" placeholder="e.g. 15000" min={1} className={inputClass(errors.rentAmount)} {...field("rentAmount")} />
                     {errors.rentAmount && <p className="text-xs text-red-500 mt-1">{errors.rentAmount}</p>}
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1">Payment Mode</label>
+                    <label className="block text-xs font-semibold text-ink/65 mb-1">Payment Mode</label>
                     <select className={inputClass()} {...field("paymentMode")}>
                       {PAYMENT_MODES.map(m => <option key={m}>{m}</option>)}
                     </select>
                   </div>
                   {form.paymentMode === "Cheque" && (
                     <div className="sm:col-span-2">
-                      <label htmlFor="rr-chequeDetails" className="block text-xs font-semibold text-slate-600 mb-1">Cheque No. & Bank</label>
+                      <label htmlFor="rr-chequeDetails" className="block text-xs font-semibold text-ink/65 mb-1">Cheque No. & Bank</label>
                       <input id="rr-chequeDetails" placeholder="e.g. 004521 — HDFC Bank, MG Road Branch" className={inputClass()} {...field("chequeDetails")} />
                     </div>
                   )}
                   <div>
-                    <label htmlFor="rr-landlordPan" className="block text-xs font-semibold text-slate-600 mb-1">
-                      Landlord PAN {needsPan ? <span className="text-red-500">*</span> : <span className="text-slate-500">(optional)</span>}
+                    <label htmlFor="rr-landlordPan" className="block text-xs font-semibold text-ink/65 mb-1">
+                      Landlord PAN {needsPan ? <span className="text-red-500">*</span> : <span className="text-ink/55">(optional)</span>}
                     </label>
                     <input id="rr-landlordPan" placeholder="AAAPL1234C" maxLength={10} className={inputClass(errors.landlordPan)}
                       {...field("landlordPan")}
@@ -310,9 +310,9 @@ export default function RentReceiptGenerator() {
                     )}
                   </div>
                   <div>
-                    <label htmlFor="rr-receiptPrefix" className="block text-xs font-semibold text-slate-600 mb-1">Receipt Prefix</label>
+                    <label htmlFor="rr-receiptPrefix" className="block text-xs font-semibold text-ink/65 mb-1">Receipt Prefix</label>
                     <input id="rr-receiptPrefix" placeholder="RR" maxLength={8} className={inputClass()} value={receiptPrefix} onChange={e => setReceiptPrefix(e.target.value.toUpperCase() || "RR")} />
-                    <p className="text-xs text-slate-500 mt-1">First receipt will be {receiptPrefix}-001</p>
+                    <p className="text-xs text-ink/55 mt-1">First receipt will be {receiptPrefix}-001</p>
                   </div>
                 </div>
 
@@ -326,13 +326,13 @@ export default function RentReceiptGenerator() {
               </div>
 
               {/* Month Selector */}
-              <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+              <div className="bg-card rounded-2xl border border-rule shadow-sm p-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-                  <h2 className="text-base font-bold text-slate-900">Rent Periods</h2>
+                  <h2 className="text-base font-bold text-ink">Rent Periods</h2>
                   <div className="flex gap-2 flex-wrap">
                     {YEAR_OPTIONS.map(y => (
                       <button key={y} onClick={() => fillFullYear(y)}
-                        className="text-xs px-3 py-1.5 rounded-lg border border-persian-blue-200 text-persian-blue-600 hover:bg-persian-blue-50 font-semibold transition">
+                        className="text-xs px-3 py-1.5 rounded-lg border border-rule text-ink hover:bg-paper font-semibold transition">
                         Full Year {y}
                       </button>
                     ))}
@@ -343,34 +343,34 @@ export default function RentReceiptGenerator() {
 
                 <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
                   {months.map((entry, i) => (
-                    <div key={i} className="flex items-center gap-2 bg-slate-50 rounded-xl px-3 py-2">
-                      <span className="text-xs font-bold text-slate-500 w-6">{i + 1}.</span>
+                    <div key={i} className="flex items-center gap-2 bg-secondary rounded-xl px-3 py-2">
+                      <span className="text-xs font-bold text-ink/55 w-6">{i + 1}.</span>
                       <select value={entry.month} onChange={e => updateMonth(i, "month", +e.target.value)}
-                        className="flex-1 text-sm border border-slate-200 rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-persian-blue-300">
+                        className="flex-1 text-sm border border-rule rounded-lg px-2 py-1.5 bg-card focus:outline-none focus:ring-1 focus:ring-credit">
                         {MONTHS.map((m, mi) => <option key={mi + 1} value={mi + 1}>{m}</option>)}
                       </select>
                       <select value={entry.year} onChange={e => updateMonth(i, "year", +e.target.value)}
-                        className="w-24 text-sm border border-slate-200 rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-persian-blue-300">
+                        className="w-24 text-sm border border-rule rounded-lg px-2 py-1.5 bg-card focus:outline-none focus:ring-1 focus:ring-credit">
                         {YEAR_OPTIONS.map(y => <option key={y}>{y}</option>)}
                       </select>
-                      <button onClick={() => removeMonth(i)} className="text-slate-500 hover:text-red-500 transition p-1">
+                      <button onClick={() => removeMonth(i)} className="text-ink/55 hover:text-red-500 transition p-1">
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
                     </div>
                   ))}
                 </div>
 
-                <button onClick={addMonth} className="mt-3 flex items-center gap-1.5 text-xs font-semibold text-persian-blue-600 hover:text-persian-blue-700 transition">
+                <button onClick={addMonth} className="mt-3 flex items-center gap-1.5 text-xs font-semibold text-ink hover:text-credit transition">
                   <Plus className="h-3.5 w-3.5" /> Add another month
                 </button>
                 {months.length > 1 && (
-                  <p className="text-xs text-slate-500 mt-2">Will generate {months.length} receipts as a single PDF ({months.length} pages)</p>
+                  <p className="text-xs text-ink/55 mt-2">Will generate {months.length} receipts as a single PDF ({months.length} pages)</p>
                 )}
               </div>
 
               {/* Download & Email actions */}
-              <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-                <h2 className="text-base font-bold text-slate-900 mb-4">Generate Receipt</h2>
+              <div className="bg-card rounded-2xl border border-rule shadow-sm p-6">
+                <h2 className="text-base font-bold text-ink mb-4">Generate Receipt</h2>
 
                 {!user ? (
                   <ResultAuthGate toolName="Rent Receipt Generator" />
@@ -378,15 +378,15 @@ export default function RentReceiptGenerator() {
                 <>
                 {/* Download */}
                 <button onClick={handleDownload} disabled={isGenerating}
-                  className="w-full flex items-center justify-center gap-2 bg-persian-blue-600 hover:bg-persian-blue-700 disabled:opacity-60 text-white font-bold py-3 rounded-xl transition text-sm mb-4">
+                  className="w-full flex items-center justify-center gap-2 bg-ink hover:bg-ink disabled:opacity-60 text-white font-bold py-3 rounded-xl transition text-sm mb-4">
                   {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
                   {isGenerating ? "Generating PDF…" : `Download PDF${months.length > 1 ? ` (${months.length} receipts)` : ""}`}
                 </button>
 
                 {/* Email */}
-                <div className="border-t border-slate-100 pt-4">
-                  <p className="text-xs font-semibold text-slate-600 mb-2 flex items-center gap-1">
-                    <Mail className="h-3.5 w-3.5 text-persian-blue-600" /> Or send to email
+                <div className="border-t border-rule pt-4">
+                  <p className="text-xs font-semibold text-ink/65 mb-2 flex items-center gap-1">
+                    <Mail className="h-3.5 w-3.5 text-ink" /> Or send to email
                   </p>
                   <div className="flex gap-2">
                     <div className="flex-1">
@@ -402,19 +402,19 @@ export default function RentReceiptGenerator() {
                   </div>
 
                   {emailResult?.sent && (
-                    <div className={`mt-3 rounded-xl p-3 flex items-start gap-2 ${emailResult.userExists ? "bg-persian-blue-50 border border-persian-blue-200" : "bg-emerald-50 border border-emerald-200"}`}>
-                      <CheckCircle2 className={`h-4 w-4 flex-shrink-0 mt-0.5 ${emailResult.userExists ? "text-persian-blue-600" : "text-emerald-600"}`} />
+                    <div className={`mt-3 rounded-xl p-3 flex items-start gap-2 ${emailResult.userExists ? "bg-paper border border-rule" : "bg-emerald-50 border border-emerald-200"}`}>
+                      <CheckCircle2 className={`h-4 w-4 flex-shrink-0 mt-0.5 ${emailResult.userExists ? "text-ink" : "text-emerald-600"}`} />
                       <div>
-                        <p className={`text-xs font-semibold ${emailResult.userExists ? "text-persian-blue-700" : "text-emerald-700"}`}>
+                        <p className={`text-xs font-semibold ${emailResult.userExists ? "text-ink" : "text-emerald-700"}`}>
                           {emailResult.userExists ? "Receipt sent + Dashboard link included" : "Receipt sent + Free account invite included"}
                         </p>
-                        <p className="text-xs text-slate-500 mt-0.5">
+                        <p className="text-xs text-ink/55 mt-0.5">
                           {emailResult.userExists
                             ? "We've included a link to your AiTaxBot dashboard where you can view this receipt."
                             : "We've included an invite to create your free AiTaxBot account to save receipts and access all calculators."}
                         </p>
                         {!emailResult.userExists && (
-                          <Link href="/login" className="inline-flex items-center gap-1 text-xs font-semibold text-persian-blue-600 hover:underline mt-1">
+                          <Link href="/login" className="inline-flex items-center gap-1 text-xs font-semibold text-ink hover:underline mt-1">
                             Create free account <ArrowRight className="h-3 w-3" />
                           </Link>
                         )}
@@ -432,8 +432,8 @@ export default function RentReceiptGenerator() {
             <div className="space-y-5">
 
               {/* Live summary */}
-              <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
-                <h3 className="text-sm font-bold text-slate-900 mb-3">Receipt Preview</h3>
+              <div className="bg-card rounded-2xl border border-rule shadow-sm p-5">
+                <h3 className="text-sm font-bold text-ink mb-3">Receipt Preview</h3>
                 <dl className="space-y-2 text-xs">
                   {[
                     { label: "Tenant", value: form.tenantName || "—" },
@@ -445,14 +445,14 @@ export default function RentReceiptGenerator() {
                     { label: "Receipts", value: months.length > 0 ? `${months.length} month${months.length > 1 ? "s" : ""}` : "—" },
                   ].map(({ label, value }) => (
                     <div key={label} className="flex justify-between gap-2">
-                      <dt className="text-slate-500 flex-shrink-0">{label}</dt>
-                      <dd className="text-slate-800 font-medium text-right truncate max-w-[140px]">{value}</dd>
+                      <dt className="text-ink/55 flex-shrink-0">{label}</dt>
+                      <dd className="text-ink font-medium text-right truncate max-w-[140px]">{value}</dd>
                     </div>
                   ))}
                 </dl>
 
                 {rentAmt > 0 && (
-                  <div className="mt-4 pt-3 border-t border-slate-100 space-y-1.5">
+                  <div className="mt-4 pt-3 border-t border-rule space-y-1.5">
                     {needsPan && !form.landlordPan.trim() && (
                       <div className="flex items-center gap-1.5 text-xs text-amber-700 bg-amber-50 rounded-lg px-2 py-1.5">
                         <Info className="h-3 w-3 flex-shrink-0" /> PAN not entered — get landlord declaration if PAN unavailable (Rule 26C)
@@ -468,21 +468,21 @@ export default function RentReceiptGenerator() {
               </div>
 
               {/* HRA CTA */}
-              <div className="bg-gradient-to-br from-persian-blue-600 to-persian-blue-800 rounded-2xl p-5 text-white">
-                <p className="text-xs font-bold uppercase tracking-wide text-persian-blue-200 mb-1">Next step</p>
+              <div className="bg-gradient-to-br from-ink to-credit rounded-2xl p-5 text-white">
+                <p className="text-xs font-bold uppercase tracking-wide text-paper/70 mb-1">Next step</p>
                 <h3 className="text-base font-bold mb-2">Calculate HRA Exemption</h3>
-                <p className="text-xs text-persian-blue-100 mb-4 leading-relaxed">
+                <p className="text-xs text-paper/80 mb-4 leading-relaxed">
                   Use your rent receipts to claim HRA exemption under Section 10(13A). Our calculator shows exactly how much you can save.
                 </p>
-                <Link href="/calculators/hra" className="flex items-center justify-center gap-1.5 bg-white text-persian-blue-700 font-bold text-sm py-2 rounded-xl hover:bg-persian-blue-50 transition">
+                <Link href="/calculators/hra" className="flex items-center justify-center gap-1.5 bg-card text-ink font-bold text-sm py-2 rounded-xl hover:bg-paper transition">
                   HRA Calculator <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               </div>
 
               {/* Tips */}
-              <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
-                <h3 className="text-sm font-bold text-slate-900 mb-3">Quick Tips</h3>
-                <ul className="space-y-2.5 text-xs text-slate-600">
+              <div className="bg-card rounded-2xl border border-rule shadow-sm p-5">
+                <h3 className="text-sm font-bold text-ink mb-3">Quick Tips</h3>
+                <ul className="space-y-2.5 text-xs text-ink/65">
                   {[
                     { icon: "📋", tip: "Keep receipts for all 12 months to submit for HRA exemption with your employer (Form 12BB)." },
                     { icon: "🔢", tip: "Landlord PAN is mandatory for HRA documentation if annual rent exceeds ₹1,00,000 (Income Tax Rule 26C). If landlord has no PAN, obtain a written declaration from them." },

@@ -93,7 +93,7 @@ export default function IncomeTaxCalculatorPage() {
         <script type="application/ld+json">{JSON.stringify(organizationSchema)}</script>
       </Helmet>
 
-      <div className="bg-white">
+      <div className="bg-paper">
 
         <CalcPageHeader
           title="Income Tax Calculator — New vs Old Regime FY 2026-27"
@@ -132,28 +132,28 @@ export default function IncomeTaxCalculatorPage() {
           <div className="max-w-6xl mx-auto">
             <Link
               href="/tools/ais-26as-form16"
-              className="group flex flex-col sm:flex-row sm:items-center gap-4 p-5 rounded-2xl border border-persian-blue-200 bg-persian-blue-50 hover:border-persian-blue-300 hover:shadow-md transition-all"
+              className="group flex flex-col sm:flex-row sm:items-center gap-4 p-5 rounded-[1.5rem] border border-rule bg-card hover:border-credit hover:shadow-[0_16px_34px_-18px] hover:shadow-ink/40 transition-all"
               data-testid="link-calc-to-reconcile"
             >
-              <div className="w-11 h-11 rounded-xl bg-persian-blue-700 flex items-center justify-center flex-shrink-0">
-                <Layers className="h-5 w-5 text-white" />
+              <div className="w-11 h-11 rounded-2xl bg-ink flex items-center justify-center flex-shrink-0">
+                <Layers className="h-5 w-5 text-paper" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-sm font-bold text-slate-900">
+                  <span className="text-sm font-bold text-ink">
                     Next: check your figures against AIS, 26AS and Form 16
                   </span>
-                  <span className="text-[10px] font-bold text-persian-blue-700 bg-white border border-persian-blue-200 px-1.5 py-0.5 rounded-full">
+                  <span className="text-[10px] font-bold rounded-full px-2 py-0.5 uppercase tracking-[0.1em] bg-credit/10 text-credit">
                     New
                   </span>
                 </div>
-                <p className="text-xs text-slate-600 leading-relaxed">
+                <p className="text-xs text-ink/65 leading-relaxed">
                   Knowing your tax is half the job. Upload your documents and our AI flags income the
                   department already knows about but your Form 16 doesn't — the mismatches that trigger
                   notices — before you file.
                 </p>
               </div>
-              <ArrowRight className="h-4 w-4 text-persian-blue-700 flex-shrink-0 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="h-4 w-4 text-credit flex-shrink-0 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
         </section>
@@ -161,16 +161,16 @@ export default function IncomeTaxCalculatorPage() {
         {/* Misconception Buster */}
         <section className="py-6 px-6">
           <div className="max-w-6xl mx-auto">
-            <div className="bg-red-50 border border-red-200 rounded-xl p-6">
-              <h3 className="text-lg font-bold text-red-800 mb-2">
+            <div className="rounded-[1.5rem] border border-notice/40 bg-warning-light p-6">
+              <h3 className="font-display text-lg font-bold text-notice mb-2">
                 ⚠️ Common Misconception — ₹12.1 Lakh Income Does NOT Mean Paying Tax on Full Amount
               </h3>
-              <p className="text-red-700 mb-2">
+              <p className="text-ink/75 mb-2">
                 Most people think: "If I earn ₹12.1 lakh, I'll pay tax on ₹12.1 lakh at the applicable slab rates."
                 This is wrong. Thanks to <strong>marginal relief</strong>, at ₹12.1 lakh taxable income your tax is only
                 <strong> ₹10,000 + 4% cess = ₹10,400</strong> — NOT ₹63,960 (what you'd incorrectly calculate without relief).
               </p>
-              <p className="text-red-700">
+              <p className="text-ink/75">
                 <strong>Your extra ₹10,000 income costs you only ₹10,400 in tax — not ₹51,960 more.</strong> The law ensures
                 that crossing the ₹12 lakh threshold never costs you more than the extra income you earned. This calculator
                 automatically applies marginal relief at all thresholds: ₹12L, ₹50L, ₹1Cr, ₹2Cr, and ₹5Cr.
@@ -180,285 +180,285 @@ export default function IncomeTaxCalculatorPage() {
         </section>
 
         {/* Educational Content */}
-        <section className="py-12 px-6 bg-white">
+        <section className="py-12 px-6 bg-card">
           <div className="max-w-6xl mx-auto">
 
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">Income Tax Slabs FY 2026-27</h2>
+            <h2 className="font-display text-2xl font-bold text-ink mb-6">Income Tax Slabs FY 2026-27</h2>
 
             <div className="overflow-x-auto mb-8">
               <table className="w-full border-collapse text-sm">
                 <thead>
-                  <tr className="bg-slate-100">
-                    <th className="border border-slate-200 p-3 text-left font-semibold">Income Range</th>
-                    <th className="border border-slate-200 p-3 text-center font-semibold text-blue-700">New Regime Tax Rate</th>
+                  <tr className="bg-secondary">
+                    <th className="border border-rule p-3 text-left font-semibold">Income Range</th>
+                    <th className="border border-rule p-3 text-center font-semibold text-ink">New Regime Tax Rate</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td className="border border-slate-200 p-3 text-slate-700">₹0 – ₹4 lakh</td>
-                    <td className="border border-slate-200 p-3 text-center font-semibold text-green-700">0%</td>
+                    <td className="border border-rule p-3 text-ink/70">₹0 – ₹4 lakh</td>
+                    <td className="border border-rule p-3 text-center font-semibold text-credit">0%</td>
                   </tr>
-                  <tr className="bg-slate-50">
-                    <td className="border border-slate-200 p-3 text-slate-700">₹4 – ₹8 lakh</td>
-                    <td className="border border-slate-200 p-3 text-center font-semibold">5%</td>
-                  </tr>
-                  <tr>
-                    <td className="border border-slate-200 p-3 text-slate-700">₹8 – ₹12 lakh</td>
-                    <td className="border border-slate-200 p-3 text-center font-semibold">10%</td>
-                  </tr>
-                  <tr className="bg-slate-50">
-                    <td className="border border-slate-200 p-3 text-slate-700">₹12 – ₹16 lakh</td>
-                    <td className="border border-slate-200 p-3 text-center font-semibold">15%</td>
+                  <tr className="bg-paper">
+                    <td className="border border-rule p-3 text-ink/70">₹4 – ₹8 lakh</td>
+                    <td className="border border-rule p-3 text-center font-semibold">5%</td>
                   </tr>
                   <tr>
-                    <td className="border border-slate-200 p-3 text-slate-700">₹16 – ₹20 lakh</td>
-                    <td className="border border-slate-200 p-3 text-center font-semibold">20%</td>
+                    <td className="border border-rule p-3 text-ink/70">₹8 – ₹12 lakh</td>
+                    <td className="border border-rule p-3 text-center font-semibold">10%</td>
                   </tr>
-                  <tr className="bg-slate-50">
-                    <td className="border border-slate-200 p-3 text-slate-700">₹20 – ₹24 lakh</td>
-                    <td className="border border-slate-200 p-3 text-center font-semibold">25%</td>
+                  <tr className="bg-paper">
+                    <td className="border border-rule p-3 text-ink/70">₹12 – ₹16 lakh</td>
+                    <td className="border border-rule p-3 text-center font-semibold">15%</td>
                   </tr>
                   <tr>
-                    <td className="border border-slate-200 p-3 text-slate-700">Above ₹24 lakh</td>
-                    <td className="border border-slate-200 p-3 text-center font-semibold">30%</td>
+                    <td className="border border-rule p-3 text-ink/70">₹16 – ₹20 lakh</td>
+                    <td className="border border-rule p-3 text-center font-semibold">20%</td>
+                  </tr>
+                  <tr className="bg-paper">
+                    <td className="border border-rule p-3 text-ink/70">₹20 – ₹24 lakh</td>
+                    <td className="border border-rule p-3 text-center font-semibold">25%</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-rule p-3 text-ink/70">Above ₹24 lakh</td>
+                    <td className="border border-rule p-3 text-center font-semibold">30%</td>
                   </tr>
                 </tbody>
               </table>
-              <p className="text-xs text-slate-500 mt-2">Plus 4% Health & Education Cess on final tax amount. Old Regime has different slabs and allows more deductions.</p>
+              <p className="text-xs text-ink/55 mt-2">Plus 4% Health & Education Cess on final tax amount. Old Regime has different slabs and allows more deductions.</p>
             </div>
 
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">New vs Old Regime — Which Should You Choose?</h2>
+            <h2 className="font-display text-2xl font-bold text-ink mb-6">New vs Old Regime — Which Should You Choose?</h2>
 
             <div className="grid md:grid-cols-2 gap-8 mb-8">
-              <div className="bg-blue-50 border border-blue-100 rounded-xl p-6">
-                <h3 className="text-xl font-semibold text-blue-900 mb-3">New Regime (Default)</h3>
-                <ul className="space-y-2 text-sm text-slate-700">
-                  <li className="flex gap-2"><span className="text-blue-600 font-bold">✓</span> Lower tax rates (0-30%)</li>
-                  <li className="flex gap-2"><span className="text-blue-600 font-bold">✓</span> Standard deduction ₹75,000</li>
-                  <li className="flex gap-2"><span className="text-blue-600 font-bold">✓</span> Rebate up to ₹60,000 (income ≤ ₹12L)</li>
-                  <li className="flex gap-2"><span className="text-blue-600 font-bold">✓</span> Simple, fewer deduction claims</li>
-                  <li className="flex gap-2"><span className="text-red-600 font-bold">✗</span> No HRA, home loan, 80C deductions</li>
-                  <li className="flex gap-2"><span className="text-red-600 font-bold">✗</span> Better only if income &gt; ₹15L with few deductions</li>
+              <div className="rounded-[1.5rem] border border-rule bg-paper p-6">
+                <h3 className="font-display text-xl font-semibold text-ink mb-3">New Regime (Default)</h3>
+                <ul className="space-y-2 text-sm text-ink/70">
+                  <li className="flex gap-2"><span className="text-credit font-bold">✓</span> Lower tax rates (0-30%)</li>
+                  <li className="flex gap-2"><span className="text-credit font-bold">✓</span> Standard deduction ₹75,000</li>
+                  <li className="flex gap-2"><span className="text-credit font-bold">✓</span> Rebate up to ₹60,000 (income ≤ ₹12L)</li>
+                  <li className="flex gap-2"><span className="text-credit font-bold">✓</span> Simple, fewer deduction claims</li>
+                  <li className="flex gap-2"><span className="text-debit font-bold">✗</span> No HRA, home loan, 80C deductions</li>
+                  <li className="flex gap-2"><span className="text-debit font-bold">✗</span> Better only if income &gt; ₹15L with few deductions</li>
                 </ul>
               </div>
 
-              <div className="bg-green-50 border border-green-100 rounded-xl p-6">
-                <h3 className="text-xl font-semibold text-green-900 mb-3">Old Regime (Traditional)</h3>
-                <ul className="space-y-2 text-sm text-slate-700">
-                  <li className="flex gap-2"><span className="text-green-600 font-bold">✓</span> All deductions available (80C, HRA, etc.)</li>
-                  <li className="flex gap-2"><span className="text-green-600 font-bold">✓</span> Section 80CCD(1B): +₹50,000 NPS deduction</li>
-                  <li className="flex gap-2"><span className="text-green-600 font-bold">✓</span> Standard deduction ₹50,000</li>
-                  <li className="flex gap-2"><span className="text-green-600 font-bold">✓</span> Better for salaried with investments</li>
-                  <li className="flex gap-2"><span className="text-red-600 font-bold">✗</span> Higher tax rates (higher slabs)</li>
-                  <li className="flex gap-2"><span className="text-red-600 font-bold">✗</span> No rebate above ₹12L</li>
+              <div className="rounded-[1.5rem] border border-rule bg-paper p-6">
+                <h3 className="font-display text-xl font-semibold text-ink mb-3">Old Regime (Traditional)</h3>
+                <ul className="space-y-2 text-sm text-ink/70">
+                  <li className="flex gap-2"><span className="text-credit font-bold">✓</span> All deductions available (80C, HRA, etc.)</li>
+                  <li className="flex gap-2"><span className="text-credit font-bold">✓</span> Section 80CCD(1B): +₹50,000 NPS deduction</li>
+                  <li className="flex gap-2"><span className="text-credit font-bold">✓</span> Standard deduction ₹50,000</li>
+                  <li className="flex gap-2"><span className="text-credit font-bold">✓</span> Better for salaried with investments</li>
+                  <li className="flex gap-2"><span className="text-debit font-bold">✗</span> Higher tax rates (higher slabs)</li>
+                  <li className="flex gap-2"><span className="text-debit font-bold">✗</span> No rebate above ₹12L</li>
                 </ul>
               </div>
             </div>
 
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">Tax Calculation Worked Examples</h2>
+            <h2 className="font-display text-2xl font-bold text-ink mb-6">Tax Calculation Worked Examples</h2>
 
             <div className="grid md:grid-cols-2 gap-6 mb-8">
 
               {/* Example 1: ₹12L Zero Tax */}
-              <div className="bg-slate-50 border rounded-xl p-6">
-                <h3 className="font-bold text-slate-900 mb-3 flex items-center gap-2">
-                  <span className="bg-green-600 text-white text-xs font-bold px-2 py-1 rounded">EXAMPLE 1</span>
+              <div className="rounded-[1.5rem] border border-rule bg-paper p-6">
+                <h3 className="font-display font-bold text-ink mb-3 flex items-center gap-2">
+                  <span className="bg-credit text-paper text-xs font-bold px-2 py-1 rounded-full">EXAMPLE 1</span>
                   ₹12 Lakh — Zero Tax
                 </h3>
-                <p className="text-sm text-slate-600 mb-4">Salaried person, New Regime, FY 2026-27</p>
+                <p className="text-sm text-ink/65 mb-4">Salaried person, New Regime, FY 2026-27</p>
                 <div className="space-y-1 text-sm">
                   <div className="flex justify-between"><span>Gross Salary</span><span className="font-semibold">₹12,75,000</span></div>
                   <div className="flex justify-between"><span>Less: Standard Deduction</span><span className="font-semibold">−₹75,000</span></div>
-                  <div className="flex justify-between border-t pt-1"><span className="text-slate-700 font-medium">Taxable Income</span><span className="font-bold">₹12,00,000</span></div>
+                  <div className="flex justify-between border-t border-rule pt-1"><span className="text-ink/70 font-medium">Taxable Income</span><span className="font-bold">₹12,00,000</span></div>
                   <div className="flex justify-between"><span>Tax on ₹12L (new slabs)</span><span className="font-semibold">₹60,000</span></div>
-                  <div className="flex justify-between"><span>Less: Section 87A Rebate</span><span className="font-semibold text-green-700">−₹60,000</span></div>
-                  <div className="flex justify-between border-t pt-1 mt-1"><span className="text-green-800 font-bold">Total Tax Payable</span><span className="font-bold text-green-700 text-base">₹0</span></div>
+                  <div className="flex justify-between"><span>Less: Section 87A Rebate</span><span className="font-semibold text-credit">−₹60,000</span></div>
+                  <div className="flex justify-between border-t border-rule pt-1 mt-1"><span className="text-ink font-bold">Total Tax Payable</span><span className="font-bold text-credit text-base">₹0</span></div>
                 </div>
-                <p className="text-xs text-green-700 mt-3 bg-green-100 rounded p-2">
+                <p className="text-xs text-credit mt-3 bg-credit/10 rounded-xl p-2">
                   ✔ Full rebate available. Net take-home from ₹12.75L gross = ₹12.75L (zero tax). Standard deduction automatically applies.
                 </p>
               </div>
 
               {/* Example 2: ₹12.1L Marginal Relief */}
-              <div className="bg-slate-50 border rounded-xl p-6">
-                <h3 className="font-bold text-slate-900 mb-3 flex items-center gap-2">
-                  <span className="bg-amber-600 text-white text-xs font-bold px-2 py-1 rounded">EXAMPLE 2</span>
+              <div className="rounded-[1.5rem] border border-rule bg-paper p-6">
+                <h3 className="font-display font-bold text-ink mb-3 flex items-center gap-2">
+                  <span className="bg-notice text-ink text-xs font-bold px-2 py-1 rounded-full">EXAMPLE 2</span>
                   ₹12.1 Lakh — Marginal Relief
                 </h3>
-                <p className="text-sm text-slate-600 mb-4">Salaried person, just over rebate limit</p>
+                <p className="text-sm text-ink/65 mb-4">Salaried person, just over rebate limit</p>
                 <div className="space-y-1 text-sm">
                   <div className="flex justify-between"><span>Taxable Income</span><span className="font-semibold">₹12,10,000</span></div>
                   <div className="flex justify-between"><span>Tax (normal calculation)</span><span className="font-semibold">₹61,500</span></div>
-                  <div className="flex justify-between"><span>Without marginal relief + cess</span><span className="font-semibold line-through text-red-500">₹63,960</span></div>
+                  <div className="flex justify-between"><span>Without marginal relief + cess</span><span className="font-semibold line-through text-debit">₹63,960</span></div>
                   <div className="flex justify-between"><span>Extra income over ₹12L</span><span className="font-semibold">₹10,000</span></div>
-                  <div className="flex justify-between"><span>Marginal relief applied</span><span className="font-semibold text-amber-700">Tax capped at ₹10,000</span></div>
-                  <div className="flex justify-between border-t pt-1 mt-1"><span className="text-amber-800 font-bold">Total Tax Payable</span><span className="font-bold text-amber-700 text-base">₹10,400</span></div>
+                  <div className="flex justify-between"><span>Marginal relief applied</span><span className="font-semibold text-notice">Tax capped at ₹10,000</span></div>
+                  <div className="flex justify-between border-t border-rule pt-1 mt-1"><span className="text-ink font-bold">Total Tax Payable</span><span className="font-bold text-notice text-base">₹10,400</span></div>
                 </div>
-                <p className="text-xs text-amber-700 mt-3 bg-amber-100 rounded p-2">
+                <p className="text-xs text-notice mt-3 bg-warning-light rounded-xl p-2">
                   ✔ Tax = ₹10,000 + 4% cess = ₹10,400. NOT ₹63,960. Marginal relief saves ₹53,560.
                 </p>
               </div>
 
               {/* Example 3: ₹50L Surcharge */}
-              <div className="bg-slate-50 border rounded-xl p-6">
-                <h3 className="font-bold text-slate-900 mb-3 flex items-center gap-2">
-                  <span className="bg-blue-700 text-white text-xs font-bold px-2 py-1 rounded">EXAMPLE 3</span>
+              <div className="rounded-[1.5rem] border border-rule bg-paper p-6">
+                <h3 className="font-display font-bold text-ink mb-3 flex items-center gap-2">
+                  <span className="bg-ink text-paper text-xs font-bold px-2 py-1 rounded-full">EXAMPLE 3</span>
                   ₹50 Lakh — Surcharge Cliff Protection
                 </h3>
-                <p className="text-sm text-slate-600 mb-4">New Regime — 10% surcharge kicks in above ₹50L</p>
+                <p className="text-sm text-ink/65 mb-4">New Regime — 10% surcharge kicks in above ₹50L</p>
                 <div className="space-y-1 text-sm">
-                  <div className="flex justify-between text-slate-700 text-xs font-semibold mb-2"><span>At ₹50L income</span><span>At ₹50.1L income</span></div>
+                  <div className="flex justify-between text-ink/70 text-xs font-semibold mb-2"><span>At ₹50L income</span><span>At ₹50.1L income</span></div>
                   <div className="flex justify-between"><span>Income Tax</span><span className="font-semibold">₹10,80,000</span></div>
                   <div className="flex justify-between"><span>Surcharge (10%)</span><span className="font-semibold">Nil</span></div>
-                  <div className="flex justify-between border-t pt-1"><span className="font-medium">Subtotal at ₹50L</span><span className="font-bold">₹11,23,200</span></div>
-                  <div className="border my-2"></div>
+                  <div className="flex justify-between border-t border-rule pt-1"><span className="font-medium">Subtotal at ₹50L</span><span className="font-bold">₹11,23,200</span></div>
+                  <div className="border-t border-rule my-2"></div>
                   <div className="flex justify-between"><span>Income Tax</span><span className="font-semibold">₹10,83,000</span></div>
                   <div className="flex justify-between"><span>Surcharge (10%)</span><span className="font-semibold">₹1,08,300</span></div>
-                  <div className="flex justify-between"><span className="text-red-600 line-through">Without relief</span><span className="font-semibold line-through text-red-600">Extra ₹1,15,832</span></div>
-                  <div className="flex justify-between border-t pt-1 mt-1"><span className="text-blue-800 font-bold">WITH marginal relief</span><span className="font-bold text-blue-700 text-base">Extra only ₹10,400</span></div>
+                  <div className="flex justify-between"><span className="text-debit line-through">Without relief</span><span className="font-semibold line-through text-debit">Extra ₹1,15,832</span></div>
+                  <div className="flex justify-between border-t border-rule pt-1 mt-1"><span className="text-ink font-bold">WITH marginal relief</span><span className="font-bold text-credit text-base">Extra only ₹10,400</span></div>
                 </div>
-                <p className="text-xs text-blue-700 mt-3 bg-blue-100 rounded p-2">
+                <p className="text-xs text-ink/70 mt-3 bg-secondary rounded-xl p-2">
                   ✔ 10% surcharge (and 15% at ₹1Cr, 25% at ₹2Cr) all have marginal relief protection. Your extra ₹10,000 income costs proportionally only ₹10,400 tax.
                 </p>
               </div>
 
               {/* Example 4: Old vs New Regime Breakeven */}
-              <div className="bg-slate-50 border rounded-xl p-6">
-                <h3 className="font-bold text-slate-900 mb-3 flex items-center gap-2">
-                  <span className="bg-persian-blue-800 text-white text-xs font-bold px-2 py-1 rounded">EXAMPLE 4</span>
+              <div className="rounded-[1.5rem] border border-rule bg-paper p-6">
+                <h3 className="font-display font-bold text-ink mb-3 flex items-center gap-2">
+                  <span className="bg-ink text-paper text-xs font-bold px-2 py-1 rounded-full">EXAMPLE 4</span>
                   Old vs New Regime — Breakeven Analysis
                 </h3>
-                <p className="text-sm text-slate-600 mb-4">Income ₹15L: Which regime saves more tax?</p>
+                <p className="text-sm text-ink/65 mb-4">Income ₹15L: Which regime saves more tax?</p>
                 <div className="space-y-1 text-sm">
-                  <div className="flex justify-between text-xs font-semibold text-slate-500 mb-2"><span>OLD REGIME</span><span>NEW REGIME</span></div>
+                  <div className="flex justify-between text-xs font-semibold text-ink/55 mb-2"><span>OLD REGIME</span><span>NEW REGIME</span></div>
                   <div className="flex justify-between"><span>Gross Income</span><span className="font-semibold">₹15,00,000 | ₹15,00,000</span></div>
                   <div className="flex justify-between"><span>Std deduction</span><span className="font-semibold">₹50,000 | ₹75,000</span></div>
                   <div className="flex justify-between"><span>80C + HRA</span><span className="font-semibold">₹2,00,000 | Nil</span></div>
                   <div className="flex justify-between"><span>Taxable income</span><span className="font-semibold">₹12,50,000 | ₹14,25,000</span></div>
-                  <div className="flex justify-between border-t pt-1 mt-1"><span className="text-persian-blue-800 font-bold">Tax + cess</span><span className="font-bold text-persian-blue-800 text-base">₹1,56,000 | ₹1,96,365</span></div>
+                  <div className="flex justify-between border-t border-rule pt-1 mt-1"><span className="text-ink font-bold">Tax + cess</span><span className="font-bold text-ink text-base">₹1,56,000 | ₹1,96,365</span></div>
                 </div>
-                <p className="text-xs text-persian-blue-800 mt-3 bg-persian-blue-100 rounded p-2">
+                <p className="text-xs text-ink/70 mt-3 bg-secondary rounded-xl p-2">
                   ✔ Old Regime wins by ₹40,365 here. But if deductions are less than ~₹3.75L at this income, New Regime wins. Use the calculator to compare your actual scenario.
                 </p>
               </div>
 
             </div>
 
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">Pro Tips on Income Tax — Save More, Pay Less</h2>
+            <h2 className="font-display text-2xl font-bold text-ink mb-6">Pro Tips on Income Tax — Save More, Pay Less</h2>
 
             <div className="grid md:grid-cols-2 gap-4 mb-8">
-              <div className="flex gap-3 p-4 bg-amber-50 border border-amber-100 rounded-lg">
-                <span className="text-amber-600 text-lg font-bold shrink-0">1</span>
+              <div className="flex gap-3 p-4 rounded-2xl border border-notice/40 bg-warning-light">
+                <span className="text-notice text-lg font-bold shrink-0">1</span>
                 <div>
-                  <p className="font-semibold text-slate-900 text-sm">₹12 Lakh is actually tax-free under new regime due to rebate u/s 87A</p>
-                  <p className="text-slate-600 text-sm mt-1">You earn ₹12L, pay zero tax after standard deduction (₹75,000) and rebate (₹60,000). This is pure tax-free income. The rebate is automatically calculated by our calculator.</p>
+                  <p className="font-semibold text-ink text-sm">₹12 Lakh is actually tax-free under new regime due to rebate u/s 87A</p>
+                  <p className="text-ink/65 text-sm mt-1">You earn ₹12L, pay zero tax after standard deduction (₹75,000) and rebate (₹60,000). This is pure tax-free income. The rebate is automatically calculated by our calculator.</p>
                 </div>
               </div>
 
-              <div className="flex gap-3 p-4 bg-amber-50 border border-amber-100 rounded-lg">
-                <span className="text-amber-600 text-lg font-bold shrink-0">2</span>
+              <div className="flex gap-3 p-4 rounded-2xl border border-notice/40 bg-warning-light">
+                <span className="text-notice text-lg font-bold shrink-0">2</span>
                 <div>
-                  <p className="font-semibold text-slate-900 text-sm">NPS 80CCD(1B) saves extra ₹15,000 tax — works only under old regime</p>
-                  <p className="text-slate-600 text-sm mt-1">Contribute ₹50,000 more to NPS Tier I above your regular 80C limit. At 30% slab = ₹15,000 free tax saving every year. This deduction is NOT available in the new regime.</p>
+                  <p className="font-semibold text-ink text-sm">NPS 80CCD(1B) saves extra ₹15,000 tax — works only under old regime</p>
+                  <p className="text-ink/65 text-sm mt-1">Contribute ₹50,000 more to NPS Tier I above your regular 80C limit. At 30% slab = ₹15,000 free tax saving every year. This deduction is NOT available in the new regime.</p>
                 </div>
               </div>
 
-              <div className="flex gap-3 p-4 bg-amber-50 border border-amber-100 rounded-lg">
-                <span className="text-amber-600 text-lg font-bold shrink-0">3</span>
+              <div className="flex gap-3 p-4 rounded-2xl border border-notice/40 bg-warning-light">
+                <span className="text-notice text-lg font-bold shrink-0">3</span>
                 <div>
-                  <p className="font-semibold text-slate-900 text-sm">Don't cross surcharge thresholds without planning — ₹50.1L costs way more than ₹50L</p>
-                  <p className="text-slate-600 text-sm mt-1">Surcharge kicks in at ₹50L (10%), ₹1Cr (15%), ₹2Cr (25%). Marginal relief protects you, but deferring bonus timing or claiming more deductions to stay just below thresholds can save significant tax if amounts are close.</p>
+                  <p className="font-semibold text-ink text-sm">Don't cross surcharge thresholds without planning — ₹50.1L costs way more than ₹50L</p>
+                  <p className="text-ink/65 text-sm mt-1">Surcharge kicks in at ₹50L (10%), ₹1Cr (15%), ₹2Cr (25%). Marginal relief protects you, but deferring bonus timing or claiming more deductions to stay just below thresholds can save significant tax if amounts are close.</p>
                 </div>
               </div>
 
-              <div className="flex gap-3 p-4 bg-amber-50 border border-amber-100 rounded-lg">
-                <span className="text-amber-600 text-lg font-bold shrink-0">4</span>
+              <div className="flex gap-3 p-4 rounded-2xl border border-notice/40 bg-warning-light">
+                <span className="text-notice text-lg font-bold shrink-0">4</span>
                 <div>
-                  <p className="font-semibold text-slate-900 text-sm">₹75,000 standard deduction is automatic under new regime — no proof needed</p>
-                  <p className="text-slate-600 text-sm mt-1">You don't need to maintain rent receipts, invest in 80C, or file any deduction claims. ₹75,000 is automatically deducted from your salary. This makes new regime attractive for simple salaried folks.</p>
+                  <p className="font-semibold text-ink text-sm">₹75,000 standard deduction is automatic under new regime — no proof needed</p>
+                  <p className="text-ink/65 text-sm mt-1">You don't need to maintain rent receipts, invest in 80C, or file any deduction claims. ₹75,000 is automatically deducted from your salary. This makes new regime attractive for simple salaried folks.</p>
                 </div>
               </div>
 
-              <div className="flex gap-3 p-4 bg-amber-50 border border-amber-100 rounded-lg">
-                <span className="text-amber-600 text-lg font-bold shrink-0">5</span>
+              <div className="flex gap-3 p-4 rounded-2xl border border-notice/40 bg-warning-light">
+                <span className="text-notice text-lg font-bold shrink-0">5</span>
                 <div>
-                  <p className="font-semibold text-slate-900 text-sm">HRA + home loan interest can ONLY be claimed under old regime</p>
-                  <p className="text-slate-600 text-sm mt-1">Paying rent AND have a home loan? Old regime lets you claim both HRA (10(13A)) and home loan interest (24(b)). New regime gives you neither. This combination strongly favors old regime.</p>
+                  <p className="font-semibold text-ink text-sm">HRA + home loan interest can ONLY be claimed under old regime</p>
+                  <p className="text-ink/65 text-sm mt-1">Paying rent AND have a home loan? Old regime lets you claim both HRA (10(13A)) and home loan interest (24(b)). New regime gives you neither. This combination strongly favors old regime.</p>
                 </div>
               </div>
 
-              <div className="flex gap-3 p-4 bg-amber-50 border border-amber-100 rounded-lg">
-                <span className="text-amber-600 text-lg font-bold shrink-0">6</span>
+              <div className="flex gap-3 p-4 rounded-2xl border border-notice/40 bg-warning-light">
+                <span className="text-notice text-lg font-bold shrink-0">6</span>
                 <div>
-                  <p className="font-semibold text-slate-900 text-sm">New regime is better for income above ₹15L with no major deductions</p>
-                  <p className="text-slate-600 text-sm mt-1">If you earn ₹20L+ with no HRA, no 80C investments, and no home loan — new regime almost always wins. Simple rule: use our calculator. It will tell you instantly which is better for your income.</p>
+                  <p className="font-semibold text-ink text-sm">New regime is better for income above ₹15L with no major deductions</p>
+                  <p className="text-ink/65 text-sm mt-1">If you earn ₹20L+ with no HRA, no 80C investments, and no home loan — new regime almost always wins. Simple rule: use our calculator. It will tell you instantly which is better for your income.</p>
                 </div>
               </div>
             </div>
 
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">FY 2026-27 Tax Regime Comparison</h2>
+            <h2 className="font-display text-2xl font-bold text-ink mb-6">FY 2026-27 Tax Regime Comparison</h2>
 
             <div className="overflow-x-auto mb-8">
               <table className="w-full border-collapse text-sm">
                 <thead>
-                  <tr className="bg-slate-100">
-                    <th className="border border-slate-200 p-3 text-left font-semibold">Feature</th>
-                    <th className="border border-slate-200 p-3 text-center font-semibold text-blue-700">New Regime</th>
-                    <th className="border border-slate-200 p-3 text-center font-semibold text-green-700">Old Regime</th>
+                  <tr className="bg-secondary">
+                    <th className="border border-rule p-3 text-left font-semibold">Feature</th>
+                    <th className="border border-rule p-3 text-center font-semibold text-ink">New Regime</th>
+                    <th className="border border-rule p-3 text-center font-semibold text-credit">Old Regime</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td className="border border-slate-200 p-3 text-slate-700">Tax Rates</td>
-                    <td className="border border-slate-200 p-3 text-center">0-30% (simplified)</td>
-                    <td className="border border-slate-200 p-3 text-center">5-30% (with surcharge)</td>
+                    <td className="border border-rule p-3 text-ink/70">Tax Rates</td>
+                    <td className="border border-rule p-3 text-center">0-30% (simplified)</td>
+                    <td className="border border-rule p-3 text-center">5-30% (with surcharge)</td>
                   </tr>
-                  <tr className="bg-slate-50">
-                    <td className="border border-slate-200 p-3 text-slate-700">Standard Deduction</td>
-                    <td className="border border-slate-200 p-3 text-center font-semibold">₹75,000</td>
-                    <td className="border border-slate-200 p-3 text-center">₹50,000</td>
-                  </tr>
-                  <tr>
-                    <td className="border border-slate-200 p-3 text-slate-700">Section 80C Deductions</td>
-                    <td className="border border-slate-200 p-3 text-center">Not available</td>
-                    <td className="border border-slate-200 p-3 text-center font-semibold">Up to ₹1.5L</td>
-                  </tr>
-                  <tr className="bg-slate-50">
-                    <td className="border border-slate-200 p-3 text-slate-700">HRA Exemption</td>
-                    <td className="border border-slate-200 p-3 text-center">Not available</td>
-                    <td className="border border-slate-200 p-3 text-center font-semibold">Available</td>
+                  <tr className="bg-paper">
+                    <td className="border border-rule p-3 text-ink/70">Standard Deduction</td>
+                    <td className="border border-rule p-3 text-center font-semibold">₹75,000</td>
+                    <td className="border border-rule p-3 text-center">₹50,000</td>
                   </tr>
                   <tr>
-                    <td className="border border-slate-200 p-3 text-slate-700">Home Loan Interest</td>
-                    <td className="border border-slate-200 p-3 text-center">Not available</td>
-                    <td className="border border-slate-200 p-3 text-center font-semibold">Up to ₹2L/year</td>
+                    <td className="border border-rule p-3 text-ink/70">Section 80C Deductions</td>
+                    <td className="border border-rule p-3 text-center">Not available</td>
+                    <td className="border border-rule p-3 text-center font-semibold">Up to ₹1.5L</td>
                   </tr>
-                  <tr className="bg-slate-50">
-                    <td className="border border-slate-200 p-3 text-slate-700">80CCD(1B) — NPS Extra</td>
-                    <td className="border border-slate-200 p-3 text-center">Not available</td>
-                    <td className="border border-slate-200 p-3 text-center font-semibold">+₹50,000</td>
+                  <tr className="bg-paper">
+                    <td className="border border-rule p-3 text-ink/70">HRA Exemption</td>
+                    <td className="border border-rule p-3 text-center">Not available</td>
+                    <td className="border border-rule p-3 text-center font-semibold">Available</td>
                   </tr>
                   <tr>
-                    <td className="border border-slate-200 p-3 text-slate-700">Rebate (up to ₹12L)</td>
-                    <td className="border border-slate-200 p-3 text-center font-semibold">Up to ₹60,000</td>
-                    <td className="border border-slate-200 p-3 text-center">Not applicable</td>
+                    <td className="border border-rule p-3 text-ink/70">Home Loan Interest</td>
+                    <td className="border border-rule p-3 text-center">Not available</td>
+                    <td className="border border-rule p-3 text-center font-semibold">Up to ₹2L/year</td>
                   </tr>
-                  <tr className="bg-slate-50">
-                    <td className="border border-slate-200 p-3 text-slate-700">Best For</td>
-                    <td className="border border-slate-200 p-3 text-center">High income, minimal deductions</td>
-                    <td className="border border-slate-200 p-3 text-center font-semibold">Salaried with investments + HRA</td>
+                  <tr className="bg-paper">
+                    <td className="border border-rule p-3 text-ink/70">80CCD(1B) — NPS Extra</td>
+                    <td className="border border-rule p-3 text-center">Not available</td>
+                    <td className="border border-rule p-3 text-center font-semibold">+₹50,000</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-rule p-3 text-ink/70">Rebate (up to ₹12L)</td>
+                    <td className="border border-rule p-3 text-center font-semibold">Up to ₹60,000</td>
+                    <td className="border border-rule p-3 text-center">Not applicable</td>
+                  </tr>
+                  <tr className="bg-paper">
+                    <td className="border border-rule p-3 text-ink/70">Best For</td>
+                    <td className="border border-rule p-3 text-center">High income, minimal deductions</td>
+                    <td className="border border-rule p-3 text-center font-semibold">Salaried with investments + HRA</td>
                   </tr>
                 </tbody>
               </table>
             </div>
 
             {/* FAQs */}
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Frequently Asked Questions</h2>
+            <h2 className="font-display text-2xl font-bold text-ink mb-4">Frequently Asked Questions</h2>
             <div className="space-y-4">
               {incomeTaxFAQs.map((faq, i) => (
                 <div key={i}>
-                  <h4 className="font-semibold text-slate-900 mb-2">{faq.question}</h4>
-                  <p className="text-slate-600">{faq.answer}</p>
+                  <h4 className="font-semibold text-ink mb-2">{faq.question}</h4>
+                  <p className="text-ink/65">{faq.answer}</p>
                 </div>
               ))}
             </div>
@@ -476,35 +476,35 @@ export default function IncomeTaxCalculatorPage() {
         </div>
 
         {/* Related Calculators */}
-        <section className="py-12 px-6 bg-slate-50">
+        <section className="py-12 px-6 bg-secondary/60">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">Related Tax & Retirement Calculators</h2>
-            <p className="text-slate-600 mb-6">
+            <h2 className="font-display text-2xl font-bold text-ink mb-2">Related Tax & Retirement Calculators</h2>
+            <p className="text-ink/65 mb-6">
               Plan your complete tax strategy — combine income tax planning with HRA, NPS, and PF calculators.
             </p>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <Link href="/calculators/hra">
-                <div className="p-4 bg-white rounded-lg border hover:border-blue-300 hover:shadow transition-all">
-                  <h3 className="font-semibold text-slate-900 mb-1">HRA Calculator</h3>
-                  <p className="text-sm text-slate-600">Claim maximum HRA deduction under Section 10(13A)</p>
+                <div className="p-4 rounded-2xl border border-rule bg-card hover:border-credit hover:shadow-[0_16px_34px_-18px] hover:shadow-ink/40 transition-all">
+                  <h3 className="font-display font-semibold text-ink mb-1">HRA Calculator</h3>
+                  <p className="text-sm text-ink/65">Claim maximum HRA deduction under Section 10(13A)</p>
                 </div>
               </Link>
               <Link href="/calculators/nps">
-                <div className="p-4 bg-white rounded-lg border hover:border-persian-blue-300 hover:shadow transition-all">
-                  <h3 className="font-semibold text-slate-900 mb-1">NPS Calculator</h3>
-                  <p className="text-sm text-slate-600">Calculate 80CCD(1B) ₹50,000 extra deduction & retirement corpus</p>
+                <div className="p-4 rounded-2xl border border-rule bg-card hover:border-credit hover:shadow-[0_16px_34px_-18px] hover:shadow-ink/40 transition-all">
+                  <h3 className="font-display font-semibold text-ink mb-1">NPS Calculator</h3>
+                  <p className="text-sm text-ink/65">Calculate 80CCD(1B) ₹50,000 extra deduction & retirement corpus</p>
                 </div>
               </Link>
               <Link href="/calculators/pf">
-                <div className="p-4 bg-white rounded-lg border hover:border-green-300 hover:shadow transition-all">
-                  <h3 className="font-semibold text-slate-900 mb-1">PF Calculator</h3>
-                  <p className="text-sm text-slate-600">Section 80C deduction via EPF & PPF contributions</p>
+                <div className="p-4 rounded-2xl border border-rule bg-card hover:border-credit hover:shadow-[0_16px_34px_-18px] hover:shadow-ink/40 transition-all">
+                  <h3 className="font-display font-semibold text-ink mb-1">PF Calculator</h3>
+                  <p className="text-sm text-ink/65">Section 80C deduction via EPF & PPF contributions</p>
                 </div>
               </Link>
               <Link href="/calculators">
-                <div className="p-4 bg-blue-50 rounded-lg border border-blue-200 hover:shadow transition-all">
-                  <h3 className="font-semibold text-blue-700 mb-1">All Calculators</h3>
-                  <p className="text-sm text-blue-600">View complete suite of financial tools</p>
+                <div className="p-4 rounded-2xl bg-ink hover:shadow-[0_16px_34px_-18px] hover:shadow-ink/40 transition-all">
+                  <h3 className="font-display font-semibold text-paper mb-1">All Calculators</h3>
+                  <p className="text-sm text-paper/70">View complete suite of financial tools</p>
                 </div>
               </Link>
             </div>

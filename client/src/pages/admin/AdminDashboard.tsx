@@ -48,12 +48,12 @@ function StatCard({
   color: string;
 }) {
   return (
-    <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+    <div className="bg-card rounded-2xl p-5 shadow-sm border border-rule">
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-slate-500 text-sm font-medium">{label}</p>
-          <p className="text-2xl font-bold text-slate-800 mt-1">{value}</p>
-          {sub && <p className="text-xs text-slate-500 mt-1">{sub}</p>}
+          <p className="text-ink/55 text-sm font-medium">{label}</p>
+          <p className="text-2xl font-bold text-ink mt-1">{value}</p>
+          {sub && <p className="text-xs text-ink/55 mt-1">{sub}</p>}
         </div>
         <div className={`p-2.5 rounded-xl ${color}`}>
           <Icon className="w-5 h-5 text-white" />
@@ -93,7 +93,7 @@ export default function AdminDashboard() {
     return (
       <AdminLayout>
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-persian-blue-600" />
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-ink" />
         </div>
       </AdminLayout>
     );
@@ -104,8 +104,8 @@ export default function AdminDashboard() {
       <AdminLayout>
         <div className="flex flex-col items-center justify-center h-64 gap-3 text-center">
           <AlertTriangle className="w-8 h-8 text-red-400" />
-          <p className="text-sm font-medium text-slate-700">Failed to load dashboard stats</p>
-          <p className="text-xs text-slate-500">Check Railway logs for Firestore errors, or verify FIREBASE_SERVICE_ACCOUNT is set.</p>
+          <p className="text-sm font-medium text-ink/80">Failed to load dashboard stats</p>
+          <p className="text-xs text-ink/55">Check Railway logs for Firestore errors, or verify FIREBASE_SERVICE_ACCOUNT is set.</p>
         </div>
       </AdminLayout>
     );
@@ -116,8 +116,8 @@ export default function AdminDashboard() {
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Page header */}
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Dashboard</h1>
-          <p className="text-slate-500 text-sm mt-1">
+          <h1 className="text-2xl font-bold text-ink">Dashboard</h1>
+          <p className="text-ink/55 text-sm mt-1">
             Overview of AiTaxBot users, calculations, and growth.
           </p>
         </div>
@@ -128,7 +128,7 @@ export default function AdminDashboard() {
             label="Total Users"
             value={(stats?.totalUsers ?? 0).toLocaleString("en-IN")}
             icon={Users}
-            color="bg-persian-blue-600"
+            color="bg-ink"
           />
           <StatCard
             label="New This Week"
@@ -170,14 +170,14 @@ export default function AdminDashboard() {
             value={(stats?.returningUsers ?? 0).toLocaleString("en-IN")}
             sub={`${stats?.returningUserRate ?? 0}% of ${(stats?.activeUsers ?? 0).toLocaleString("en-IN")} active users`}
             icon={UserCheck}
-            color="bg-persian-blue-700"
+            color="bg-ink"
           />
         </div>
 
         {/* Signup trend chart */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-          <h2 className="font-semibold text-slate-700 mb-4 flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-persian-blue-600" />
+        <div className="bg-card rounded-2xl p-6 shadow-sm border border-rule">
+          <h2 className="font-semibold text-ink/80 mb-4 flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-ink" />
             Signups — Last 30 Days
           </h2>
           {chartData.length > 0 ? (
@@ -213,7 +213,7 @@ export default function AdminDashboard() {
               </AreaChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-52 flex items-center justify-center text-slate-500 text-sm">
+            <div className="h-52 flex items-center justify-center text-ink/55 text-sm">
               No signup data yet — send traffic to aitaxbot.co.in to start seeing trends here.
             </div>
           )}
@@ -221,19 +221,19 @@ export default function AdminDashboard() {
 
         {/* Admin setup instructions (Level 1 only) */}
         {adminLevel === 1 && (
-          <div className="bg-gradient-to-r from-slate-800 to-slate-900 rounded-2xl p-6 text-white">
+          <div className="bg-gradient-to-r from-ink to-ink rounded-2xl p-6 text-white">
             <h3 className="font-semibold text-white mb-2 flex items-center gap-2">
               🔧 How to add more admins
             </h3>
-            <ol className="text-slate-300 text-sm space-y-1.5 list-decimal list-inside">
+            <ol className="text-ink/35 text-sm space-y-1.5 list-decimal list-inside">
               <li>
                 Have the new admin sign up (or sign in) at{" "}
-                <span className="text-persian-blue-300 font-mono">/login</span> with their Google
+                <span className="text-paper/60 font-mono">/login</span> with their Google
                 account.
               </li>
               <li>
                 Open{" "}
-                <span className="font-mono text-persian-blue-300">Firebase Console → Firestore</span>{" "}
+                <span className="font-mono text-paper/60">Firebase Console → Firestore</span>{" "}
                 and find their <span className="font-mono">UID</span> in the{" "}
                 <span className="font-mono">users</span> collection (if they also registered as a
                 user). For admin-only accounts, get the UID from Firebase Auth.

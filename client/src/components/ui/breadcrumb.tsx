@@ -14,7 +14,7 @@ interface BreadcrumbProps {
 
 export function Breadcrumb({ items, className = "" }: BreadcrumbProps) {
   return (
-    <nav className={`flex items-center space-x-1 text-sm text-neutral-600 ${className}`} aria-label="Breadcrumb">
+    <nav className={`flex items-center space-x-1 text-sm text-ink/65 ${className}`} aria-label="Breadcrumb">
       <ol className="flex items-center space-x-1">
         <li>
           <a 
@@ -28,10 +28,10 @@ export function Breadcrumb({ items, className = "" }: BreadcrumbProps) {
         </li>
         {items.map((item, index) => (
           <li key={index} className="flex items-center">
-            <ChevronRight className="w-4 h-4 mx-1 text-neutral-400" />
+            <ChevronRight className="w-4 h-4 mx-1 text-ink/40" />
             {item.current ? (
               <span 
-                className="font-medium text-neutral-900"
+                className="font-medium text-ink"
                 aria-current="page"
                 data-testid={`breadcrumb-current-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
               >

@@ -35,15 +35,15 @@ export default function Modal({ isOpen, onClose, title, children, size = "4xl" }
          from dialog to dialog across the site. */
       className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
     >
-      <Card className={`bg-white rounded-xl ${sizeClasses[size]} w-full max-h-[90vh] overflow-y-auto`}>
+      <Card className={`bg-card rounded-xl ${sizeClasses[size]} w-full max-h-[90vh] overflow-y-auto`}>
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 id={titleId} className="text-2xl font-bold text-slate-900">{title}</h2>
+            <h2 id={titleId} className="text-2xl font-bold text-ink">{title}</h2>
             <Button
               variant="ghost"
               size="sm"
               onClick={onClose}
-              className="text-slate-500 hover:text-slate-700"
+              className="text-ink/55 hover:text-ink/80"
               aria-label="Close"
               data-testid="button-close-modal"
             >

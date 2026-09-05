@@ -62,26 +62,26 @@ export default function WhatsAppButton() {
              bar. Reverts to the original offset from md upwards, where no tab
              bar exists. */
           className="fixed bottom-[calc(148px+env(safe-area-inset-bottom))] md:bottom-24 right-4 z-[45]
-                     max-w-[220px] bg-white rounded-2xl shadow-xl border border-slate-200 p-3"
+                     max-w-[220px] bg-card rounded-2xl shadow-xl border border-rule p-3"
           style={{ animation: "fadeInUp 0.3s ease" }}
           role="status"
         >
           <button
             onClick={dismiss}
-            className="absolute top-1.5 right-2 text-slate-500 hover:text-slate-700 text-xs leading-none"
+            className="absolute top-1.5 right-2 text-ink/55 hover:text-ink/80 text-xs leading-none"
             aria-label="Dismiss WhatsApp prompt"
           >
             ✕
           </button>
-          <p className="text-xs font-semibold text-slate-800 leading-snug pr-4">
+          <p className="text-xs font-semibold text-ink leading-snug pr-4">
             Have a tax question?
           </p>
-          <p className="text-xs text-slate-500 mt-0.5 leading-snug">
+          <p className="text-xs text-ink/55 mt-0.5 leading-snug">
             Chat with AiTaxBot on WhatsApp — free, instant answers.
           </p>
           {/* Arrow pointing down-right */}
           <div
-            className="absolute bottom-[-8px] right-6 w-4 h-4 bg-white border-r border-b border-slate-200 rotate-45"
+            className="absolute bottom-[-8px] right-6 w-4 h-4 bg-card border-r border-b border-rule rotate-45"
           />
         </div>
       )}

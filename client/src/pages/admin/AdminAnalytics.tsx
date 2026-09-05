@@ -30,9 +30,9 @@ const COLORS = CATEGORICAL;
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-white border border-slate-100 rounded-xl shadow-lg px-4 py-2.5">
-      <p className="text-xs font-semibold text-slate-600 mb-1">{label ?? payload[0]?.name}</p>
-      <p className="text-sm font-bold text-persian-blue-700">{payload[0]?.value} users</p>
+    <div className="bg-card border border-rule rounded-xl shadow-lg px-4 py-2.5">
+      <p className="text-xs font-semibold text-ink/65 mb-1">{label ?? payload[0]?.name}</p>
+      <p className="text-sm font-bold text-ink">{payload[0]?.value} users</p>
     </div>
   );
 };
@@ -80,7 +80,7 @@ export default function AdminAnalytics() {
     return (
       <AdminLayout>
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-persian-blue-600" />
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-ink" />
         </div>
       </AdminLayout>
     );
@@ -91,7 +91,7 @@ export default function AdminAnalytics() {
       <AdminLayout>
         <div className="flex flex-col items-center justify-center h-64 gap-3 text-center">
           <svg className="w-8 h-8 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /></svg>
-          <p className="text-sm font-medium text-slate-700">Failed to load analytics</p>
+          <p className="text-sm font-medium text-ink/80">Failed to load analytics</p>
           <p className="text-xs text-red-500">{(error as Error)?.message}</p>
         </div>
       </AdminLayout>
@@ -105,15 +105,15 @@ export default function AdminAnalytics() {
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Analytics</h1>
-          <p className="text-slate-500 text-sm mt-1">
+          <h1 className="text-2xl font-bold text-ink">Analytics</h1>
+          <p className="text-ink/55 text-sm mt-1">
             User demographics — occupation, geography, and sign-in method breakdown.
           </p>
         </div>
 
         {/* Occupation breakdown — bar chart */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-          <h2 className="font-semibold text-slate-700 mb-5">Occupation Breakdown</h2>
+        <div className="bg-card rounded-2xl p-6 shadow-sm border border-rule">
+          <h2 className="font-semibold text-ink/80 mb-5">Occupation Breakdown</h2>
           {hasData(data?.occupation ?? []) ? (
             <ResponsiveContainer width="100%" height={260}>
               <BarChart
@@ -142,8 +142,8 @@ export default function AdminAnalytics() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Top States */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-            <h2 className="font-semibold text-slate-700 mb-5">Top States</h2>
+          <div className="bg-card rounded-2xl p-6 shadow-sm border border-rule">
+            <h2 className="font-semibold text-ink/80 mb-5">Top States</h2>
             {hasData(data?.states ?? []) ? (
               <ResponsiveContainer width="100%" height={260}>
                 <BarChart
@@ -174,8 +174,8 @@ export default function AdminAnalytics() {
           </div>
 
           {/* Auth Providers — pie chart */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-            <h2 className="font-semibold text-slate-700 mb-5">Sign-in Methods</h2>
+          <div className="bg-card rounded-2xl p-6 shadow-sm border border-rule">
+            <h2 className="font-semibold text-ink/80 mb-5">Sign-in Methods</h2>
             {data?.authProviders?.length ? (
               <ResponsiveContainer width="100%" height={260}>
                 <PieChart>
@@ -211,8 +211,8 @@ export default function AdminAnalytics() {
 
         {/* Raw data table */}
         {data && (
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 overflow-x-auto">
-            <h2 className="font-semibold text-slate-700 mb-4">Raw Breakdown</h2>
+          <div className="bg-card rounded-2xl p-6 shadow-sm border border-rule overflow-x-auto">
+            <h2 className="font-semibold text-ink/80 mb-4">Raw Breakdown</h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               {[
                 { title: "Occupation", rows: data.occupation },
@@ -220,13 +220,13 @@ export default function AdminAnalytics() {
                 { title: "Auth Provider", rows: data.authProviders },
               ].map(({ title, rows }) => (
                 <div key={title}>
-                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">{title}</p>
+                  <p className="text-xs font-semibold text-ink/55 uppercase tracking-wide mb-2">{title}</p>
                   <table className="w-full text-sm">
                     <tbody>
                       {rows.map(({ name, value }) => (
-                        <tr key={name} className="border-b border-slate-50">
-                          <td className="py-1.5 text-slate-700">{name}</td>
-                          <td className="py-1.5 text-right text-slate-500 font-medium">{value}</td>
+                        <tr key={name} className="border-b border-rule">
+                          <td className="py-1.5 text-ink/80">{name}</td>
+                          <td className="py-1.5 text-right text-ink/55 font-medium">{value}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -244,7 +244,7 @@ export default function AdminAnalytics() {
 function EmptyChart({ label }: { label: string }) {
   return (
     <div className="h-52 flex items-center justify-center">
-      <p className="text-slate-500 text-sm text-center max-w-xs">{label}</p>
+      <p className="text-ink/55 text-sm text-center max-w-xs">{label}</p>
     </div>
   );
 }

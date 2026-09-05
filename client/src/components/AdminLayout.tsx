@@ -33,7 +33,7 @@ const navItems = [
 const LEVEL_LABELS: Record<number, { label: string; color: string }> = {
   1: { label: "Super Admin", color: "bg-red-100 text-red-700" },
   2: { label: "Manager", color: "bg-amber-100 text-amber-700" },
-  3: { label: "Viewer", color: "bg-blue-100 text-blue-700" },
+  3: { label: "Viewer", color: "bg-blue-100 text-ink" },
 };
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -51,16 +51,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const Sidebar = ({ mobile = false }: { mobile?: boolean }) => (
     <aside
       className={cn(
-        "flex flex-col bg-slate-900 text-white",
+        "flex flex-col bg-ink text-white",
         mobile ? "w-64 h-full" : "w-64 h-screen sticky top-0 hidden md:flex"
       )}
     >
       {/* Logo */}
-      <div className="flex items-center gap-3 px-5 py-5 border-b border-slate-700">
+      <div className="flex items-center gap-3 px-5 py-5 border-b border-rule">
         <img src={logoImage} alt="AiTaxBot" className="h-8 w-8 rounded-lg" />
         <div>
           <div className="font-bold text-white text-sm">AiTaxBot</div>
-          <div className="text-slate-400 text-xs">Admin Panel</div>
+          <div className="text-ink/45 text-xs">Admin Panel</div>
         </div>
       </div>
 
@@ -76,7 +76,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <Shield className="w-3 h-3" />
             {levelInfo.label}
           </span>
-          <p className="text-slate-400 text-xs mt-1 truncate">{user?.email}</p>
+          <p className="text-ink/45 text-xs mt-1 truncate">{user?.email}</p>
         </div>
       )}
 
@@ -94,8 +94,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 className={cn(
                   "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
                   isActive
-                    ? "bg-persian-blue-600 text-white shadow-md"
-                    : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                    ? "bg-ink text-white shadow-md"
+                    : "text-ink/35 hover:bg-ink hover:text-white"
                 )}
               >
                 <item.icon className="w-4.5 h-4.5 flex-shrink-0" />
@@ -107,16 +107,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </nav>
 
       {/* Footer */}
-      <div className="px-3 py-4 border-t border-slate-700 space-y-2">
+      <div className="px-3 py-4 border-t border-rule space-y-2">
         <Link
           href="/"
-          className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-slate-400 hover:bg-slate-800 hover:text-white transition-all"
+          className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-ink/45 hover:bg-ink hover:text-white transition-all"
         >
           ← Back to Website
         </Link>
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-slate-400 hover:bg-red-900/40 hover:text-red-400 transition-all"
+          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-ink/45 hover:bg-red-900/40 hover:text-red-400 transition-all"
         >
           <LogOut className="w-4 h-4" />
           Sign Out
@@ -126,7 +126,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   );
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="flex min-h-screen bg-secondary">
       {/* Desktop sidebar */}
       <Sidebar />
 
@@ -148,7 +148,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile top bar */}
-        <div className="md:hidden flex items-center justify-between px-4 py-3 bg-slate-900 text-white">
+        <div className="md:hidden flex items-center justify-between px-4 py-3 bg-ink text-white">
           <button onClick={() => setSidebarOpen(true)}>
             <Menu className="w-5 h-5" />
           </button>

@@ -52,8 +52,8 @@ const taxCalculators: CalcDef[] = [
     description: 'Compare Old vs New regime for FY 2026-27. Includes Section 87A rebate, marginal relief, and surcharge at all thresholds.',
     icon: Calculator,
     link: '/calculators/income-tax',
-    color: 'text-persian-blue-700',
-    bg: 'bg-persian-blue-50',
+    color: 'text-ink',
+    bg: 'bg-paper',
     badge: 'Popular',
     features: [
       'Old vs New regime comparison',
@@ -67,8 +67,8 @@ const taxCalculators: CalcDef[] = [
     description: 'Compute your House Rent Allowance exemption under Section 10(13A). Now covers all 8 metro cities per IT Rules 2026.',
     icon: Home,
     link: '/calculators/hra',
-    color: 'text-persian-blue-700',
-    bg: 'bg-persian-blue-50',
+    color: 'text-ink',
+    bg: 'bg-paper',
     features: [
       'Section 10(13A) compliant',
       '8 metro cities (IT Rules 2026)',
@@ -84,8 +84,8 @@ const investmentCalculators: CalcDef[] = [
     description: 'Plan your Systematic Investment Plan and estimate mutual fund returns. See how regular investments grow through compounding.',
     icon: TrendingUp,
     link: '/calculators/sip',
-    color: 'text-persian-blue-700',
-    bg: 'bg-persian-blue-50',
+    color: 'text-ink',
+    bg: 'bg-paper',
     features: [
       'Monthly investment planning',
       'Compounding returns visualised',
@@ -98,8 +98,8 @@ const investmentCalculators: CalcDef[] = [
     description: 'Plan regular monthly income from mutual fund investments for retirement. Track corpus sustainability over your horizon.',
     icon: Wallet,
     link: '/calculators/swp',
-    color: 'text-persian-blue-700',
-    bg: 'bg-persian-blue-50',
+    color: 'text-ink',
+    bg: 'bg-paper',
     features: [
       'Regular withdrawal planning',
       'Remaining corpus tracking',
@@ -112,8 +112,8 @@ const investmentCalculators: CalcDef[] = [
     description: 'Calculate your National Pension System corpus, monthly pension, and the exclusive ₹50,000 extra deduction under Section 80CCD(1B).',
     icon: TrendingUp,
     link: '/calculators/nps',
-    color: 'text-persian-blue-700',
-    bg: 'bg-persian-blue-50',
+    color: 'text-ink',
+    bg: 'bg-paper',
     features: [
       'Section 80CCD(1B) +₹50,000 saving',
       'Employer contribution (80CCD2)',
@@ -126,8 +126,8 @@ const investmentCalculators: CalcDef[] = [
     description: 'Calculate EPF, VPF & PPF contributions with employer split breakdown and year-wise retirement corpus projection at 8.25% interest.',
     icon: Shield,
     link: '/calculators/pf',
-    color: 'text-persian-blue-700',
-    bg: 'bg-persian-blue-50',
+    color: 'text-ink',
+    bg: 'bg-paper',
     features: [
       'Employee-employer split breakdown',
       'VPF contribution planning',
@@ -140,8 +140,8 @@ const investmentCalculators: CalcDef[] = [
     description: 'Check loan eligibility, calculate EMI, total interest, and annual tax savings under Section 24 and Section 80C.',
     icon: Home,
     link: '/calculators/home-loan',
-    color: 'text-persian-blue-700',
-    bg: 'bg-persian-blue-50',
+    color: 'text-ink',
+    bg: 'bg-paper',
     features: [
       'Loan eligibility from income (FOIR)',
       'EMI + total interest over tenure',
@@ -154,8 +154,8 @@ const investmentCalculators: CalcDef[] = [
     description: 'Calculate two-wheeler and car loan EMI with on-road cost breakdown. Switch between bike and car with pre-filled 2026 rates.',
     icon: TrendingUp,
     link: '/calculators/vehicle-loan',
-    color: 'text-persian-blue-700',
-    bg: 'bg-persian-blue-50',
+    color: 'text-ink',
+    bg: 'bg-paper',
     features: [
       'Two-wheeler & four-wheeler toggle',
       'On-road price to EMI in seconds',
@@ -171,8 +171,8 @@ const tradingTools: CalcDef[] = [
     description: 'Calculate capital gains tax on US stocks with auto USD/INR rate, F&O business income, US dividend DTAA credit, and Schedule FA checklist.',
     icon: Globe,
     link: '/calculators/trading-tax',
-    color: 'text-persian-blue-700',
-    bg: 'bg-persian-blue-50',
+    color: 'text-ink',
+    bg: 'bg-paper',
     badge: 'New',
     features: [
       'US stocks: STCG (slab) vs LTCG 12.5% at 24 months',
@@ -189,8 +189,8 @@ const documentTools: CalcDef[] = [
     description: 'Generate professional rent receipts for HRA claims. PDF with landlord PAN, revenue stamp notice, and payment mode. Email delivery included.',
     icon: FileText,
     link: '/tools/rent-receipt',
-    color: 'text-persian-blue-700',
-    bg: 'bg-persian-blue-50',
+    color: 'text-ink',
+    bg: 'bg-paper',
     features: [
       'PDF receipts for full year in one click',
       'Landlord PAN & revenue stamp guidance',
@@ -203,8 +203,8 @@ const documentTools: CalcDef[] = [
     description: 'Upload all three PDFs and instantly detect mismatches before filing ITR. AI flags salary gaps, TDS mismatches, and unreported income.',
     icon: Award,
     link: '/tools/ais-26as-form16',
-    color: 'text-persian-blue-700',
-    bg: 'bg-persian-blue-50',
+    color: 'text-ink',
+    bg: 'bg-paper',
     badge: 'AI',
     features: [
       'AI extracts & compares all 3 documents',
@@ -219,28 +219,28 @@ function CalculatorCard({ calc }: { calc: CalcDef }) {
   const Icon = calc.icon;
   return (
     <Link href={calc.link} className="block group">
-      <div className="h-full bg-white border border-slate-200 rounded-2xl p-6 hover:border-blue-300 hover:shadow-md transition-all duration-200 flex flex-col">
+      <div className="h-full rounded-[1.5rem] border border-rule bg-card p-6 transition-all hover:-translate-y-0.5 hover:border-credit hover:shadow-[0_16px_34px_-18px] hover:shadow-ink/40 flex flex-col">
         <div className="flex items-start justify-between mb-4">
-          <div className={`w-11 h-11 ${calc.bg} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform`}>
-            <Icon className={`h-5 w-5 ${calc.color}`} />
+          <div className={`w-11 h-11 ${calc.bg} rounded-2xl flex items-center justify-center text-ink transition-colors group-hover:bg-credit/10 group-hover:text-credit`}>
+            <Icon className="h-5 w-5" />
           </div>
           {calc.badge && (
-            <span className="px-2 py-0.5 bg-blue-600 text-white text-[10px] font-bold rounded-full">
+            <span className="px-2 py-0.5 bg-credit text-paper text-[10px] font-bold rounded-full">
               {calc.badge}
             </span>
           )}
         </div>
-        <h3 className="font-semibold text-slate-900 mb-2 text-base">{calc.title}</h3>
-        <p className="text-xs text-slate-500 leading-relaxed mb-4 flex-1">{calc.description}</p>
+        <h3 className="font-display font-bold text-ink mb-2 text-base">{calc.title}</h3>
+        <p className="text-xs text-ink/65 leading-relaxed mb-4 flex-1">{calc.description}</p>
         <ul className="space-y-1.5 mb-5">
           {calc.features.map((f, i) => (
-            <li key={i} className="flex items-start gap-2 text-xs text-slate-600">
-              <CheckCircle2 className="h-3.5 w-3.5 text-blue-500 mt-0.5 shrink-0" />
+            <li key={i} className="flex items-start gap-2 text-xs text-ink/70">
+              <CheckCircle2 className="h-3.5 w-3.5 text-credit mt-0.5 shrink-0" />
               <span>{f}</span>
             </li>
           ))}
         </ul>
-        <div className="flex items-center gap-1.5 text-xs font-semibold text-blue-600 group-hover:gap-2.5 transition-all">
+        <div className="flex items-center gap-1.5 text-xs font-semibold text-credit group-hover:gap-2.5 transition-all">
           Open Calculator <ArrowRight className="h-3.5 w-3.5" />
         </div>
       </div>
@@ -251,8 +251,8 @@ function CalculatorCard({ calc }: { calc: CalcDef }) {
 function SectionTitle({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
     <div className="mb-8">
-      <h2 className="text-xl font-bold text-slate-900 mb-1">{title}</h2>
-      {subtitle && <p className="text-sm text-slate-500">{subtitle}</p>}
+      <h2 className="font-display text-xl font-bold text-ink mb-1">{title}</h2>
+      {subtitle && <p className="text-sm text-ink/65">{subtitle}</p>}
     </div>
   );
 }
@@ -284,25 +284,25 @@ export default function Calculators() {
         <script type="application/ld+json">{JSON.stringify(organizationSchema)}</script>
       </Helmet>
 
-      <div className="bg-white">
+      <div className="bg-paper">
 
         {/* Page header */}
-        <header className="bg-white border-b border-slate-100">
+        <header className="bg-card border-b border-rule">
           <div className="max-w-7xl mx-auto px-6 pt-4">
-            <nav className="flex items-center gap-1.5 text-xs text-slate-500" aria-label="Breadcrumb">
-              <Link href="/" className="hover:text-blue-600 transition-colors">Home</Link>
-              <span className="text-slate-300">/</span>
-              <span className="text-slate-600 font-medium">Calculators</span>
+            <nav className="flex items-center gap-1.5 text-xs text-ink/55" aria-label="Breadcrumb">
+              <Link href="/" className="hover:text-credit transition-colors">Home</Link>
+              <span className="text-ink/25">/</span>
+              <span className="text-ink/70 font-medium">Calculators</span>
             </nav>
           </div>
           <div className="max-w-7xl mx-auto px-6 pt-6 pb-8">
             <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
               <div className="flex-1">
-                <div className="border-l-4 border-blue-600 pl-4 mb-5">
-                  <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">
+                <div className="border-l-4 border-credit pl-4 mb-5">
+                  <h1 className="font-display text-2xl md:text-3xl font-bold text-ink mb-2">
                     Free Tax &amp; Financial Calculators
                   </h1>
-                  <p className="text-sm text-slate-500 max-w-2xl leading-relaxed">
+                  <p className="text-sm text-ink/65 max-w-2xl leading-relaxed">
                     All calculators built for Indian taxpayers — Income Tax, HRA, SIP, SWP, PF, NPS, Home Loan, Vehicle Loan, Trading Tax, and more. Updated for FY 2026-27 (AY 2027-28).
                   </p>
                 </div>
@@ -312,14 +312,14 @@ export default function Calculators() {
                     { icon: Zap,    text: "IT Act 2025 Ready" },
                     { icon: Clock,  text: "FY 2026-27 Updated" },
                   ].map(({ icon: Icon, text }) => (
-                    <span key={text} className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-100">
+                    <span key={text} className="inline-flex items-center gap-1 px-2.5 py-1 bg-secondary text-ink/70 text-xs font-medium rounded-full">
                       <Icon className="h-3 w-3" />{text}
                     </span>
                   ))}
                 </div>
               </div>
               <div className="flex-shrink-0">
-                <span className="inline-block px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded-full">
+                <span className="inline-block px-3 py-1.5 bg-ink text-paper text-xs font-semibold rounded-full">
                   FY 2026-27 · AY 2027-28
                 </span>
               </div>
@@ -328,9 +328,9 @@ export default function Calculators() {
         </header>
 
         {/* Intro text */}
-        <section className="py-6 px-6 bg-slate-50 border-b border-slate-100">
+        <section className="py-6 px-6 bg-secondary/60 border-b border-rule">
           <div className="max-w-7xl mx-auto">
-            <p className="text-sm text-slate-600 leading-relaxed">
+            <p className="text-sm text-ink/70 leading-relaxed">
               Whether you are a salaried professional calculating income tax under the Old or New regime,
               a tenant computing HRA exemption, or planning your retirement through SIP, SWP, or Provident Fund,
               AiTaxBot provides accurate and easy-to-use tools for every financial need. Each tool is built for
@@ -384,9 +384,9 @@ export default function Calculators() {
         </div>
 
         {/* Why AiTaxBot */}
-        <section className="py-14 px-6 bg-slate-50 border-t border-slate-100">
+        <section className="py-14 px-6 bg-secondary/60 border-t border-rule">
           <div className="max-w-7xl mx-auto">
-            <h2 className="text-xl font-bold text-slate-900 text-center mb-10">Why Use Our Calculators?</h2>
+            <h2 className="font-display text-xl font-bold text-ink text-center mb-10">Why Use Our Calculators?</h2>
             <div className="grid gap-8 md:grid-cols-3">
               {[
                 { icon: Award,      title: "CA Reviewed",          body: "All calculations are reviewed by a Chartered Accountant and follow the latest Income Tax Act provisions for maximum accuracy." },
@@ -394,11 +394,11 @@ export default function Calculators() {
                 { icon: TrendingUp, title: "Updated for FY 2026-27", body: "We update our calculators immediately when tax laws or interest rates change so you always get current information." },
               ].map(({ icon: Icon, title, body }) => (
                 <div key={title} className="text-center">
-                  <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <Icon className="h-6 w-6 text-blue-600" />
+                  <div className="w-12 h-12 bg-card rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Icon className="h-6 w-6 text-credit" />
                   </div>
-                  <h3 className="font-semibold text-slate-900 mb-2">{title}</h3>
-                  <p className="text-sm text-slate-500 leading-relaxed">{body}</p>
+                  <h3 className="font-display font-bold text-ink mb-2">{title}</h3>
+                  <p className="text-sm text-ink/65 leading-relaxed">{body}</p>
                 </div>
               ))}
             </div>

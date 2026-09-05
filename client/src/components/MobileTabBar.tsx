@@ -90,7 +90,7 @@ export default function MobileTabBar() {
       // visit, and the WhatsApp FAB sat on top of the fourth tab permanently.
       //   z-40 → this bar        z-45 → WhatsApp FAB       z-60 → cookie banner
       // Keep those three in sync if any of them changes.
-      className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-slate-200
+      className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-card border-t border-rule
                  pb-[env(safe-area-inset-bottom)]"
       data-testid="mobile-tab-bar"
     >
@@ -108,7 +108,7 @@ export default function MobileTabBar() {
                 // floor even on small phones.
                 className={`flex flex-col items-center justify-center gap-0.5 min-h-[56px] px-1
                   text-[11px] font-medium transition-colors
-                  ${active ? "text-persian-blue-700" : "text-slate-500"}`}
+                  ${active ? "text-ink" : "text-ink/50"}`}
               >
                 <Icon className="w-5 h-5" strokeWidth={active ? 2.4 : 1.8} />
                 <span className="leading-none">{tab.label}</span>

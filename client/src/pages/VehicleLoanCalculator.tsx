@@ -83,7 +83,7 @@ export default function VehicleLoanCalculatorPage() {
         <script type="application/ld+json">{JSON.stringify(organizationSchema)}</script>
       </Helmet>
 
-      <div className="bg-white">
+      <div className="bg-card">
 
         <CalcPageHeader
           title="Vehicle Loan EMI Calculator — Two-Wheeler & Car Loan"
@@ -103,13 +103,13 @@ export default function VehicleLoanCalculatorPage() {
         </section>
 
         {/* SEO Content */}
-        <section className="py-12 px-6 bg-white">
+        <section className="py-12 px-6 bg-card">
           <div className="max-w-6xl mx-auto">
 
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">Vehicle Loan EMI Reference Tables</h2>
+            <h2 className="text-2xl font-bold text-ink mb-6">Vehicle Loan EMI Reference Tables</h2>
 
             {/* Two-Wheeler Table */}
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">Two-Wheeler Loan EMI Table (at 12.5% p.a.)</h3>
+            <h3 className="text-xl font-semibold text-ink mb-2">Two-Wheeler Loan EMI Table (at 12.5% p.a.)</h3>
             <div className="overflow-x-auto mb-3">
               <table className="w-full border-collapse text-sm">
                 <thead>
@@ -129,24 +129,24 @@ export default function VehicleLoanCalculatorPage() {
                     { loan: "₹1,50,000", emis: ["₹13,358", "₹7,085", "₹5,016", "₹3,405"] },
                     { loan: "₹2,00,000", emis: ["₹17,810", "₹9,447", "₹6,688", "₹4,540"] },
                   ].map((row, i) => (
-                    <tr key={i} className={i % 2 === 1 ? "bg-slate-50" : ""}>
-                      <td className="border border-slate-200 p-3 font-semibold text-slate-800">{row.loan}</td>
+                    <tr key={i} className={i % 2 === 1 ? "bg-secondary" : ""}>
+                      <td className="border border-rule p-3 font-semibold text-ink">{row.loan}</td>
                       {row.emis.map((emi, j) => (
-                        <td key={j} className="border border-slate-200 p-3 text-center text-slate-700">{emi}</td>
+                        <td key={j} className="border border-rule p-3 text-center text-ink/80">{emi}</td>
                       ))}
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-            <p className="text-xs text-slate-500 mb-6">*At 12.5% p.a. Actual rates vary by lender and credit profile.</p>
+            <p className="text-xs text-ink/55 mb-6">*At 12.5% p.a. Actual rates vary by lender and credit profile.</p>
 
             {/* Car Loan Table */}
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">Car Loan EMI Table (at 9.25% p.a.)</h3>
+            <h3 className="text-xl font-semibold text-ink mb-2">Car Loan EMI Table (at 9.25% p.a.)</h3>
             <div className="overflow-x-auto mb-3">
               <table className="w-full border-collapse text-sm">
                 <thead>
-                  <tr className="bg-blue-700 text-white">
+                  <tr className="bg-ink text-white">
                     <th className="border border-blue-600 p-3 text-left font-semibold">Loan Amount</th>
                     <th className="border border-blue-600 p-3 text-center font-semibold">3 Years</th>
                     <th className="border border-blue-600 p-3 text-center font-semibold">5 Years</th>
@@ -161,21 +161,21 @@ export default function VehicleLoanCalculatorPage() {
                     { loan: "₹12 Lakh", emis: ["₹38,239", "₹24,991", "₹19,192"] },
                     { loan: "₹20 Lakh", emis: ["₹63,731", "₹41,652", "₹31,987"] },
                   ].map((row, i) => (
-                    <tr key={i} className={i % 2 === 1 ? "bg-slate-50" : ""}>
-                      <td className="border border-slate-200 p-3 font-semibold text-slate-800">{row.loan}</td>
+                    <tr key={i} className={i % 2 === 1 ? "bg-secondary" : ""}>
+                      <td className="border border-rule p-3 font-semibold text-ink">{row.loan}</td>
                       {row.emis.map((emi, j) => (
-                        <td key={j} className="border border-slate-200 p-3 text-center text-slate-700">{emi}</td>
+                        <td key={j} className="border border-rule p-3 text-center text-ink/80">{emi}</td>
                       ))}
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-            <p className="text-xs text-slate-500 mb-8">*At 9.25% p.a. Actual rates vary by lender and credit profile.</p>
+            <p className="text-xs text-ink/55 mb-8">*At 9.25% p.a. Actual rates vary by lender and credit profile.</p>
 
             {/* Flat vs Reducing explainer */}
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">Flat Rate vs Reducing Balance — The Hidden Cost</h2>
-            <p className="text-slate-600 mb-4 text-sm">
+            <h2 className="text-2xl font-bold text-ink mb-2">Flat Rate vs Reducing Balance — The Hidden Cost</h2>
+            <p className="text-ink/65 mb-4 text-sm">
               Many dealers and some lenders quote an interest rate without clarifying whether it's a <strong>flat (simple) rate</strong> or a
               <strong> reducing balance rate</strong>. At the same quoted percentage, flat rate costs you nearly double the interest.
               Always ask before you sign.
@@ -204,17 +204,17 @@ export default function VehicleLoanCalculatorPage() {
             </div>
 
             {/* Example table */}
-            <h3 className="text-lg font-semibold text-slate-900 mb-2">Example: ₹5 Lakh Car Loan at 9% — Flat vs Reducing</h3>
+            <h3 className="text-lg font-semibold text-ink mb-2">Example: ₹5 Lakh Car Loan at 9% — Flat vs Reducing</h3>
             <div className="overflow-x-auto mb-2">
               <table className="w-full border-collapse text-sm">
                 <thead>
-                  <tr className="bg-slate-800 text-white">
-                    <th className="border border-slate-700 p-3 text-left">Tenure</th>
-                    <th className="border border-slate-700 p-3 text-center text-green-300">Reducing Balance EMI</th>
-                    <th className="border border-slate-700 p-3 text-center text-green-300">Reducing Total Interest</th>
-                    <th className="border border-slate-700 p-3 text-center text-red-300">Flat Rate EMI</th>
-                    <th className="border border-slate-700 p-3 text-center text-red-300">Flat Total Interest</th>
-                    <th className="border border-slate-700 p-3 text-center text-yellow-300">Extra Cost (Flat)</th>
+                  <tr className="bg-ink text-white">
+                    <th className="border border-rule p-3 text-left">Tenure</th>
+                    <th className="border border-rule p-3 text-center text-green-300">Reducing Balance EMI</th>
+                    <th className="border border-rule p-3 text-center text-green-300">Reducing Total Interest</th>
+                    <th className="border border-rule p-3 text-center text-red-300">Flat Rate EMI</th>
+                    <th className="border border-rule p-3 text-center text-red-300">Flat Total Interest</th>
+                    <th className="border border-rule p-3 text-center text-yellow-300">Extra Cost (Flat)</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -223,23 +223,23 @@ export default function VehicleLoanCalculatorPage() {
                     { tenure: "5 Years", redEmi: "₹10,373", redInt: "₹1,22,380", flatEmi: "₹13,194", flatInt: "₹2,25,000", extra: "+₹1,02,620" },
                     { tenure: "7 Years", redEmi: "₹7,952", redInt: "₹1,67,970", flatEmi: "₹11,310", flatInt: "₹3,15,000", extra: "+₹1,47,030" },
                   ].map((row, i) => (
-                    <tr key={i} className={i % 2 === 1 ? "bg-slate-50" : "bg-white"}>
-                      <td className="border border-slate-200 p-3 font-semibold text-slate-800">{row.tenure}</td>
-                      <td className="border border-slate-200 p-3 text-center text-green-700 font-semibold">{row.redEmi}</td>
-                      <td className="border border-slate-200 p-3 text-center text-green-700">{row.redInt}</td>
-                      <td className="border border-slate-200 p-3 text-center text-red-600 font-semibold">{row.flatEmi}</td>
-                      <td className="border border-slate-200 p-3 text-center text-red-600">{row.flatInt}</td>
-                      <td className="border border-slate-200 p-3 text-center font-bold text-orange-700">{row.extra}</td>
+                    <tr key={i} className={i % 2 === 1 ? "bg-secondary" : "bg-card"}>
+                      <td className="border border-rule p-3 font-semibold text-ink">{row.tenure}</td>
+                      <td className="border border-rule p-3 text-center text-green-700 font-semibold">{row.redEmi}</td>
+                      <td className="border border-rule p-3 text-center text-green-700">{row.redInt}</td>
+                      <td className="border border-rule p-3 text-center text-red-600 font-semibold">{row.flatEmi}</td>
+                      <td className="border border-rule p-3 text-center text-red-600">{row.flatInt}</td>
+                      <td className="border border-rule p-3 text-center font-bold text-orange-700">{row.extra}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-            <p className="text-xs text-slate-500 mb-4">*₹5 lakh loan at 9% p.a. Flat rate example shows ~80–90% higher total interest than reducing balance at the identical quoted rate.</p>
+            <p className="text-xs text-ink/55 mb-4">*₹5 lakh loan at 9% p.a. Flat rate example shows ~80–90% higher total interest than reducing balance at the identical quoted rate.</p>
 
             {/* Convert tip */}
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-8 text-sm">
-              <p className="font-bold text-blue-900 mb-1">🔄 Quick Rule: How to Convert Flat Rate to Reducing Equivalent</p>
+            <div className="bg-secondary border border-rule rounded-xl p-4 mb-8 text-sm">
+              <p className="font-bold text-ink mb-1">🔄 Quick Rule: How to Convert Flat Rate to Reducing Equivalent</p>
               <p className="text-blue-800">
                 Multiply the flat rate by approximately <strong>1.8 to 1.9</strong> to get the equivalent reducing balance rate.
                 So a "9% flat rate" is actually equivalent to paying ~16–17% on reducing balance terms.
@@ -248,7 +248,7 @@ export default function VehicleLoanCalculatorPage() {
             </div>
 
             {/* Tips */}
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Vehicle Loan Tips — Save on Interest</h2>
+            <h2 className="text-2xl font-bold text-ink mb-4">Vehicle Loan Tips — Save on Interest</h2>
             <div className="grid md:grid-cols-2 gap-4 mb-8">
               {[
                 { n: 1, tip: "Check manufacturer financing — often lowest rates", detail: "Maruti Suzuki Finance, Hyundai Finance and Honda often offer rates 0.5–1% lower than regular banks as a sales tool. Always get a quote from the OEM's financing arm before your bank." },
@@ -259,20 +259,20 @@ export default function VehicleLoanCalculatorPage() {
                 <div key={n} className="flex gap-3 p-4 bg-amber-50 border border-amber-100 rounded-lg">
                   <span className="text-amber-600 text-lg font-bold shrink-0">{n}</span>
                   <div>
-                    <p className="font-semibold text-slate-900 text-sm">{tip}</p>
-                    <p className="text-slate-600 text-sm mt-1">{detail}</p>
+                    <p className="font-semibold text-ink text-sm">{tip}</p>
+                    <p className="text-ink/65 text-sm mt-1">{detail}</p>
                   </div>
                 </div>
               ))}
             </div>
 
             {/* FAQs */}
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Frequently Asked Questions</h2>
+            <h2 className="text-2xl font-bold text-ink mb-4">Frequently Asked Questions</h2>
             <div className="space-y-4">
               {vehicleFAQs.map((faq, i) => (
                 <div key={i}>
-                  <h4 className="font-semibold text-slate-900 mb-2">{faq.question}</h4>
-                  <p className="text-slate-600">{faq.answer}</p>
+                  <h4 className="font-semibold text-ink mb-2">{faq.question}</h4>
+                  <p className="text-ink/65">{faq.answer}</p>
                 </div>
               ))}
             </div>
@@ -288,33 +288,33 @@ export default function VehicleLoanCalculatorPage() {
           <RectangleAd />
         </div>
 
-        <section className="py-12 px-6 bg-slate-50">
+        <section className="py-12 px-6 bg-secondary">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">Related Calculators</h2>
-            <p className="text-slate-600 mb-6">Plan your complete financial commitments alongside your vehicle loan.</p>
+            <h2 className="text-2xl font-bold text-ink mb-2">Related Calculators</h2>
+            <p className="text-ink/65 mb-6">Plan your complete financial commitments alongside your vehicle loan.</p>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <Link href="/calculators/home-loan">
-                <div className="p-4 bg-white rounded-lg border hover:border-blue-300 hover:shadow transition-all">
-                  <h3 className="font-semibold text-slate-900 mb-1">Home Loan Calculator</h3>
-                  <p className="text-sm text-slate-600">Check if you can afford both vehicle and home loan EMIs together</p>
+                <div className="p-4 bg-card rounded-lg border hover:border-credit hover:shadow transition-all">
+                  <h3 className="font-semibold text-ink mb-1">Home Loan Calculator</h3>
+                  <p className="text-sm text-ink/65">Check if you can afford both vehicle and home loan EMIs together</p>
                 </div>
               </Link>
               <Link href="/calculators/income-tax">
-                <div className="p-4 bg-white rounded-lg border hover:border-green-300 hover:shadow transition-all">
-                  <h3 className="font-semibold text-slate-900 mb-1">Income Tax Calculator</h3>
-                  <p className="text-sm text-slate-600">Calculate your take-home income after tax to plan EMIs</p>
+                <div className="p-4 bg-card rounded-lg border hover:border-green-300 hover:shadow transition-all">
+                  <h3 className="font-semibold text-ink mb-1">Income Tax Calculator</h3>
+                  <p className="text-sm text-ink/65">Calculate your take-home income after tax to plan EMIs</p>
                 </div>
               </Link>
               <Link href="/calculators/sip">
-                <div className="p-4 bg-white rounded-lg border hover:border-persian-blue-300 hover:shadow transition-all">
-                  <h3 className="font-semibold text-slate-900 mb-1">SIP Calculator</h3>
-                  <p className="text-sm text-slate-600">Invest the money you save with a shorter loan tenure</p>
+                <div className="p-4 bg-card rounded-lg border hover:border-credit hover:shadow transition-all">
+                  <h3 className="font-semibold text-ink mb-1">SIP Calculator</h3>
+                  <p className="text-sm text-ink/65">Invest the money you save with a shorter loan tenure</p>
                 </div>
               </Link>
               <Link href="/calculators">
-                <div className="p-4 bg-blue-50 rounded-lg border border-blue-200 hover:shadow transition-all">
-                  <h3 className="font-semibold text-blue-700 mb-1">All Calculators</h3>
-                  <p className="text-sm text-blue-600">View complete suite of free financial tools</p>
+                <div className="p-4 bg-secondary rounded-lg border border-rule hover:shadow transition-all">
+                  <h3 className="font-semibold text-ink mb-1">All Calculators</h3>
+                  <p className="text-sm text-credit">View complete suite of free financial tools</p>
                 </div>
               </Link>
             </div>

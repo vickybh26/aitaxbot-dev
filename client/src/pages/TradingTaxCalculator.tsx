@@ -87,7 +87,7 @@ export default function TradingTaxCalculatorPage() {
         <script type="application/ld+json">{JSON.stringify(organizationSchema)}</script>
       </Helmet>
 
-      <div className="bg-white">
+      <div className="bg-card">
 
         <CalcPageHeader
           breadcrumbs={[
@@ -102,9 +102,9 @@ export default function TradingTaxCalculatorPage() {
         />
 
         {/* SEO intro paragraph */}
-        <section className="py-6 px-6 bg-white border-b border-slate-100">
+        <section className="py-6 px-6 bg-card border-b border-rule">
           <div className="max-w-5xl mx-auto">
-            <p className="text-slate-700 leading-relaxed">
+            <p className="text-ink/80 leading-relaxed">
               Indians investing in US markets through platforms like INDmoney, Vested, and Stockal face a
               complex tax calculation challenge at ITR filing time. Every trade requires USD-to-INR conversion
               using the RBI/FBIL reference rate on the exact buy and sell date, the holding period determines
@@ -130,101 +130,101 @@ export default function TradingTaxCalculatorPage() {
         </div>
 
         {/* Tax reference table */}
-        <section className="py-12 px-6 bg-white border-y border-slate-100">
+        <section className="py-12 px-6 bg-card border-y border-rule">
           <div className="max-w-5xl mx-auto">
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">Trading Income Tax Rates at a Glance — FY 2025-26</h2>
+            <h2 className="text-2xl font-bold text-ink mb-6">Trading Income Tax Rates at a Glance — FY 2025-26</h2>
             <div className="overflow-x-auto">
               <table className="w-full text-sm border-collapse">
                 <thead>
-                  <tr className="bg-slate-100">
-                    <th className="text-left px-4 py-3 font-semibold text-slate-700 border border-slate-200">Income Type</th>
-                    <th className="text-left px-4 py-3 font-semibold text-slate-700 border border-slate-200">Category</th>
-                    <th className="text-left px-4 py-3 font-semibold text-slate-700 border border-slate-200">Holding Period</th>
-                    <th className="text-left px-4 py-3 font-semibold text-slate-700 border border-slate-200">Tax Rate</th>
-                    <th className="text-left px-4 py-3 font-semibold text-slate-700 border border-slate-200">ITR Form</th>
+                  <tr className="bg-secondary">
+                    <th className="text-left px-4 py-3 font-semibold text-ink/80 border border-rule">Income Type</th>
+                    <th className="text-left px-4 py-3 font-semibold text-ink/80 border border-rule">Category</th>
+                    <th className="text-left px-4 py-3 font-semibold text-ink/80 border border-rule">Holding Period</th>
+                    <th className="text-left px-4 py-3 font-semibold text-ink/80 border border-rule">Tax Rate</th>
+                    <th className="text-left px-4 py-3 font-semibold text-ink/80 border border-rule">ITR Form</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="border border-slate-200">
-                    <td className="px-4 py-3 font-medium text-slate-800 border border-slate-200">US Stocks &amp; ETFs (STCG)</td>
-                    <td className="px-4 py-3 text-slate-600 border border-slate-200">Capital Gains</td>
-                    <td className="px-4 py-3 text-slate-600 border border-slate-200">Less than 24 months</td>
-                    <td className="px-4 py-3 text-slate-600 border border-slate-200">Slab rate</td>
-                    <td className="px-4 py-3 text-slate-600 border border-slate-200">ITR-2</td>
+                  <tr className="border border-rule">
+                    <td className="px-4 py-3 font-medium text-ink border border-rule">US Stocks &amp; ETFs (STCG)</td>
+                    <td className="px-4 py-3 text-ink/65 border border-rule">Capital Gains</td>
+                    <td className="px-4 py-3 text-ink/65 border border-rule">Less than 24 months</td>
+                    <td className="px-4 py-3 text-ink/65 border border-rule">Slab rate</td>
+                    <td className="px-4 py-3 text-ink/65 border border-rule">ITR-2</td>
                   </tr>
-                  <tr className="bg-slate-50 border border-slate-200">
-                    <td className="px-4 py-3 font-medium text-slate-800 border border-slate-200">US Stocks &amp; ETFs (LTCG)</td>
-                    <td className="px-4 py-3 text-slate-600 border border-slate-200">Capital Gains</td>
-                    <td className="px-4 py-3 text-slate-600 border border-slate-200">24 months or more</td>
-                    <td className="px-4 py-3 font-semibold text-blue-700 border border-slate-200">12.5% (no indexation)</td>
-                    <td className="px-4 py-3 text-slate-600 border border-slate-200">ITR-2</td>
+                  <tr className="bg-secondary border border-rule">
+                    <td className="px-4 py-3 font-medium text-ink border border-rule">US Stocks &amp; ETFs (LTCG)</td>
+                    <td className="px-4 py-3 text-ink/65 border border-rule">Capital Gains</td>
+                    <td className="px-4 py-3 text-ink/65 border border-rule">24 months or more</td>
+                    <td className="px-4 py-3 font-semibold text-ink border border-rule">12.5% (no indexation)</td>
+                    <td className="px-4 py-3 text-ink/65 border border-rule">ITR-2</td>
                   </tr>
-                  <tr className="border border-slate-200">
-                    <td className="px-4 py-3 font-medium text-slate-800 border border-slate-200">US Dividends</td>
-                    <td className="px-4 py-3 text-slate-600 border border-slate-200">Other Sources</td>
-                    <td className="px-4 py-3 text-slate-600 border border-slate-200">N/A</td>
-                    <td className="px-4 py-3 text-slate-600 border border-slate-200">Slab rate (DTAA credit for 25% US WHT)</td>
-                    <td className="px-4 py-3 text-slate-600 border border-slate-200">ITR-2 + Form 67</td>
+                  <tr className="border border-rule">
+                    <td className="px-4 py-3 font-medium text-ink border border-rule">US Dividends</td>
+                    <td className="px-4 py-3 text-ink/65 border border-rule">Other Sources</td>
+                    <td className="px-4 py-3 text-ink/65 border border-rule">N/A</td>
+                    <td className="px-4 py-3 text-ink/65 border border-rule">Slab rate (DTAA credit for 25% US WHT)</td>
+                    <td className="px-4 py-3 text-ink/65 border border-rule">ITR-2 + Form 67</td>
                   </tr>
-                  <tr className="bg-slate-50 border border-slate-200">
-                    <td className="px-4 py-3 font-medium text-slate-800 border border-slate-200">Indian F&amp;O</td>
-                    <td className="px-4 py-3 text-slate-600 border border-slate-200">Business Income</td>
-                    <td className="px-4 py-3 text-slate-600 border border-slate-200">N/A</td>
-                    <td className="px-4 py-3 text-slate-600 border border-slate-200">Slab rate (non-speculative business)</td>
-                    <td className="px-4 py-3 text-slate-600 border border-slate-200">ITR-3</td>
+                  <tr className="bg-secondary border border-rule">
+                    <td className="px-4 py-3 font-medium text-ink border border-rule">Indian F&amp;O</td>
+                    <td className="px-4 py-3 text-ink/65 border border-rule">Business Income</td>
+                    <td className="px-4 py-3 text-ink/65 border border-rule">N/A</td>
+                    <td className="px-4 py-3 text-ink/65 border border-rule">Slab rate (non-speculative business)</td>
+                    <td className="px-4 py-3 text-ink/65 border border-rule">ITR-3</td>
                   </tr>
-                  <tr className="border border-slate-200">
-                    <td className="px-4 py-3 font-medium text-slate-800 border border-slate-200">US F&amp;O / Options</td>
-                    <td className="px-4 py-3 text-slate-600 border border-slate-200">Business Income</td>
-                    <td className="px-4 py-3 text-slate-600 border border-slate-200">N/A</td>
-                    <td className="px-4 py-3 text-slate-600 border border-slate-200">Slab rate</td>
-                    <td className="px-4 py-3 text-slate-600 border border-slate-200">ITR-3</td>
+                  <tr className="border border-rule">
+                    <td className="px-4 py-3 font-medium text-ink border border-rule">US F&amp;O / Options</td>
+                    <td className="px-4 py-3 text-ink/65 border border-rule">Business Income</td>
+                    <td className="px-4 py-3 text-ink/65 border border-rule">N/A</td>
+                    <td className="px-4 py-3 text-ink/65 border border-rule">Slab rate</td>
+                    <td className="px-4 py-3 text-ink/65 border border-rule">ITR-3</td>
                   </tr>
-                  <tr className="bg-slate-50 border border-slate-200">
-                    <td className="px-4 py-3 font-medium text-slate-800 border border-slate-200">Forex (Exchange)</td>
-                    <td className="px-4 py-3 text-slate-600 border border-slate-200">Capital Gains</td>
-                    <td className="px-4 py-3 text-slate-600 border border-slate-200">Based on holding period</td>
-                    <td className="px-4 py-3 text-slate-600 border border-slate-200">STCG: slab / LTCG: 20% + indexation</td>
-                    <td className="px-4 py-3 text-slate-600 border border-slate-200">ITR-2</td>
+                  <tr className="bg-secondary border border-rule">
+                    <td className="px-4 py-3 font-medium text-ink border border-rule">Forex (Exchange)</td>
+                    <td className="px-4 py-3 text-ink/65 border border-rule">Capital Gains</td>
+                    <td className="px-4 py-3 text-ink/65 border border-rule">Based on holding period</td>
+                    <td className="px-4 py-3 text-ink/65 border border-rule">STCG: slab / LTCG: 20% + indexation</td>
+                    <td className="px-4 py-3 text-ink/65 border border-rule">ITR-2</td>
                   </tr>
                 </tbody>
               </table>
             </div>
-            <p className="text-xs text-slate-500 mt-3">
+            <p className="text-xs text-ink/55 mt-3">
               * Rates applicable for Indian tax residents under ITA 1961 for FY 2025-26. LTCG rate of 12.5% introduced by Finance Act 2024 (effective July 23, 2024 for listed assets, applicable to all foreign equity per Finance Act 2024 amendments). Surcharge and cess apply on final tax liability.
             </p>
           </div>
         </section>
 
         {/* FX conversion guide */}
-        <section className="py-12 px-6 bg-slate-50">
+        <section className="py-12 px-6 bg-secondary">
           <div className="max-w-5xl mx-auto">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">How USD/INR Conversion Works for US Stock Tax</h2>
-            <p className="text-slate-600 mb-6 leading-relaxed">
+            <h2 className="text-2xl font-bold text-ink mb-4">How USD/INR Conversion Works for US Stock Tax</h2>
+            <p className="text-ink/65 mb-6 leading-relaxed">
               The most confusing part of taxing US stock gains is the currency conversion. India's income tax law
               requires you to convert both the purchase price and sale price to Indian Rupees using the
               RBI/FBIL Telegraphic Transfer (TT) buying rate on the respective dates. Here is the step-by-step
               calculation:
             </p>
             <div className="space-y-4">
-              <div className="border-l-4 border-blue-600 bg-white px-5 py-4 rounded-r-lg">
-                <p className="font-semibold text-slate-800 mb-1">Step 1: Convert cost of acquisition to INR</p>
-                <p className="text-slate-600 text-sm">Cost (INR) = Quantity × Buy Price (USD) × RBI rate on buy date</p>
+              <div className="border-l-4 border-blue-600 bg-card px-5 py-4 rounded-r-lg">
+                <p className="font-semibold text-ink mb-1">Step 1: Convert cost of acquisition to INR</p>
+                <p className="text-ink/65 text-sm">Cost (INR) = Quantity × Buy Price (USD) × RBI rate on buy date</p>
               </div>
-              <div className="border-l-4 border-blue-600 bg-white px-5 py-4 rounded-r-lg">
-                <p className="font-semibold text-slate-800 mb-1">Step 2: Convert sale proceeds to INR</p>
-                <p className="text-slate-600 text-sm">Sale proceeds (INR) = Quantity × Sell Price (USD) × RBI rate on sell date</p>
+              <div className="border-l-4 border-blue-600 bg-card px-5 py-4 rounded-r-lg">
+                <p className="font-semibold text-ink mb-1">Step 2: Convert sale proceeds to INR</p>
+                <p className="text-ink/65 text-sm">Sale proceeds (INR) = Quantity × Sell Price (USD) × RBI rate on sell date</p>
               </div>
-              <div className="border-l-4 border-blue-600 bg-white px-5 py-4 rounded-r-lg">
-                <p className="font-semibold text-slate-800 mb-1">Step 3: Compute capital gain</p>
-                <p className="text-slate-600 text-sm">Capital gain = Sale proceeds (INR) − Cost of acquisition (INR) − Transfer expenses</p>
+              <div className="border-l-4 border-blue-600 bg-card px-5 py-4 rounded-r-lg">
+                <p className="font-semibold text-ink mb-1">Step 3: Compute capital gain</p>
+                <p className="text-ink/65 text-sm">Capital gain = Sale proceeds (INR) − Cost of acquisition (INR) − Transfer expenses</p>
               </div>
-              <div className="border-l-4 border-blue-600 bg-white px-5 py-4 rounded-r-lg">
-                <p className="font-semibold text-slate-800 mb-1">Step 4: Determine STCG vs LTCG</p>
-                <p className="text-slate-600 text-sm">Held less than 24 months → STCG at slab rate. Held 24 months or more → LTCG at 12.5%.</p>
+              <div className="border-l-4 border-blue-600 bg-card px-5 py-4 rounded-r-lg">
+                <p className="font-semibold text-ink mb-1">Step 4: Determine STCG vs LTCG</p>
+                <p className="text-ink/65 text-sm">Held less than 24 months → STCG at slab rate. Held 24 months or more → LTCG at 12.5%.</p>
               </div>
             </div>
-            <p className="text-sm text-slate-500 mt-5 border-l-4 border-slate-300 pl-4">
+            <p className="text-sm text-ink/55 mt-5 border-l-4 border-rule pl-4">
               Note: This calculator uses ECB/Frankfurter rates for convenience. For final ITR filing, use
               the official FBIL reference rate from <strong>fbil.org.in</strong> or the RBI website. Discrepancies
               between sources are typically minor but should be verified for large trades.
@@ -233,10 +233,10 @@ export default function TradingTaxCalculatorPage() {
         </section>
 
         {/* Schedule FA section */}
-        <section className="py-12 px-6 bg-white border-y border-slate-100">
+        <section className="py-12 px-6 bg-card border-y border-rule">
           <div className="max-w-5xl mx-auto">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Schedule FA — Mandatory Foreign Asset Disclosure</h2>
-            <p className="text-slate-600 mb-5 leading-relaxed">
+            <h2 className="text-2xl font-bold text-ink mb-4">Schedule FA — Mandatory Foreign Asset Disclosure</h2>
+            <p className="text-ink/65 mb-5 leading-relaxed">
               Every Indian resident who holds foreign assets — including US stocks on INDmoney, Vested, Stockal,
               or any other platform — must disclose them in Schedule FA (Foreign Assets) of their ITR. This is
               separate from reporting capital gains. Even if you made no profit, or are below the basic exemption
@@ -245,23 +245,23 @@ export default function TradingTaxCalculatorPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm border-collapse">
                 <thead>
-                  <tr className="bg-slate-100">
-                    <th className="text-left px-4 py-3 font-semibold text-slate-700 border border-slate-200">What to disclose</th>
-                    <th className="text-left px-4 py-3 font-semibold text-slate-700 border border-slate-200">Details required</th>
+                  <tr className="bg-secondary">
+                    <th className="text-left px-4 py-3 font-semibold text-ink/80 border border-rule">What to disclose</th>
+                    <th className="text-left px-4 py-3 font-semibold text-ink/80 border border-rule">Details required</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="border border-slate-200">
-                    <td className="px-4 py-3 font-medium text-slate-800 border border-slate-200">US stocks held on December 31</td>
-                    <td className="px-4 py-3 text-slate-600 border border-slate-200">Name of stock, ISIN, date of acquisition, cost in INR, peak value during year, closing value on Dec 31</td>
+                  <tr className="border border-rule">
+                    <td className="px-4 py-3 font-medium text-ink border border-rule">US stocks held on December 31</td>
+                    <td className="px-4 py-3 text-ink/65 border border-rule">Name of stock, ISIN, date of acquisition, cost in INR, peak value during year, closing value on Dec 31</td>
                   </tr>
-                  <tr className="bg-slate-50 border border-slate-200">
-                    <td className="px-4 py-3 font-medium text-slate-800 border border-slate-200">US brokerage account</td>
-                    <td className="px-4 py-3 text-slate-600 border border-slate-200">Account number, name of institution (INDmoney / Vested / Stockal), country (USA), peak and closing balance</td>
+                  <tr className="bg-secondary border border-rule">
+                    <td className="px-4 py-3 font-medium text-ink border border-rule">US brokerage account</td>
+                    <td className="px-4 py-3 text-ink/65 border border-rule">Account number, name of institution (INDmoney / Vested / Stockal), country (USA), peak and closing balance</td>
                   </tr>
-                  <tr className="border border-slate-200">
-                    <td className="px-4 py-3 font-medium text-slate-800 border border-slate-200">Penalty for non-disclosure</td>
-                    <td className="px-4 py-3 text-red-600 font-semibold border border-slate-200">₹10,00,000 per account under Black Money Act, 2015</td>
+                  <tr className="border border-rule">
+                    <td className="px-4 py-3 font-medium text-ink border border-rule">Penalty for non-disclosure</td>
+                    <td className="px-4 py-3 text-red-600 font-semibold border border-rule">₹10,00,000 per account under Black Money Act, 2015</td>
                   </tr>
                 </tbody>
               </table>
@@ -281,32 +281,32 @@ export default function TradingTaxCalculatorPage() {
         <AuthorBox />
 
         {/* Related tools */}
-        <section className="py-10 px-6 bg-slate-50">
+        <section className="py-10 px-6 bg-secondary">
           <div className="max-w-5xl mx-auto">
-            <h2 className="text-xl font-bold text-slate-900 mb-5">Related Tools</h2>
+            <h2 className="text-xl font-bold text-ink mb-5">Related Tools</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Link href="/calculators/income-tax">
-                <div className="bg-white border border-slate-200 hover:border-blue-300 hover:shadow-sm rounded-lg p-4 transition-all cursor-pointer">
-                  <p className="font-semibold text-slate-800 text-sm">Income Tax Calculator</p>
-                  <p className="text-xs text-slate-500 mt-1">Add trading income to your salary and compute total tax liability</p>
+                <div className="bg-card border border-rule hover:border-credit hover:shadow-sm rounded-lg p-4 transition-all cursor-pointer">
+                  <p className="font-semibold text-ink text-sm">Income Tax Calculator</p>
+                  <p className="text-xs text-ink/55 mt-1">Add trading income to your salary and compute total tax liability</p>
                 </div>
               </Link>
               <Link href="/nri/dtaa-calculator">
-                <div className="bg-white border border-slate-200 hover:border-blue-300 hover:shadow-sm rounded-lg p-4 transition-all cursor-pointer">
-                  <p className="font-semibold text-slate-800 text-sm">DTAA Calculator</p>
-                  <p className="text-xs text-slate-500 mt-1">Compute Double Tax Avoidance Agreement relief on foreign income</p>
+                <div className="bg-card border border-rule hover:border-credit hover:shadow-sm rounded-lg p-4 transition-all cursor-pointer">
+                  <p className="font-semibold text-ink text-sm">DTAA Calculator</p>
+                  <p className="text-xs text-ink/55 mt-1">Compute Double Tax Avoidance Agreement relief on foreign income</p>
                 </div>
               </Link>
               <Link href="/blog/capital-gains-itr-where-to-report">
-                <div className="bg-white border border-slate-200 hover:border-blue-300 hover:shadow-sm rounded-lg p-4 transition-all cursor-pointer">
-                  <p className="font-semibold text-slate-800 text-sm">Capital Gains in ITR — Where to Report</p>
-                  <p className="text-xs text-slate-500 mt-1">Step-by-step guide to reporting CG in Schedule CG of your ITR</p>
+                <div className="bg-card border border-rule hover:border-credit hover:shadow-sm rounded-lg p-4 transition-all cursor-pointer">
+                  <p className="font-semibold text-ink text-sm">Capital Gains in ITR — Where to Report</p>
+                  <p className="text-xs text-ink/55 mt-1">Step-by-step guide to reporting CG in Schedule CG of your ITR</p>
                 </div>
               </Link>
               <Link href="/blog/capital-gains-tax-stocks-mutual-funds">
-                <div className="bg-white border border-slate-200 hover:border-blue-300 hover:shadow-sm rounded-lg p-4 transition-all cursor-pointer">
-                  <p className="font-semibold text-slate-800 text-sm">Capital Gains Tax on Stocks & Mutual Funds</p>
-                  <p className="text-xs text-slate-500 mt-1">Understand STCG vs LTCG rates, set-off rules, and exemptions</p>
+                <div className="bg-card border border-rule hover:border-credit hover:shadow-sm rounded-lg p-4 transition-all cursor-pointer">
+                  <p className="font-semibold text-ink text-sm">Capital Gains Tax on Stocks & Mutual Funds</p>
+                  <p className="text-xs text-ink/55 mt-1">Understand STCG vs LTCG rates, set-off rules, and exemptions</p>
                 </div>
               </Link>
             </div>
@@ -314,9 +314,9 @@ export default function TradingTaxCalculatorPage() {
         </section>
 
         {/* Disclaimer */}
-        <section className="py-8 px-6 bg-white border-t border-slate-100">
+        <section className="py-8 px-6 bg-card border-t border-rule">
           <div className="max-w-5xl mx-auto">
-            <p className="text-xs text-slate-500 leading-relaxed">
+            <p className="text-xs text-ink/55 leading-relaxed">
               <strong>Disclaimer:</strong> This calculator is for educational and informational purposes only. It uses
               approximate exchange rates from the ECB/Frankfurter API which may differ from official RBI/FBIL rates.
               Tax calculations are based on Indian tax law for FY 2025-26 (AY 2026-27). Surcharge and health &

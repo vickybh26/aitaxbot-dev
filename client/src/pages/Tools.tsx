@@ -74,29 +74,29 @@ export default function Tools() {
       </Helmet>
 
       <div className="container mx-auto px-4 py-10 max-w-5xl">
-        <h1 className="text-3xl font-bold text-slate-900 mb-1">Tools</h1>
-        <p className="text-slate-600 mb-8">
+        <h1 className="text-3xl font-bold text-ink mb-1">Tools</h1>
+        <p className="text-ink/65 mb-8">
           Everything on AiTaxBot is free to use.
         </p>
 
         {/* Primary tool — deliberately given a full-width card of its own. */}
         <Link href={PRIMARY.href}>
-          <div className="rounded-2xl border border-persian-blue-200 bg-gradient-to-br from-persian-blue-50 to-blue-50 p-6 mb-6 hover:shadow-md transition-shadow cursor-pointer">
+          <div className="rounded-2xl border border-rule bg-gradient-to-br from-paper to-blue-50 p-6 mb-6 hover:shadow-md transition-shadow cursor-pointer">
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-xl bg-persian-blue-600 flex items-center justify-center shrink-0">
+              <div className="w-12 h-12 rounded-xl bg-ink flex items-center justify-center shrink-0">
                 <PRIMARY.icon className="w-6 h-6 text-white" />
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-2 mb-1 flex-wrap">
-                  <h2 className="text-lg font-bold text-slate-900">{PRIMARY.title}</h2>
-                  <span className="text-[10px] font-bold text-persian-blue-800 bg-white border border-persian-blue-200 px-2 py-0.5 rounded-full">
+                  <h2 className="text-lg font-bold text-ink">{PRIMARY.title}</h2>
+                  <span className="text-[10px] font-bold text-ink bg-card border border-rule px-2 py-0.5 rounded-full">
                     Most useful before filing
                   </span>
                 </div>
-                <p className="text-sm text-slate-700 leading-relaxed mb-4">
+                <p className="text-sm text-ink/80 leading-relaxed mb-4">
                   {PRIMARY.description}
                 </p>
-                <Button size="sm" className="bg-persian-blue-600 hover:bg-persian-blue-700 text-white">
+                <Button size="sm" className="bg-ink hover:bg-ink text-white">
                   Run a free check <ArrowRight className="w-3 h-3 ml-1" />
                 </Button>
               </div>
@@ -107,13 +107,13 @@ export default function Tools() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {TOOLS.map(({ title, description, href, icon: Icon }) => (
             <Link key={href} href={href}>
-              <div className="h-full rounded-2xl border border-slate-200 bg-white p-5 hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer flex flex-col">
-                <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center mb-3">
-                  <Icon className="w-5 h-5 text-persian-blue-700" />
+              <div className="h-full rounded-2xl border border-rule bg-card p-5 hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer flex flex-col">
+                <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center mb-3">
+                  <Icon className="w-5 h-5 text-ink" />
                 </div>
-                <h2 className="text-base font-bold text-slate-900 mb-1">{title}</h2>
-                <p className="text-sm text-slate-600 leading-snug">{description}</p>
-                <span className="mt-auto pt-3 text-xs font-semibold text-blue-600 flex items-center gap-1">
+                <h2 className="text-base font-bold text-ink mb-1">{title}</h2>
+                <p className="text-sm text-ink/65 leading-snug">{description}</p>
+                <span className="mt-auto pt-3 text-xs font-semibold text-credit flex items-center gap-1">
                   Open <ArrowRight className="w-3 h-3" />
                 </span>
               </div>

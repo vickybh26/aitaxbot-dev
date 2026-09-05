@@ -71,15 +71,15 @@ const PRESET_TAGS = ["High Value", "Lead", "CA Client", "Follow Up", "VIP", "Ina
 
 const TAG_COLORS: Record<string, string> = {
   "High Value": "bg-emerald-100 text-emerald-700",
-  "Lead": "bg-blue-100 text-blue-700",
+  "Lead": "bg-blue-100 text-ink",
   "CA Client": "bg-violet-100 text-violet-700",
   "Follow Up": "bg-amber-100 text-amber-700",
   "VIP": "bg-rose-100 text-rose-700",
-  "Inactive": "bg-slate-100 text-slate-600",
+  "Inactive": "bg-secondary text-ink/65",
   "Referred": "bg-cyan-100 text-cyan-700",
 };
 
-const tagColor = (tag: string) => TAG_COLORS[tag] ?? "bg-slate-100 text-slate-700";
+const tagColor = (tag: string) => TAG_COLORS[tag] ?? "bg-secondary text-ink/80";
 
 // ─── UserRow ─────────────────────────────────────────────────────────────────
 
@@ -103,8 +103,8 @@ function UserRow({
   return (
     <tr
       className={cn(
-        "border-b border-slate-100 hover:bg-slate-50 cursor-pointer transition-colors",
-        selected && "bg-persian-blue-50"
+        "border-b border-rule hover:bg-secondary cursor-pointer transition-colors",
+        selected && "bg-paper"
       )}
       onClick={() => onSelect(user)}
     >
@@ -113,21 +113,21 @@ function UserRow({
           {user.profileImageUrl ? (
             <img src={user.profileImageUrl} className="w-8 h-8 rounded-full object-cover" alt="" />
           ) : (
-            <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center">
-              <UserCircle className="w-5 h-5 text-slate-500" />
+            <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
+              <UserCircle className="w-5 h-5 text-ink/55" />
             </div>
           )}
           <div>
-            <div className="font-medium text-slate-800 text-sm">
+            <div className="font-medium text-ink text-sm">
               {user.firstName ?? ""} {user.lastName ?? ""}
-              {!user.firstName && !user.lastName && <span className="text-slate-500">No name</span>}
+              {!user.firstName && !user.lastName && <span className="text-ink/55">No name</span>}
             </div>
-            <div className="text-slate-500 text-xs">{user.email}</div>
+            <div className="text-ink/55 text-xs">{user.email}</div>
           </div>
         </div>
       </td>
-      <td className="px-4 py-3 text-sm text-slate-600">{user.occupation ?? "—"}</td>
-      <td className="px-4 py-3 text-sm text-slate-600">
+      <td className="px-4 py-3 text-sm text-ink/65">{user.occupation ?? "—"}</td>
+      <td className="px-4 py-3 text-sm text-ink/65">
         {user.city ? `${user.city}, ` : ""}
         {user.state ?? "—"}
       </td>
@@ -142,7 +142,7 @@ function UserRow({
                   {t}
                 </span>
               ))
-            : <span className="text-slate-300 text-xs">—</span>}
+            : <span className="text-ink/35 text-xs">—</span>}
         </div>
       </td>
       <td className="px-4 py-3">
@@ -157,12 +157,12 @@ function UserRow({
           // nothing anywhere in the codebase, so completing a profile changed
           // nothing for the user. Zero recipients completed their profile.
           // The status is still shown because it is useful admin context.
-          <span className="flex items-center gap-1 text-slate-500 text-xs">
+          <span className="flex items-center gap-1 text-ink/55 text-xs">
             <Circle className="w-3.5 h-3.5" /> Incomplete
           </span>
         )}
       </td>
-      <td className="px-4 py-3 text-xs text-slate-500">{joinedDate}</td>
+      <td className="px-4 py-3 text-xs text-ink/55">{joinedDate}</td>
     </tr>
   );
 }
@@ -280,19 +280,19 @@ function CRMDrawer({
       className="fixed inset-0 z-40 flex justify-end"
     >
       <div className="fixed inset-0 bg-black/30" onClick={onClose} />
-      <aside className="relative z-50 w-full max-w-sm bg-white shadow-2xl flex flex-col h-full overflow-hidden">
+      <aside className="relative z-50 w-full max-w-sm bg-card shadow-2xl flex flex-col h-full overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200">
-          <h3 id="admin-user-drawer-title" className="font-semibold text-slate-800">User Profile &amp; CRM</h3>
-          <button onClick={onClose} className="p-1 rounded-lg hover:bg-slate-100" aria-label="Close user profile">
-            <X className="w-4 h-4 text-slate-500" />
+        <div className="flex items-center justify-between px-5 py-4 border-b border-rule">
+          <h3 id="admin-user-drawer-title" className="font-semibold text-ink">User Profile &amp; CRM</h3>
+          <button onClick={onClose} className="p-1 rounded-lg hover:bg-secondary" aria-label="Close user profile">
+            <X className="w-4 h-4 text-ink/55" />
           </button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-5 space-y-6">
           {isLoading ? (
             <div className="flex items-center justify-center h-40">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-persian-blue-600" />
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-ink" />
             </div>
           ) : user ? (
             <>
@@ -301,17 +301,17 @@ function CRMDrawer({
                 {user.profileImageUrl ? (
                   <img src={user.profileImageUrl} className="w-14 h-14 rounded-2xl object-cover" alt="" />
                 ) : (
-                  <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center">
-                    <UserCircle className="w-8 h-8 text-slate-500" />
+                  <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center">
+                    <UserCircle className="w-8 h-8 text-ink/55" />
                   </div>
                 )}
                 <div>
-                  <div className="font-semibold text-slate-800">
+                  <div className="font-semibold text-ink">
                     {user.firstName ?? ""} {user.lastName ?? ""}
-                    {!user.firstName && !user.lastName && <span className="text-slate-500">No name</span>}
+                    {!user.firstName && !user.lastName && <span className="text-ink/55">No name</span>}
                   </div>
-                  <div className="text-slate-500 text-sm">{user.email}</div>
-                  {user.mobile && <div className="text-slate-500 text-xs mt-0.5">{user.mobile}</div>}
+                  <div className="text-ink/55 text-sm">{user.email}</div>
+                  {user.mobile && <div className="text-ink/55 text-xs mt-0.5">{user.mobile}</div>}
                 </div>
               </div>
 
@@ -325,8 +325,8 @@ function CRMDrawer({
                   { label: "Joined", value: joinedDate },
                 ].map(({ label, value }) => (
                   <div key={label}>
-                    <p className="text-xs text-slate-500 font-medium uppercase tracking-wide">{label}</p>
-                    <p className="text-slate-700 mt-0.5">{value ?? "—"}</p>
+                    <p className="text-xs text-ink/55 font-medium uppercase tracking-wide">{label}</p>
+                    <p className="text-ink/80 mt-0.5">{value ?? "—"}</p>
                   </div>
                 ))}
               </div>
@@ -334,8 +334,8 @@ function CRMDrawer({
               {/* Tags */}
               <div>
                 <div className="flex items-center gap-1.5 mb-3">
-                  <Tag className="w-4 h-4 text-slate-500" />
-                  <span className="text-sm font-semibold text-slate-700">Tags</span>
+                  <Tag className="w-4 h-4 text-ink/55" />
+                  <span className="text-sm font-semibold text-ink/80">Tags</span>
                 </div>
                 <div className="flex flex-wrap gap-2 mb-3">
                   {PRESET_TAGS.map((tag) => {
@@ -349,7 +349,7 @@ function CRMDrawer({
                           "text-xs px-3 py-1.5 rounded-full font-medium border transition-all",
                           active
                             ? `${tagColor(tag)} border-transparent shadow-sm`
-                            : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"
+                            : "bg-card border-rule text-ink/55 hover:border-credit"
                         )}
                       >
                         {tag}
@@ -377,9 +377,9 @@ function CRMDrawer({
               {/* Notes */}
               <div>
                 <div className="flex items-center gap-1.5 mb-3">
-                  <StickyNote className="w-4 h-4 text-slate-500" />
-                  <span className="text-sm font-semibold text-slate-700">Notes</span>
-                  <span className="ml-auto text-xs text-slate-500">{user.notes?.length ?? 0} note(s)</span>
+                  <StickyNote className="w-4 h-4 text-ink/55" />
+                  <span className="text-sm font-semibold text-ink/80">Notes</span>
+                  <span className="ml-auto text-xs text-ink/55">{user.notes?.length ?? 0} note(s)</span>
                 </div>
 
                 {canWrite && (
@@ -398,7 +398,7 @@ function CRMDrawer({
                     />
                     <Button
                       size="sm"
-                      className="h-8 px-3 bg-persian-blue-600 hover:bg-persian-blue-700 text-white"
+                      className="h-8 px-3 bg-ink hover:bg-ink text-white"
                       onClick={() => newNote.trim() && addNoteMutation.mutate(newNote)}
                       disabled={addNoteMutation.isPending}
                     >
@@ -420,9 +420,9 @@ function CRMDrawer({
                           key={note.id}
                           className="bg-amber-50 border border-amber-100 rounded-xl p-3 group"
                         >
-                          <p className="text-slate-700 text-sm leading-relaxed">{note.text}</p>
+                          <p className="text-ink/80 text-sm leading-relaxed">{note.text}</p>
                           <div className="flex items-center justify-between mt-2">
-                            <div className="text-xs text-slate-500">
+                            <div className="text-xs text-ink/55">
                               {note.adminEmail} · {noteDate}
                             </div>
                             {adminLevel === 1 && (
@@ -438,7 +438,7 @@ function CRMDrawer({
                       );
                     })
                   ) : (
-                    <p className="text-slate-500 text-xs italic">No notes yet.</p>
+                    <p className="text-ink/55 text-xs italic">No notes yet.</p>
                   )}
                 </div>
               </div>
@@ -448,7 +448,7 @@ function CRMDrawer({
 
         {/* Super Admin: delete user */}
         {adminLevel === 1 && (
-          <div className="p-4 border-t border-slate-200 bg-red-50">
+          <div className="p-4 border-t border-rule bg-red-50">
             <p className="text-xs text-red-600 font-medium mb-2 flex items-center gap-1">
               <AlertTriangle className="w-3.5 h-3.5" /> Danger Zone
             </p>
@@ -582,8 +582,8 @@ export default function AdminUsers() {
         {/* Header */}
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
-            <h1 className="text-2xl font-bold text-slate-800">Users &amp; CRM</h1>
-            <p className="text-slate-500 text-sm mt-1">
+            <h1 className="text-2xl font-bold text-ink">Users &amp; CRM</h1>
+            <p className="text-ink/55 text-sm mt-1">
               {data?.total ?? "—"} users · Click a row to open CRM panel
             </p>
           </div>
@@ -600,10 +600,10 @@ export default function AdminUsers() {
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
+        <div className="bg-card rounded-2xl p-4 shadow-sm border border-rule">
           <div className="flex flex-wrap gap-3 items-center">
             <div className="relative flex-1 min-w-48">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink/55" />
               <Input
                 aria-label="Search users by name, email or phone"
                 placeholder="Search name, email, phone…"
@@ -615,7 +615,7 @@ export default function AdminUsers() {
             <select
               value={occupationFilter}
               onChange={(e) => { setOccupationFilter(e.target.value); setPage(1); }}
-              className="border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-persian-blue-500"
+              className="border border-rule rounded-lg px-3 py-2 text-sm text-ink/80 bg-card focus:outline-none focus:ring-2 focus:ring-ink"
             >
               <option value="">All Occupations</option>
               {["Salaried", "Self-Employed", "Business Owner", "Freelancer", "Student", "Retired", "Other"].map((o) => (
@@ -625,7 +625,7 @@ export default function AdminUsers() {
             <select
               value={tagFilter}
               onChange={(e) => { setTagFilter(e.target.value); setPage(1); }}
-              className="border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-persian-blue-500"
+              className="border border-rule rounded-lg px-3 py-2 text-sm text-ink/80 bg-card focus:outline-none focus:ring-2 focus:ring-ink"
             >
               <option value="">All Tags</option>
               {PRESET_TAGS.map((t) => <option key={t} value={t}>{t}</option>)}
@@ -633,7 +633,7 @@ export default function AdminUsers() {
             {(occupationFilter || stateFilter || tagFilter || debouncedSearch) && (
               <button
                 onClick={() => { setOccupationFilter(""); setStateFilter(""); setTagFilter(""); setSearch(""); setDebouncedSearch(""); setPage(1); }}
-                className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-600"
+                className="flex items-center gap-1 text-xs text-ink/55 hover:text-ink/65"
               >
                 <X className="w-3.5 h-3.5" /> Clear filters
               </button>
@@ -642,21 +642,21 @@ export default function AdminUsers() {
         </div>
 
         {/* Table */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+        <div className="bg-card rounded-2xl shadow-sm border border-rule overflow-hidden">
           {isLoading ? (
             <div className="flex items-center justify-center h-48">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-persian-blue-600" />
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-ink" />
             </div>
           ) : isError ? (
             <div className="flex flex-col items-center justify-center h-48 gap-3 text-center px-4">
               <AlertTriangle className="w-8 h-8 text-red-400" />
               <div>
-                <p className="text-sm font-medium text-slate-700">Failed to load users</p>
+                <p className="text-sm font-medium text-ink/80">Failed to load users</p>
                 <p className="text-xs text-red-500 mt-1">{(error as Error)?.message}</p>
               </div>
               <button
                 onClick={() => refetch()}
-                className="text-xs text-persian-blue-600 hover:underline mt-1"
+                className="text-xs text-ink hover:underline mt-1"
               >
                 Retry
               </button>
@@ -666,9 +666,9 @@ export default function AdminUsers() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left">
                   <thead>
-                    <tr className="border-b border-slate-100 bg-slate-50">
+                    <tr className="border-b border-rule bg-secondary">
                       {["User", "Occupation", "Location", "Tags", "Profile", "Joined"].map((h) => (
-                        <th key={h} className="px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                        <th key={h} className="px-4 py-3 text-xs font-semibold text-ink/55 uppercase tracking-wide">
                           {h}
                         </th>
                       ))}
@@ -687,7 +687,7 @@ export default function AdminUsers() {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={6} className="px-4 py-12 text-center text-slate-500 text-sm">
+                        <td colSpan={6} className="px-4 py-12 text-center text-ink/55 text-sm">
                           No users found.
                         </td>
                       </tr>
@@ -698,8 +698,8 @@ export default function AdminUsers() {
 
               {/* Pagination */}
               {data && data.totalPages > 1 && (
-                <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100">
-                  <p className="text-sm text-slate-500">
+                <div className="flex items-center justify-between px-4 py-3 border-t border-rule">
+                  <p className="text-sm text-ink/55">
                     Page {data.page} of {data.totalPages} · {data.total} users
                   </p>
                   <div className="flex gap-2">
@@ -736,7 +736,7 @@ export default function AdminUsers() {
 
       {/* Delete User Confirmation */}
       <Dialog open={deleteUserOpen} onOpenChange={setDeleteUserOpen}>
-        <DialogContent className="max-w-md bg-white">
+        <DialogContent className="max-w-md bg-card">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-red-700">
               <AlertTriangle className="h-5 w-5" />
@@ -744,7 +744,7 @@ export default function AdminUsers() {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
-            <p className="text-sm text-slate-700">
+            <p className="text-sm text-ink/80">
               You are about to <strong>permanently delete</strong> this user account and all associated data.
             </p>
             <p className="text-sm text-red-600 font-medium">

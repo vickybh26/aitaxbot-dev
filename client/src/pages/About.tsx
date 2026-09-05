@@ -35,7 +35,7 @@ export default function About() {
       <div>
         <div className="max-w-4xl mx-auto px-6 py-8">
           <div className="prose prose-lg max-w-none">
-            <p className="text-xl text-slate-600 mb-8 leading-relaxed">
+            <p className="text-xl text-ink/65 mb-8 leading-relaxed">
               At AiTaxBot, we believe taxes shouldn't be stressful. Our mission is simple — to make tax
               calculation and financial planning easy, accurate, and accessible for every Indian. Whether
               you're a salaried professional, a freelancer, a property owner, or a crypto trader, AiTaxBot
@@ -45,44 +45,44 @@ export default function About() {
 
             {/* What We Do */}
             <section className="mb-10">
-              <h2 className="text-2xl font-semibold text-slate-900 mb-6">What We Do</h2>
+              <h2 className="text-2xl font-semibold text-ink mb-6">What We Do</h2>
 
               <div className="grid md:grid-cols-2 gap-6">
-                <div className="bg-blue-50 rounded-lg p-6">
-                  <h3 className="text-xl font-semibold text-blue-900 mb-3">🧮 Income Tax Calculator</h3>
-                  <p className="text-slate-700">Compare Old vs New regime, estimate your tax liability under ITA 2025, and find out exactly how much you save — updated for AY 2026-27.</p>
+                <div className="bg-secondary rounded-lg p-6">
+                  <h3 className="text-xl font-semibold text-ink mb-3">🧮 Income Tax Calculator</h3>
+                  <p className="text-ink/80">Compare Old vs New regime, estimate your tax liability under ITA 2025, and find out exactly how much you save — updated for AY 2026-27.</p>
                 </div>
 
                 <div className="bg-green-50 rounded-lg p-6">
                   <h3 className="text-xl font-semibold text-green-900 mb-3">🛠️ Financial Calculators</h3>
-                  <p className="text-slate-700">HRA exemption, SIP returns, SWP planning, NPS corpus, PF maturity, home loan EMI, vehicle loan — all free, all instant.</p>
+                  <p className="text-ink/80">HRA exemption, SIP returns, SWP planning, NPS corpus, PF maturity, home loan EMI, vehicle loan — all free, all instant.</p>
                 </div>
 
                 <div className="bg-teal-50 rounded-lg p-6">
                   <h3 className="text-xl font-semibold text-teal-900 mb-3">🧾 Rent Receipt Generator</h3>
-                  <p className="text-slate-700">Generate rent receipts as a PDF in seconds and get them emailed directly to you — no sign-up required for basic use.</p>
+                  <p className="text-ink/80">Generate rent receipts as a PDF in seconds and get them emailed directly to you — no sign-up required for basic use.</p>
                 </div>
 
                 <div className="bg-orange-50 rounded-lg p-6">
                   <h3 className="text-xl font-semibold text-orange-900 mb-3">📈 Trading Tax Calculator</h3>
-                  <p className="text-slate-700">Calculate STCG and LTCG on equity, F&amp;O, and crypto trades. Understand your US stocks tax liability under DTAA.</p>
+                  <p className="text-ink/80">Calculate STCG and LTCG on equity, F&amp;O, and crypto trades. Understand your US stocks tax liability under DTAA.</p>
                 </div>
 
-                <div className="bg-persian-blue-50 rounded-lg p-6">
-                  <h3 className="text-xl font-semibold text-persian-blue-900 mb-3">🔍 Find a CA — Free Directory</h3>
-                  <p className="text-slate-700">Browse verified Chartered Accountants across India by city and specialisation. Send enquiries directly — no platform fee, ever.</p>
+                <div className="bg-paper rounded-lg p-6">
+                  <h3 className="text-xl font-semibold text-ink mb-3">🔍 Find a CA — Free Directory</h3>
+                  <p className="text-ink/80">Browse verified Chartered Accountants across India by city and specialisation. Send enquiries directly — no platform fee, ever.</p>
                 </div>
 
-                <div className="bg-persian-blue-50 rounded-lg p-6">
-                  <h3 className="text-xl font-semibold text-persian-blue-900 mb-3">📰 Tax Blog & Guides</h3>
-                  <p className="text-slate-700">Simplified explanations of ITR filing, ITA 2025 changes, HRA rules, capital gains, 80C deductions — written in plain English.</p>
+                <div className="bg-paper rounded-lg p-6">
+                  <h3 className="text-xl font-semibold text-ink mb-3">📰 Tax Blog & Guides</h3>
+                  <p className="text-ink/80">Simplified explanations of ITR filing, ITA 2025 changes, HRA rules, capital gains, 80C deductions — written in plain English.</p>
                 </div>
               </div>
             </section>
 
             {/* Why AiTaxBot */}
             <section className="mb-10">
-              <h2 className="text-2xl font-semibold text-slate-900 mb-6">Why AiTaxBot?</h2>
+              <h2 className="text-2xl font-semibold text-ink mb-6">Why AiTaxBot?</h2>
 
               <div className="space-y-6">
                 <div className="flex items-start space-x-4">
@@ -92,32 +92,32 @@ export default function About() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-slate-900 mb-2">Completely Free</h3>
-                    <p className="text-slate-700">No hidden charges, no subscriptions, no paywalls. Every calculator, tool, and article is free to use.</p>
+                    <h3 className="text-xl font-semibold text-ink mb-2">Completely Free</h3>
+                    <p className="text-ink/80">No hidden charges, no subscriptions, no paywalls. Every calculator, tool, and article is free to use.</p>
                   </div>
                 </div>
 
                 <div className="flex items-start space-x-4">
                   <div className="bg-blue-100 rounded-full p-2 mt-1 flex-shrink-0">
-                    <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="w-5 h-5 text-credit" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-slate-900 mb-2">Built for India</h3>
-                    <p className="text-slate-700">Fully aligned with Indian tax law — Income Tax Act 2025, IT Rules 2026, AY 2026-27 slabs, 8-metro HRA rules, and crypto taxation. Not a generic global tool adapted for India.</p>
+                    <h3 className="text-xl font-semibold text-ink mb-2">Built for India</h3>
+                    <p className="text-ink/80">Fully aligned with Indian tax law — Income Tax Act 2025, IT Rules 2026, AY 2026-27 slabs, 8-metro HRA rules, and crypto taxation. Not a generic global tool adapted for India.</p>
                   </div>
                 </div>
 
                 <div className="flex items-start space-x-4">
-                  <div className="bg-persian-blue-100 rounded-full p-2 mt-1 flex-shrink-0">
-                    <svg className="w-5 h-5 text-persian-blue-700" fill="currentColor" viewBox="0 0 20 20">
+                  <div className="bg-secondary rounded-full p-2 mt-1 flex-shrink-0">
+                    <svg className="w-5 h-5 text-ink" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-slate-900 mb-2">Simple &amp; Transparent</h3>
-                    <p className="text-slate-700">No jargon, no complex forms. Straightforward answers and tools you can trust. Every calculation is explained step by step.</p>
+                    <h3 className="text-xl font-semibold text-ink mb-2">Simple &amp; Transparent</h3>
+                    <p className="text-ink/80">No jargon, no complex forms. Straightforward answers and tools you can trust. Every calculation is explained step by step.</p>
                   </div>
                 </div>
 
@@ -128,8 +128,8 @@ export default function About() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-slate-900 mb-2">CA-Backed Accuracy</h3>
-                    <p className="text-slate-700">Every calculator and article is reviewed by a qualified Chartered Accountant. We cite the relevant sections of the Income Tax Act so you can verify every figure yourself.</p>
+                    <h3 className="text-xl font-semibold text-ink mb-2">CA-Backed Accuracy</h3>
+                    <p className="text-ink/80">Every calculator and article is reviewed by a qualified Chartered Accountant. We cite the relevant sections of the Income Tax Act so you can verify every figure yourself.</p>
                   </div>
                 </div>
 
@@ -140,8 +140,8 @@ export default function About() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-slate-900 mb-2">Your Data, Your Control</h3>
-                    <p className="text-slate-700">Calculations run in your browser, and nothing is saved unless you are signed in. Once you are, your latest result is kept so it is waiting on your dashboard next time — you can delete any saved result, or your whole account, at any time.</p>
+                    <h3 className="text-xl font-semibold text-ink mb-2">Your Data, Your Control</h3>
+                    <p className="text-ink/80">Calculations run in your browser, and nothing is saved unless you are signed in. Once you are, your latest result is kept so it is waiting on your dashboard next time — you can delete any saved result, or your whole account, at any time.</p>
                   </div>
                 </div>
               </div>
@@ -149,18 +149,18 @@ export default function About() {
 
             {/* Find a CA section */}
             <section className="mb-10">
-              <h2 className="text-2xl font-semibold text-slate-900 mb-6">Find a CA — Free Directory Service</h2>
+              <h2 className="text-2xl font-semibold text-ink mb-6">Find a CA — Free Directory Service</h2>
               <div className="bg-gradient-to-r from-teal-50 to-blue-50 border border-teal-100 rounded-lg p-8">
-                <p className="text-slate-800 leading-relaxed mb-4">
+                <p className="text-ink leading-relaxed mb-4">
                   Calculators answer "how much" — but sometimes you need a qualified professional to answer
                   "what next." That's why AiTaxBot maintains a free directory of Chartered Accountants across India.
                 </p>
-                <p className="text-slate-800 leading-relaxed mb-4">
+                <p className="text-ink leading-relaxed mb-4">
                   CAs list their own profiles voluntarily. Users can browse by city and service area, and send
                   an enquiry directly to any CA. <strong>AiTaxBot charges no fee</strong> — to users or to CAs —
                   for this service.
                 </p>
-                <p className="text-slate-700 text-sm leading-relaxed mb-6">
+                <p className="text-ink/80 text-sm leading-relaxed mb-6">
                   <strong>Important:</strong> AiTaxBot is an informational platform. We do not recommend, refer,
                   rank, or endorse any CA. Profiles are displayed in alphabetical order. We advise all users to
                   verify a CA's ICAI membership number at{" "}
@@ -168,7 +168,7 @@ export default function About() {
                     href="https://www.icai.org/post.html?post_id=11967"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 underline"
+                    className="text-credit underline"
                   >
                     icai.org
                   </a>{" "}
@@ -185,16 +185,16 @@ export default function About() {
 
             {/* About the Founder */}
             <section className="mb-10" id="author">
-              <h2 className="text-2xl font-semibold text-slate-900 mb-6">About the Founder</h2>
-              <div className="bg-blue-50 rounded-lg p-8 border border-blue-100">
+              <h2 className="text-2xl font-semibold text-ink mb-6">About the Founder</h2>
+              <div className="bg-secondary rounded-lg p-8 border border-rule">
                 <div className="flex items-start gap-6">
                   <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-2xl font-bold text-blue-600">CA</span>
+                    <span className="text-2xl font-bold text-credit">CA</span>
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-slate-900 mb-1">Chartered Accountant & Founder</h3>
-                    <p className="text-blue-700 font-semibold mb-3">AiTaxBot · aitaxbot.co.in</p>
-                    <p className="text-slate-700 leading-relaxed">
+                    <h3 className="text-xl font-bold text-ink mb-1">Chartered Accountant & Founder</h3>
+                    <p className="text-ink font-semibold mb-3">AiTaxBot · aitaxbot.co.in</p>
+                    <p className="text-ink/80 leading-relaxed">
                       AiTaxBot was founded by a qualified Chartered Accountant who saw firsthand how confusing
                       India's tax system can be for ordinary taxpayers. The platform was built to bridge that gap
                       — giving individuals the same clarity that CA clients receive, for free. Every calculator,
@@ -208,9 +208,9 @@ export default function About() {
 
             {/* Our Vision */}
             <section className="mb-10">
-              <h2 className="text-2xl font-semibold text-slate-900 mb-6">Our Vision</h2>
-              <div className="bg-gradient-to-r from-blue-50 to-persian-blue-50 rounded-lg p-8">
-                <p className="text-lg text-slate-800 leading-relaxed">
+              <h2 className="text-2xl font-semibold text-ink mb-6">Our Vision</h2>
+              <div className="bg-gradient-to-r from-blue-50 to-paper rounded-lg p-8">
+                <p className="text-lg text-ink leading-relaxed">
                   To become India's most trusted free tax and finance platform — empowering every Indian taxpayer
                   to file with confidence, plan with clarity, and never overpay a rupee.
                 </p>
@@ -233,12 +233,12 @@ export default function About() {
 
             {/* CTA */}
             <section className="text-center">
-              <div className="bg-slate-50 rounded-lg p-8">
-                <h3 className="text-2xl font-semibold text-slate-900 mb-4">Ready to take control of your taxes?</h3>
-                <p className="text-slate-600 mb-6">Start with our free income tax calculator — compare Old vs New Regime in under a minute.</p>
+              <div className="bg-secondary rounded-lg p-8">
+                <h3 className="text-2xl font-semibold text-ink mb-4">Ready to take control of your taxes?</h3>
+                <p className="text-ink/65 mb-6">Start with our free income tax calculator — compare Old vs New Regime in under a minute.</p>
                 <Link
                   href="/calculators/income-tax"
-                  className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium inline-block"
+                  className="bg-ink text-white px-8 py-3 rounded-lg hover:bg-credit transition-colors font-medium inline-block"
                   data-testid="button-start-calculating"
                 >
                   Start Calculating →

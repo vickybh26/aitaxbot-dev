@@ -122,9 +122,9 @@ function RegimeChart({
     if (active && payload?.length) {
       const { name, tax } = payload[0].payload;
       return (
-        <div className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs shadow-md">
-          <p className="font-semibold text-slate-700">{name}</p>
-          <p className="text-slate-900 font-bold">{fmt(tax)}</p>
+        <div className="bg-card border border-rule rounded-lg px-3 py-2 text-xs shadow-md">
+          <p className="font-semibold text-ink/80">{name}</p>
+          <p className="text-ink font-bold">{fmt(tax)}</p>
         </div>
       );
     }
@@ -1021,10 +1021,10 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
           <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-0.5">
             <CheckCircle className="h-3 w-3" /> CA-Reviewed Calculations
           </span>
-          <span className="inline-flex items-center gap-1 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-full px-2.5 py-0.5">
+          <span className="inline-flex items-center gap-1 text-xs font-medium text-ink bg-secondary border border-rule rounded-full px-2.5 py-0.5">
             <CheckCircle className="h-3 w-3" /> Updated for Finance Act 2025
           </span>
-          <span className="inline-flex items-center gap-1 text-xs font-medium text-slate-600 bg-slate-50 border border-slate-200 rounded-full px-2.5 py-0.5">
+          <span className="inline-flex items-center gap-1 text-xs font-medium text-ink/65 bg-secondary border border-rule rounded-full px-2.5 py-0.5">
             <Shield className="h-3 w-3" /> Nothing saved unless you sign in
           </span>
         </div>
@@ -1111,7 +1111,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                         </div>
                       </details>
                     ) : formData.financialYear === '2025-26' ? (
-                      <details className="mt-2 rounded-lg border border-blue-200 bg-blue-50 p-3 text-xs text-blue-900">
+                      <details className="mt-2 rounded-lg border border-rule bg-secondary p-3 text-xs text-ink">
                         <summary className="font-semibold mb-1.5 cursor-pointer select-none">📘 Income Tax Act, 2025 — FY 2026-27 (Budget 2026 slabs)</summary>
                         <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 mt-1.5">
                           <span><span className="font-medium">New Regime:</span> Section 115BAC</span>
@@ -1126,7 +1126,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                         </div>
                       </details>
                     ) : (
-                      <details className="mt-2 rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs text-slate-700">
+                      <details className="mt-2 rounded-lg border border-rule bg-secondary p-3 text-xs text-ink/80">
                         <summary className="font-semibold mb-1.5 cursor-pointer select-none">📙 Income Tax Act, 1961 — FY 2024-25 (Budget 2024 slabs)</summary>
                         <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 mt-1.5">
                           <span><span className="font-medium">New Regime:</span> Section 115BAC</span>
@@ -1216,7 +1216,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                       onChange={(e) => updateFormData('capitalGainsIncome', e.target.value)}
                       data-testid="input-capital-gains-income"
                     />
-                    <p className="text-xs text-slate-500 mt-1">
+                    <p className="text-xs text-ink/55 mt-1">
                       Debt funds, unlisted shares, property — gains taxed at your slab rate.
                       Listed shares and equity mutual funds go in the two fields below.
                     </p>
@@ -1240,7 +1240,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                       onChange={(e) => updateFormData('ltcgEquity', e.target.value)}
                       data-testid="input-ltcg-equity"
                     />
-                    <p className="text-xs text-slate-500 mt-1">
+                    <p className="text-xs text-ink/55 mt-1">
                       Held over 12 months. Section 112A — first ₹1,25,000 exempt each
                       year, balance taxed at 12.5%. Not eligible for the rebate.
                     </p>
@@ -1259,7 +1259,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                       onChange={(e) => updateFormData('stcgEquity', e.target.value)}
                       data-testid="input-stcg-equity"
                     />
-                    <p className="text-xs text-slate-500 mt-1">
+                    <p className="text-xs text-ink/55 mt-1">
                       Held 12 months or less. Section 111A — taxed at 20%.
                     </p>
                   </div>
@@ -1491,7 +1491,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                       <button
                         type="button"
                         onClick={() => setShowHRAModal(true)}
-                        className="text-xs text-persian-blue-600 hover:text-persian-blue-800 font-medium underline underline-offset-2"
+                        className="text-xs text-ink hover:text-credit font-medium underline underline-offset-2"
                       >
                         Calculate HRA →
                       </button>
@@ -1521,7 +1521,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                       onChange={(e) => updateFormData('basicSalary', e.target.value)}
                       data-testid="input-basic-salary"
                     />
-                    <p className="text-xs text-slate-500 mt-1">
+                    <p className="text-xs text-ink/55 mt-1">
                       {parseFloat(formData.basicSalary) > 0
                         ? 'Used for the HRA exemption — the law computes it on basic + DA, not gross salary.'
                         : 'Needed for an accurate HRA exemption. Left blank, we fall back to gross salary, which overstates the exemption.'}
@@ -1639,10 +1639,10 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
           ) : result ? (
             <div className="space-y-6">
               {/* Recommendation Banner — DS Callout style */}
-              <div className="rounded-2xl border overflow-hidden bg-white shadow-sm">
+              <div className="rounded-2xl border overflow-hidden bg-card shadow-sm">
                 <div className={`px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
                   result.recommendedRegime === 'new'
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-ink text-white'
                     : 'bg-green-600 text-white'
                 }`}>
                   <div>
@@ -1658,7 +1658,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                     <Button
                       onClick={() => { if (user) { generatePDF(); } else { onGuestDownload?.(); } }}
                       disabled={isGeneratingPDF}
-                      className="bg-white/20 hover:bg-white/30 text-white border-white/30 border"
+                      className="bg-card/20 hover:bg-card/30 text-white border-white/30 border"
                       variant="outline"
                       data-testid="button-download-pdf"
                     >
@@ -1668,7 +1668,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                       <Button
                         onClick={saveCalculation}
                         disabled={isSaving}
-                        className="bg-white/20 hover:bg-white/30 text-white border-white/30 border"
+                        className="bg-card/20 hover:bg-card/30 text-white border-white/30 border"
                         variant="outline"
                         data-testid="button-save-calculation"
                       >
@@ -1678,7 +1678,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                   </div>
                 </div>
                 {result.savings > 0 && (
-                  <div className="px-5 py-3 border-t border-slate-100">
+                  <div className="px-5 py-3 border-t border-rule">
                     <Callout tone="info">
                       Switch to the <strong>{result.recommendedRegime === 'old' ? 'Old' : 'New'} Regime</strong> when your employer asks for your regime declaration this April — you cannot change it mid-year for TDS purposes.
                     </Callout>
@@ -1707,7 +1707,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                     <div className="flex items-start justify-between gap-4 flex-wrap">
                       <div>
                         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">Recommended ITR Form</p>
-                        <h3 className="text-2xl font-bold text-slate-900">{itr.formLabel}</h3>
+                        <h3 className="text-2xl font-bold text-ink">{itr.formLabel}</h3>
                       </div>
                       <Badge variant="secondary" className="mt-1">Based on income sources entered above</Badge>
                     </div>
@@ -1717,12 +1717,12 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                       ))}
                     </div>
                     {itr.blockers.length > 0 && (
-                      <div className="mt-3 pt-3 border-t border-slate-100">
-                        <p className="text-xs font-semibold text-slate-500 mb-1.5">Why not the simpler form:</p>
+                      <div className="mt-3 pt-3 border-t border-rule">
+                        <p className="text-xs font-semibold text-ink/55 mb-1.5">Why not the simpler form:</p>
                         <ul className="space-y-1">
                           {itr.blockers.map((b, i) => (
-                            <li key={i} className="text-xs text-slate-500 flex items-start gap-1.5">
-                              <span className="mt-1 w-1 h-1 rounded-full bg-slate-400 flex-shrink-0" />
+                            <li key={i} className="text-xs text-ink/55 flex items-start gap-1.5">
+                              <span className="mt-1 w-1 h-1 rounded-full bg-ink/40 flex-shrink-0" />
                               {b}
                             </li>
                           ))}
@@ -1742,7 +1742,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
 
               {/* Regime Comparison Bar Chart */}
               <Card className="p-5 premium-glass-card premium-glass-card-hover transition-all duration-300">
-                <h3 className="text-sm font-semibold text-slate-700 mb-4">Tax Comparison — Old vs New Regime</h3>
+                <h3 className="text-sm font-semibold text-ink/80 mb-4">Tax Comparison — Old vs New Regime</h3>
                 <RegimeChart
                   oldTax={result.oldRegime.totalTax}
                   newTax={result.newRegime.totalTax}
@@ -1798,8 +1798,8 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                     </div>
                     <Separator />
                     <div className="flex justify-between text-lg">
-                      <span className="font-bold text-slate-900">Total Tax</span>
-                      <span className="font-bold text-slate-900">{formatCurrency(result.oldRegime.totalTax)}</span>
+                      <span className="font-bold text-ink">Total Tax</span>
+                      <span className="font-bold text-ink">{formatCurrency(result.oldRegime.totalTax)}</span>
                     </div>
                     <div className="flex justify-between text-lg">
                       <span className="font-bold text-success">Take Home</span>
@@ -1807,7 +1807,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                     </div>
                   </div>
 
-                  <div className="mt-4 p-3 bg-neutral-50 rounded">
+                  <div className="mt-4 p-3 bg-secondary rounded">
                     <div className="text-center">
                       <div className="text-sm text-readable-light">Effective Tax Rate</div>
                       <div className="text-xl font-bold text-primary">{`${result.oldRegime.effectiveRate.toFixed(1)}%`}</div>
@@ -1864,8 +1864,8 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                     </div>
                     <Separator />
                     <div className="flex justify-between text-lg">
-                      <span className="font-bold text-slate-900">Total Tax</span>
-                      <span className="font-bold text-slate-900">{formatCurrency(result.newRegime.totalTax)}</span>
+                      <span className="font-bold text-ink">Total Tax</span>
+                      <span className="font-bold text-ink">{formatCurrency(result.newRegime.totalTax)}</span>
                     </div>
                     <div className="flex justify-between text-lg">
                       <span className="font-bold text-success">Take Home</span>
@@ -1873,7 +1873,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                     </div>
                   </div>
 
-                  <div className="mt-4 p-3 bg-neutral-50 rounded">
+                  <div className="mt-4 p-3 bg-secondary rounded">
                     <div className="text-center">
                       <div className="text-sm text-readable-light">Effective Tax Rate</div>
                       <div className="text-xl font-bold text-primary">{`${result.newRegime.effectiveRate.toFixed(1)}%`}</div>
@@ -1884,7 +1884,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
             </div>
           ) : (
             <div className="text-center py-12">
-              <PieChart className="h-10 w-10 text-neutral-300 mb-4" />
+              <PieChart className="h-10 w-10 text-ink/35 mb-4" />
               <p className="text-readable-light">Complete the calculation to see detailed results</p>
             </div>
           )}
@@ -1893,46 +1893,46 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
           {result && user && (
             <div className="mt-6">
               {aiLoading ? (
-                <Card className="p-5 border-2 border-persian-blue-100 bg-gradient-to-r from-persian-blue-50/70 to-persian-blue-50/70 backdrop-blur-md shadow-sm transition-all duration-300">
-                  <div className="flex items-center gap-3 text-persian-blue-800">
+                <Card className="p-5 border-2 border-rule bg-gradient-to-r from-paper/70 to-paper/70 backdrop-blur-md shadow-sm transition-all duration-300">
+                  <div className="flex items-center gap-3 text-ink">
                     <Sparkles className="w-5 h-5 animate-pulse" />
                     <span className="font-semibold">AI Tax Advisor is analysing your profile…</span>
                     <Loader2 className="w-4 h-4 animate-spin ml-auto" />
                   </div>
                 </Card>
               ) : aiAdvice && aiAdvice.tips?.length > 0 ? (
-                <Card className="p-5 border-2 border-persian-blue-100 bg-gradient-to-br from-persian-blue-50/70 to-persian-blue-50/70 backdrop-blur-md shadow-sm transition-all duration-300">
+                <Card className="p-5 border-2 border-rule bg-gradient-to-br from-paper/70 to-paper/70 backdrop-blur-md shadow-sm transition-all duration-300">
                   {/* Header */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-2">
-                      <div className="bg-persian-blue-700 rounded-lg p-1.5">
+                      <div className="bg-ink rounded-lg p-1.5">
                         <Sparkles className="w-4 h-4 text-white" />
                       </div>
                       <div>
-                        <h3 className="font-bold text-persian-blue-900 text-sm">AI Tax Advisor</h3>
-                        <p className="text-persian-blue-700 text-xs">AI Powered • Personalised for you</p>
+                        <h3 className="font-bold text-ink text-sm">AI Tax Advisor</h3>
+                        <p className="text-ink text-xs">AI Powered • Personalised for you</p>
                       </div>
                     </div>
                     {aiAdvice.maxPossibleSaving > 0 && (
                       <div className="text-right">
-                        <div className="text-xs text-persian-blue-700">Potential extra savings</div>
+                        <div className="text-xs text-ink">Potential extra savings</div>
                         <div className="text-lg font-bold text-green-600">₹{aiAdvice.maxPossibleSaving.toLocaleString('en-IN')}</div>
                       </div>
                     )}
                   </div>
 
                   {/* Summary */}
-                  <div className="bg-white/70 rounded-lg p-3 mb-4 border border-persian-blue-100">
-                    <p className="text-sm text-slate-700 italic">"{aiAdvice.summary}"</p>
+                  <div className="bg-card/70 rounded-lg p-3 mb-4 border border-rule">
+                    <p className="text-sm text-ink/80 italic">"{aiAdvice.summary}"</p>
                   </div>
 
                   {/* Savings score */}
                   <div className="mb-4">
-                    <div className="flex justify-between text-xs text-persian-blue-800 mb-1">
+                    <div className="flex justify-between text-xs text-ink mb-1">
                       <span>Tax Optimisation Score</span>
                       <span className="font-bold">{aiAdvice.savingsScore}/100</span>
                     </div>
-                    <div className="h-2 bg-persian-blue-100 rounded-full overflow-hidden">
+                    <div className="h-2 bg-secondary rounded-full overflow-hidden">
                       <div
                         className={`h-full rounded-full transition-all duration-700 ${aiAdvice.savingsScore >= 80 ? 'bg-green-500' : aiAdvice.savingsScore >= 50 ? 'bg-amber-500' : 'bg-red-500'}`}
                         style={{ width: `${aiAdvice.savingsScore}%` }}
@@ -1943,7 +1943,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                   {/* Tips */}
                   <div className="space-y-3">
                     {aiAdvice.tips.map((tip, i) => (
-                      <div key={i} className={`bg-white rounded-lg p-3 border ${tip.priority === 'high' ? 'border-red-200' : tip.priority === 'medium' ? 'border-amber-200' : 'border-slate-200'}`}>
+                      <div key={i} className={`bg-card rounded-lg p-3 border ${tip.priority === 'high' ? 'border-red-200' : tip.priority === 'medium' ? 'border-amber-200' : 'border-rule'}`}>
                         <div className="flex items-start gap-2">
                           <div className="mt-0.5 shrink-0">
                             {tip.priority === 'high' ? <AlertTriangle className="w-4 h-4 text-red-500" /> :
@@ -1952,24 +1952,24 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between gap-2 flex-wrap">
-                              <p className="text-sm font-semibold text-slate-800">{tip.title}</p>
+                              <p className="text-sm font-semibold text-ink">{tip.title}</p>
                               <div className="flex items-center gap-1.5 shrink-0">
                                 {tip.section && (
-                                  <span className="text-xs bg-persian-blue-100 text-persian-blue-800 px-1.5 py-0.5 rounded font-medium">{tip.section}</span>
+                                  <span className="text-xs bg-secondary text-ink px-1.5 py-0.5 rounded font-medium">{tip.section}</span>
                                 )}
                                 {tip.potentialSaving && tip.potentialSaving > 0 && (
                                   <span className="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-bold">Save ₹{tip.potentialSaving.toLocaleString('en-IN')}</span>
                                 )}
                               </div>
                             </div>
-                            <p className="text-xs text-slate-600 mt-1 leading-relaxed">{tip.detail}</p>
+                            <p className="text-xs text-ink/65 mt-1 leading-relaxed">{tip.detail}</p>
                           </div>
                         </div>
                       </div>
                     ))}
                   </div>
 
-                  <p className="text-xs text-persian-blue-600 mt-3 text-center">
+                  <p className="text-xs text-ink mt-3 text-center">
                     💡 Complete your profile for more personalised AI recommendations
                   </p>
                 </Card>
@@ -2014,7 +2014,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                     </thead>
                     <tbody>
                       {result.oldRegime.taxBreakdown.map((slab, index) => (
-                        <tr key={index} className="border-b border-neutral-100">
+                        <tr key={index} className="border-b border-rule">
                           <td className="py-2 text-sm">{slab.slab}</td>
                           <td className="py-2 text-right">{`${slab.rate}%`}</td>
                           <td className="py-2 text-right">{formatCurrency(slab.tax)}</td>
@@ -2039,7 +2039,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                     </thead>
                     <tbody>
                       {result.newRegime.taxBreakdown.map((slab, index) => (
-                        <tr key={index} className="border-b border-neutral-100">
+                        <tr key={index} className="border-b border-rule">
                           <td className="py-2 text-sm">{slab.slab}</td>
                           <td className="py-2 text-right">{`${slab.rate}%`}</td>
                           <td className="py-2 text-right">{formatCurrency(slab.tax)}</td>
@@ -2052,7 +2052,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
             </div>
           ) : (
             <div className="text-center py-12">
-              <ClipboardList className="h-10 w-10 text-neutral-300 mb-4" />
+              <ClipboardList className="h-10 w-10 text-ink/35 mb-4" />
               <p className="text-readable-light">Complete the calculation to see tax breakdown</p>
             </div>
           )}

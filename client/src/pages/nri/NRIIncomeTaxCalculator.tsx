@@ -274,10 +274,10 @@ export default function NRIIncomeTaxCalculator() {
         </div>
 
         {/* Calculator Section */}
-        <div className="bg-white rounded-lg shadow-lg p-8 mb-12">
+        <div className="bg-card rounded-lg shadow-lg p-8 mb-12">
           <div className="flex items-center gap-3 mb-6">
             <Calculator className="text-rose-600" size={28} />
-            <h2 className="text-2xl font-bold text-slate-900">Interactive NRI Income Tax Calculator</h2>
+            <h2 className="text-2xl font-bold text-ink">Interactive NRI Income Tax Calculator</h2>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
@@ -285,15 +285,15 @@ export default function NRIIncomeTaxCalculator() {
             <div className="space-y-6">
               {/* Residential Status (Read-only) */}
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Residential Status</label>
-                <div className="px-4 py-3 bg-slate-100 rounded-lg text-slate-700 font-medium">
+                <label className="block text-sm font-semibold text-ink/80 mb-2">Residential Status</label>
+                <div className="px-4 py-3 bg-secondary rounded-lg text-ink/80 font-medium">
                   NRI (Non-Resident Indian)
                 </div>
               </div>
 
               {/* Age Group */}
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-3">Age Group</label>
+                <label className="block text-sm font-semibold text-ink/80 mb-3">Age Group</label>
                 <div className="space-y-2">
                   {[
                     { value: "below60", label: "Below 60 years" },
@@ -309,7 +309,7 @@ export default function NRIIncomeTaxCalculator() {
                         onChange={(e) => setAgeGroup(e.target.value as typeof ageGroup)}
                         className="w-4 h-4 text-rose-600"
                       />
-                      <span className="text-slate-700">{option.label}</span>
+                      <span className="text-ink/80">{option.label}</span>
                     </label>
                   ))}
                 </div>
@@ -317,7 +317,7 @@ export default function NRIIncomeTaxCalculator() {
 
               {/* Income Sources */}
               <div>
-                <h3 className="text-sm font-semibold text-slate-700 mb-3">Income Sources</h3>
+                <h3 className="text-sm font-semibold text-ink/80 mb-3">Income Sources</h3>
                 <div className="space-y-4">
                   {/* Salary */}
                   <label className="flex items-start gap-3">
@@ -328,14 +328,14 @@ export default function NRIIncomeTaxCalculator() {
                       className="w-4 h-4 text-rose-600 mt-1"
                     />
                     <div className="flex-1">
-                      <span className="text-slate-700 font-medium">Salary from Indian employer</span>
+                      <span className="text-ink/80 font-medium">Salary from Indian employer</span>
                       {incomeToggles.salary && (
                         <input
                           type="number"
                           value={salary}
                           onChange={(e) => setSalary(Number(e.target.value))}
                           placeholder="₹0"
-                          className="w-full mt-2 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
+                          className="w-full mt-2 px-3 py-2 border border-rule rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
                         />
                       )}
                     </div>
@@ -350,14 +350,14 @@ export default function NRIIncomeTaxCalculator() {
                       className="w-4 h-4 text-rose-600 mt-1"
                     />
                     <div className="flex-1">
-                      <span className="text-slate-700 font-medium">Rental income from Indian property</span>
+                      <span className="text-ink/80 font-medium">Rental income from Indian property</span>
                       {incomeToggles.rental && (
                         <input
                           type="number"
                           value={rentalIncome}
                           onChange={(e) => setRentalIncome(Number(e.target.value))}
                           placeholder="₹0"
-                          className="w-full mt-2 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
+                          className="w-full mt-2 px-3 py-2 border border-rule rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
                         />
                       )}
                     </div>
@@ -372,14 +372,14 @@ export default function NRIIncomeTaxCalculator() {
                       className="w-4 h-4 text-rose-600 mt-1"
                     />
                     <div className="flex-1">
-                      <span className="text-slate-700 font-medium">NRO account interest (₹) — auto-applies 30% TDS</span>
+                      <span className="text-ink/80 font-medium">NRO account interest (₹) — auto-applies 30% TDS</span>
                       {incomeToggles.nroInterest && (
                         <input
                           type="number"
                           value={nroInterest}
                           onChange={(e) => setNroInterest(Number(e.target.value))}
                           placeholder="₹0"
-                          className="w-full mt-2 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
+                          className="w-full mt-2 px-3 py-2 border border-rule rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
                         />
                       )}
                     </div>
@@ -394,14 +394,14 @@ export default function NRIIncomeTaxCalculator() {
                       className="w-4 h-4 text-rose-600 mt-1"
                     />
                     <div className="flex-1">
-                      <span className="text-slate-700 font-medium">Dividend income (₹) — auto-applies 20% TDS</span>
+                      <span className="text-ink/80 font-medium">Dividend income (₹) — auto-applies 20% TDS</span>
                       {incomeToggles.dividend && (
                         <input
                           type="number"
                           value={dividendIncome}
                           onChange={(e) => setDividendIncome(Number(e.target.value))}
                           placeholder="₹0"
-                          className="w-full mt-2 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
+                          className="w-full mt-2 px-3 py-2 border border-rule rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
                         />
                       )}
                     </div>
@@ -416,14 +416,14 @@ export default function NRIIncomeTaxCalculator() {
                       className="w-4 h-4 text-rose-600 mt-1"
                     />
                     <div className="flex-1">
-                      <span className="text-slate-700 font-medium">Short-term capital gains - equity (₹) — 20% flat (post budget 2024)</span>
+                      <span className="text-ink/80 font-medium">Short-term capital gains - equity (₹) — 20% flat (post budget 2024)</span>
                       {incomeToggles.stcgEquity && (
                         <input
                           type="number"
                           value={stcgEquity}
                           onChange={(e) => setStcgEquity(Number(e.target.value))}
                           placeholder="₹0"
-                          className="w-full mt-2 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
+                          className="w-full mt-2 px-3 py-2 border border-rule rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
                         />
                       )}
                     </div>
@@ -438,14 +438,14 @@ export default function NRIIncomeTaxCalculator() {
                       className="w-4 h-4 text-rose-600 mt-1"
                     />
                     <div className="flex-1">
-                      <span className="text-slate-700 font-medium">Long-term capital gains - equity (₹) — 12.5% flat above ₹1.25L (post budget 2024)</span>
+                      <span className="text-ink/80 font-medium">Long-term capital gains - equity (₹) — 12.5% flat above ₹1.25L (post budget 2024)</span>
                       {incomeToggles.ltcgEquity && (
                         <input
                           type="number"
                           value={ltcgEquity}
                           onChange={(e) => setLtcgEquity(Number(e.target.value))}
                           placeholder="₹0"
-                          className="w-full mt-2 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
+                          className="w-full mt-2 px-3 py-2 border border-rule rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
                         />
                       )}
                     </div>
@@ -460,14 +460,14 @@ export default function NRIIncomeTaxCalculator() {
                       className="w-4 h-4 text-rose-600 mt-1"
                     />
                     <div className="flex-1">
-                      <span className="text-slate-700 font-medium">Long-term capital gains - property (₹)</span>
+                      <span className="text-ink/80 font-medium">Long-term capital gains - property (₹)</span>
                       {incomeToggles.ltcgProperty && (
                         <input
                           type="number"
                           value={ltcgProperty}
                           onChange={(e) => setLtcgProperty(Number(e.target.value))}
                           placeholder="₹0"
-                          className="w-full mt-2 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
+                          className="w-full mt-2 px-3 py-2 border border-rule rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
                         />
                       )}
                     </div>
@@ -484,22 +484,22 @@ export default function NRIIncomeTaxCalculator() {
                     onChange={(e) => setDtaaEnabled(e.target.checked)}
                     className="w-4 h-4 text-rose-600"
                   />
-                  <span className="text-slate-700 font-medium">Enable DTAA Benefit</span>
+                  <span className="text-ink/80 font-medium">Enable DTAA Benefit</span>
                 </label>
                 {dtaaEnabled && (
                   <div className="space-y-3 ml-7">
                     <div>
-                      <label className="block text-sm text-slate-600 mb-1">TDS already paid (₹)</label>
+                      <label className="block text-sm text-ink/65 mb-1">TDS already paid (₹)</label>
                       <input
                         type="number"
                         value={tdsPaid}
                         onChange={(e) => setTdsPaid(Number(e.target.value))}
                         placeholder="₹0"
-                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
+                        className="w-full px-3 py-2 border border-rule rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm text-slate-600 mb-1">DTAA relief rate (%)</label>
+                      <label className="block text-sm text-ink/65 mb-1">DTAA relief rate (%)</label>
                       <input
                         type="number"
                         value={dtaaRate}
@@ -507,7 +507,7 @@ export default function NRIIncomeTaxCalculator() {
                         placeholder="15"
                         min="0"
                         max="100"
-                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
+                        className="w-full px-3 py-2 border border-rule rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
                       />
                     </div>
                   </div>
@@ -516,39 +516,39 @@ export default function NRIIncomeTaxCalculator() {
 
               {/* Deductions */}
               <div>
-                <h3 className="text-sm font-semibold text-slate-700 mb-3">Deductions (Only in Old Regime)</h3>
+                <h3 className="text-sm font-semibold text-ink/80 mb-3">Deductions (Only in Old Regime)</h3>
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-sm text-slate-600 mb-1">Section 80C (Max ₹1.5L)</label>
+                    <label className="block text-sm text-ink/65 mb-1">Section 80C (Max ₹1.5L)</label>
                     <input
                       type="number"
                       value={section80c}
                       onChange={(e) => setSection80c(Number(e.target.value))}
                       placeholder="₹0"
                       disabled={regime === "new"}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 disabled:bg-slate-100"
+                      className="w-full px-3 py-2 border border-rule rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 disabled:bg-secondary"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm text-slate-600 mb-1">Section 80D health insurance (Max ₹25K/50K)</label>
+                    <label className="block text-sm text-ink/65 mb-1">Section 80D health insurance (Max ₹25K/50K)</label>
                     <input
                       type="number"
                       value={section80d}
                       onChange={(e) => setSection80d(Number(e.target.value))}
                       placeholder="₹0"
                       disabled={regime === "new"}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 disabled:bg-slate-100"
+                      className="w-full px-3 py-2 border border-rule rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 disabled:bg-secondary"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm text-slate-600 mb-1">Home loan interest 80EEA (₹)</label>
+                    <label className="block text-sm text-ink/65 mb-1">Home loan interest 80EEA (₹)</label>
                     <input
                       type="number"
                       value={homeLoamInterest}
                       onChange={(e) => setHomeLoamInterest(Number(e.target.value))}
                       placeholder="₹0"
                       disabled={regime === "new"}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 disabled:bg-slate-100"
+                      className="w-full px-3 py-2 border border-rule rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 disabled:bg-secondary"
                     />
                   </div>
                 </div>
@@ -556,7 +556,7 @@ export default function NRIIncomeTaxCalculator() {
 
               {/* Regime Selection */}
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-3">Tax Regime</label>
+                <label className="block text-sm font-semibold text-ink/80 mb-3">Tax Regime</label>
                 <div className="space-y-2">
                   {[
                     { value: "new", label: "New Regime (Recommended)" },
@@ -571,7 +571,7 @@ export default function NRIIncomeTaxCalculator() {
                         onChange={(e) => setRegime(e.target.value as typeof regime)}
                         className="w-4 h-4 text-rose-600"
                       />
-                      <span className="text-slate-700">{option.label}</span>
+                      <span className="text-ink/80">{option.label}</span>
                     </label>
                   ))}
                 </div>
@@ -580,91 +580,91 @@ export default function NRIIncomeTaxCalculator() {
 
             {/* Results Section */}
             <div className="bg-gradient-to-br from-rose-50 to-orange-50 rounded-lg p-6 space-y-4 h-fit">
-              <h3 className="text-lg font-bold text-slate-900 mb-6">Tax Calculation Summary</h3>
+              <h3 className="text-lg font-bold text-ink mb-6">Tax Calculation Summary</h3>
 
               <div className="space-y-3">
                 <div className="flex justify-between items-center py-2 border-b border-rose-200">
-                  <span className="text-slate-700">Total Indian Income</span>
-                  <span className="font-semibold text-slate-900">{formatCurrency(totalIncome)}</span>
+                  <span className="text-ink/80">Total Indian Income</span>
+                  <span className="font-semibold text-ink">{formatCurrency(totalIncome)}</span>
                 </div>
 
                 <div className="flex justify-between items-center py-2 border-b border-rose-200">
-                  <span className="text-slate-700">Total Deductions</span>
-                  <span className="font-semibold text-slate-900">{formatCurrency(totalDeductions)}</span>
+                  <span className="text-ink/80">Total Deductions</span>
+                  <span className="font-semibold text-ink">{formatCurrency(totalDeductions)}</span>
                 </div>
 
                 <div className="flex justify-between items-center py-2 border-b border-rose-200">
-                  <span className="text-slate-700">Taxable Income</span>
-                  <span className="font-semibold text-slate-900">{formatCurrency(taxableIncome)}</span>
+                  <span className="text-ink/80">Taxable Income</span>
+                  <span className="font-semibold text-ink">{formatCurrency(taxableIncome)}</span>
                 </div>
 
-                <div className="pt-2 mt-4 space-y-2 bg-white bg-opacity-50 p-4 rounded-lg">
+                <div className="pt-2 mt-4 space-y-2 bg-card bg-opacity-50 p-4 rounded-lg">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-600">Tax on Salary &amp; Rental</span>
-                    <span className="font-medium text-slate-800">{formatCurrency(taxOnSalaryAndRental)}</span>
+                    <span className="text-sm text-ink/65">Tax on Salary &amp; Rental</span>
+                    <span className="font-medium text-ink">{formatCurrency(taxOnSalaryAndRental)}</span>
                   </div>
 
                   {incomeToggles.nroInterest && (
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-slate-600">Tax on NRO Interest (30%)</span>
-                      <span className="font-medium text-slate-800">{formatCurrency(nroInterestTax)}</span>
+                      <span className="text-sm text-ink/65">Tax on NRO Interest (30%)</span>
+                      <span className="font-medium text-ink">{formatCurrency(nroInterestTax)}</span>
                     </div>
                   )}
 
                   {incomeToggles.dividend && (
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-slate-600">Tax on Dividend (20%)</span>
-                      <span className="font-medium text-slate-800">{formatCurrency(dividendTax)}</span>
+                      <span className="text-sm text-ink/65">Tax on Dividend (20%)</span>
+                      <span className="font-medium text-ink">{formatCurrency(dividendTax)}</span>
                     </div>
                   )}
 
                   {incomeToggles.stcgEquity && (
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-slate-600">Tax on STCG Equity (20%)</span>
-                      <span className="font-medium text-slate-800">{formatCurrency(stcgEquityTax)}</span>
+                      <span className="text-sm text-ink/65">Tax on STCG Equity (20%)</span>
+                      <span className="font-medium text-ink">{formatCurrency(stcgEquityTax)}</span>
                     </div>
                   )}
 
                   {incomeToggles.ltcgEquity && (
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-slate-600">Tax on LTCG Equity (12.5%)</span>
-                      <span className="font-medium text-slate-800">{formatCurrency(ltcgEquityTax)}</span>
+                      <span className="text-sm text-ink/65">Tax on LTCG Equity (12.5%)</span>
+                      <span className="font-medium text-ink">{formatCurrency(ltcgEquityTax)}</span>
                     </div>
                   )}
 
                   {incomeToggles.ltcgProperty && (
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-slate-600">Tax on LTCG Property (12.5%)</span>
-                      <span className="font-medium text-slate-800">{formatCurrency(ltcgPropertyTax)}</span>
+                      <span className="text-sm text-ink/65">Tax on LTCG Property (12.5%)</span>
+                      <span className="font-medium text-ink">{formatCurrency(ltcgPropertyTax)}</span>
                     </div>
                   )}
                 </div>
 
                 <div className="flex justify-between items-center py-2 border-b border-rose-200">
-                  <span className="text-slate-700">Subtotal (before surcharge &amp; cess)</span>
-                  <span className="font-semibold text-slate-900">{formatCurrency(totalTaxBeforeSurcharge)}</span>
+                  <span className="text-ink/80">Subtotal (before surcharge &amp; cess)</span>
+                  <span className="font-semibold text-ink">{formatCurrency(totalTaxBeforeSurcharge)}</span>
                 </div>
 
                 {surcharge > 0 && (
                   <div className="flex justify-between items-center py-2 border-b border-rose-200">
-                    <span className="text-slate-700">Surcharge (25%)</span>
-                    <span className="font-semibold text-slate-900">{formatCurrency(surcharge)}</span>
+                    <span className="text-ink/80">Surcharge (25%)</span>
+                    <span className="font-semibold text-ink">{formatCurrency(surcharge)}</span>
                   </div>
                 )}
 
                 <div className="flex justify-between items-center py-2 border-b border-rose-200">
-                  <span className="text-slate-700">Health &amp; Education Cess (4%)</span>
-                  <span className="font-semibold text-slate-900">{formatCurrency(cess)}</span>
+                  <span className="text-ink/80">Health &amp; Education Cess (4%)</span>
+                  <span className="font-semibold text-ink">{formatCurrency(cess)}</span>
                 </div>
 
-                <div className="flex justify-between items-center py-3 bg-white bg-opacity-70 px-3 rounded-lg border-2 border-rose-300">
-                  <span className="text-slate-900 font-bold">Total Tax Liability</span>
+                <div className="flex justify-between items-center py-3 bg-card bg-opacity-70 px-3 rounded-lg border-2 border-rose-300">
+                  <span className="text-ink font-bold">Total Tax Liability</span>
                   <span className="font-bold text-rose-700 text-lg">{formatCurrency(totalTaxLiability)}</span>
                 </div>
 
                 <div className="flex justify-between items-center py-2 border-b border-rose-200">
-                  <span className="text-slate-700">TDS Already Deducted</span>
-                  <span className="font-semibold text-slate-900">{formatCurrency(totalTdsDeducted)}</span>
+                  <span className="text-ink/80">TDS Already Deducted</span>
+                  <span className="font-semibold text-ink">{formatCurrency(totalTdsDeducted)}</span>
                 </div>
 
                 {balancePayable > 0 && (
@@ -691,19 +691,19 @@ export default function NRIIncomeTaxCalculator() {
         </div>
 
         {/* NRI vs Resident Comparison Table */}
-        <div className="bg-white rounded-lg shadow-lg p-8 mb-12 overflow-x-auto">
-          <h2 className="text-2xl font-bold text-slate-900 mb-6">NRI vs Resident Tax Comparison</h2>
+        <div className="bg-card rounded-lg shadow-lg p-8 mb-12 overflow-x-auto">
+          <h2 className="text-2xl font-bold text-ink mb-6">NRI vs Resident Tax Comparison</h2>
           <table className="w-full">
             <thead>
-              <tr className="bg-slate-100 border-b-2 border-slate-300">
-                <th className="px-4 py-3 text-left font-semibold text-slate-900">Feature</th>
-                <th className="px-4 py-3 text-left font-semibold text-slate-900">Resident Indian</th>
-                <th className="px-4 py-3 text-left font-semibold text-slate-900">NRI</th>
+              <tr className="bg-secondary border-b-2 border-rule">
+                <th className="px-4 py-3 text-left font-semibold text-ink">Feature</th>
+                <th className="px-4 py-3 text-left font-semibold text-ink">Resident Indian</th>
+                <th className="px-4 py-3 text-left font-semibold text-ink">NRI</th>
               </tr>
             </thead>
             <tbody>
-              <tr className="border-b border-slate-200 hover:bg-slate-50">
-                <td className="px-4 py-3 text-slate-700">Section 87A Rebate (up to ₹12L)</td>
+              <tr className="border-b border-rule hover:bg-secondary">
+                <td className="px-4 py-3 text-ink/80">Section 87A Rebate (up to ₹12L)</td>
                 <td className="px-4 py-3">
                   <span className="text-green-600 font-semibold">✓ Yes — zero tax</span>
                 </td>
@@ -711,23 +711,23 @@ export default function NRIIncomeTaxCalculator() {
                   <span className="text-red-600 font-semibold">✗ Not available</span>
                 </td>
               </tr>
-              <tr className="border-b border-slate-200 hover:bg-slate-50">
-                <td className="px-4 py-3 text-slate-700">Basic Exemption Limit</td>
+              <tr className="border-b border-rule hover:bg-secondary">
+                <td className="px-4 py-3 text-ink/80">Basic Exemption Limit</td>
                 <td className="px-4 py-3">₹3,00,000</td>
                 <td className="px-4 py-3">₹3,00,000</td>
               </tr>
-              <tr className="border-b border-slate-200 hover:bg-slate-50">
-                <td className="px-4 py-3 text-slate-700">NRO Interest TDS</td>
+              <tr className="border-b border-rule hover:bg-secondary">
+                <td className="px-4 py-3 text-ink/80">NRO Interest TDS</td>
                 <td className="px-4 py-3">N/A</td>
                 <td className="px-4 py-3">30% (flat, no threshold)</td>
               </tr>
-              <tr className="border-b border-slate-200 hover:bg-slate-50">
-                <td className="px-4 py-3 text-slate-700">LTCG on Equity</td>
+              <tr className="border-b border-rule hover:bg-secondary">
+                <td className="px-4 py-3 text-ink/80">LTCG on Equity</td>
                 <td className="px-4 py-3">12.5% above ₹1.25L</td>
                 <td className="px-4 py-3">12.5% (no ₹1.25L exemption for NRIs in some cases)</td>
               </tr>
-              <tr className="border-b border-slate-200 hover:bg-slate-50">
-                <td className="px-4 py-3 text-slate-700">Old Regime Deductions (80C, 80D)</td>
+              <tr className="border-b border-rule hover:bg-secondary">
+                <td className="px-4 py-3 text-ink/80">Old Regime Deductions (80C, 80D)</td>
                 <td className="px-4 py-3">
                   <span className="text-green-600 font-semibold">✓ Available</span>
                 </td>
@@ -735,8 +735,8 @@ export default function NRIIncomeTaxCalculator() {
                   <span className="text-green-600 font-semibold">✓ Available</span>
                 </td>
               </tr>
-              <tr className="border-b border-slate-200 hover:bg-slate-50">
-                <td className="px-4 py-3 text-slate-700">NPS 80CCD(1B) deduction</td>
+              <tr className="border-b border-rule hover:bg-secondary">
+                <td className="px-4 py-3 text-ink/80">NPS 80CCD(1B) deduction</td>
                 <td className="px-4 py-3">
                   <span className="text-green-600 font-semibold">✓ Available</span>
                 </td>
@@ -744,8 +744,8 @@ export default function NRIIncomeTaxCalculator() {
                   <span className="text-red-600 font-semibold">✗ NRIs cannot open new NPS Tier 1</span>
                 </td>
               </tr>
-              <tr className="border-b border-slate-200 hover:bg-slate-50">
-                <td className="px-4 py-3 text-slate-700">DTAA Benefits</td>
+              <tr className="border-b border-rule hover:bg-secondary">
+                <td className="px-4 py-3 text-ink/80">DTAA Benefits</td>
                 <td className="px-4 py-3">
                   <span className="text-red-600 font-semibold">✗ N/A</span>
                 </td>
@@ -753,8 +753,8 @@ export default function NRIIncomeTaxCalculator() {
                   <span className="text-green-600 font-semibold">✓ Available</span>
                 </td>
               </tr>
-              <tr className="border-b border-slate-200 hover:bg-slate-50">
-                <td className="px-4 py-3 text-slate-700">Advance Tax</td>
+              <tr className="border-b border-rule hover:bg-secondary">
+                <td className="px-4 py-3 text-ink/80">Advance Tax</td>
                 <td className="px-4 py-3">Required if &gt;₹10K liability</td>
                 <td className="px-4 py-3">Required if &gt;₹10K liability</td>
               </tr>
@@ -765,9 +765,9 @@ export default function NRIIncomeTaxCalculator() {
         {/* Worked Examples */}
         <div className="grid md:grid-cols-2 gap-8 mb-12">
           {/* Example 1 */}
-          <div className="bg-blue-50 rounded-lg p-6 border-l-4 border-blue-500">
-            <h3 className="text-xl font-bold text-blue-900 mb-4">Example 1: US-based NRI with Rental + NRO Interest</h3>
-            <div className="space-y-2 text-slate-800 mb-4">
+          <div className="bg-secondary rounded-lg p-6 border-l-4 border-blue-500">
+            <h3 className="text-xl font-bold text-ink mb-4">Example 1: US-based NRI with Rental + NRO Interest</h3>
+            <div className="space-y-2 text-ink mb-4">
               <p>
                 <strong>Income:</strong>
               </p>
@@ -776,7 +776,7 @@ export default function NRIIncomeTaxCalculator() {
                 <li>• NRO Interest: ₹2,00,000</li>
               </ul>
             </div>
-            <div className="space-y-2 text-slate-800 mb-4">
+            <div className="space-y-2 text-ink mb-4">
               <p>
                 <strong>Calculation:</strong>
               </p>
@@ -786,16 +786,16 @@ export default function NRIIncomeTaxCalculator() {
                 <li>• Total tax: ₹75,000, TDS paid: ₹60,000</li>
               </ul>
             </div>
-            <div className="bg-white p-3 rounded">
-              <p className="text-blue-900 font-semibold">Balance payable: ₹15,000</p>
-              <p className="text-sm text-blue-700 mt-1">NO 87A rebate applies</p>
+            <div className="bg-card p-3 rounded">
+              <p className="text-ink font-semibold">Balance payable: ₹15,000</p>
+              <p className="text-sm text-ink mt-1">NO 87A rebate applies</p>
             </div>
           </div>
 
           {/* Example 2 */}
-          <div className="bg-persian-blue-50 rounded-lg p-6 border-l-4 border-persian-blue-600">
-            <h3 className="text-xl font-bold text-persian-blue-900 mb-4">Example 2: UK-based NRI with Property Sale</h3>
-            <div className="space-y-2 text-slate-800 mb-4">
+          <div className="bg-paper rounded-lg p-6 border-l-4 border-ink">
+            <h3 className="text-xl font-bold text-ink mb-4">Example 2: UK-based NRI with Property Sale</h3>
+            <div className="space-y-2 text-ink mb-4">
               <p>
                 <strong>Property Sale:</strong>
               </p>
@@ -805,7 +805,7 @@ export default function NRIIncomeTaxCalculator() {
                 <li>• LTCG: ₹40L (indexed)</li>
               </ul>
             </div>
-            <div className="space-y-2 text-slate-800 mb-4">
+            <div className="space-y-2 text-ink mb-4">
               <p>
                 <strong>Tax &amp; TDS:</strong>
               </p>
@@ -815,8 +815,8 @@ export default function NRIIncomeTaxCalculator() {
                 <li>• Can claim DTAA credit in UK return</li>
               </ul>
             </div>
-            <div className="bg-white p-3 rounded">
-              <p className="text-persian-blue-900 font-semibold">File ITR to claim refund of excess TDS</p>
+            <div className="bg-card p-3 rounded">
+              <p className="text-ink font-semibold">File ITR to claim refund of excess TDS</p>
             </div>
           </div>
         </div>
@@ -905,16 +905,16 @@ export default function NRIIncomeTaxCalculator() {
         </div>
 
         {/* FAQs */}
-        <div className="bg-white rounded-lg shadow-lg p-8 mb-12">
-          <h2 className="text-2xl font-bold text-slate-900 mb-8">Frequently Asked Questions</h2>
+        <div className="bg-card rounded-lg shadow-lg p-8 mb-12">
+          <h2 className="text-2xl font-bold text-ink mb-8">Frequently Asked Questions</h2>
           <div className="space-y-6">
             {faqs.map((faq, index) => (
-              <details key={index} className="group border border-slate-200 rounded-lg">
-                <summary className="flex items-center justify-between cursor-pointer p-4 bg-slate-50 hover:bg-slate-100 transition">
-                  <h3 className="font-semibold text-slate-900">{faq.q}</h3>
-                  <ChevronRight size={20} className="text-slate-600 group-open:rotate-90 transition" />
+              <details key={index} className="group border border-rule rounded-lg">
+                <summary className="flex items-center justify-between cursor-pointer p-4 bg-secondary hover:bg-secondary transition">
+                  <h3 className="font-semibold text-ink">{faq.q}</h3>
+                  <ChevronRight size={20} className="text-ink/65 group-open:rotate-90 transition" />
                 </summary>
-                <div className="px-4 py-3 text-slate-700 border-t border-slate-200">{faq.a}</div>
+                <div className="px-4 py-3 text-ink/80 border-t border-rule">{faq.a}</div>
               </details>
             ))}
           </div>
@@ -922,7 +922,7 @@ export default function NRIIncomeTaxCalculator() {
 
         {/* Related Tools */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold text-slate-900 mb-6">Related Tools &amp; Calculators</h2>
+          <h2 className="text-2xl font-bold text-ink mb-6">Related Tools &amp; Calculators</h2>
           <div className="grid md:grid-cols-4 gap-6">
             {[
               {
@@ -951,10 +951,10 @@ export default function NRIIncomeTaxCalculator() {
               },
             ].map((tool, index) => (
               <Link key={index} href={tool.link}>
-                <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg hover:scale-105 transition cursor-pointer">
+                <div className="bg-card rounded-lg shadow-md p-6 hover:shadow-lg hover:scale-105 transition cursor-pointer">
                   <div className="text-4xl mb-3">{tool.icon}</div>
-                  <h3 className="font-semibold text-slate-900 mb-2">{tool.title}</h3>
-                  <p className="text-sm text-slate-600">{tool.description}</p>
+                  <h3 className="font-semibold text-ink mb-2">{tool.title}</h3>
+                  <p className="text-sm text-ink/65">{tool.description}</p>
                 </div>
               </Link>
             ))}

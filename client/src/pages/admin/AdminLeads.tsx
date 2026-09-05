@@ -73,8 +73,8 @@ export default function AdminLeads() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Leads</h1>
-            <p className="text-slate-500 text-sm mt-1">
+            <h1 className="text-2xl font-bold text-ink">Leads</h1>
+            <p className="text-ink/55 text-sm mt-1">
               {leads.length} lead{leads.length !== 1 ? "s" : ""} captured from tax calculation download prompts
             </p>
           </div>
@@ -94,49 +94,49 @@ export default function AdminLeads() {
 
         {/* Table */}
         {isLoading ? (
-          <div className="flex items-center justify-center py-20 text-slate-500">
+          <div className="flex items-center justify-center py-20 text-ink/55">
             <RefreshCw className="h-5 w-5 animate-spin mr-2" /> Loading…
           </div>
         ) : isError ? (
           <div className="flex flex-col items-center justify-center py-20 gap-3 text-center">
             <AlertTriangle className="h-8 w-8 text-red-400" />
-            <p className="text-sm font-medium text-slate-700">Failed to load leads</p>
+            <p className="text-sm font-medium text-ink/80">Failed to load leads</p>
             <p className="text-xs text-red-500">{(error as Error)?.message}</p>
-            <button onClick={() => refetch()} className="text-xs text-persian-blue-600 hover:underline">Retry</button>
+            <button onClick={() => refetch()} className="text-xs text-ink hover:underline">Retry</button>
           </div>
         ) : leads.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-slate-500 gap-2">
+          <div className="flex flex-col items-center justify-center py-20 text-ink/55 gap-2">
             <Users className="h-10 w-10 opacity-40" />
             <p>No leads yet. They'll appear here once users calculate their tax and enter their details.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
+          <div className="overflow-x-auto rounded-lg border border-rule bg-card">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-100 bg-slate-50">
-                  <th className="px-4 py-3 text-left font-medium text-slate-600">Name</th>
-                  <th className="px-4 py-3 text-left font-medium text-slate-600">Email</th>
-                  <th className="px-4 py-3 text-left font-medium text-slate-600">Mobile</th>
-                  <th className="px-4 py-3 text-left font-medium text-slate-600">Source</th>
-                  <th className="px-4 py-3 text-left font-medium text-slate-600">Tax Summary</th>
-                  <th className="px-4 py-3 text-left font-medium text-slate-600">Date</th>
+                <tr className="border-b border-rule bg-secondary">
+                  <th className="px-4 py-3 text-left font-medium text-ink/65">Name</th>
+                  <th className="px-4 py-3 text-left font-medium text-ink/65">Email</th>
+                  <th className="px-4 py-3 text-left font-medium text-ink/65">Mobile</th>
+                  <th className="px-4 py-3 text-left font-medium text-ink/65">Source</th>
+                  <th className="px-4 py-3 text-left font-medium text-ink/65">Tax Summary</th>
+                  <th className="px-4 py-3 text-left font-medium text-ink/65">Date</th>
                 </tr>
               </thead>
               <tbody>
                 {leads.map((lead) => (
-                  <tr key={lead.id} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
-                    <td className="px-4 py-3 font-medium text-slate-900">{lead.name}</td>
-                    <td className="px-4 py-3 text-slate-600">
-                      <a href={`mailto:${lead.email}`} className="hover:text-blue-600 transition-colors">
+                  <tr key={lead.id} className="border-b border-rule hover:bg-secondary transition-colors">
+                    <td className="px-4 py-3 font-medium text-ink">{lead.name}</td>
+                    <td className="px-4 py-3 text-ink/65">
+                      <a href={`mailto:${lead.email}`} className="hover:text-credit transition-colors">
                         {lead.email}
                       </a>
                     </td>
-                    <td className="px-4 py-3 text-slate-600">{lead.whatsapp ?? "—"}</td>
-                    <td className="px-4 py-3 text-slate-500 text-xs">{lead.source ?? "—"}</td>
-                    <td className="px-4 py-3 text-slate-500 text-xs max-w-xs truncate" title={lead.summaryText ?? ""}>
+                    <td className="px-4 py-3 text-ink/65">{lead.whatsapp ?? "—"}</td>
+                    <td className="px-4 py-3 text-ink/55 text-xs">{lead.source ?? "—"}</td>
+                    <td className="px-4 py-3 text-ink/55 text-xs max-w-xs truncate" title={lead.summaryText ?? ""}>
                       {lead.summaryText ?? "—"}
                     </td>
-                    <td className="px-4 py-3 text-slate-500 text-xs">
+                    <td className="px-4 py-3 text-ink/55 text-xs">
                       {lead.createdAt ? new Date(lead.createdAt).toLocaleDateString("en-IN") : "—"}
                     </td>
                   </tr>

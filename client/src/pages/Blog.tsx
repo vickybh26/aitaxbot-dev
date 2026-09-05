@@ -84,13 +84,13 @@ const CATEGORIES: Category[] = ["All", "Tax Planning", "Investing", "Personal Fi
 // ─── Category styling ─────────────────────────────────────────────────────────
 const CATEGORY_STYLES: Record<Category, { banner: string; badge: string; icon: JSX.Element }> = {
   "All": {
-    banner: "bg-gradient-to-br from-persian-blue-600 to-persian-blue-800",
-    badge: "bg-persian-blue-50 text-persian-blue-700",
+    banner: "bg-gradient-to-br from-ink to-credit",
+    badge: "bg-paper text-ink",
     icon: <BookOpen className="h-4 w-4" />,
   },
   "Tax Planning": {
-    banner: "bg-gradient-to-br from-persian-blue-600 to-persian-blue-900",
-    badge: "bg-persian-blue-50 text-persian-blue-700",
+    banner: "bg-gradient-to-br from-ink to-credit",
+    badge: "bg-paper text-ink",
     icon: <Calculator className="h-4 w-4" />,
   },
   "Investing": {
@@ -109,7 +109,7 @@ const CATEGORY_STYLES: Record<Category, { banner: string; badge: string; icon: J
     icon: <Landmark className="h-4 w-4" />,
   },
   "Retirement": {
-    banner: "bg-gradient-to-br from-violet-500 to-persian-blue-800",
+    banner: "bg-gradient-to-br from-violet-500 to-credit",
     badge: "bg-violet-50 text-violet-700",
     icon: <PiggyBank className="h-4 w-4" />,
   },
@@ -187,36 +187,36 @@ export default function Blog() {
         <meta property="og:image" content="https://www.aitaxbot.co.in/images/aitaxbot-logo.png" />
       </Helmet>
 
-      <div className="bg-slate-50">
+      <div className="bg-secondary">
 
         {/* ── Hero / Page Header ─────────────────────────────────────────── */}
-        <section className="bg-white border-b border-slate-100 py-12 px-6">
+        <section className="bg-card border-b border-rule py-12 px-6">
           <div className="max-w-6xl mx-auto">
             <div className="flex items-center gap-2 mb-3">
-              <BookOpen className="h-5 w-5 text-persian-blue-600" />
-              <span className="text-sm font-semibold text-persian-blue-600 uppercase tracking-wider">AiTaxBot Blog</span>
+              <BookOpen className="h-5 w-5 text-ink" />
+              <span className="text-sm font-semibold text-ink uppercase tracking-wider">AiTaxBot Blog</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-3 leading-tight">
+            <h1 className="text-4xl md:text-5xl font-bold text-ink mb-3 leading-tight">
               Tax & Finance Insights
             </h1>
-            <p className="text-lg text-slate-500 max-w-2xl mb-8">
+            <p className="text-lg text-ink/55 max-w-2xl mb-8">
               CA-verified guides on income tax, ITR filing, investments, and the new Income Tax Act 2025 — written for Indian taxpayers.
             </p>
 
             {/* Search Bar */}
             <div className="relative max-w-md">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-ink/55" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 placeholder="Search articles…"
-                className="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-persian-blue-300 focus:border-transparent transition"
+                className="w-full pl-10 pr-10 py-3 rounded-xl border border-rule bg-secondary text-sm text-ink placeholder-ink/40 focus:outline-none focus:ring-2 focus:ring-credit focus:border-transparent transition"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-ink/55 hover:text-ink/65"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -226,7 +226,7 @@ export default function Blog() {
         </section>
 
         {/* ── Category Filters ──────────────────────────────────────────────── */}
-        <section className="bg-white border-b border-slate-100 px-6 py-4 sticky top-0 z-10 shadow-sm">
+        <section className="bg-card border-b border-rule px-6 py-4 sticky top-0 z-10 shadow-sm">
           <div className="max-w-6xl mx-auto">
             <div className="flex flex-wrap gap-2">
               {CATEGORIES.map(cat => {
@@ -238,8 +238,8 @@ export default function Blog() {
                     onClick={() => setSelectedCategory(cat)}
                     className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium transition-all border ${
                       active
-                        ? "bg-persian-blue-600 text-white border-persian-blue-600 shadow-sm"
-                        : "bg-white text-slate-600 border-slate-200 hover:border-persian-blue-300 hover:text-persian-blue-700"
+                        ? "bg-ink text-white border-ink shadow-sm"
+                        : "bg-card text-ink/65 border-rule hover:border-credit hover:text-credit"
                     }`}
                   >
                     {cat !== "All" && <span className={active ? "text-white" : ""}>{style.icon}</span>}
@@ -257,16 +257,16 @@ export default function Blog() {
           {selectedCategory === "All" && !searchQuery && (
             <div className="mb-12">
               <div className="flex items-center gap-2 mb-4">
-                <BarChart2 className="h-4 w-4 text-persian-blue-600" />
-                <span className="text-sm font-bold text-persian-blue-600 uppercase tracking-wide">Featured Article</span>
+                <BarChart2 className="h-4 w-4 text-ink" />
+                <span className="text-sm font-bold text-ink uppercase tracking-wide">Featured Article</span>
               </div>
 
               <Link href={`/blog/${featuredPost.slug}`}>
-                <div className="group bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-md hover:shadow-xl transition-all cursor-pointer flex flex-col md:flex-row">
+                <div className="group bg-card rounded-2xl overflow-hidden border border-rule shadow-md hover:shadow-xl transition-all cursor-pointer flex flex-col md:flex-row">
                   {/* Left colour band */}
                   <div className={`${featuredStyle.banner} md:w-2/5 min-h-[200px] flex flex-col justify-end p-8 relative`}>
                     <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_70%_30%,white,transparent)]" />
-                    <span className={`inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-white/20 text-white mb-3 self-start`}>
+                    <span className={`inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-card/20 text-white mb-3 self-start`}>
                       {featuredStyle.icon}
                       {featuredPost.category}
                     </span>
@@ -280,15 +280,15 @@ export default function Blog() {
                   <div className="p-8 md:w-3/5 flex flex-col justify-center">
                     <div className="flex items-center gap-2 mb-3">
                       <span className="text-xs font-bold bg-orange-100 text-orange-700 px-2.5 py-0.5 rounded-full">New</span>
-                      <span className="text-xs text-slate-500">{featuredPost.date}</span>
+                      <span className="text-xs text-ink/55">{featuredPost.date}</span>
                     </div>
-                    <h2 className="text-2xl md:text-3xl font-bold text-slate-900 group-hover:text-persian-blue-600 transition-colors leading-snug mb-4">
+                    <h2 className="text-2xl md:text-3xl font-bold text-ink group-hover:text-ink transition-colors leading-snug mb-4">
                       {featuredPost.title}
                     </h2>
-                    <p className="text-slate-500 leading-relaxed mb-6 line-clamp-3">
+                    <p className="text-ink/55 leading-relaxed mb-6 line-clamp-3">
                       {featuredPost.excerpt}
                     </p>
-                    <span className="inline-flex items-center gap-2 text-sm font-semibold text-persian-blue-600 group-hover:gap-3 transition-all">
+                    <span className="inline-flex items-center gap-2 text-sm font-semibold text-ink group-hover:gap-3 transition-all">
                       Read full article <ArrowRight className="h-4 w-4" />
                     </span>
                   </div>
@@ -299,7 +299,7 @@ export default function Blog() {
 
           {/* ── Results count ─────────────────────────────────────────────── */}
           <div className="flex items-center justify-between mb-6">
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-ink/55">
               {searchQuery
                 ? `${filtered.length} result${filtered.length !== 1 ? "s" : ""} for "${searchQuery}"`
                 : selectedCategory === "All"
@@ -315,7 +315,7 @@ export default function Blog() {
                 const style = CATEGORY_STYLES[post.category];
                 return (
                   <Link key={post.slug} href={`/blog/${post.slug}`}>
-                    <article className="group bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all cursor-pointer h-full flex flex-col">
+                    <article className="group bg-card rounded-2xl overflow-hidden border border-rule shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all cursor-pointer h-full flex flex-col">
 
                       {/* Category colour strip */}
                       <div className={`${style.banner} h-2 w-full`} />
@@ -333,17 +333,17 @@ export default function Blog() {
                         </div>
 
                         {/* Title */}
-                        <h3 className="text-base font-bold text-slate-900 group-hover:text-persian-blue-600 transition-colors leading-snug mb-3 flex-1">
+                        <h3 className="text-base font-bold text-ink group-hover:text-ink transition-colors leading-snug mb-3 flex-1">
                           {post.title}
                         </h3>
 
                         {/* Excerpt */}
-                        <p className="text-sm text-slate-500 leading-relaxed line-clamp-3 mb-5">
+                        <p className="text-sm text-ink/55 leading-relaxed line-clamp-3 mb-5">
                           {post.excerpt}
                         </p>
 
                         {/* Footer */}
-                        <div className="flex items-center justify-between text-xs text-slate-500 pt-4 border-t border-slate-50">
+                        <div className="flex items-center justify-between text-xs text-ink/55 pt-4 border-t border-rule">
                           <div className="flex items-center gap-3">
                             <span className="flex items-center gap-1">
                               <Calendar className="h-3.5 w-3.5" />{post.date}
@@ -352,7 +352,7 @@ export default function Blog() {
                               <Clock className="h-3.5 w-3.5" />{post.readTime}
                             </span>
                           </div>
-                          <ArrowRight className="h-4 w-4 text-persian-blue-500 group-hover:translate-x-1 transition-transform" />
+                          <ArrowRight className="h-4 w-4 text-ink group-hover:translate-x-1 transition-transform" />
                         </div>
                       </div>
                     </article>
@@ -361,12 +361,12 @@ export default function Blog() {
               })}
             </div>
           ) : (
-            <div className="text-center py-20 bg-white rounded-2xl border border-slate-100">
-              <FileText className="h-10 w-10 text-slate-300 mx-auto mb-3" />
-              <p className="text-slate-500 font-medium">No articles found.</p>
+            <div className="text-center py-20 bg-card rounded-2xl border border-rule">
+              <FileText className="h-10 w-10 text-ink/35 mx-auto mb-3" />
+              <p className="text-ink/55 font-medium">No articles found.</p>
               <button
                 onClick={() => { setSelectedCategory("All"); setSearchQuery(""); }}
-                className="mt-4 text-sm text-persian-blue-600 hover:underline"
+                className="mt-4 text-sm text-ink hover:underline"
               >
                 Clear filters
               </button>
@@ -374,13 +374,13 @@ export default function Blog() {
           )}
 
           {/* ── Bottom CTA ────────────────────────────────────────────────── */}
-          <div className="mt-16 bg-persian-blue-600 rounded-2xl p-8 md:p-10 text-white text-center">
+          <div className="mt-16 bg-ink rounded-2xl p-8 md:p-10 text-white text-center">
             <h3 className="text-2xl font-bold mb-2">Have a tax question?</h3>
-            <p className="text-persian-blue-100 mb-6 max-w-md mx-auto">
+            <p className="text-paper/80 mb-6 max-w-md mx-auto">
               Ask AiTaxBot and get instant, CA-verified answers on ITR filing, deductions, capital gains, and more.
             </p>
             <Link href="/">
-              <button className="bg-white text-persian-blue-700 font-bold px-6 py-3 rounded-xl hover:bg-persian-blue-50 transition-colors inline-flex items-center gap-2">
+              <button className="bg-card text-ink font-bold px-6 py-3 rounded-xl hover:bg-paper transition-colors inline-flex items-center gap-2">
                 Ask AiTaxBot <ArrowRight className="h-4 w-4" />
               </button>
             </Link>

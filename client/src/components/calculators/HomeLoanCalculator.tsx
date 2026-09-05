@@ -116,8 +116,8 @@ export default function HomeLoanCalculator() {
   const downPaymentPct = propertyPrice > 0 ? ((downPayment / propertyPrice) * 100).toFixed(1) : "0";
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-      <div className="bg-gradient-to-r from-persian-blue-600 to-persian-blue-700 p-6">
+    <div className="bg-card rounded-xl shadow-sm border border-rule overflow-hidden">
+      <div className="bg-gradient-to-r from-ink to-credit p-6">
         <h2 className="text-xl font-bold text-white">Home Loan Affordability Calculator</h2>
         <p className="text-blue-100 text-sm mt-1">Know your eligibility, EMI and tax benefits — before you visit the bank</p>
       </div>
@@ -127,9 +127,9 @@ export default function HomeLoanCalculator() {
 
           {/* Inputs */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-slate-800 text-sm uppercase tracking-wide">Your Income & Obligations</h3>
+            <h3 className="font-semibold text-ink text-sm uppercase tracking-wide">Your Income & Obligations</h3>
             <div>
-              <Label className="text-sm font-medium text-slate-700">Monthly Gross Income (₹)</Label>
+              <Label className="text-sm font-medium text-ink/80">Monthly Gross Income (₹)</Label>
               <Input
                 type="number"
                 inputMode="numeric"
@@ -138,10 +138,10 @@ export default function HomeLoanCalculator() {
                 className="mt-1"
                 placeholder="100000"
               />
-              <p className="text-xs text-slate-500 mt-1">Bank typically allows 50% of income towards all EMIs</p>
+              <p className="text-xs text-ink/55 mt-1">Bank typically allows 50% of income towards all EMIs</p>
             </div>
             <div>
-              <Label className="text-sm font-medium text-slate-700">Existing Monthly EMIs (₹)</Label>
+              <Label className="text-sm font-medium text-ink/80">Existing Monthly EMIs (₹)</Label>
               <Input
                 type="number"
                 inputMode="numeric"
@@ -150,12 +150,12 @@ export default function HomeLoanCalculator() {
                 className="mt-1"
                 placeholder="0"
               />
-              <p className="text-xs text-slate-500 mt-1">Car loan, personal loan, education loan etc.</p>
+              <p className="text-xs text-ink/55 mt-1">Car loan, personal loan, education loan etc.</p>
             </div>
 
-            <h3 className="font-semibold text-slate-800 text-sm uppercase tracking-wide pt-2">Property & Loan Details</h3>
+            <h3 className="font-semibold text-ink text-sm uppercase tracking-wide pt-2">Property & Loan Details</h3>
             <div>
-              <Label className="text-sm font-medium text-slate-700">Property Price (₹)</Label>
+              <Label className="text-sm font-medium text-ink/80">Property Price (₹)</Label>
               <Input
                 type="number"
                 inputMode="numeric"
@@ -166,8 +166,8 @@ export default function HomeLoanCalculator() {
               />
             </div>
             <div>
-              <Label className="text-sm font-medium text-slate-700">
-                Down Payment (₹) <span className="text-slate-500 font-normal">— {downPaymentPct}% of price</span>
+              <Label className="text-sm font-medium text-ink/80">
+                Down Payment (₹) <span className="text-ink/55 font-normal">— {downPaymentPct}% of price</span>
               </Label>
               <Input
                 type="number"
@@ -177,11 +177,11 @@ export default function HomeLoanCalculator() {
                 className="mt-1"
                 placeholder="1500000"
               />
-              <p className="text-xs text-slate-500 mt-1">Minimum 20% down payment (LTV 80%) required by most banks</p>
+              <p className="text-xs text-ink/55 mt-1">Minimum 20% down payment (LTV 80%) required by most banks</p>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label className="text-sm font-medium text-slate-700">Tenure (Years)</Label>
+                <Label className="text-sm font-medium text-ink/80">Tenure (Years)</Label>
                 <Input
                   type="number"
                   inputMode="numeric"
@@ -193,7 +193,7 @@ export default function HomeLoanCalculator() {
                 />
               </div>
               <div>
-                <Label className="text-sm font-medium text-slate-700">Interest Rate (% p.a.)</Label>
+                <Label className="text-sm font-medium text-ink/80">Interest Rate (% p.a.)</Label>
                 <Input
                   type="number"
                   inputMode="decimal"
@@ -206,11 +206,11 @@ export default function HomeLoanCalculator() {
               </div>
             </div>
 
-            <div className="bg-slate-50 rounded-lg p-3 text-sm">
-              <div className="flex justify-between text-slate-600"><span>Loan Amount:</span><span className="font-semibold text-slate-900">{formatINR(loanAmount)}</span></div>
+            <div className="bg-secondary rounded-lg p-3 text-sm">
+              <div className="flex justify-between text-ink/65"><span>Loan Amount:</span><span className="font-semibold text-ink">{formatINR(loanAmount)}</span></div>
             </div>
 
-            <Button onClick={calculate} className="w-full bg-persian-blue-700 hover:bg-persian-blue-800 text-white font-semibold py-3">
+            <Button onClick={calculate} className="w-full bg-ink hover:bg-credit text-white font-semibold py-3">
               Calculate Affordability & EMI
             </Button>
           </div>
@@ -226,42 +226,42 @@ export default function HomeLoanCalculator() {
                 <div className={`rounded-xl p-4 border-2 ${loanAmount <= result.maxLoanEligible ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'}`}>
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-xl">{loanAmount <= result.maxLoanEligible ? '✅' : '⚠️'}</span>
-                    <span className="font-bold text-slate-900">
+                    <span className="font-bold text-ink">
                       {loanAmount <= result.maxLoanEligible ? 'You are eligible for this loan' : 'Loan may exceed your eligibility'}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-600">Max loan you qualify for:</span>
-                    <span className="font-bold text-slate-900">{formatINR(result.maxLoanEligible)}</span>
+                    <span className="text-ink/65">Max loan you qualify for:</span>
+                    <span className="font-bold text-ink">{formatINR(result.maxLoanEligible)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-600">Loan amount requested:</span>
+                    <span className="text-ink/65">Loan amount requested:</span>
                     <span className={`font-bold ${loanAmount <= result.maxLoanEligible ? 'text-green-700' : 'text-red-700'}`}>{formatINR(result.loanAmount)}</span>
                   </div>
                 </div>
 
                 {/* EMI breakdown */}
-                <div className="bg-blue-50 rounded-xl p-4">
-                  <h4 className="font-bold text-slate-900 mb-3">EMI & Loan Breakdown</h4>
+                <div className="bg-secondary rounded-xl p-4">
+                  <h4 className="font-bold text-ink mb-3">EMI & Loan Breakdown</h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-slate-600">Monthly EMI:</span>
-                      <span className="font-bold text-blue-700 text-lg">{formatINR(result.emi)}</span>
+                      <span className="text-ink/65">Monthly EMI:</span>
+                      <span className="font-bold text-ink text-lg">{formatINR(result.emi)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-600">Loan Amount:</span>
+                      <span className="text-ink/65">Loan Amount:</span>
                       <span className="font-semibold">{formatINR(result.loanAmount)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-600">Total Interest:</span>
+                      <span className="text-ink/65">Total Interest:</span>
                       <span className="font-semibold text-orange-600">{formatINR(result.totalInterest)}</span>
                     </div>
-                    <div className="flex justify-between border-t border-blue-200 pt-2">
-                      <span className="text-slate-700 font-medium">Total Amount Payable:</span>
+                    <div className="flex justify-between border-t border-rule pt-2">
+                      <span className="text-ink/80 font-medium">Total Amount Payable:</span>
                       <span className="font-bold">{formatINR(result.totalPayment)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-600">LTV Ratio:</span>
+                      <span className="text-ink/65">LTV Ratio:</span>
                       <span className={`font-semibold ${result.ltv <= 80 ? 'text-green-700' : 'text-red-600'}`}>{result.ltv.toFixed(1)}% {result.ltv > 80 ? '(exceeds 80% max)' : '✓'}</span>
                     </div>
                   </div>
@@ -269,28 +269,28 @@ export default function HomeLoanCalculator() {
 
                 {/* Tax benefits */}
                 <div className="bg-green-50 rounded-xl p-4">
-                  <h4 className="font-bold text-slate-900 mb-1">Tax Benefits (Old Regime Only)</h4>
-                  <p className="text-xs text-slate-500 mb-3">Applicable in the financial year you pay interest/principal. Not available under New Regime.</p>
+                  <h4 className="font-bold text-ink mb-1">Tax Benefits (Old Regime Only)</h4>
+                  <p className="text-xs text-ink/55 mb-3">Applicable in the financial year you pay interest/principal. Not available under New Regime.</p>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-slate-600">Interest paid (Year 1 est.):</span>
+                      <span className="text-ink/65">Interest paid (Year 1 est.):</span>
                       <span className="font-semibold">{formatINR(result.annualInterestYear1)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-600">Section 24 deduction (interest, max ₹2L):</span>
+                      <span className="text-ink/65">Section 24 deduction (interest, max ₹2L):</span>
                       <span className="font-semibold text-green-700">{formatINR(result.section24Deduction)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-600">Section 80C deduction (principal, within ₹1.5L):</span>
+                      <span className="text-ink/65">Section 80C deduction (principal, within ₹1.5L):</span>
                       <span className="font-semibold text-green-700">{formatINR(result.section80CDeduction)}</span>
                     </div>
                     <div className="border-t border-green-200 pt-2 space-y-1">
                       <div className="flex justify-between">
-                        <span className="text-slate-700 font-medium">Annual tax saving @ 30% slab:</span>
+                        <span className="text-ink/80 font-medium">Annual tax saving @ 30% slab:</span>
                         <span className="font-bold text-green-700">{formatINR(result.annualTaxSaving30)}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-slate-700 font-medium">Annual tax saving @ 20% slab:</span>
+                        <span className="text-ink/80 font-medium">Annual tax saving @ 20% slab:</span>
                         <span className="font-bold text-green-700">{formatINR(result.annualTaxSaving20)}</span>
                       </div>
                     </div>
@@ -299,10 +299,10 @@ export default function HomeLoanCalculator() {
 
               </div>
             ) : (
-              <div className="flex items-center justify-center h-full min-h-[300px] bg-slate-50 rounded-xl border border-dashed border-slate-300">
-                <div className="text-center text-slate-500">
+              <div className="flex items-center justify-center h-full min-h-[300px] bg-secondary rounded-xl border border-dashed border-rule">
+                <div className="text-center text-ink/55">
                   <div className="text-4xl mb-3">🏠</div>
-                  <p className="font-medium text-slate-500">Enter your details and click Calculate</p>
+                  <p className="font-medium text-ink/55">Enter your details and click Calculate</p>
                   <p className="text-sm mt-1">Get your eligibility, EMI and tax benefits instantly</p>
                 </div>
               </div>

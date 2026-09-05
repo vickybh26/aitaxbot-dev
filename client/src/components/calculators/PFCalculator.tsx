@@ -289,7 +289,7 @@ export default function PFCalculator() {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <Calculator className="w-5 h-5 text-persian-blue-600" />
+                <Calculator className="w-5 h-5 text-ink" />
                 PF Contribution Details
               </CardTitle>
             </CardHeader>
@@ -332,7 +332,7 @@ export default function PFCalculator() {
                       className="h-12"
                       data-testid="input-monthly-basic-da"
                     />
-                    <p className="text-xs text-slate-500">Base for EPF contribution calculation</p>
+                    <p className="text-xs text-ink/55">Base for EPF contribution calculation</p>
                   </div>
 
                   <div className="space-y-2">
@@ -367,7 +367,7 @@ export default function PFCalculator() {
                       className="h-12"
                       data-testid="input-interest-rate"
                     />
-                    <p className="text-xs text-slate-500">FY 2026-27 EPF rate: 8.25% (declared by EPFO · governed by EPF &amp; MP Act, 1952)</p>
+                    <p className="text-xs text-ink/55">FY 2026-27 EPF rate: 8.25% (declared by EPFO · governed by EPF &amp; MP Act, 1952)</p>
                   </div>
 
                   <div className="space-y-2">
@@ -401,7 +401,7 @@ export default function PFCalculator() {
                       className="h-12"
                       data-testid="input-vpf-percent"
                     />
-                    <p className="text-xs text-slate-500">Optional: Extra voluntary contribution at same interest rate</p>
+                    <p className="text-xs text-ink/55">Optional: Extra voluntary contribution at same interest rate</p>
                   </div>
 
                   <div className="space-y-2">
@@ -418,7 +418,7 @@ export default function PFCalculator() {
                       className="h-12"
                       data-testid="input-existing-balance"
                     />
-                    <p className="text-xs text-slate-500">Current accumulated PF balance, if any</p>
+                    <p className="text-xs text-ink/55">Current accumulated PF balance, if any</p>
                   </div>
                 </div>
               ) : (
@@ -437,7 +437,7 @@ export default function PFCalculator() {
                       className="h-12"
                       data-testid="input-ppf-yearly"
                     />
-                    <p className="text-xs text-slate-500">Min ₹500, Max ₹1,50,000 per year</p>
+                    <p className="text-xs text-ink/55">Min ₹500, Max ₹1,50,000 per year</p>
                   </div>
 
                   <div className="space-y-2">
@@ -455,7 +455,7 @@ export default function PFCalculator() {
                       className="h-12"
                       data-testid="input-interest-rate"
                     />
-                    <p className="text-xs text-slate-500">Current PPF rate: 7.1% (Q1 FY 2026-27 · governed by PPF Scheme, 2019 under PFMS Act)</p>
+                    <p className="text-xs text-ink/55">Current PPF rate: 7.1% (Q1 FY 2026-27 · governed by PPF Scheme, 2019 under PFMS Act)</p>
                   </div>
 
                   <div className="space-y-2">
@@ -472,7 +472,7 @@ export default function PFCalculator() {
                       className="h-12"
                       data-testid="input-pf-years"
                     />
-                    <p className="text-xs text-slate-500">Minimum 15 years, extendable in blocks of 5</p>
+                    <p className="text-xs text-ink/55">Minimum 15 years, extendable in blocks of 5</p>
                   </div>
 
                   <div className="space-y-2">
@@ -489,15 +489,15 @@ export default function PFCalculator() {
                       className="h-12"
                       data-testid="input-existing-balance"
                     />
-                    <p className="text-xs text-slate-500">Current PPF balance, if any</p>
+                    <p className="text-xs text-ink/55">Current PPF balance, if any</p>
                   </div>
                 </div>
               )}
 
               {pfType === "epf" && (
-                <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="p-4 bg-secondary rounded-lg border border-rule">
                   <div className="flex items-start gap-2">
-                    <Info className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                    <Info className="w-4 h-4 text-credit mt-0.5 flex-shrink-0" />
                     <div className="text-sm text-blue-800">
                       <p className="font-medium mb-1">EPF Contribution Split:</p>
                       <ul className="space-y-1 text-xs">
@@ -529,7 +529,7 @@ export default function PFCalculator() {
 
               <Button
                 onClick={calculatePF}
-                className="w-full h-12 bg-persian-blue-600 hover:bg-persian-blue-700 text-white font-medium"
+                className="w-full h-12 bg-ink hover:bg-ink text-white font-medium"
                 data-testid="button-calculate-pf"
               >
                 <Calculator className="w-4 h-4 mr-2" />
@@ -544,34 +544,34 @@ export default function PFCalculator() {
             <ResultAuthGate toolName="PF Calculator" />
           ) : result ? (
             <>
-              <Card className="border-persian-blue-200 bg-gradient-to-br from-persian-blue-50 to-blue-50">
+              <Card className="border-rule bg-gradient-to-br from-paper to-blue-50">
                 <CardHeader>
-                  <CardTitle className="text-lg text-persian-blue-700">Estimated PF Corpus at Retirement</CardTitle>
+                  <CardTitle className="text-lg text-ink">Estimated PF Corpus at Retirement</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-center mb-6">
-                    <div className="text-4xl font-bold text-persian-blue-700" data-testid="text-total-corpus">
+                    <div className="text-4xl font-bold text-ink" data-testid="text-total-corpus">
                       {formatCurrency(result.totalCorpus)}
                     </div>
-                    <p className="text-sm text-slate-600 mt-1">{`After ${years} years at ${interestRate}% interest`}</p>
+                    <p className="text-sm text-ink/65 mt-1">{`After ${years} years at ${interestRate}% interest`}</p>
                   </div>
 
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="text-center p-3 bg-white rounded-lg border">
-                      <div className="text-lg font-bold text-blue-600">{formatCurrency(result.totalEmployeeContribution)}</div>
-                      <div className="text-xs text-slate-600">Your Contribution</div>
+                    <div className="text-center p-3 bg-card rounded-lg border">
+                      <div className="text-lg font-bold text-credit">{formatCurrency(result.totalEmployeeContribution)}</div>
+                      <div className="text-xs text-ink/65">Your Contribution</div>
                     </div>
-                    <div className="text-center p-3 bg-white rounded-lg border">
+                    <div className="text-center p-3 bg-card rounded-lg border">
                       <div className="text-lg font-bold text-green-600">{formatCurrency(result.totalEmployerContribution)}</div>
-                      <div className="text-xs text-slate-600">Employer EPF</div>
+                      <div className="text-xs text-ink/65">Employer EPF</div>
                     </div>
-                    <div className="text-center p-3 bg-white rounded-lg border">
-                      <div className="text-lg font-bold text-persian-blue-700">{formatCurrency(result.totalVPF)}</div>
-                      <div className="text-xs text-slate-600">VPF Amount</div>
+                    <div className="text-center p-3 bg-card rounded-lg border">
+                      <div className="text-lg font-bold text-ink">{formatCurrency(result.totalVPF)}</div>
+                      <div className="text-xs text-ink/65">VPF Amount</div>
                     </div>
-                    <div className="text-center p-3 bg-white rounded-lg border">
+                    <div className="text-center p-3 bg-card rounded-lg border">
                       <div className="text-lg font-bold text-amber-600">{formatCurrency(result.totalInterestEarned)}</div>
-                      <div className="text-xs text-slate-600">Interest Earned</div>
+                      <div className="text-xs text-ink/65">Interest Earned</div>
                     </div>
                   </div>
                 </CardContent>
@@ -590,7 +590,7 @@ export default function PFCalculator() {
                     <Separator />
                     <div className="flex justify-between">
                       <span className="text-sm">Employee (12%):</span>
-                      <span className="font-medium text-blue-600">{formatCurrencyFull(result.employeeContributionMonthly)}</span>
+                      <span className="font-medium text-credit">{formatCurrencyFull(result.employeeContributionMonthly)}</span>
                     </div>
                     {pfType === "epf" && (
                       <>
@@ -600,21 +600,21 @@ export default function PFCalculator() {
                         </div>
                         <div className="flex justify-between">
                           <span className="text-sm">Employer EPS (8.33%):</span>
-                          <span className="font-medium text-slate-500">{formatCurrencyFull(result.employerEPSMonthly)}</span>
+                          <span className="font-medium text-ink/55">{formatCurrencyFull(result.employerEPSMonthly)}</span>
                         </div>
-                        <p className="text-xs text-slate-500">EPS goes to pension fund, not your PF balance</p>
+                        <p className="text-xs text-ink/55">EPS goes to pension fund, not your PF balance</p>
                       </>
                     )}
                     {vpfPercent > 0 && (
                       <div className="flex justify-between">
                         <span className="text-sm">{`VPF (${vpfPercent}%):`}</span>
-                        <span className="font-medium text-persian-blue-700">{formatCurrencyFull(result.vpfMonthly)}</span>
+                        <span className="font-medium text-ink">{formatCurrencyFull(result.vpfMonthly)}</span>
                       </div>
                     )}
                     <Separator />
                     <div className="flex justify-between font-bold">
                       <span>Total to PF Account:</span>
-                      <span className="text-persian-blue-600">{formatCurrencyFull(result.totalMonthlyDeposit)}</span>
+                      <span className="text-ink">{formatCurrencyFull(result.totalMonthlyDeposit)}</span>
                     </div>
                   </CardContent>
                 </Card>
@@ -647,9 +647,9 @@ export default function PFCalculator() {
                         </div>
                       )}
                     </div>
-                    <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <div className="p-3 bg-secondary rounded-lg border border-rule">
                       <div className="text-sm font-medium text-blue-800">EEE Tax Status</div>
-                      <div className="text-xs text-blue-700 mt-1">
+                      <div className="text-xs text-ink mt-1">
                         EPF enjoys Exempt-Exempt-Exempt status: contribution exempt, growth exempt, withdrawal exempt (after 5 years of continuous service)
                       </div>
                     </div>
@@ -658,8 +658,8 @@ export default function PFCalculator() {
               </div>
             </>
           ) : (
-            <div className="text-center py-12 text-slate-500">
-              <Calculator className="w-12 h-12 mx-auto mb-4 text-slate-300" />
+            <div className="text-center py-12 text-ink/55">
+              <Calculator className="w-12 h-12 mx-auto mb-4 text-ink/35" />
               <p>Enter your details and click "Calculate PF Corpus" to see results</p>
             </div>
           )}
@@ -677,38 +677,38 @@ export default function PFCalculator() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm" data-testid="table-yearly-breakdown">
                     <thead>
-                      <tr className="border-b bg-slate-50">
+                      <tr className="border-b bg-secondary">
                         <th className="text-left p-3 font-medium">Year</th>
                         <th className="text-right p-3 font-medium">Opening</th>
                         <th className="text-right p-3 font-medium">Employee</th>
                         <th className="text-right p-3 font-medium">Employer</th>
                         {vpfPercent > 0 && <th className="text-right p-3 font-medium">VPF</th>}
                         <th className="text-right p-3 font-medium">Interest</th>
-                        <th className="text-right p-3 font-medium text-persian-blue-700">Closing</th>
+                        <th className="text-right p-3 font-medium text-ink">Closing</th>
                       </tr>
                     </thead>
                     <tbody>
                       {result.yearlyGrowth.map((row) => (
-                        <tr key={row.year} className="border-b hover:bg-slate-50">
+                        <tr key={row.year} className="border-b hover:bg-secondary">
                           <td className="p-3 font-medium">{row.year}</td>
-                          <td className="p-3 text-right text-slate-600">{formatCurrency(row.openingBalance)}</td>
-                          <td className="p-3 text-right text-blue-600">{formatCurrency(row.employeeContribution)}</td>
+                          <td className="p-3 text-right text-ink/65">{formatCurrency(row.openingBalance)}</td>
+                          <td className="p-3 text-right text-credit">{formatCurrency(row.employeeContribution)}</td>
                           <td className="p-3 text-right text-green-600">{formatCurrency(row.employerContribution)}</td>
-                          {vpfPercent > 0 && <td className="p-3 text-right text-persian-blue-700">{formatCurrency(row.vpfContribution)}</td>}
+                          {vpfPercent > 0 && <td className="p-3 text-right text-ink">{formatCurrency(row.vpfContribution)}</td>}
                           <td className="p-3 text-right text-amber-600">{formatCurrency(row.interest)}</td>
-                          <td className="p-3 text-right font-bold text-persian-blue-700">{formatCurrency(row.closingBalance)}</td>
+                          <td className="p-3 text-right font-bold text-ink">{formatCurrency(row.closingBalance)}</td>
                         </tr>
                       ))}
                     </tbody>
                     <tfoot>
-                      <tr className="border-t-2 bg-persian-blue-50 font-bold">
+                      <tr className="border-t-2 bg-paper font-bold">
                         <td className="p-3">Total</td>
                         <td className="p-3 text-right">-</td>
-                        <td className="p-3 text-right text-blue-700">{formatCurrency(result.totalEmployeeContribution)}</td>
+                        <td className="p-3 text-right text-ink">{formatCurrency(result.totalEmployeeContribution)}</td>
                         <td className="p-3 text-right text-green-700">{formatCurrency(result.totalEmployerContribution)}</td>
-                        {vpfPercent > 0 && <td className="p-3 text-right text-persian-blue-800">{formatCurrency(result.totalVPF)}</td>}
+                        {vpfPercent > 0 && <td className="p-3 text-right text-ink">{formatCurrency(result.totalVPF)}</td>}
                         <td className="p-3 text-right text-amber-700">{formatCurrency(result.totalInterestEarned)}</td>
-                        <td className="p-3 text-right text-persian-blue-800">{formatCurrency(result.totalCorpus)}</td>
+                        <td className="p-3 text-right text-ink">{formatCurrency(result.totalCorpus)}</td>
                       </tr>
                     </tfoot>
                   </table>
@@ -716,8 +716,8 @@ export default function PFCalculator() {
               </CardContent>
             </Card>
           ) : (
-            <div className="text-center py-12 text-slate-500">
-              <PieChart className="w-12 h-12 mx-auto mb-4 text-slate-300" />
+            <div className="text-center py-12 text-ink/55">
+              <PieChart className="w-12 h-12 mx-auto mb-4 text-ink/35" />
               <p>Calculate PF to see year-wise breakdown</p>
             </div>
           )}
@@ -736,8 +736,8 @@ export default function PFCalculator() {
               </CardContent>
             </Card>
           ) : (
-            <div className="text-center py-12 text-slate-500">
-              <TrendingUp className="w-12 h-12 mx-auto mb-4 text-slate-300" />
+            <div className="text-center py-12 text-ink/55">
+              <TrendingUp className="w-12 h-12 mx-auto mb-4 text-ink/35" />
               <p>Calculate PF to see growth chart</p>
             </div>
           )}

@@ -65,7 +65,7 @@ export default function ClientManager({ firmId }: { firmId: string }) {
   });
 
   if (!firmId) {
-    return <div className="text-center py-8 text-slate-500">Please select a firm first</div>;
+    return <div className="text-center py-8 text-ink/55">Please select a firm first</div>;
   }
 
   if (isLoading) {
@@ -85,7 +85,7 @@ export default function ClientManager({ firmId }: { firmId: string }) {
         <Card className="p-6">
           <form onSubmit={(e) => { e.preventDefault(); createMutation.mutate(formData); }} className="space-y-6">
             <div className="space-y-4">
-              <h4 className="font-medium text-sm text-slate-700">Client Information</h4>
+              <h4 className="font-medium text-sm text-ink/80">Client Information</h4>
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-2">
                   <Label>Client Name *</Label>
@@ -107,7 +107,7 @@ export default function ClientManager({ firmId }: { firmId: string }) {
                       maxLength={15}
                       placeholder="22AAAAA0000A1Z5"
                     />
-                    <p className="text-xs text-slate-500 mt-1">Leave empty for non-GST registered clients</p>
+                    <p className="text-xs text-ink/55 mt-1">Leave empty for non-GST registered clients</p>
                   </div>
                 )}
 
@@ -145,7 +145,7 @@ export default function ClientManager({ firmId }: { firmId: string }) {
             </div>
 
             <div className="space-y-4">
-              <h4 className="font-medium text-sm text-slate-700">Client Address</h4>
+              <h4 className="font-medium text-sm text-ink/80">Client Address</h4>
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-2">
                   <Label>Address *</Label>
@@ -207,12 +207,12 @@ export default function ClientManager({ firmId }: { firmId: string }) {
               <div>
                 <h3 className="font-semibold">{client.clientName}</h3>
                 {firm?.isGstRegistered && client.gstin && (
-                  <p className="text-sm text-slate-600">GSTIN: {client.gstin}</p>
+                  <p className="text-sm text-ink/65">GSTIN: {client.gstin}</p>
                 )}
-                {client.email && <p className="text-sm text-slate-600">{client.email}</p>}
-                {client.phone && <p className="text-sm text-slate-600">{client.phone}</p>}
+                {client.email && <p className="text-sm text-ink/65">{client.email}</p>}
+                {client.phone && <p className="text-sm text-ink/65">{client.phone}</p>}
                 {client.address && (
-                  <p className="text-sm text-slate-600">
+                  <p className="text-sm text-ink/65">
                     {client.address}, {client.city}, {client.state} - {client.pincode}
                   </p>
                 )}
@@ -222,7 +222,7 @@ export default function ClientManager({ firmId }: { firmId: string }) {
         ))}
 
         {clients.length === 0 && !isCreating && (
-          <div className="text-center py-8 text-slate-500">
+          <div className="text-center py-8 text-ink/55">
             No clients yet. Add your first client to get started.
           </div>
         )}

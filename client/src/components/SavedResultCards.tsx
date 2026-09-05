@@ -95,12 +95,12 @@ export default function SavedResultCards() {
       <div className="flex items-center justify-between mb-4">
         <h2
           id="saved-results-heading"
-          className="text-xl font-bold text-slate-900 flex items-center gap-2"
+          className="text-xl font-bold text-ink flex items-center gap-2"
         >
-          <Clock className="w-5 h-5 text-blue-600" />
+          <Clock className="w-5 h-5 text-credit" />
           Where you left off
         </h2>
-        <span className="text-xs text-slate-500">Only your results — documents are never stored</span>
+        <span className="text-xs text-ink/55">Only your results — documents are never stored</span>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -113,32 +113,32 @@ export default function SavedResultCards() {
               className={`rounded-2xl border p-5 flex flex-col ${
                 isRecon
                   ? "bg-amber-50 border-amber-200"
-                  : "bg-white border-slate-200"
+                  : "bg-card border-rule"
               }`}
             >
               <div className="flex items-start justify-between gap-2 mb-2">
                 <div className="flex items-center gap-2 min-w-0">
                   <div
                     className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                      isRecon ? "bg-amber-100" : "bg-blue-50"
+                      isRecon ? "bg-amber-100" : "bg-secondary"
                     }`}
                   >
                     {isRecon ? (
                       <FileSearch className="w-4 h-4 text-amber-700" />
                     ) : (
-                      <Calculator className="w-4 h-4 text-blue-600" />
+                      <Calculator className="w-4 h-4 text-credit" />
                     )}
                   </div>
                   <p
                     className={`text-xs font-semibold truncate ${
-                      isRecon ? "text-amber-900" : "text-slate-500"
+                      isRecon ? "text-amber-900" : "text-ink/55"
                     }`}
                   >
                     {item.toolName}
                   </p>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
-                  <span className="text-[11px] text-slate-500">
+                  <span className="text-[11px] text-ink/55">
                     {timeAgo(item.updatedAt)}
                   </span>
                   <button
@@ -147,7 +147,7 @@ export default function SavedResultCards() {
                     disabled={clearing === item.toolKey}
                     aria-label={`Clear saved ${item.toolName} result`}
                     title="Clear this saved result"
-                    className="p-1 rounded-md text-slate-500 hover:text-slate-700 hover:bg-slate-100 disabled:opacity-50"
+                    className="p-1 rounded-md text-ink/55 hover:text-ink/80 hover:bg-secondary disabled:opacity-50"
                     data-testid={`clear-saved-${item.toolKey}`}
                   >
                     {clearing === item.toolKey ? (
@@ -159,12 +159,12 @@ export default function SavedResultCards() {
                 </div>
               </div>
 
-              <p className={`text-xs mb-0.5 ${isRecon ? "text-amber-800" : "text-slate-500"}`}>
+              <p className={`text-xs mb-0.5 ${isRecon ? "text-amber-800" : "text-ink/55"}`}>
                 {item.headline.label}
               </p>
               <p
                 className={`font-bold tabular-nums leading-tight ${
-                  isRecon ? "text-lg text-amber-950" : "text-2xl text-slate-900"
+                  isRecon ? "text-lg text-amber-950" : "text-2xl text-ink"
                 }`}
               >
                 {item.headline.value}
@@ -181,12 +181,12 @@ export default function SavedResultCards() {
                     <li
                       key={i}
                       className={`text-xs flex gap-2 ${
-                        isRecon ? "text-amber-900" : "text-slate-600"
+                        isRecon ? "text-amber-900" : "text-ink/65"
                       }`}
                     >
                       {d.label ? (
                         <>
-                          <span className="text-slate-500">{d.label}</span>
+                          <span className="text-ink/55">{d.label}</span>
                           <span className="ml-auto font-medium tabular-nums">{d.value}</span>
                         </>
                       ) : (
@@ -205,7 +205,7 @@ export default function SavedResultCards() {
                   className={`w-full text-xs font-semibold ${
                     isRecon
                       ? "bg-amber-600 hover:bg-amber-700 text-white"
-                      : "bg-persian-blue-600 hover:bg-persian-blue-700 text-white"
+                      : "bg-ink hover:bg-ink text-white"
                   }`}
                 >
                   {isRecon ? "Open report" : "Update"}

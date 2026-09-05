@@ -11,22 +11,22 @@ const calloutConfig: Record<CalloutType, { borderColor: string; label: string; b
   info: {
     borderColor: 'border-blue-400',
     label: 'Note',
-    bgColor: 'bg-slate-50'
+    bgColor: 'bg-secondary'
   },
   warning: {
     borderColor: 'border-amber-500',
     label: '⚠ Warning',
-    bgColor: 'bg-slate-50'
+    bgColor: 'bg-secondary'
   },
   tip: {
     borderColor: 'border-green-500',
     label: 'Tip',
-    bgColor: 'bg-slate-50'
+    bgColor: 'bg-secondary'
   },
   important: {
     borderColor: 'border-red-500',
     label: 'Important',
-    bgColor: 'bg-slate-50'
+    bgColor: 'bg-secondary'
   }
 };
 
@@ -35,10 +35,10 @@ export default function Callout({ type, children }: CalloutProps) {
 
   return (
     <div className={`border-l-4 ${config.borderColor} ${config.bgColor} p-4 rounded-r-lg`}>
-      <div className="text-xs font-semibold text-slate-600 mb-2">
+      <div className="text-xs font-semibold text-ink/65 mb-2">
         {config.label}
       </div>
-      <div className="text-sm text-slate-700">
+      <div className="text-sm text-ink/80">
         {children}
       </div>
     </div>

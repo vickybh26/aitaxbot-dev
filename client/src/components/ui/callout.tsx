@@ -14,10 +14,10 @@ const TONE_STYLES: Record<
   { bg: string; border: string; icon: string; title: string; Icon: typeof AlertCircle }
 > = {
   info: {
-    bg: "bg-blue-50",
-    border: "border-blue-100",
-    icon: "text-blue-600",
-    title: "text-blue-700",
+    bg: "bg-secondary",
+    border: "border-rule",
+    icon: "text-credit",
+    title: "text-ink",
     Icon: AlertCircle,
   },
   success: {
@@ -68,7 +68,7 @@ export function Callout({ tone = "info", title, children, className }: CalloutPr
         {title && (
           <span className={cn("text-sm font-semibold", styles.title)}>{title}</span>
         )}
-        <span className="text-sm text-slate-700 leading-relaxed">{children}</span>
+        <span className="text-sm text-ink/80 leading-relaxed">{children}</span>
       </div>
     </div>
   );

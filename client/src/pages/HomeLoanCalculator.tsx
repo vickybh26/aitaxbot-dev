@@ -79,7 +79,7 @@ export default function HomeLoanCalculatorPage() {
         <script type="application/ld+json">{JSON.stringify(organizationSchema)}</script>
       </Helmet>
 
-      <div className="bg-white">
+      <div className="bg-card">
 
         <CalcPageHeader
           title="Home Loan EMI & Affordability Calculator"
@@ -116,14 +116,14 @@ export default function HomeLoanCalculatorPage() {
         </section>
 
         {/* SEO Content */}
-        <section className="py-12 px-6 bg-white">
+        <section className="py-12 px-6 bg-card">
           <div className="max-w-6xl mx-auto">
 
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">Understanding Home Loan Affordability in India</h2>
+            <h2 className="text-2xl font-bold text-ink mb-6">Understanding Home Loan Affordability in India</h2>
             <div className="grid md:grid-cols-2 gap-8 mb-8">
               <div>
-                <h3 className="text-xl font-semibold text-slate-900 mb-3">How Banks Calculate Your Eligibility</h3>
-                <p className="text-slate-600">
+                <h3 className="text-xl font-semibold text-ink mb-3">How Banks Calculate Your Eligibility</h3>
+                <p className="text-ink/65">
                   Banks use FOIR (Fixed Obligation to Income Ratio) — typically 40–50% of gross monthly income.
                   This means all your EMIs combined (home loan + car loan + personal loan) cannot exceed 50% of
                   your monthly income. The higher your income and lower your existing obligations, the larger the
@@ -131,8 +131,8 @@ export default function HomeLoanCalculatorPage() {
                 </p>
               </div>
               <div>
-                <h3 className="text-xl font-semibold text-slate-900 mb-3">What Affects Your Home Loan Rate?</h3>
-                <p className="text-slate-600">
+                <h3 className="text-xl font-semibold text-ink mb-3">What Affects Your Home Loan Rate?</h3>
+                <p className="text-ink/65">
                   Home loan interest rates in India (FY 2026-27) range from 8.35% to 9.5% depending on:
                   CIBIL score (750+ gets best rates), loan amount, property type (ready possession vs under construction),
                   lender (PSU banks vs private), and whether you opt for MCLR or repo-linked rate. A 0.5% rate difference
@@ -142,12 +142,12 @@ export default function HomeLoanCalculatorPage() {
             </div>
 
             {/* EMI Reference Table */}
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">Home Loan EMI Reference Table — At 8.75% p.a.</h2>
-            <p className="text-slate-600 mb-4">Quick reference for common loan amounts. Use the calculator above for your exact figures.</p>
+            <h2 className="text-2xl font-bold text-ink mb-2">Home Loan EMI Reference Table — At 8.75% p.a.</h2>
+            <p className="text-ink/65 mb-4">Quick reference for common loan amounts. Use the calculator above for your exact figures.</p>
             <div className="overflow-x-auto mb-8">
               <table className="w-full border-collapse text-sm">
                 <thead>
-                  <tr className="bg-blue-700 text-white">
+                  <tr className="bg-ink text-white">
                     <th className="border border-blue-600 p-3 text-left font-semibold">Loan Amount</th>
                     <th className="border border-blue-600 p-3 text-center font-semibold">10 Years</th>
                     <th className="border border-blue-600 p-3 text-center font-semibold">15 Years</th>
@@ -164,42 +164,42 @@ export default function HomeLoanCalculatorPage() {
                     { loan: "₹75 Lakh", emis: ["₹93,502", "₹74,812", "₹66,150", "₹61,537", "₹58,985"] },
                     { loan: "₹1 Crore", emis: ["₹1,24,670", "₹99,750", "₹88,200", "₹82,049", "₹78,646"] },
                   ].map((row, i) => (
-                    <tr key={i} className={i % 2 === 1 ? "bg-slate-50" : ""}>
-                      <td className="border border-slate-200 p-3 font-semibold text-slate-800">{row.loan}</td>
+                    <tr key={i} className={i % 2 === 1 ? "bg-secondary" : ""}>
+                      <td className="border border-rule p-3 font-semibold text-ink">{row.loan}</td>
                       {row.emis.map((emi, j) => (
-                        <td key={j} className="border border-slate-200 p-3 text-center text-slate-700">{emi}</td>
+                        <td key={j} className="border border-rule p-3 text-center text-ink/80">{emi}</td>
                       ))}
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-            <p className="text-xs text-slate-500 mb-8">*At 8.75% p.a. interest. Monthly EMI figures. Actual rates vary by lender and credit profile.</p>
+            <p className="text-xs text-ink/55 mb-8">*At 8.75% p.a. interest. Monthly EMI figures. Actual rates vary by lender and credit profile.</p>
 
             {/* Home Loan Tax Benefits Table */}
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Home Loan Tax Benefits — Section 24 & Section 80C (Old Regime)</h2>
+            <h2 className="text-2xl font-bold text-ink mb-4">Home Loan Tax Benefits — Section 24 & Section 80C (Old Regime)</h2>
             <div className="grid md:grid-cols-2 gap-4 mb-8">
-              <div className="bg-blue-50 border border-blue-100 rounded-xl p-5">
-                <div className="text-2xl font-bold text-blue-700 mb-1">Section 24</div>
-                <div className="text-sm font-semibold text-slate-700 mb-2">(Section 22(2) under ITA 2025)</div>
-                <p className="text-sm text-slate-600 mb-3">Deduction on home loan <strong>interest</strong> paid during the year.</p>
+              <div className="bg-secondary border border-rule rounded-xl p-5">
+                <div className="text-2xl font-bold text-ink mb-1">Section 24</div>
+                <div className="text-sm font-semibold text-ink/80 mb-2">(Section 22(2) under ITA 2025)</div>
+                <p className="text-sm text-ink/65 mb-3">Deduction on home loan <strong>interest</strong> paid during the year.</p>
                 <div className="space-y-2 text-sm">
-                  <div className="flex justify-between"><span className="text-slate-600">Self-occupied property:</span><span className="font-semibold">Up to ₹2,00,000/year</span></div>
-                  <div className="flex justify-between"><span className="text-slate-600">Let-out property:</span><span className="font-semibold">Actual interest (no limit)</span></div>
-                  <div className="flex justify-between"><span className="text-slate-600">Under construction:</span><span className="font-semibold">Deduction starts after possession</span></div>
-                  <div className="border-t border-blue-200 pt-2 flex justify-between font-semibold text-blue-700">
+                  <div className="flex justify-between"><span className="text-ink/65">Self-occupied property:</span><span className="font-semibold">Up to ₹2,00,000/year</span></div>
+                  <div className="flex justify-between"><span className="text-ink/65">Let-out property:</span><span className="font-semibold">Actual interest (no limit)</span></div>
+                  <div className="flex justify-between"><span className="text-ink/65">Under construction:</span><span className="font-semibold">Deduction starts after possession</span></div>
+                  <div className="border-t border-rule pt-2 flex justify-between font-semibold text-ink">
                     <span>Tax saving at 30% slab:</span><span>₹62,400/year</span>
                   </div>
                 </div>
               </div>
               <div className="bg-green-50 border border-green-100 rounded-xl p-5">
                 <div className="text-2xl font-bold text-green-700 mb-1">Section 80C</div>
-                <div className="text-sm font-semibold text-slate-700 mb-2">(Section 123 under ITA 2025)</div>
-                <p className="text-sm text-slate-600 mb-3">Deduction on home loan <strong>principal</strong> repayment.</p>
+                <div className="text-sm font-semibold text-ink/80 mb-2">(Section 123 under ITA 2025)</div>
+                <p className="text-sm text-ink/65 mb-3">Deduction on home loan <strong>principal</strong> repayment.</p>
                 <div className="space-y-2 text-sm">
-                  <div className="flex justify-between"><span className="text-slate-600">Combined 80C limit:</span><span className="font-semibold">₹1,50,000/year</span></div>
-                  <div className="flex justify-between"><span className="text-slate-600">Includes:</span><span className="font-semibold">EPF + ELSS + PPF + Principal</span></div>
-                  <div className="flex justify-between"><span className="text-slate-600">Stamp duty & registration:</span><span className="font-semibold">Claimable in year of payment</span></div>
+                  <div className="flex justify-between"><span className="text-ink/65">Combined 80C limit:</span><span className="font-semibold">₹1,50,000/year</span></div>
+                  <div className="flex justify-between"><span className="text-ink/65">Includes:</span><span className="font-semibold">EPF + ELSS + PPF + Principal</span></div>
+                  <div className="flex justify-between"><span className="text-ink/65">Stamp duty & registration:</span><span className="font-semibold">Claimable in year of payment</span></div>
                   <div className="border-t border-green-200 pt-2 flex justify-between font-semibold text-green-700">
                     <span>Max saving at 30% slab:</span><span>₹46,800/year</span>
                   </div>
@@ -208,7 +208,7 @@ export default function HomeLoanCalculatorPage() {
             </div>
 
             {/* Pro Tips */}
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Home Loan Pro Tips — Save Lakhs in Interest</h2>
+            <h2 className="text-2xl font-bold text-ink mb-4">Home Loan Pro Tips — Save Lakhs in Interest</h2>
             <div className="grid md:grid-cols-2 gap-4 mb-8">
               {[
                 { n: 1, tip: "Make partial prepayments in early years", detail: "In the first 5 years, 80%+ of your EMI goes to interest, not principal. Even ₹50,000 prepayment in Year 2 can cut 18+ months from your loan and save ₹3–5L in interest. Most banks allow 1–2 free prepayments per year." },
@@ -221,20 +221,20 @@ export default function HomeLoanCalculatorPage() {
                 <div key={n} className="flex gap-3 p-4 bg-amber-50 border border-amber-100 rounded-lg">
                   <span className="text-amber-600 text-lg font-bold shrink-0">{n}</span>
                   <div>
-                    <p className="font-semibold text-slate-900 text-sm">{tip}</p>
-                    <p className="text-slate-600 text-sm mt-1">{detail}</p>
+                    <p className="font-semibold text-ink text-sm">{tip}</p>
+                    <p className="text-ink/65 text-sm mt-1">{detail}</p>
                   </div>
                 </div>
               ))}
             </div>
 
             {/* FAQs */}
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Frequently Asked Questions</h2>
+            <h2 className="text-2xl font-bold text-ink mb-4">Frequently Asked Questions</h2>
             <div className="space-y-4">
               {homeLoanFAQs.map((faq, i) => (
                 <div key={i}>
-                  <h4 className="font-semibold text-slate-900 mb-2">{faq.question}</h4>
-                  <p className="text-slate-600">{faq.answer}</p>
+                  <h4 className="font-semibold text-ink mb-2">{faq.question}</h4>
+                  <p className="text-ink/65">{faq.answer}</p>
                 </div>
               ))}
             </div>
@@ -251,33 +251,33 @@ export default function HomeLoanCalculatorPage() {
         </div>
 
         {/* Related Calculators */}
-        <section className="py-12 px-6 bg-slate-50">
+        <section className="py-12 px-6 bg-secondary">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">Related Calculators</h2>
-            <p className="text-slate-600 mb-6">Plan your complete financial picture alongside your home loan.</p>
+            <h2 className="text-2xl font-bold text-ink mb-2">Related Calculators</h2>
+            <p className="text-ink/65 mb-6">Plan your complete financial picture alongside your home loan.</p>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <Link href="/calculators/income-tax">
-                <div className="p-4 bg-white rounded-lg border hover:border-blue-300 hover:shadow transition-all">
-                  <h3 className="font-semibold text-slate-900 mb-1">Income Tax Calculator</h3>
-                  <p className="text-sm text-slate-600">Compare Old vs New regime with home loan deductions</p>
+                <div className="p-4 bg-card rounded-lg border hover:border-credit hover:shadow transition-all">
+                  <h3 className="font-semibold text-ink mb-1">Income Tax Calculator</h3>
+                  <p className="text-sm text-ink/65">Compare Old vs New regime with home loan deductions</p>
                 </div>
               </Link>
               <Link href="/calculators/hra">
-                <div className="p-4 bg-white rounded-lg border hover:border-green-300 hover:shadow transition-all">
-                  <h3 className="font-semibold text-slate-900 mb-1">HRA Calculator</h3>
-                  <p className="text-sm text-slate-600">Claim HRA while paying home loan EMI on a different city</p>
+                <div className="p-4 bg-card rounded-lg border hover:border-green-300 hover:shadow transition-all">
+                  <h3 className="font-semibold text-ink mb-1">HRA Calculator</h3>
+                  <p className="text-sm text-ink/65">Claim HRA while paying home loan EMI on a different city</p>
                 </div>
               </Link>
               <Link href="/calculators/vehicle-loan">
-                <div className="p-4 bg-white rounded-lg border hover:border-orange-300 hover:shadow transition-all">
-                  <h3 className="font-semibold text-slate-900 mb-1">Vehicle Loan Calculator</h3>
-                  <p className="text-sm text-slate-600">Calculate car or two-wheeler loan EMI alongside home loan</p>
+                <div className="p-4 bg-card rounded-lg border hover:border-orange-300 hover:shadow transition-all">
+                  <h3 className="font-semibold text-ink mb-1">Vehicle Loan Calculator</h3>
+                  <p className="text-sm text-ink/65">Calculate car or two-wheeler loan EMI alongside home loan</p>
                 </div>
               </Link>
               <Link href="/calculators">
-                <div className="p-4 bg-blue-50 rounded-lg border border-blue-200 hover:shadow transition-all">
-                  <h3 className="font-semibold text-blue-700 mb-1">All Calculators</h3>
-                  <p className="text-sm text-blue-600">View complete suite of free financial tools</p>
+                <div className="p-4 bg-secondary rounded-lg border border-rule hover:shadow transition-all">
+                  <h3 className="font-semibold text-ink mb-1">All Calculators</h3>
+                  <p className="text-sm text-credit">View complete suite of free financial tools</p>
                 </div>
               </Link>
             </div>

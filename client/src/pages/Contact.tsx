@@ -81,8 +81,8 @@ export default function Contact() {
           <div className="grid md:grid-cols-2 gap-12">
             {/* Contact Information */}
             <div>
-              <h2 className="text-2xl font-semibold text-slate-900 mb-6">Get in Touch</h2>
-              <p className="text-slate-600 mb-8">
+              <h2 className="text-2xl font-semibold text-ink mb-6">Get in Touch</h2>
+              <p className="text-ink/65 mb-8">
                 Have questions about tax calculations, need help with our tools, or want to share feedback? 
                 We'd love to hear from you. Our team is here to help you navigate your tax journey.
               </p>
@@ -90,17 +90,17 @@ export default function Contact() {
               <div className="space-y-6">
                 <div className="flex items-start space-x-4">
                   <div className="bg-blue-100 rounded-full p-3 mt-1">
-                    <Mail className="w-5 h-5 text-blue-600" />
+                    <Mail className="w-5 h-5 text-credit" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-slate-900 mb-2">Email</h3>
+                    <h3 className="text-lg font-semibold text-ink mb-2">Email</h3>
                     {/* One address, on the canonical domain — same decision as
                         Footer.tsx. Two addresses on different TLDs read as a
                         typo or a second organisation on a page where people are
                         deciding whether to trust us with financial data. */}
                     <a 
                       href="mailto:admin@aitaxbot.co.in" 
-                      className="text-persian-blue-600 hover:text-persian-blue-700 transition-colors"
+                      className="text-ink hover:text-credit transition-colors"
                       data-testid="link-email"
                     >
                       admin@aitaxbot.co.in
@@ -113,10 +113,10 @@ export default function Contact() {
                     <Phone className="w-5 h-5 text-green-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-slate-900 mb-2">Phone</h3>
+                    <h3 className="text-lg font-semibold text-ink mb-2">Phone</h3>
                     <a 
                       href="tel:+917899869036" 
-                      className="text-persian-blue-600 hover:text-persian-blue-700 transition-colors"
+                      className="text-ink hover:text-credit transition-colors"
                       data-testid="link-phone"
                     >
                       +91 78998 69036
@@ -125,18 +125,18 @@ export default function Contact() {
                 </div>
 
                 <div className="flex items-start space-x-4">
-                  <div className="bg-persian-blue-100 rounded-full p-3 mt-1">
-                    <MapPin className="w-5 h-5 text-persian-blue-700" />
+                  <div className="bg-secondary rounded-full p-3 mt-1">
+                    <MapPin className="w-5 h-5 text-ink" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-slate-900 mb-2">Location</h3>
-                    <p className="text-slate-700">Bengaluru, Karnataka, India</p>
+                    <h3 className="text-lg font-semibold text-ink mb-2">Location</h3>
+                    <p className="text-ink/80">Bengaluru, Karnataka, India</p>
                   </div>
                 </div>
               </div>
 
               <div className="mt-8">
-                <h3 className="text-lg font-semibold text-slate-900 mb-4">Follow Us</h3>
+                <h3 className="text-lg font-semibold text-ink mb-4">Follow Us</h3>
                 <div className="flex space-x-4">
                   <a 
                     href="https://www.linkedin.com/company/aitaxbot/" 
@@ -145,7 +145,7 @@ export default function Contact() {
                     className="bg-blue-100 hover:bg-blue-200 rounded-full p-3 transition-colors"
                     data-testid="link-linkedin"
                   >
-                    <Linkedin className="w-5 h-5 text-blue-600" />
+                    <Linkedin className="w-5 h-5 text-credit" />
                   </a>
                   <a 
                     href="https://www.instagram.com/aitaxbot/" 
@@ -161,11 +161,11 @@ export default function Contact() {
             </div>
 
             {/* Contact Form */}
-            <div className="bg-slate-50 rounded-lg p-8">
-              <h2 className="text-2xl font-semibold text-slate-900 mb-6">Send us a Message</h2>
+            <div className="bg-secondary rounded-lg p-8">
+              <h2 className="text-2xl font-semibold text-ink mb-6">Send us a Message</h2>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-2">
+                  <label htmlFor="name" className="block text-sm font-medium text-ink/80 mb-2">
                     Full Name *
                   </label>
                   <input
@@ -176,14 +176,14 @@ export default function Contact() {
                     value={formData.name}
                     onChange={handleChange}
                     disabled={contactMutation.isPending}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-persian-blue-500 focus:border-persian-blue-500 transition-colors disabled:opacity-50"
+                    className="w-full px-4 py-3 border border-rule rounded-lg focus:ring-2 focus:ring-ink focus:border-ink transition-colors disabled:opacity-50"
                     placeholder="Your full name"
                     data-testid="input-name"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
+                  <label htmlFor="email" className="block text-sm font-medium text-ink/80 mb-2">
                     Email Address *
                   </label>
                   <input
@@ -194,14 +194,14 @@ export default function Contact() {
                     value={formData.email}
                     onChange={handleChange}
                     disabled={contactMutation.isPending}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-persian-blue-500 focus:border-persian-blue-500 transition-colors disabled:opacity-50"
+                    className="w-full px-4 py-3 border border-rule rounded-lg focus:ring-2 focus:ring-ink focus:border-ink transition-colors disabled:opacity-50"
                     placeholder="your.email@example.com"
                     data-testid="input-email"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="subject" className="block text-sm font-medium text-slate-700 mb-2">
+                  <label htmlFor="subject" className="block text-sm font-medium text-ink/80 mb-2">
                     Subject
                   </label>
                   <input
@@ -211,14 +211,14 @@ export default function Contact() {
                     value={formData.subject}
                     onChange={handleChange}
                     disabled={contactMutation.isPending}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-persian-blue-500 focus:border-persian-blue-500 transition-colors disabled:opacity-50"
+                    className="w-full px-4 py-3 border border-rule rounded-lg focus:ring-2 focus:ring-ink focus:border-ink transition-colors disabled:opacity-50"
                     placeholder="How can we help you?"
                     data-testid="input-subject"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-slate-700 mb-2">
+                  <label htmlFor="message" className="block text-sm font-medium text-ink/80 mb-2">
                     Message *
                   </label>
                   <textarea
@@ -229,7 +229,7 @@ export default function Contact() {
                     value={formData.message}
                     onChange={handleChange}
                     disabled={contactMutation.isPending}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-persian-blue-500 focus:border-persian-blue-500 transition-colors resize-none disabled:opacity-50"
+                    className="w-full px-4 py-3 border border-rule rounded-lg focus:ring-2 focus:ring-ink focus:border-ink transition-colors resize-none disabled:opacity-50"
                     placeholder="Tell us about your question or feedback..."
                     data-testid="input-message"
                   ></textarea>
@@ -238,14 +238,14 @@ export default function Contact() {
                 <button
                   type="submit"
                   disabled={contactMutation.isPending}
-                  className="w-full bg-persian-blue-600 text-white px-6 py-3 rounded-lg hover:bg-persian-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-ink text-white px-6 py-3 rounded-lg hover:bg-ink transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                   data-testid="button-submit-contact"
                 >
                   {contactMutation.isPending ? 'Sending...' : 'Send Message'}
                 </button>
               </form>
 
-              <div className="mt-6 text-sm text-slate-500">
+              <div className="mt-6 text-sm text-ink/55">
                 <p>* Required fields</p>
                 <p className="mt-2">We typically respond within 24 hours during business days.</p>
               </div>
@@ -253,24 +253,24 @@ export default function Contact() {
           </div>
 
           {/* Additional Information */}
-          <div className="mt-12 bg-blue-50 rounded-lg p-8">
-            <h2 className="text-2xl font-semibold text-slate-900 mb-4">Frequently Asked Questions</h2>
+          <div className="mt-12 bg-secondary rounded-lg p-8">
+            <h2 className="text-2xl font-semibold text-ink mb-4">Frequently Asked Questions</h2>
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <h3 className="text-lg font-semibold text-slate-900 mb-2">Is AiTaxBot really free?</h3>
-                <p className="text-slate-700">Yes! All our calculators and tools are completely free to use with no hidden charges or subscriptions.</p>
+                <h3 className="text-lg font-semibold text-ink mb-2">Is AiTaxBot really free?</h3>
+                <p className="text-ink/80">Yes! All our calculators and tools are completely free to use with no hidden charges or subscriptions.</p>
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-slate-900 mb-2">How accurate are the calculations?</h3>
-                <p className="text-slate-700">Our calculations are based on the latest Indian tax laws and are designed by a Chartered Accountant for maximum accuracy.</p>
+                <h3 className="text-lg font-semibold text-ink mb-2">How accurate are the calculations?</h3>
+                <p className="text-ink/80">Our calculations are based on the latest Indian tax laws and are designed by a Chartered Accountant for maximum accuracy.</p>
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-slate-900 mb-2">Do you store my financial data?</h3>
-                <p className="text-slate-700">No, all calculations are performed locally in your browser. We don't store any of your financial information.</p>
+                <h3 className="text-lg font-semibold text-ink mb-2">Do you store my financial data?</h3>
+                <p className="text-ink/80">No, all calculations are performed locally in your browser. We don't store any of your financial information.</p>
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-slate-900 mb-2">Can you help with tax filing?</h3>
-                <p className="text-slate-700">We provide calculation tools and guidance. For actual tax filing, please consult with a qualified tax professional.</p>
+                <h3 className="text-lg font-semibold text-ink mb-2">Can you help with tax filing?</h3>
+                <p className="text-ink/80">We provide calculation tools and guidance. For actual tax filing, please consult with a qualified tax professional.</p>
               </div>
             </div>
           </div>

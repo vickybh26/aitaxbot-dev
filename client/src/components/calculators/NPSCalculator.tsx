@@ -177,21 +177,21 @@ export default function NPSCalculator() {
     <div className="space-y-6">
       {/* Input Card */}
       <Card className="p-6 shadow-soft">
-        <h2 className="text-xl font-bold text-slate-900 mb-6">NPS Calculator Inputs</h2>
+        <h2 className="text-xl font-bold text-ink mb-6">NPS Calculator Inputs</h2>
 
         {/* Regime Selector */}
-        <div className="mb-6 p-4 rounded-lg border border-slate-200 bg-slate-50">
-          <p className="text-sm font-medium text-slate-700 mb-2">Tax Regime</p>
+        <div className="mb-6 p-4 rounded-lg border border-rule bg-secondary">
+          <p className="text-sm font-medium text-ink/80 mb-2">Tax Regime</p>
           <div className="flex gap-2">
             <button
               onClick={() => { setRegime('new'); setResult(null); }}
-              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${regime === 'new' ? 'bg-blue-600 text-white' : 'bg-white border border-slate-300 text-slate-700 hover:bg-slate-50'}`}
+              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${regime === 'new' ? 'bg-ink text-white' : 'bg-card border border-rule text-ink/80 hover:bg-secondary'}`}
             >
               New Regime (Default)
             </button>
             <button
               onClick={() => { setRegime('old'); setResult(null); }}
-              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${regime === 'old' ? 'bg-blue-600 text-white' : 'bg-white border border-slate-300 text-slate-700 hover:bg-slate-50'}`}
+              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${regime === 'old' ? 'bg-ink text-white' : 'bg-card border border-rule text-ink/80 hover:bg-secondary'}`}
             >
               Old Regime
             </button>
@@ -211,7 +211,7 @@ export default function NPSCalculator() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
 
           <div>
-            <Label htmlFor="currentAge" className="text-sm font-medium text-slate-700 mb-1 block">
+            <Label htmlFor="currentAge" className="text-sm font-medium text-ink/80 mb-1 block">
               Current Age (years)
             </Label>
             <Input
@@ -223,11 +223,11 @@ export default function NPSCalculator() {
               onChange={(e) => setCurrentAge(Number(e.target.value))}
               className="w-full"
             />
-            <p className="text-xs text-slate-500 mt-1">Min 18, Max 59</p>
+            <p className="text-xs text-ink/55 mt-1">Min 18, Max 59</p>
           </div>
 
           <div>
-            <Label htmlFor="retirementAge" className="text-sm font-medium text-slate-700 mb-1 block">
+            <Label htmlFor="retirementAge" className="text-sm font-medium text-ink/80 mb-1 block">
               Retirement Age (years)
             </Label>
             <Input
@@ -239,11 +239,11 @@ export default function NPSCalculator() {
               onChange={(e) => setRetirementAge(Number(e.target.value))}
               className="w-full"
             />
-            <p className="text-xs text-slate-500 mt-1">NPS matures at 60, extendable to 75</p>
+            <p className="text-xs text-ink/55 mt-1">NPS matures at 60, extendable to 75</p>
           </div>
 
           <div>
-            <Label htmlFor="monthlyContribution" className="text-sm font-medium text-slate-700 mb-1 block">
+            <Label htmlFor="monthlyContribution" className="text-sm font-medium text-ink/80 mb-1 block">
               Your Monthly Contribution (₹)
             </Label>
             <Input
@@ -255,11 +255,11 @@ export default function NPSCalculator() {
               onChange={(e) => setMonthlyContribution(Number(e.target.value))}
               className="w-full"
             />
-            <p className="text-xs text-slate-500 mt-1">Minimum ₹500/month for Tier I</p>
+            <p className="text-xs text-ink/55 mt-1">Minimum ₹500/month for Tier I</p>
           </div>
 
           <div>
-            <Label htmlFor="employerContribution" className="text-sm font-medium text-slate-700 mb-1 block">
+            <Label htmlFor="employerContribution" className="text-sm font-medium text-ink/80 mb-1 block">
               Employer Monthly Contribution (₹)
             </Label>
             <Input
@@ -271,7 +271,7 @@ export default function NPSCalculator() {
               onChange={(e) => setEmployerContribution(Number(e.target.value))}
               className="w-full"
             />
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-ink/55 mt-1">
               Leave 0 if self-employed.{" "}
               {regime === 'new'
                 ? <span className="text-green-700 font-medium">New Regime: deductible up to 14% of salary for all employers (ITA 2025, S.124(2)).</span>
@@ -281,7 +281,7 @@ export default function NPSCalculator() {
           </div>
 
           <div>
-            <Label htmlFor="expectedReturn" className="text-sm font-medium text-slate-700 mb-1 block">
+            <Label htmlFor="expectedReturn" className="text-sm font-medium text-ink/80 mb-1 block">
               Expected Annual Return (%)
             </Label>
             <Input
@@ -293,11 +293,11 @@ export default function NPSCalculator() {
               onChange={(e) => setExpectedReturn(Number(e.target.value))}
               className="w-full"
             />
-            <p className="text-xs text-slate-500 mt-1">Historical NPS equity: 10–12%</p>
+            <p className="text-xs text-ink/55 mt-1">Historical NPS equity: 10–12%</p>
           </div>
 
           <div>
-            <Label htmlFor="annuityRate" className="text-sm font-medium text-slate-700 mb-1 block">
+            <Label htmlFor="annuityRate" className="text-sm font-medium text-ink/80 mb-1 block">
               Expected Annuity Rate (%)
             </Label>
             <Input
@@ -309,14 +309,14 @@ export default function NPSCalculator() {
               onChange={(e) => setAnnuityRate(Number(e.target.value))}
               className="w-full"
             />
-            <p className="text-xs text-slate-500 mt-1">Current annuity rates: 5–7%</p>
+            <p className="text-xs text-ink/55 mt-1">Current annuity rates: 5–7%</p>
           </div>
 
           {/* Salary drives the percentage caps: 80CCD(1) is limited to 10% of
               salary and 80CCD(2) to 14%. Without it the tool could only apply
               the absolute ceilings, which overstated the benefit. */}
           <div>
-            <Label htmlFor="annualSalary" className="text-sm font-medium text-slate-700 mb-1 block">
+            <Label htmlFor="annualSalary" className="text-sm font-medium text-ink/80 mb-1 block">
               Annual Salary (Basic + DA)
             </Label>
             <Input
@@ -327,13 +327,13 @@ export default function NPSCalculator() {
               onChange={(e) => { setAnnualSalary(Number(e.target.value)); setResult(null); }}
               className="w-full"
             />
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-ink/55 mt-1">
               80CCD(1) is capped at 10% of this figure, and employer 80CCD(2) at 14%.
             </p>
           </div>
 
           <div>
-            <Label htmlFor="taxRate" className="text-sm font-medium text-slate-700 mb-1 block">
+            <Label htmlFor="taxRate" className="text-sm font-medium text-ink/80 mb-1 block">
               Your Marginal Tax Slab (%)
             </Label>
             <select
@@ -359,7 +359,7 @@ export default function NPSCalculator() {
                 </>
               )}
             </select>
-            <p className="text-xs text-slate-500 mt-1">Your top slab rate — used to estimate tax savings</p>
+            <p className="text-xs text-ink/55 mt-1">Your top slab rate — used to estimate tax savings</p>
           </div>
 
         </div>
@@ -380,7 +380,7 @@ export default function NPSCalculator() {
 
           {/* Main Result Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Card className="p-4 bg-gradient-to-br from-persian-blue-600 to-persian-blue-700 text-white">
+            <Card className="p-4 bg-gradient-to-br from-ink to-credit text-white">
               <p className="text-xs text-blue-100 mb-1">Total Corpus at {retirementAge}</p>
               <p className="text-xl font-bold">{formatCurrency(result.totalCorpus)}</p>
             </Card>
@@ -388,8 +388,8 @@ export default function NPSCalculator() {
               <p className="text-xs text-green-100 mb-1">Lump Sum (60%, Tax-Free)</p>
               <p className="text-xl font-bold">{formatCurrency(result.lumpSum)}</p>
             </Card>
-            <Card className="p-4 bg-gradient-to-br from-persian-blue-600 to-persian-blue-700 text-white">
-              <p className="text-xs text-persian-blue-100 mb-1">Monthly Pension (Est.)</p>
+            <Card className="p-4 bg-gradient-to-br from-ink to-credit text-white">
+              <p className="text-xs text-paper/80 mb-1">Monthly Pension (Est.)</p>
               <p className="text-xl font-bold">{formatCurrency(result.monthlyPension)}</p>
             </Card>
             <Card className="p-4 bg-gradient-to-br from-orange-500 to-orange-600 text-white">
@@ -403,34 +403,34 @@ export default function NPSCalculator() {
 
             {/* Corpus Breakdown */}
             <Card className="p-6 shadow-soft">
-              <h3 className="text-lg font-bold text-slate-900 mb-4">Corpus Breakdown</h3>
+              <h3 className="text-lg font-bold text-ink mb-4">Corpus Breakdown</h3>
               <div className="space-y-3">
-                <div className="flex justify-between items-center py-2 border-b border-slate-100">
-                  <span className="text-slate-600">Total Contributed</span>
-                  <span className="font-semibold text-slate-900">{formatCurrency(result.totalContributed)}</span>
+                <div className="flex justify-between items-center py-2 border-b border-rule">
+                  <span className="text-ink/65">Total Contributed</span>
+                  <span className="font-semibold text-ink">{formatCurrency(result.totalContributed)}</span>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-slate-100">
-                  <span className="text-slate-600">Returns Earned</span>
+                <div className="flex justify-between items-center py-2 border-b border-rule">
+                  <span className="text-ink/65">Returns Earned</span>
                   <span className="font-semibold text-green-600">{formatCurrency(result.totalReturns)}</span>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-slate-100 font-bold">
-                  <span className="text-slate-900">Total Corpus</span>
-                  <span className="text-blue-600">{formatCurrency(result.totalCorpus)}</span>
+                <div className="flex justify-between items-center py-2 border-b border-rule font-bold">
+                  <span className="text-ink">Total Corpus</span>
+                  <span className="text-credit">{formatCurrency(result.totalCorpus)}</span>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-slate-100">
-                  <span className="text-slate-600">Lump Sum (60%) — Tax-Free</span>
+                <div className="flex justify-between items-center py-2 border-b border-rule">
+                  <span className="text-ink/65">Lump Sum (60%) — Tax-Free</span>
                   <span className="font-semibold text-green-600">{formatCurrency(result.lumpSum)}</span>
                 </div>
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-slate-600">Annuity Corpus (40%)</span>
-                  <span className="font-semibold text-persian-blue-700">{formatCurrency(result.annuityCorpus)}</span>
+                  <span className="text-ink/65">Annuity Corpus (40%)</span>
+                  <span className="font-semibold text-ink">{formatCurrency(result.annuityCorpus)}</span>
                 </div>
               </div>
             </Card>
 
             {/* Chart */}
             <Card className="p-6 shadow-soft">
-              <h3 className="text-lg font-bold text-slate-900 mb-4">Investment vs Returns</h3>
+              <h3 className="text-lg font-bold text-ink mb-4">Investment vs Returns</h3>
               <div className="h-52">
                 <canvas ref={chartRef}></canvas>
               </div>
@@ -440,26 +440,26 @@ export default function NPSCalculator() {
 
           {/* Tax Saving Breakdown */}
           <Card className="p-6 shadow-soft border-l-4 border-l-green-500">
-            <h3 className="text-lg font-bold text-slate-900 mb-4">Annual Tax Savings Breakdown</h3>
+            <h3 className="text-lg font-bold text-ink mb-4">Annual Tax Savings Breakdown</h3>
             <div className={`grid gap-4 ${regime === 'new' ? 'md:grid-cols-1' : 'md:grid-cols-3'}`}>
               {regime === 'old' && (
                 <div className="bg-green-50 p-4 rounded-lg">
-                  <p className="text-xs text-slate-500 mb-1">80CCD(1) — Your NPS contribution</p>
+                  <p className="text-xs text-ink/55 mb-1">80CCD(1) — Your NPS contribution</p>
                   <p className="text-xl font-bold text-green-700">{formatCurrency(result.taxSaving80CCD1)}</p>
-                  <p className="text-xs text-slate-500 mt-1">Up to 10% of salary, within ₹1.5L 80C limit</p>
+                  <p className="text-xs text-ink/55 mt-1">Up to 10% of salary, within ₹1.5L 80C limit</p>
                 </div>
               )}
               {regime === 'old' && (
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <p className="text-xs text-slate-500 mb-1">80CCD(1B) — Extra NPS deduction</p>
-                  <p className="text-xl font-bold text-blue-700">{formatCurrency(result.taxSaving80CCD1B)}</p>
-                  <p className="text-xs text-slate-500 mt-1">Additional ₹50,000 over & above 80C</p>
+                <div className="bg-secondary p-4 rounded-lg">
+                  <p className="text-xs text-ink/55 mb-1">80CCD(1B) — Extra NPS deduction</p>
+                  <p className="text-xl font-bold text-ink">{formatCurrency(result.taxSaving80CCD1B)}</p>
+                  <p className="text-xs text-ink/55 mt-1">Additional ₹50,000 over & above 80C</p>
                 </div>
               )}
-              <div className="bg-persian-blue-50 p-4 rounded-lg">
-                <p className="text-xs text-slate-500 mb-1">80CCD(2) — Employer contribution</p>
-                <p className="text-xl font-bold text-persian-blue-800">{formatCurrency(result.taxSaving80CCD2)}</p>
-                <p className="text-xs text-slate-500 mt-1">
+              <div className="bg-paper p-4 rounded-lg">
+                <p className="text-xs text-ink/55 mb-1">80CCD(2) — Employer contribution</p>
+                <p className="text-xl font-bold text-ink">{formatCurrency(result.taxSaving80CCD2)}</p>
+                <p className="text-xs text-ink/55 mt-1">
                   {regime === 'new'
                     ? 'Available in New Regime — up to 14% of salary for ALL employers (S.124(2), ITA 2025)'
                     : 'Old Regime: up to 14% for Govt employees; 10% for private employers (S.124(1))'}
@@ -474,14 +474,14 @@ export default function NPSCalculator() {
                   ) * (taxRate / 100) * 1.04)} more in tax savings.
               </div>
             )}
-            <div className="mt-4 bg-slate-50 p-4 rounded-lg flex justify-between items-center">
-              <span className="font-semibold text-slate-900">Total Annual Tax Saving</span>
+            <div className="mt-4 bg-secondary p-4 rounded-lg flex justify-between items-center">
+              <span className="font-semibold text-ink">Total Annual Tax Saving</span>
               <span className="text-2xl font-bold text-green-600">{formatCurrency(result.totalTaxSaving)}</span>
             </div>
           </Card>
 
           {/* Investment Duration */}
-          <Card className="p-4 bg-blue-50 border border-blue-200">
+          <Card className="p-4 bg-secondary border border-rule">
             <p className="text-sm text-blue-800">
               <strong>Investment Duration:</strong> {retirementAge - currentAge} years &nbsp;|&nbsp;
               <strong>Total Months:</strong> {(retirementAge - currentAge) * 12} &nbsp;|&nbsp;

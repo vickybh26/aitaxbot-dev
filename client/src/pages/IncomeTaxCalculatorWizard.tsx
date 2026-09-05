@@ -31,16 +31,16 @@ export default function IncomeTaxCalculatorWizardPage() {
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
 
-      <div className="bg-white min-h-screen">
+      <div className="bg-card min-h-screen">
         <div className="max-w-xl mx-auto px-4 pt-4">
-          <nav className="flex items-center gap-1.5 text-xs text-neutral-500 mb-2" aria-label="Breadcrumb">
+          <nav className="flex items-center gap-1.5 text-xs text-ink/55 mb-2" aria-label="Breadcrumb">
             <Link href="/" className="hover:text-[hsl(var(--interactive-blue))]">Home</Link>
-            <span className="text-neutral-300">/</span>
+            <span className="text-ink/35">/</span>
             <Link href="/calculators" className="hover:text-[hsl(var(--interactive-blue))]">Calculators</Link>
-            <span className="text-neutral-300">/</span>
-            <span className="text-neutral-600 font-medium">Income Tax Wizard (Preview)</span>
+            <span className="text-ink/35">/</span>
+            <span className="text-ink/65 font-medium">Income Tax Wizard (Preview)</span>
           </nav>
-          <h1 className="text-lg font-semibold text-neutral-900">Income Tax Calculator — Step by Step (Preview)</h1>
+          <h1 className="text-lg font-semibold text-ink">Income Tax Calculator — Step by Step (Preview)</h1>
         </div>
         <section className="py-4 px-4">
           <TaxWizard />

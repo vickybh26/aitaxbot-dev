@@ -132,17 +132,17 @@ export default function Profile() {
         <meta name="robots" content="noindex" />
       </Helmet>
 
-      <div className="bg-slate-50 py-8 px-4">
+      <div className="bg-secondary py-8 px-4">
         <div className="max-w-2xl mx-auto space-y-6">
 
           {/* Header card */}
           <Card className="overflow-hidden">
-            <div className="bg-gradient-to-r from-persian-blue-600 to-persian-blue-700 px-6 py-8 text-white">
+            <div className="bg-gradient-to-r from-ink to-credit px-6 py-8 text-white">
               <div className="flex items-center gap-4">
                 {user?.photoURL ? (
                   <img src={user.photoURL} alt="Profile" className="w-16 h-16 rounded-full border-2 border-white/50" />
                 ) : (
-                  <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-2xl font-bold">
+                  <div className="w-16 h-16 rounded-full bg-card/20 flex items-center justify-center text-2xl font-bold">
                     {(userProfile?.firstName || user?.email || 'U')[0].toUpperCase()}
                   </div>
                 )}
@@ -152,7 +152,7 @@ export default function Profile() {
                   </h1>
                   <p className="text-blue-100 text-sm">{user?.email}</p>
                   {userProfile?.occupation && (
-                    <span className="inline-block mt-1 bg-white/20 text-white text-xs px-2 py-0.5 rounded-full">
+                    <span className="inline-block mt-1 bg-card/20 text-white text-xs px-2 py-0.5 rounded-full">
                       {OCCUPATIONS[userProfile.occupation] || userProfile.occupation}
                     </span>
                   )}
@@ -165,8 +165,8 @@ export default function Profile() {
                   <span>Profile completion</span>
                   <span>{completionPct}%</span>
                 </div>
-                <div className="h-2 bg-white/20 rounded-full overflow-hidden">
-                  <div className="h-full bg-white rounded-full transition-all duration-500" style={{ width: `${completionPct}%` }} />
+                <div className="h-2 bg-card/20 rounded-full overflow-hidden">
+                  <div className="h-full bg-card rounded-full transition-all duration-500" style={{ width: `${completionPct}%` }} />
                 </div>
                 {completionPct < 100 && (
                   <p className="text-blue-100 text-xs mt-1">Complete your profile to unlock personalised tax tips.</p>
@@ -272,7 +272,7 @@ export default function Profile() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-slate-600 mb-4">
+              <p className="text-sm text-ink/65 mb-4">
                 Permanently delete your AiTaxBot account and all associated personal data
                 (profile, saved calculation history, profile change logs). This cannot be
                 undone. Under India's Digital Personal Data Protection Act, 2023, you have
@@ -292,7 +292,7 @@ export default function Profile() {
       </div>
 
       <Dialog open={deleteOpen} onOpenChange={(open) => !deleting && setDeleteOpen(open)}>
-        <DialogContent className="max-w-md bg-white">
+        <DialogContent className="max-w-md bg-card">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-red-700">
               <AlertTriangle className="h-5 w-5" />
@@ -300,7 +300,7 @@ export default function Profile() {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
-            <p className="text-sm text-slate-700">
+            <p className="text-sm text-ink/80">
               You are about to <strong>permanently delete</strong> your AiTaxBot account
               and all data linked to it — profile, saved calculations, and profile history.
             </p>
@@ -327,10 +327,10 @@ export default function Profile() {
 function InfoRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
     <div className="flex items-center gap-3">
-      <div className="text-slate-500 shrink-0">{icon}</div>
+      <div className="text-ink/55 shrink-0">{icon}</div>
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-slate-500">{label}</p>
-        <p className="text-sm font-medium text-slate-900 truncate">{value}</p>
+        <p className="text-xs text-ink/55">{label}</p>
+        <p className="text-sm font-medium text-ink truncate">{value}</p>
       </div>
     </div>
   );

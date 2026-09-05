@@ -128,23 +128,23 @@ export default function CookieConsent() {
       aria-live="polite"
       data-nosnippet
     >
-      <div className="bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-2xl">
+      <div className="bg-card/95 backdrop-blur-md border-t border-rule shadow-2xl">
         <div className="max-w-7xl mx-auto px-4 py-6">
           {!showPreferences ? (
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div className="flex items-start gap-4 flex-1">
-                <Cookie className="w-8 h-8 text-persian-blue-600 flex-shrink-0 mt-1" />
+                <Cookie className="w-8 h-8 text-ink flex-shrink-0 mt-1" />
                 <div>
-                  <h3 className="font-semibold text-slate-900 mb-1">
+                  <h3 className="font-semibold text-ink mb-1">
                     We Value Your Privacy
                   </h3>
-                  <p className="text-sm text-slate-700 leading-relaxed">
+                  <p className="text-sm text-ink/80 leading-relaxed">
                     We use cookies to enhance your browsing experience, serve personalized ads or content, 
                     and analyze our traffic. By clicking "Accept All", you consent to our use of cookies. 
                     You can manage your preferences or learn more in our{" "}
                     <a 
                       href="/privacy-policy" 
-                      className="text-persian-blue-600 hover:text-persian-blue-700 underline font-medium"
+                      className="text-ink hover:text-credit underline font-medium"
                       data-testid="link-privacy-policy"
                     >
                       Privacy Policy
@@ -175,7 +175,7 @@ export default function CookieConsent() {
                 <Button
                   size="sm"
                   onClick={handleAcceptAll}
-                  className="bg-persian-blue-600 hover:bg-persian-blue-700 text-white text-sm"
+                  className="bg-ink hover:bg-ink text-white text-sm"
                   data-testid="button-accept-all"
                 >
                   Accept All
@@ -184,7 +184,7 @@ export default function CookieConsent() {
               
               <button
                 onClick={handleRejectNonEssential}
-                className="absolute top-4 right-4 text-slate-500 hover:text-slate-600 transition-colors"
+                className="absolute top-4 right-4 text-ink/55 hover:text-ink/65 transition-colors"
                 aria-label="Close"
                 data-testid="button-close-banner"
               >
@@ -195,19 +195,19 @@ export default function CookieConsent() {
             <div className="space-y-6">
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-4">
-                  <Cookie className="w-8 h-8 text-persian-blue-600 flex-shrink-0 mt-1" />
+                  <Cookie className="w-8 h-8 text-ink flex-shrink-0 mt-1" />
                   <div>
-                    <h3 className="font-semibold text-slate-900 mb-1">
+                    <h3 className="font-semibold text-ink mb-1">
                       Cookie Preferences
                     </h3>
-                    <p className="text-sm text-slate-600">
+                    <p className="text-sm text-ink/65">
                       Choose which types of cookies you want to allow
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={() => setShowPreferences(false)}
-                  className="text-slate-500 hover:text-slate-600 transition-colors"
+                  className="text-ink/55 hover:text-ink/65 transition-colors"
                   aria-label="Close"
                   data-testid="button-close-preferences"
                 >
@@ -217,19 +217,19 @@ export default function CookieConsent() {
 
               <div className="space-y-4">
                 {/* Essential Cookies */}
-                <div className="flex items-start gap-4 p-4 bg-slate-50 rounded-lg">
+                <div className="flex items-start gap-4 p-4 bg-secondary rounded-lg">
                   <input
                     type="checkbox"
                     checked={preferences.essential}
                     disabled
-                    className="mt-1 w-4 h-4 rounded border-slate-300"
+                    className="mt-1 w-4 h-4 rounded border-rule"
                     data-testid="checkbox-essential"
                   />
                   <div className="flex-1">
-                    <h4 className="font-semibold text-slate-900 mb-1">
+                    <h4 className="font-semibold text-ink mb-1">
                       Essential Cookies (Required)
                     </h4>
-                    <p className="text-sm text-slate-600">
+                    <p className="text-sm text-ink/65">
                       These cookies are necessary for the website to function and cannot be disabled. 
                       They enable basic functions like page navigation and access to secure areas.
                     </p>
@@ -237,19 +237,19 @@ export default function CookieConsent() {
                 </div>
 
                 {/* Analytics Cookies */}
-                <div className="flex items-start gap-4 p-4 bg-slate-50 rounded-lg">
+                <div className="flex items-start gap-4 p-4 bg-secondary rounded-lg">
                   <input
                     type="checkbox"
                     checked={preferences.analytics}
                     onChange={(e) => setPreferences({ ...preferences, analytics: e.target.checked })}
-                    className="mt-1 w-4 h-4 rounded border-slate-300 text-persian-blue-600 focus:ring-persian-blue-500"
+                    className="mt-1 w-4 h-4 rounded border-rule text-ink focus:ring-ink"
                     data-testid="checkbox-analytics"
                   />
                   <div className="flex-1">
-                    <h4 className="font-semibold text-slate-900 mb-1">
+                    <h4 className="font-semibold text-ink mb-1">
                       Analytics Cookies
                     </h4>
-                    <p className="text-sm text-slate-600">
+                    <p className="text-sm text-ink/65">
                       These cookies help us understand how visitors interact with our website 
                       (e.g., Google Analytics, Microsoft Clarity). This helps us improve our services.
                     </p>
@@ -257,19 +257,19 @@ export default function CookieConsent() {
                 </div>
 
                 {/* Advertising Cookies */}
-                <div className="flex items-start gap-4 p-4 bg-slate-50 rounded-lg">
+                <div className="flex items-start gap-4 p-4 bg-secondary rounded-lg">
                   <input
                     type="checkbox"
                     checked={preferences.advertising}
                     onChange={(e) => setPreferences({ ...preferences, advertising: e.target.checked })}
-                    className="mt-1 w-4 h-4 rounded border-slate-300 text-persian-blue-600 focus:ring-persian-blue-500"
+                    className="mt-1 w-4 h-4 rounded border-rule text-ink focus:ring-ink"
                     data-testid="checkbox-advertising"
                   />
                   <div className="flex-1">
-                    <h4 className="font-semibold text-slate-900 mb-1">
+                    <h4 className="font-semibold text-ink mb-1">
                       Advertising Cookies
                     </h4>
-                    <p className="text-sm text-slate-600">
+                    <p className="text-sm text-ink/65">
                       These cookies are used by Google AdSense and other advertising partners 
                       to display relevant ads based on your browsing history. You can opt out 
                       via{" "}
@@ -277,7 +277,7 @@ export default function CookieConsent() {
                         href="https://www.google.com/settings/ads" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="text-persian-blue-600 hover:underline"
+                        className="text-ink hover:underline"
                       >
                         Google Ads Settings
                       </a>.
@@ -286,7 +286,7 @@ export default function CookieConsent() {
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-3 justify-end pt-4 border-t border-slate-200">
+              <div className="flex flex-col sm:flex-row gap-3 justify-end pt-4 border-t border-rule">
                 <Button
                   variant="outline"
                   onClick={() => setShowPreferences(false)}
@@ -296,7 +296,7 @@ export default function CookieConsent() {
                 </Button>
                 <Button
                   onClick={handleSavePreferences}
-                  className="bg-persian-blue-600 hover:bg-persian-blue-700 text-white"
+                  className="bg-ink hover:bg-ink text-white"
                   data-testid="button-save-preferences"
                 >
                   Save Preferences

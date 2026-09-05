@@ -117,7 +117,7 @@ export default function RepatriationPlanner() {
               <h2 className="text-2xl font-bold text-red-900 mb-3">
                 You Can't Just Wire Money Abroad From Your NRO Account
               </h2>
-              <p className="text-slate-800 leading-relaxed">
+              <p className="text-ink leading-relaxed">
                 Many NRIs try to directly transfer large amounts from their NRO account abroad and get blocked by their bank. Under FEMA, NRO repatriation requires a CA-certified Form 15CB and online Form 15CA filing before the remittance. NRE account funds are freely repatriable with no paperwork. Missing this step causes transfers to be reversed and can attract scrutiny.
               </p>
             </div>
@@ -130,7 +130,7 @@ export default function RepatriationPlanner() {
         </div>
 
         {/* Interactive Calculator Section */}
-        <section className="bg-white border border-slate-200 rounded-lg p-8 mb-12 shadow-sm">
+        <section className="bg-card border border-rule rounded-lg p-8 mb-12 shadow-sm">
           <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
             <Globe className="text-amber-600" size={32} />
             Interactive Repatriation Calculator
@@ -139,11 +139,11 @@ export default function RepatriationPlanner() {
           <div className="grid md:grid-cols-2 gap-8">
             {/* Inputs */}
             <div className="space-y-6">
-              <h3 className="text-xl font-semibold mb-6 text-slate-900">Step 1: Enter Your Details</h3>
+              <h3 className="text-xl font-semibold mb-6 text-ink">Step 1: Enter Your Details</h3>
 
               {/* Source Account */}
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-3">Source Account Type</label>
+                <label className="block text-sm font-semibold text-ink/80 mb-3">Source Account Type</label>
                 <div className="space-y-2">
                   {["nro", "nre", "fcnr"].map((account) => (
                     <label key={account} className="flex items-center gap-3 cursor-pointer">
@@ -155,7 +155,7 @@ export default function RepatriationPlanner() {
                         onChange={(e) => setCalculator((prev) => ({ ...prev, sourceAccount: e.target.value as any }))}
                         className="w-4 h-4 text-amber-600"
                       />
-                      <span className="text-slate-700 font-medium">
+                      <span className="text-ink/80 font-medium">
                         {account === "nro" && "NRO Account (Non-Resident Ordinary)"}
                         {account === "nre" && "NRE Account (Non-Resident External)"}
                         {account === "fcnr" && "FCNR Account (Foreign Currency Non-Resident)"}
@@ -168,7 +168,7 @@ export default function RepatriationPlanner() {
               {/* Amount Input */}
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <label className="block text-sm font-semibold text-slate-700">Amount to Repatriate</label>
+                  <label className="block text-sm font-semibold text-ink/80">Amount to Repatriate</label>
                   <button
                     onClick={toggleCurrency}
                     className="text-xs font-semibold bg-amber-100 text-amber-700 px-3 py-1 rounded hover:bg-amber-200 transition-colors"
@@ -177,29 +177,29 @@ export default function RepatriationPlanner() {
                   </button>
                 </div>
                 <div className="relative">
-                  <span className="absolute left-4 top-3 text-slate-600 font-semibold">
+                  <span className="absolute left-4 top-3 text-ink/65 font-semibold">
                     {calculator.currencyMode === "inr" ? "₹" : "$"}
                   </span>
                   <input
                     type="number"
                     value={calculator.currencyMode === "inr" ? calculator.amountInr : calculator.amountUsd}
                     onChange={(e) => handleAmountChange(Number(e.target.value))}
-                    className="w-full pl-8 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                    className="w-full pl-8 pr-4 py-3 border border-rule rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                     placeholder="Enter amount"
                   />
                 </div>
-                <p className="text-xs text-slate-500 mt-2">
+                <p className="text-xs text-ink/55 mt-2">
                   Equivalent to: {calculator.currencyMode === "inr" ? `$${calculator.amountUsd.toLocaleString()}` : `₹${calculator.amountInr.toLocaleString()}`} (at {exchangeRate}/)
                 </p>
               </div>
 
               {/* Source of Funds */}
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-3">Source of Funds</label>
+                <label className="block text-sm font-semibold text-ink/80 mb-3">Source of Funds</label>
                 <select
                   value={calculator.sourceOfFunds}
                   onChange={(e) => setCalculator((prev) => ({ ...prev, sourceOfFunds: e.target.value }))}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-rule rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                 >
                   <option value="property-sale">Sale of property</option>
                   <option value="fd-maturity">NRO FD maturity</option>
@@ -219,7 +219,7 @@ export default function RepatriationPlanner() {
                     onChange={(e) => setCalculator((prev) => ({ ...prev, taxCleared: e.target.checked }))}
                     className="w-4 h-4 text-green-600 rounded"
                   />
-                  <span className="text-slate-700 font-medium">Taxes paid and cleared</span>
+                  <span className="text-ink/80 font-medium">Taxes paid and cleared</span>
                 </label>
               </div>
 
@@ -232,17 +232,17 @@ export default function RepatriationPlanner() {
                     onChange={(e) => setCalculator((prev) => ({ ...prev, caCertificateObtained: e.target.checked }))}
                     className="w-4 h-4 text-green-600 rounded"
                   />
-                  <span className="text-slate-700 font-medium">CA certificate (Form 15CB) obtained</span>
+                  <span className="text-ink/80 font-medium">CA certificate (Form 15CB) obtained</span>
                 </label>
               </div>
             </div>
 
             {/* Output Results */}
             <div className="space-y-6">
-              <h3 className="text-xl font-semibold mb-6 text-slate-900">Step 2: View Results</h3>
+              <h3 className="text-xl font-semibold mb-6 text-ink">Step 2: View Results</h3>
 
               {/* Account Type Info */}
-              <div className={`p-6 rounded-lg border-2 ${isNreOrFcnr ? "bg-green-50 border-green-300" : "bg-blue-50 border-blue-300"}`}>
+              <div className={`p-6 rounded-lg border-2 ${isNreOrFcnr ? "bg-green-50 border-green-300" : "bg-secondary border-blue-300"}`}>
                 {isNreOrFcnr ? (
                   <>
                     <div className="flex items-center gap-2 mb-4">
@@ -257,15 +257,15 @@ export default function RepatriationPlanner() {
                   </>
                 ) : (
                   <>
-                    <h4 className="text-lg font-bold text-blue-900 mb-4">NRO Account Repatriation Rules</h4>
+                    <h4 className="text-lg font-bold text-ink mb-4">NRO Account Repatriation Rules</h4>
                     <div className="space-y-3 text-blue-800">
                       <div>
                         <p className="text-sm font-semibold">Annual Limit</p>
-                        <p className="text-lg font-bold text-blue-900">${nroLimit.toLocaleString()} (≈ ₹{(nroLimit * exchangeRate).toLocaleString()})</p>
+                        <p className="text-lg font-bold text-ink">${nroLimit.toLocaleString()} (≈ ₹{(nroLimit * exchangeRate).toLocaleString()})</p>
                       </div>
                       <div>
                         <p className="text-sm font-semibold">Remaining This FY</p>
-                        <p className="text-lg font-bold text-blue-900">${(nroLimit - calculator.amountUsd).toLocaleString()}</p>
+                        <p className="text-lg font-bold text-ink">${(nroLimit - calculator.amountUsd).toLocaleString()}</p>
                       </div>
                       {exceedsNroLimit && (
                         <div className="bg-red-50 border border-red-300 p-3 rounded mt-3">
@@ -292,18 +292,18 @@ export default function RepatriationPlanner() {
               )}
 
               {/* Exchange Rate Info */}
-              <div className="bg-slate-50 p-6 rounded-lg border border-slate-200">
-                <h4 className="font-bold text-slate-900 mb-3">Exchange Rate Impact</h4>
-                <p className="text-slate-700 mb-2">Current rate: ₹{exchangeRate} per USD</p>
-                <p className="text-slate-700">
+              <div className="bg-secondary p-6 rounded-lg border border-rule">
+                <h4 className="font-bold text-ink mb-3">Exchange Rate Impact</h4>
+                <p className="text-ink/80 mb-2">Current rate: ₹{exchangeRate} per USD</p>
+                <p className="text-ink/80">
                   <strong>Your amount in USD:</strong> ${calculator.amountUsd.toLocaleString()}
                 </p>
               </div>
 
               {/* Timeline */}
-              <div className="bg-persian-blue-50 p-6 rounded-lg border border-persian-blue-200">
-                <h4 className="font-bold text-persian-blue-900 mb-3">Estimated Timeline</h4>
-                <p className="text-persian-blue-800">
+              <div className="bg-paper p-6 rounded-lg border border-rule">
+                <h4 className="font-bold text-ink mb-3">Estimated Timeline</h4>
+                <p className="text-ink">
                   {calculator.sourceAccount === "nro"
                     ? "3–7 working days after forms are submitted to bank"
                     : "3–7 working days for SWIFT transfer"}
@@ -326,15 +326,15 @@ export default function RepatriationPlanner() {
           </div>
 
           {/* Checklist */}
-          <div className="mt-10 pt-10 border-t border-slate-200">
-            <h3 className="text-xl font-bold mb-6 text-slate-900">Required Steps</h3>
+          <div className="mt-10 pt-10 border-t border-rule">
+            <h3 className="text-xl font-bold mb-6 text-ink">Required Steps</h3>
             <div className="grid md:grid-cols-2 gap-4">
               {getRequiredSteps().map((step, idx) => (
                 <div key={idx} className="flex items-start gap-3 p-4 bg-amber-50 rounded-lg border border-amber-200">
                   <div className="flex-shrink-0 w-8 h-8 bg-amber-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
                     {idx + 1}
                   </div>
-                  <span className="text-slate-800 font-medium pt-1">{step}</span>
+                  <span className="text-ink font-medium pt-1">{step}</span>
                 </div>
               ))}
             </div>
@@ -349,7 +349,7 @@ export default function RepatriationPlanner() {
             <div className="bg-green-50 border-2 border-green-300 rounded-lg p-8">
               <h3 className="text-2xl font-bold text-green-900 mb-4">NRE Account</h3>
               <p className="text-sm font-semibold text-green-700 mb-6">Freely Repatriable</p>
-              <ul className="space-y-3 text-slate-800">
+              <ul className="space-y-3 text-ink">
                 <li className="flex items-start gap-3">
                   <CheckCircle size={20} className="text-green-600 flex-shrink-0 mt-0.5" />
                   <span>No limit on amount</span>
@@ -377,56 +377,56 @@ export default function RepatriationPlanner() {
             </div>
 
             {/* NRO Account */}
-            <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-8">
-              <h3 className="text-2xl font-bold text-blue-900 mb-4">NRO Account</h3>
-              <p className="text-sm font-semibold text-blue-700 mb-6">Up to USD 1 Million/Year</p>
-              <ul className="space-y-3 text-slate-800">
+            <div className="bg-secondary border-2 border-blue-300 rounded-lg p-8">
+              <h3 className="text-2xl font-bold text-ink mb-4">NRO Account</h3>
+              <p className="text-sm font-semibold text-ink mb-6">Up to USD 1 Million/Year</p>
+              <ul className="space-y-3 text-ink">
                 <li className="flex items-start gap-3">
-                  <AlertCircle size={20} className="text-blue-600 flex-shrink-0 mt-0.5" />
+                  <AlertCircle size={20} className="text-credit flex-shrink-0 mt-0.5" />
                   <span>Combined limit: USD 1M per financial year (current + capital account)</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <AlertCircle size={20} className="text-blue-600 flex-shrink-0 mt-0.5" />
+                  <AlertCircle size={20} className="text-credit flex-shrink-0 mt-0.5" />
                   <span>Requires Form 15CB (CA certificate)</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <AlertCircle size={20} className="text-blue-600 flex-shrink-0 mt-0.5" />
+                  <AlertCircle size={20} className="text-credit flex-shrink-0 mt-0.5" />
                   <span>Form 15CA (online) must be filed</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <AlertCircle size={20} className="text-blue-600 flex-shrink-0 mt-0.5" />
+                  <AlertCircle size={20} className="text-credit flex-shrink-0 mt-0.5" />
                   <span>Tax must be paid/cleared before remittance</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <AlertCircle size={20} className="text-blue-600 flex-shrink-0 mt-0.5" />
+                  <AlertCircle size={20} className="text-credit flex-shrink-0 mt-0.5" />
                   <span>Forms required for each transaction</span>
                 </li>
               </ul>
             </div>
 
             {/* FCNR Account */}
-            <div className="bg-persian-blue-50 border-2 border-persian-blue-300 rounded-lg p-8">
-              <h3 className="text-2xl font-bold text-persian-blue-900 mb-4">FCNR Account</h3>
-              <p className="text-sm font-semibold text-persian-blue-800 mb-6">Freely Repatriable</p>
-              <ul className="space-y-3 text-slate-800">
+            <div className="bg-paper border-2 border-rule rounded-lg p-8">
+              <h3 className="text-2xl font-bold text-ink mb-4">FCNR Account</h3>
+              <p className="text-sm font-semibold text-ink mb-6">Freely Repatriable</p>
+              <ul className="space-y-3 text-ink">
                 <li className="flex items-start gap-3">
-                  <CheckCircle size={20} className="text-persian-blue-700 flex-shrink-0 mt-0.5" />
+                  <CheckCircle size={20} className="text-ink flex-shrink-0 mt-0.5" />
                   <span>Funds in foreign currency — seamless repatriation</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle size={20} className="text-persian-blue-700 flex-shrink-0 mt-0.5" />
+                  <CheckCircle size={20} className="text-ink flex-shrink-0 mt-0.5" />
                   <span>Principal and interest freely transferable</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle size={20} className="text-persian-blue-700 flex-shrink-0 mt-0.5" />
+                  <CheckCircle size={20} className="text-ink flex-shrink-0 mt-0.5" />
                   <span>No forms, no CA required</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle size={20} className="text-persian-blue-700 flex-shrink-0 mt-0.5" />
+                  <CheckCircle size={20} className="text-ink flex-shrink-0 mt-0.5" />
                   <span>Repatriate on maturity or anytime</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle size={20} className="text-persian-blue-700 flex-shrink-0 mt-0.5" />
+                  <CheckCircle size={20} className="text-ink flex-shrink-0 mt-0.5" />
                   <span>No exchange rate risk (already in foreign currency)</span>
                 </li>
               </ul>
@@ -437,7 +437,7 @@ export default function RepatriationPlanner() {
         {/* Step-by-Step Guide */}
         <section className="mb-12">
           <h2 className="text-3xl font-bold mb-8">Step-by-Step NRO Repatriation Guide</h2>
-          <div className="bg-slate-50 border border-slate-300 rounded-lg p-8">
+          <div className="bg-secondary border border-rule rounded-lg p-8">
             <div className="space-y-6">
               {[
                 {
@@ -478,14 +478,14 @@ export default function RepatriationPlanner() {
                     </div>
                   </div>
                   <div className="flex-1">
-                    <h4 className="text-lg font-bold text-slate-900 mb-2">{item.title}</h4>
-                    <p className="text-slate-700">{item.description}</p>
+                    <h4 className="text-lg font-bold text-ink mb-2">{item.title}</h4>
+                    <p className="text-ink/80">{item.description}</p>
                   </div>
                 </div>
               ))}
             </div>
-            <div className="mt-8 pt-8 border-t border-slate-300">
-              <p className="text-sm text-slate-700">
+            <div className="mt-8 pt-8 border-t border-rule">
+              <p className="text-sm text-ink/80">
                 <strong>Note:</strong> Remittances below ₹5 lakh (approximate) may not require Form 15CB — only Form 15CA. Confirm with your CA.
               </p>
             </div>
@@ -497,22 +497,22 @@ export default function RepatriationPlanner() {
           <h2 className="text-3xl font-bold mb-8">Worked Examples</h2>
           <div className="grid md:grid-cols-2 gap-8">
             {/* Example 1 */}
-            <div className="bg-white border-2 border-amber-300 rounded-lg p-8">
+            <div className="bg-card border-2 border-amber-300 rounded-lg p-8">
               <h3 className="text-2xl font-bold text-amber-900 mb-6 flex items-center gap-2">
                 <Send size={24} />
                 Example 1: Selling Indian Property
               </h3>
-              <div className="space-y-4 text-slate-800">
+              <div className="space-y-4 text-ink">
                 <div>
-                  <p className="font-semibold text-slate-900">Property sale proceeds</p>
+                  <p className="font-semibold text-ink">Property sale proceeds</p>
                   <p className="text-lg">₹80 lakh</p>
                 </div>
                 <div>
-                  <p className="font-semibold text-slate-900">TDS deducted by buyer @ 20%</p>
+                  <p className="font-semibold text-ink">TDS deducted by buyer @ 20%</p>
                   <p className="text-lg">₹16 lakh (deposited to govt)</p>
                 </div>
-                <div className="pt-4 border-t border-slate-200">
-                  <p className="font-semibold text-slate-900 mb-2">Steps:</p>
+                <div className="pt-4 border-t border-rule">
+                  <p className="font-semibold text-ink mb-2">Steps:</p>
                   <ul className="space-y-2 text-sm">
                     <li>• NRI files ITR, calculates actual LTCG tax</li>
                     <li>• Get refund of excess TDS (if any)</li>
@@ -521,7 +521,7 @@ export default function RepatriationPlanner() {
                     <li>• Submit to bank: ₹64 lakh + any refund sent abroad</li>
                   </ul>
                 </div>
-                <div className="pt-4 border-t border-slate-200 bg-amber-50 p-4 rounded">
+                <div className="pt-4 border-t border-rule bg-amber-50 p-4 rounded">
                   <p className="text-sm text-amber-900">
                     <strong>Note:</strong> Counted towards USD 1M annual NRO repatriation limit.
                   </p>
@@ -530,22 +530,22 @@ export default function RepatriationPlanner() {
             </div>
 
             {/* Example 2 */}
-            <div className="bg-white border-2 border-blue-300 rounded-lg p-8">
-              <h3 className="text-2xl font-bold text-blue-900 mb-6 flex items-center gap-2">
+            <div className="bg-card border-2 border-blue-300 rounded-lg p-8">
+              <h3 className="text-2xl font-bold text-ink mb-6 flex items-center gap-2">
                 <TrendingUp size={24} />
                 Example 2: NRO FD Maturity
               </h3>
-              <div className="space-y-4 text-slate-800">
+              <div className="space-y-4 text-ink">
                 <div>
-                  <p className="font-semibold text-slate-900">NRO FD maturity amount</p>
+                  <p className="font-semibold text-ink">NRO FD maturity amount</p>
                   <p className="text-lg">₹20 lakh</p>
                 </div>
                 <div>
-                  <p className="font-semibold text-slate-900">TDS on interest @ 30%</p>
+                  <p className="font-semibold text-ink">TDS on interest @ 30%</p>
                   <p className="text-lg">₹1.2 lakh (on ₹4L interest)</p>
                 </div>
-                <div className="pt-4 border-t border-slate-200">
-                  <p className="font-semibold text-slate-900 mb-2">Steps:</p>
+                <div className="pt-4 border-t border-rule">
+                  <p className="font-semibold text-ink mb-2">Steps:</p>
                   <ul className="space-y-2 text-sm">
                     <li>• Principal was own money (no additional tax)</li>
                     <li>• Form 15CB required (exceeds ₹5L threshold)</li>
@@ -554,8 +554,8 @@ export default function RepatriationPlanner() {
                     <li>• Transfer ₹20 lakh abroad</li>
                   </ul>
                 </div>
-                <div className="pt-4 border-t border-slate-200 bg-blue-50 p-4 rounded">
-                  <p className="text-sm text-blue-900">
+                <div className="pt-4 border-t border-rule bg-secondary p-4 rounded">
+                  <p className="text-sm text-ink">
                     <strong>Limit Status:</strong> Well within USD 1M annual limit.
                   </p>
                 </div>
@@ -609,7 +609,7 @@ export default function RepatriationPlanner() {
                   </div>
                   <div>
                     <h4 className="text-lg font-bold text-amber-900">{tip.title}</h4>
-                    <p className="text-slate-800 mt-2">{tip.description}</p>
+                    <p className="text-ink mt-2">{tip.description}</p>
                   </div>
                 </div>
               ))}
@@ -647,12 +647,12 @@ export default function RepatriationPlanner() {
                 a: "The bank will refuse to process the remittance. If you somehow bypass the bank, the foreign recipient's bank may flag the transfer as non-compliant with Indian tax regulations, leading to financial penalties, account freezes, or legal scrutiny from Indian tax authorities.",
               },
             ].map((faq, idx) => (
-              <details key={idx} className="bg-white border border-slate-200 rounded-lg p-6 group cursor-pointer hover:shadow-md transition-shadow">
-                <summary className="font-semibold text-slate-900 flex items-start justify-between">
+              <details key={idx} className="bg-card border border-rule rounded-lg p-6 group cursor-pointer hover:shadow-md transition-shadow">
+                <summary className="font-semibold text-ink flex items-start justify-between">
                   <span>{faq.q}</span>
-                  <ChevronRight size={20} className="text-slate-500 group-open:rotate-90 transition-transform flex-shrink-0 mt-1 ml-2" />
+                  <ChevronRight size={20} className="text-ink/55 group-open:rotate-90 transition-transform flex-shrink-0 mt-1 ml-2" />
                 </summary>
-                <p className="text-slate-700 mt-4">{faq.a}</p>
+                <p className="text-ink/80 mt-4">{faq.a}</p>
               </details>
             ))}
           </div>
@@ -690,12 +690,12 @@ export default function RepatriationPlanner() {
               },
             ].map((tool, idx) => (
               <Link key={idx} href={tool.link}>
-                <a className="block bg-white border border-slate-200 rounded-lg p-6 hover:shadow-lg hover:border-amber-400 transition-all">
+                <a className="block bg-card border border-rule rounded-lg p-6 hover:shadow-lg hover:border-amber-400 transition-all">
                   <div className="flex items-start gap-3 mb-3">
                     <BookOpen className="text-amber-600 flex-shrink-0 mt-1" size={24} />
-                    <h3 className="text-lg font-bold text-slate-900">{tool.title}</h3>
+                    <h3 className="text-lg font-bold text-ink">{tool.title}</h3>
                   </div>
-                  <p className="text-slate-700 text-sm">{tool.description}</p>
+                  <p className="text-ink/80 text-sm">{tool.description}</p>
                 </a>
               </Link>
             ))}

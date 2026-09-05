@@ -337,24 +337,24 @@ export default function Dashboard() {
       value: statsLoading ? "..." : (stats?.savedCalculations ?? 0).toString(),
       icon: FileText,
       change: stats?.savedCalculations ? "Stored for 30 days" : "Nothing saved yet",
-      color: "text-persian-blue-600",
-      bgColor: "bg-persian-blue-50"
+      color: "text-ink",
+      bgColor: "bg-paper"
     },
     {
       title: "Results Kept",
       value: statsLoading ? "..." : (stats?.savedResults ?? 0).toString(),
       icon: Layers,
       change: stats?.savedResults ? "Waiting on your dashboard" : "Run a tool to save one",
-      color: "text-persian-blue-700",
-      bgColor: "bg-persian-blue-50"
+      color: "text-ink",
+      bgColor: "bg-paper"
     },
     {
       title: "Active Days",
       value: statsLoading ? "..." : (stats?.activeDays ?? 0).toString(),
       icon: Activity,
       change: stats?.lastActivityAt ? `Last active ${getTimeAgo(stats.lastActivityAt)}` : "No activity yet",
-      color: "text-slate-600",
-      bgColor: "bg-slate-100"
+      color: "text-ink/65",
+      bgColor: "bg-secondary"
     }
   ];
 
@@ -367,8 +367,8 @@ export default function Dashboard() {
       change: stats.accounting.paidInvoices
         ? `${stats.accounting.paidInvoices} paid, ${stats.accounting.unpaidInvoices} pending`
         : "No invoices yet",
-      color: "text-slate-600",
-      bgColor: "bg-slate-100"
+      color: "text-ink/65",
+      bgColor: "bg-secondary"
     },
     {
       title: "Total Clients",
@@ -396,16 +396,16 @@ export default function Dashboard() {
       description: "Calculate income tax with old vs new regime comparison",
       icon: Calculator,
       link: "/calculators/income-tax",
-      color: "text-blue-600",
-      bgGradient: "from-blue-500 to-persian-blue-600"
+      color: "text-credit",
+      bgGradient: "from-blue-500 to-credit"
     },
     {
       title: "AIS Reconciliation",
       description: "Verify your income across AIS, 26AS & Form 16 before filing",
       icon: Layers,
       link: "/tools/ais-26as-form16",
-      color: "text-persian-blue-700",
-      bgGradient: "from-persian-blue-600 to-persian-blue-700",
+      color: "text-ink",
+      bgGradient: "from-ink to-credit",
       badge: "New"
     },
     {
@@ -413,8 +413,8 @@ export default function Dashboard() {
       description: `${blogPosts.length} CA-reviewed articles on ITR, HRA, capital gains & more`,
       icon: BookOpen,
       link: "/blog",
-      color: "text-persian-blue-700",
-      bgGradient: "from-persian-blue-600 to-persian-blue-700"
+      color: "text-ink",
+      bgGradient: "from-ink to-credit"
     },
     {
       title: "Find a CA",
@@ -440,17 +440,17 @@ export default function Dashboard() {
         <ProfileCompletionModal onClose={() => setShowProfileModal(false)} />
       )}
 
-      <div className="bg-gradient-to-br from-slate-50 to-blue-50">
+      <div className="bg-gradient-to-br from-paper to-blue-50">
       <div className="container mx-auto px-4 py-8">
 
         {/* Welcome Banner */}
         <div className="mb-8">
-          <div className="bg-gradient-to-r from-persian-blue-600 to-persian-blue-700 rounded-2xl p-6 text-white mb-4 flex items-center justify-between gap-4 flex-wrap">
+          <div className="bg-gradient-to-r from-ink to-credit rounded-2xl p-6 text-white mb-4 flex items-center justify-between gap-4 flex-wrap">
             <div className="flex items-center gap-4">
               {user?.photoURL ? (
                 <img src={user.photoURL} alt="Avatar" className="w-14 h-14 rounded-full border-2 border-white/40" />
               ) : (
-                <div className="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center text-2xl font-bold">
+                <div className="w-14 h-14 rounded-full bg-card/20 flex items-center justify-center text-2xl font-bold">
                   {(userProfile?.firstName || user?.email || 'U')[0].toUpperCase()}
                 </div>
               )}
@@ -462,7 +462,7 @@ export default function Dashboard() {
               </div>
             </div>
             <Link href="/profile">
-              <Button variant="outline" size="sm" className="bg-white/10 border-white/30 text-white hover:bg-white/20">
+              <Button variant="outline" size="sm" className="bg-card/10 border-white/30 text-white hover:bg-card/20">
                 <User className="w-4 h-4 mr-1" /> My Profile
               </Button>
             </Link>
@@ -523,29 +523,29 @@ export default function Dashboard() {
 
         {/* ── TAX SEASON CHECKLIST ── */}
         <div className="mb-8">
-          <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-            <CheckCircle className="w-5 h-5 text-blue-600" />
+          <h2 className="text-xl font-bold text-ink mb-4 flex items-center gap-2">
+            <CheckCircle className="w-5 h-5 text-credit" />
             Your ITR Filing Roadmap
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {[
-              { step: 1, title: "AIS Reconciliation", desc: "Verify your income matches AIS & Form 16", href: "/tools/ais-26as-form16", badge: "Start here", icon: Search, from: "from-persian-blue-600", to: "to-persian-blue-700" },
-              { step: 2, title: "Compare Regimes", desc: "Old vs New — find which saves you more", href: "/calculators/income-tax", badge: null, icon: Calculator, from: "from-blue-500", to: "to-persian-blue-600" },
-              { step: 3, title: "Claim Deductions", desc: "HRA, 80C, NPS, home loan — don't miss any", href: "/calculators/hra", badge: null, icon: Target, from: "from-persian-blue-600", to: "to-persian-blue-700" },
+              { step: 1, title: "AIS Reconciliation", desc: "Verify your income matches AIS & Form 16", href: "/tools/ais-26as-form16", badge: "Start here", icon: Search, from: "from-ink", to: "to-credit" },
+              { step: 2, title: "Compare Regimes", desc: "Old vs New — find which saves you more", href: "/calculators/income-tax", badge: null, icon: Calculator, from: "from-blue-500", to: "to-credit" },
+              { step: 3, title: "Claim Deductions", desc: "HRA, 80C, NPS, home loan — don't miss any", href: "/calculators/hra", badge: null, icon: Target, from: "from-ink", to: "to-credit" },
               { step: 4, title: "File ITR by Jul 31", desc: "Step-by-step guide for ITR-1 & ITR-4", href: "/blog/how-to-file-itr-1-online-fy-2025-26", badge: null, icon: FileText, from: "from-green-500", to: "to-green-600" },
             ].map(({ step, title, desc, href, badge, icon: Icon, from, to }) => (
               <Link key={step} href={href}>
-                <div className="group bg-white border border-slate-200 rounded-xl p-4 hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer h-full">
+                <div className="group bg-card border border-rule rounded-xl p-4 hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer h-full">
                   <div className="flex items-center gap-2 mb-2">
                     <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${from} ${to} flex items-center justify-center shrink-0`}>
                       <Icon className="w-3.5 h-3.5 text-white" />
                     </div>
-                    <span className="text-xs font-bold text-slate-500">Step {step}</span>
-                    {badge && <span className="ml-auto text-[10px] font-bold text-persian-blue-800 bg-persian-blue-50 border border-persian-blue-100 px-1.5 py-0.5 rounded-full">{badge}</span>}
+                    <span className="text-xs font-bold text-ink/55">Step {step}</span>
+                    {badge && <span className="ml-auto text-[10px] font-bold text-ink bg-paper border border-rule px-1.5 py-0.5 rounded-full">{badge}</span>}
                   </div>
-                  <p className="text-sm font-bold text-slate-900 mb-1">{title}</p>
-                  <p className="text-xs text-slate-500 leading-snug">{desc}</p>
-                  <div className="mt-3 flex items-center text-xs font-semibold text-blue-600 group-hover:gap-1.5 gap-1 transition-all">
+                  <p className="text-sm font-bold text-ink mb-1">{title}</p>
+                  <p className="text-xs text-ink/55 leading-snug">{desc}</p>
+                  <div className="mt-3 flex items-center text-xs font-semibold text-credit group-hover:gap-1.5 gap-1 transition-all">
                     Go <ChevronRight className="w-3 h-3" />
                   </div>
                 </div>
@@ -557,17 +557,17 @@ export default function Dashboard() {
         {/* ── TAX SAVING SCOPE (Prosperr-style) ── */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <h2 className="text-xl font-bold text-ink flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-green-600" />
               Your Tax Saving Scope
             </h2>
-            <span className="text-xs text-slate-500">Based on FY 2026-27 rules · 100% free</span>
+            <span className="text-xs text-ink/55">Based on FY 2026-27 rules · 100% free</span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               {
                 icon: PiggyBank, label: "Section 80C", color: "blue",
-                bg: "bg-blue-50", iconColor: "text-blue-600", border: "border-blue-100",
+                bg: "bg-secondary", iconColor: "text-credit", border: "border-rule",
                 amount: "₹1,50,000", sub: "ELSS · PPF · LIC · ULIP",
                 taxSaved: "Save up to ₹31,200 in tax",
                 href: "/calculators/income-tax", cta: "Calculate Now"
@@ -588,34 +588,34 @@ export default function Dashboard() {
               },
               {
                 icon: Layers, label: "AIS Reconciliation", color: "indigo",
-                bg: "bg-persian-blue-50", iconColor: "text-persian-blue-700", border: "border-persian-blue-100",
+                bg: "bg-paper", iconColor: "text-ink", border: "border-rule",
                 amount: "Avoid Notices", sub: "Match AIS · 26AS · Form 16",
                 taxSaved: "Spot mismatches before filing",
                 href: "/tools/ais-26as-form16", cta: "Run Free →", badge: "New"
               },
             ].map(({ icon: Icon, label, bg, iconColor, border, amount, sub, taxSaved, href, cta, badge }) => (
-              <div key={label} className={`bg-white border ${border} rounded-2xl p-5 flex flex-col gap-3`}>
+              <div key={label} className={`bg-card border ${border} rounded-2xl p-5 flex flex-col gap-3`}>
                 <div className="flex items-center justify-between">
                   <div className={`w-9 h-9 rounded-xl ${bg} flex items-center justify-center`}>
                     <Icon className={`w-4.5 h-4.5 ${iconColor}`} />
                   </div>
-                  {badge && <span className="text-[10px] font-bold text-persian-blue-800 bg-persian-blue-50 border border-persian-blue-100 px-1.5 py-0.5 rounded-full">{badge}</span>}
+                  {badge && <span className="text-[10px] font-bold text-ink bg-paper border border-rule px-1.5 py-0.5 rounded-full">{badge}</span>}
                 </div>
                 <div>
-                  <p className="text-xs font-semibold text-slate-500 mb-0.5">{label}</p>
-                  <p className="text-2xl font-black text-slate-900">{amount}</p>
-                  <p className="text-xs text-slate-500">{sub}</p>
+                  <p className="text-xs font-semibold text-ink/55 mb-0.5">{label}</p>
+                  <p className="text-2xl font-black text-ink">{amount}</p>
+                  <p className="text-xs text-ink/55">{sub}</p>
                 </div>
                 <p className="text-xs text-green-700 font-medium bg-green-50 rounded-lg px-2.5 py-1.5">{taxSaved}</p>
                 <Link href={href} className="mt-auto">
-                  <Button size="sm" variant="outline" className={`w-full text-xs font-semibold border-slate-200 hover:bg-slate-50`}>
+                  <Button size="sm" variant="outline" className={`w-full text-xs font-semibold border-rule hover:bg-secondary`}>
                     {cta}
                   </Button>
                 </Link>
               </div>
             ))}
           </div>
-          <p className="text-xs text-slate-500 mt-3">* Tax saved estimates based on 30% slab. Actual savings depend on your income & deductions.</p>
+          <p className="text-xs text-ink/55 mt-3">* Tax saved estimates based on 30% slab. Actual savings depend on your income & deductions.</p>
         </div>
 
         {/* Quick Stats */}
@@ -629,11 +629,11 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div>
-                  <p className="text-sm text-slate-600 mb-1">{stat.title}</p>
+                  <p className="text-sm text-ink/65 mb-1">{stat.title}</p>
                   {/* tabular-figures: the redesign uses IBM Plex's tabular
                       numerals so figures don't jitter or misalign between cards */}
-                  <p className="text-2xl font-bold text-slate-900 tabular-figures">{stat.value}</p>
-                  <p className="text-xs text-slate-500 mt-1">{stat.change}</p>
+                  <p className="text-2xl font-bold text-ink tabular-figures">{stat.value}</p>
+                  <p className="text-xs text-ink/55 mt-1">{stat.change}</p>
                 </div>
               </CardContent>
             </Card>
@@ -645,7 +645,7 @@ export default function Dashboard() {
             reading 0 / 0 / ₹0, which read as "the dashboard is broken". */}
         {accountingStats.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-lg font-bold text-slate-900 mb-4">Your Practice</h2>
+            <h2 className="text-lg font-bold text-ink mb-4">Your Practice</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {accountingStats.map((stat, index) => (
                 <Card key={index} className="hover:shadow-lg transition-shadow" data-testid={`stat-${stat.title.toLowerCase().replace(/\s+/g, '-')}`}>
@@ -656,9 +656,9 @@ export default function Dashboard() {
                       </div>
                     </div>
                     <div>
-                      <p className="text-sm text-slate-600 mb-1">{stat.title}</p>
-                      <p className="text-2xl font-bold text-slate-900 tabular-figures">{stat.value}</p>
-                      <p className="text-xs text-slate-500 mt-1">{stat.change}</p>
+                      <p className="text-sm text-ink/65 mb-1">{stat.title}</p>
+                      <p className="text-2xl font-bold text-ink tabular-figures">{stat.value}</p>
+                      <p className="text-xs text-ink/55 mt-1">{stat.change}</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -671,9 +671,9 @@ export default function Dashboard() {
         {/* Saved Tax Calculations */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-slate-900">Saved Tax Calculations</h2>
+            <h2 className="text-2xl font-bold text-ink">Saved Tax Calculations</h2>
             <Link href="/calculators/income-tax">
-              <Button variant="outline" className="text-blue-600 border-blue-600 hover:bg-blue-50">
+              <Button variant="outline" className="text-credit border-blue-600 hover:bg-secondary">
                 <Calculator className="h-4 w-4 mr-2" />
                 New Calculation
               </Button>
@@ -683,13 +683,13 @@ export default function Dashboard() {
             <CardContent className="p-6">
               {taxCalcLoading ? (
                 <div className="flex items-center justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+                  <Loader2 className="h-8 w-8 animate-spin text-credit" />
                 </div>
               ) : taxCalculations.length === 0 ? (
                 <div className="text-center py-12">
-                  <Calculator className="h-12 w-12 text-slate-500 mx-auto mb-4" />
-                  <p className="text-slate-600 mb-2">No saved calculations</p>
-                  <p className="text-sm text-slate-500 mb-4">Use the Income Tax Calculator and click "Save Calculation" to store your results here.</p>
+                  <Calculator className="h-12 w-12 text-ink/55 mx-auto mb-4" />
+                  <p className="text-ink/65 mb-2">No saved calculations</p>
+                  <p className="text-sm text-ink/55 mb-4">Use the Income Tax Calculator and click "Save Calculation" to store your results here.</p>
                   <Link href="/calculators/income-tax">
                     <Button variant="default">
                       Go to Tax Calculator
@@ -698,7 +698,7 @@ export default function Dashboard() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <p className="text-sm text-slate-500 mb-4">
+                  <p className="text-sm text-ink/55 mb-4">
                     Your last {taxCalculations.length} calculation{taxCalculations.length > 1 ? 's' : ''}. 
                     Calculations are automatically deleted after 30 days.
                   </p>
@@ -707,30 +707,30 @@ export default function Dashboard() {
                     return (
                       <div
                         key={calc.id}
-                        className="flex items-start gap-4 p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
+                        className="flex items-start gap-4 p-4 bg-secondary rounded-lg hover:bg-secondary transition-colors"
                         data-testid={`saved-calc-${calc.id}`}
                       >
                         <div className="p-2 rounded-lg bg-blue-100">
-                          <Calculator className="h-5 w-5 text-blue-600" />
+                          <Calculator className="h-5 w-5 text-credit" />
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
-                            <p className="font-semibold text-slate-900">
+                            <p className="font-semibold text-ink">
                               FY {calc.financialYear} (AY {calc.assessmentYear})
                             </p>
                             <span className={`px-2 py-0.5 text-xs rounded-full ${
                               calc.recommendedRegime === 'new' 
                                 ? 'bg-green-100 text-green-700' 
-                                : 'bg-blue-100 text-blue-700'
+                                : 'bg-blue-100 text-ink'
                             }`}>
                               {calc.recommendedRegime === 'new' ? 'New Regime' : 'Old Regime'} Recommended
                             </span>
                           </div>
-                          <p className="text-sm text-slate-600">
+                          <p className="text-sm text-ink/65">
                             Gross Income: ₹{parseFloat(calc.grossIncome).toLocaleString('en-IN')} • 
                             Tax Savings: ₹{parseFloat(calc.savings).toLocaleString('en-IN')}
                           </p>
-                          <div className="flex items-center gap-4 mt-1 text-xs text-slate-500">
+                          <div className="flex items-center gap-4 mt-1 text-xs text-ink/55">
                             <span className="flex items-center gap-1">
                               <Calendar className="h-3 w-3" />
                               Saved {formatDate(calc.createdAt)}
@@ -775,7 +775,7 @@ export default function Dashboard() {
 
         {/* Feature Cards */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-slate-900 mb-6">Quick Access</h2>
+          <h2 className="text-2xl font-bold text-ink mb-6">Quick Access</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {features.map((feature, index) => (
               <Link key={index} href={feature.link}>
@@ -784,14 +784,14 @@ export default function Dashboard() {
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
-                        <div className={`p-3 rounded-lg bg-slate-50 group-hover:scale-110 transition-transform`}>
+                        <div className={`p-3 rounded-lg bg-secondary group-hover:scale-110 transition-transform`}>
                           <feature.icon className={`h-6 w-6 ${feature.color}`} />
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
                             <CardTitle className="text-lg">{feature.title}</CardTitle>
                             {(feature as any).badge && (
-                              <span className="text-[10px] font-bold text-persian-blue-800 bg-persian-blue-50 border border-persian-blue-100 px-1.5 py-0.5 rounded-full">{(feature as any).badge}</span>
+                              <span className="text-[10px] font-bold text-ink bg-paper border border-rule px-1.5 py-0.5 rounded-full">{(feature as any).badge}</span>
                             )}
                           </div>
                           <CardDescription className="mt-1">
@@ -799,7 +799,7 @@ export default function Dashboard() {
                           </CardDescription>
                         </div>
                       </div>
-                      <ArrowRight className="h-5 w-5 text-slate-500 group-hover:translate-x-1 transition-transform" />
+                      <ArrowRight className="h-5 w-5 text-ink/55 group-hover:translate-x-1 transition-transform" />
                     </div>
                   </CardHeader>
                 </Card>
@@ -811,19 +811,19 @@ export default function Dashboard() {
         {/* Recent Calculator Activity */}
         <div>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-slate-900">Recent Calculator Activity</h2>
+            <h2 className="text-2xl font-bold text-ink">Recent Calculator Activity</h2>
           </div>
           <Card>
             <CardContent className="p-6">
               {toolUsageLoading ? (
                 <div className="flex items-center justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+                  <Loader2 className="h-8 w-8 animate-spin text-credit" />
                 </div>
               ) : toolUsageEvents.length === 0 ? (
                 <div className="text-center py-12">
-                  <Activity className="h-12 w-12 text-slate-500 mx-auto mb-4" />
-                  <p className="text-slate-600 mb-2">No calculator activity yet</p>
-                  <p className="text-sm text-slate-500">Use any calculator while logged in and your activity will appear here.</p>
+                  <Activity className="h-12 w-12 text-ink/55 mx-auto mb-4" />
+                  <p className="text-ink/65 mb-2">No calculator activity yet</p>
+                  <p className="text-sm text-ink/55">Use any calculator while logged in and your activity will appear here.</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -832,15 +832,15 @@ export default function Dashboard() {
                       key={event.id}
                       className="flex items-start gap-4 pb-3 border-b last:border-b-0 last:pb-0"
                     >
-                      <div className="p-2 rounded-lg bg-blue-50 shrink-0">
-                        <Calculator className="h-5 w-5 text-blue-600" />
+                      <div className="p-2 rounded-lg bg-secondary shrink-0">
+                        <Calculator className="h-5 w-5 text-credit" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-slate-900 truncate">{event.tool}</p>
+                        <p className="font-semibold text-ink truncate">{event.tool}</p>
                         {event.summary && (
-                          <p className="text-sm text-slate-600 mt-0.5 truncate">{event.summary}</p>
+                          <p className="text-sm text-ink/65 mt-0.5 truncate">{event.summary}</p>
                         )}
-                        <p className="text-xs text-slate-500 mt-0.5">{getTimeAgo(event.createdAt)}</p>
+                        <p className="text-xs text-ink/55 mt-0.5">{getTimeAgo(event.createdAt)}</p>
                       </div>
                     </div>
                   ))}
@@ -882,25 +882,25 @@ export default function Dashboard() {
 
           return (
             <div className="mb-8">
-              <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-blue-600" />
+              <h2 className="text-lg font-bold text-ink mb-4 flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-credit" />
                 {fyLabel}
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 {events.map((item, i) => (
-                  <div key={i} className={`bg-white rounded-xl border p-3 flex items-start gap-3 ${item.past ? 'opacity-60' : ''}`}>
+                  <div key={i} className={`bg-card rounded-xl border p-3 flex items-start gap-3 ${item.past ? 'opacity-60' : ''}`}>
                     <div className={`shrink-0 w-9 h-9 rounded-lg flex items-center justify-center text-white text-xs font-bold
                       ${item.past        ? 'bg-green-500'  :
                         item.color === 'amber'  ? 'bg-amber-500'  :
-                        item.color === 'blue'   ? 'bg-blue-600'   :
-                        item.color === 'purple' ? 'bg-persian-blue-700' :
-                        item.color === 'indigo' ? 'bg-persian-blue-700' : 'bg-red-500'}`}>
+                        item.color === 'blue'   ? 'bg-ink'   :
+                        item.color === 'purple' ? 'bg-ink' :
+                        item.color === 'indigo' ? 'bg-ink' : 'bg-red-500'}`}>
                       {item.past ? '✓' : <Calendar className="w-4 h-4" />}
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-slate-900">{item.display}</p>
-                      <p className="text-xs font-semibold text-slate-700">{item.label}</p>
-                      <p className="text-xs text-slate-500 leading-tight">{item.sub}</p>
+                      <p className="text-xs font-bold text-ink">{item.display}</p>
+                      <p className="text-xs font-semibold text-ink/80">{item.label}</p>
+                      <p className="text-xs text-ink/55 leading-tight">{item.sub}</p>
                     </div>
                   </div>
                 ))}

@@ -147,8 +147,8 @@ export default function AdminCAs() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">CA Directory</h1>
-            <p className="text-slate-500 text-sm mt-1">
+            <h1 className="text-2xl font-bold text-ink">CA Directory</h1>
+            <p className="text-ink/55 text-sm mt-1">
               Review and approve CA profile registrations
             </p>
           </div>
@@ -159,15 +159,15 @@ export default function AdminCAs() {
         </div>
 
         {/* Status tabs */}
-        <div className="flex gap-2 border-b border-slate-200">
+        <div className="flex gap-2 border-b border-rule">
           {TABS.map((t) => (
             <button
               key={t.key}
               onClick={() => setActiveTab(t.key)}
               className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === t.key
-                  ? "border-blue-600 text-blue-700"
-                  : "border-transparent text-slate-500 hover:text-slate-700"
+                  ? "border-blue-600 text-ink"
+                  : "border-transparent text-ink/55 hover:text-ink/80"
               }`}
             >
               {t.label}
@@ -177,47 +177,47 @@ export default function AdminCAs() {
 
         {/* Table */}
         {isLoading ? (
-          <div className="flex items-center justify-center py-20 text-slate-500">
+          <div className="flex items-center justify-center py-20 text-ink/55">
             <RefreshCw className="h-5 w-5 animate-spin mr-2" /> Loading…
           </div>
         ) : cas.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-slate-500 gap-2">
+          <div className="flex flex-col items-center justify-center py-20 text-ink/55 gap-2">
             <Users className="h-10 w-10 opacity-40" />
             <p>No CA profiles found for this filter.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
+          <div className="overflow-x-auto rounded-lg border border-rule bg-card">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-100 bg-slate-50">
-                  <th className="px-4 py-3 text-left font-medium text-slate-600">Name</th>
-                  <th className="px-4 py-3 text-left font-medium text-slate-600">ICAI No.</th>
-                  <th className="px-4 py-3 text-left font-medium text-slate-600">City</th>
-                  <th className="px-4 py-3 text-left font-medium text-slate-600">Practice Areas</th>
-                  <th className="px-4 py-3 text-left font-medium text-slate-600">Submitted</th>
-                  <th className="px-4 py-3 text-left font-medium text-slate-600">Status</th>
-                  <th className="px-4 py-3 text-left font-medium text-slate-600">Actions</th>
+                <tr className="border-b border-rule bg-secondary">
+                  <th className="px-4 py-3 text-left font-medium text-ink/65">Name</th>
+                  <th className="px-4 py-3 text-left font-medium text-ink/65">ICAI No.</th>
+                  <th className="px-4 py-3 text-left font-medium text-ink/65">City</th>
+                  <th className="px-4 py-3 text-left font-medium text-ink/65">Practice Areas</th>
+                  <th className="px-4 py-3 text-left font-medium text-ink/65">Submitted</th>
+                  <th className="px-4 py-3 text-left font-medium text-ink/65">Status</th>
+                  <th className="px-4 py-3 text-left font-medium text-ink/65">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {cas.map((ca) => (
-                  <tr key={ca.id} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
-                    <td className="px-4 py-3 font-medium text-slate-900">{ca.fullName}</td>
-                    <td className="px-4 py-3 text-slate-600 font-mono text-xs">{ca.icaiMembershipNumber}</td>
-                    <td className="px-4 py-3 text-slate-600">{ca.city}, {ca.state}</td>
+                  <tr key={ca.id} className="border-b border-rule hover:bg-secondary transition-colors">
+                    <td className="px-4 py-3 font-medium text-ink">{ca.fullName}</td>
+                    <td className="px-4 py-3 text-ink/65 font-mono text-xs">{ca.icaiMembershipNumber}</td>
+                    <td className="px-4 py-3 text-ink/65">{ca.city}, {ca.state}</td>
                     <td className="px-4 py-3">
                       <div className="flex flex-wrap gap-1">
                         {(ca.practiceAreas ?? []).slice(0, 3).map((area) => (
-                          <span key={area} className="px-1.5 py-0.5 bg-blue-50 text-blue-700 rounded text-xs">
+                          <span key={area} className="px-1.5 py-0.5 bg-secondary text-ink rounded text-xs">
                             {area.replace(/_/g, " ")}
                           </span>
                         ))}
                         {(ca.practiceAreas ?? []).length > 3 && (
-                          <span className="text-slate-500 text-xs">+{ca.practiceAreas.length - 3}</span>
+                          <span className="text-ink/55 text-xs">+{ca.practiceAreas.length - 3}</span>
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-slate-500 text-xs">
+                    <td className="px-4 py-3 text-ink/55 text-xs">
                       {ca.createdAt ? new Date(ca.createdAt).toLocaleDateString("en-IN") : "—"}
                     </td>
                     <td className="px-4 py-3">
@@ -230,7 +230,7 @@ export default function AdminCAs() {
                         <button
                           title="View profile"
                           onClick={() => { setSelected(ca); setViewOpen(true); }}
-                          className="p-1 text-slate-500 hover:text-blue-600 transition-colors"
+                          className="p-1 text-ink/55 hover:text-credit transition-colors"
                         >
                           <Eye className="h-4 w-4" />
                         </button>
@@ -240,14 +240,14 @@ export default function AdminCAs() {
                               title="Approve"
                               onClick={() => approveMutation.mutate(ca.id)}
                               disabled={approveMutation.isPending}
-                              className="p-1 text-slate-500 hover:text-green-600 transition-colors disabled:opacity-40"
+                              className="p-1 text-ink/55 hover:text-green-600 transition-colors disabled:opacity-40"
                             >
                               <CheckCircle className="h-4 w-4" />
                             </button>
                             <button
                               title="Reject"
                               onClick={() => { setSelected(ca); setRejectOpen(true); }}
-                              className="p-1 text-slate-500 hover:text-red-600 transition-colors"
+                              className="p-1 text-ink/55 hover:text-red-600 transition-colors"
                             >
                               <XCircle className="h-4 w-4" />
                             </button>
@@ -257,7 +257,7 @@ export default function AdminCAs() {
                           <button
                             title="Delete permanently"
                             onClick={() => { setSelected(ca); setDeleteOpen(true); }}
-                            className="p-1 text-slate-500 hover:text-red-700 transition-colors"
+                            className="p-1 text-ink/55 hover:text-red-700 transition-colors"
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -274,7 +274,7 @@ export default function AdminCAs() {
 
       {/* View Profile Modal */}
       <Dialog open={viewOpen} onOpenChange={setViewOpen}>
-        <DialogContent className="max-w-lg bg-white">
+        <DialogContent className="max-w-lg bg-card">
           <DialogHeader>
             <DialogTitle>CA Profile — {selected?.fullName}</DialogTitle>
           </DialogHeader>
@@ -332,7 +332,7 @@ export default function AdminCAs() {
 
       {/* Delete Confirmation Modal */}
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <DialogContent className="max-w-md bg-white">
+        <DialogContent className="max-w-md bg-card">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-red-700">
               <AlertTriangle className="h-5 w-5" />
@@ -340,12 +340,12 @@ export default function AdminCAs() {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
-            <p className="text-sm text-slate-700">
+            <p className="text-sm text-ink/80">
               You are about to <strong>permanently delete</strong> the profile for:
             </p>
-            <div className="bg-slate-50 rounded-lg p-3 text-sm">
+            <div className="bg-secondary rounded-lg p-3 text-sm">
               <p className="font-semibold">{selected?.fullName}</p>
-              <p className="text-slate-500">ICAI: {selected?.icaiMembershipNumber} · {selected?.email}</p>
+              <p className="text-ink/55">ICAI: {selected?.icaiMembershipNumber} · {selected?.email}</p>
             </div>
             <p className="text-sm text-red-600 font-medium">
               This action cannot be undone. The CA will need to re-register if deleted by mistake.
@@ -366,12 +366,12 @@ export default function AdminCAs() {
 
       {/* Reject Modal */}
       <Dialog open={rejectOpen} onOpenChange={setRejectOpen}>
-        <DialogContent className="max-w-md bg-white">
+        <DialogContent className="max-w-md bg-card">
           <DialogHeader>
             <DialogTitle>Reject CA — {selected?.fullName}</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
-            <p className="text-sm text-slate-500">Provide a reason. This will be emailed to the CA.</p>
+            <p className="text-sm text-ink/55">Provide a reason. This will be emailed to the CA.</p>
             <Textarea
               aria-label="Reason for rejection"
               placeholder="e.g. ICAI membership number could not be verified. Please re-register with your valid membership details."
@@ -399,8 +399,8 @@ export default function AdminCAs() {
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex gap-3">
-      <span className="text-slate-500 w-32 shrink-0">{label}</span>
-      <span className="text-slate-900 font-medium">{value}</span>
+      <span className="text-ink/55 w-32 shrink-0">{label}</span>
+      <span className="text-ink font-medium">{value}</span>
     </div>
   );
 }

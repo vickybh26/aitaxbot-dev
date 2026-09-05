@@ -138,10 +138,10 @@ export default function TaxDownloadModal({
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={handleClose} />
 
       {/* Modal card */}
-      <div className="relative z-10 w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
+      <div className="relative z-10 w-full max-w-md bg-card rounded-2xl shadow-2xl overflow-hidden">
 
         {/* Gradient header */}
-        <div className="bg-gradient-to-r from-persian-blue-600 to-persian-blue-700 px-6 pt-6 pb-8">
+        <div className="bg-gradient-to-r from-ink to-credit px-6 pt-6 pb-8">
           <button
             onClick={handleClose}
             className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors"
@@ -160,7 +160,7 @@ export default function TaxDownloadModal({
                 Get your detailed tax<br />breakdown — free
               </h2>
               {summaryText && (
-                <p className="mt-3 text-sm text-blue-100 bg-white/10 rounded-lg px-3 py-2">
+                <p className="mt-3 text-sm text-blue-100 bg-card/10 rounded-lg px-3 py-2">
                   {summaryText}
                 </p>
               )}
@@ -198,12 +198,12 @@ export default function TaxDownloadModal({
           {/* ── Step: Form ── */}
           {step === "form" && (
             <form onSubmit={handleSubmit} className="space-y-4">
-              <p className="text-sm text-slate-500 -mt-1">
+              <p className="text-sm text-ink/55 -mt-1">
                 Enter your details and we'll email you the full breakdown — Old Regime vs New Regime, deductions, and more.
               </p>
 
               <div className="space-y-1">
-                <Label htmlFor="td-name" className="text-slate-700">
+                <Label htmlFor="td-name" className="text-ink/80">
                   Full Name <span className="text-red-500">*</span>
                 </Label>
                 <Input
@@ -212,12 +212,12 @@ export default function TaxDownloadModal({
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Rajesh Kumar"
                   autoComplete="name"
-                  className="border-slate-200 focus-visible:ring-blue-500"
+                  className="border-rule focus-visible:ring-blue-500"
                 />
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor="td-email" className="text-slate-700">
+                <Label htmlFor="td-email" className="text-ink/80">
                   Email Address <span className="text-red-500">*</span>
                 </Label>
                 <Input
@@ -227,12 +227,12 @@ export default function TaxDownloadModal({
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="rajesh@example.com"
                   autoComplete="email"
-                  className="border-slate-200 focus-visible:ring-blue-500"
+                  className="border-rule focus-visible:ring-blue-500"
                 />
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor="td-mobile" className="text-slate-700">
+                <Label htmlFor="td-mobile" className="text-ink/80">
                   Mobile Number <span className="text-red-500">*</span>
                 </Label>
                 <Input
@@ -242,7 +242,7 @@ export default function TaxDownloadModal({
                   onChange={(e) => setMobile(e.target.value)}
                   placeholder="9876543210"
                   autoComplete="tel"
-                  className="border-slate-200 focus-visible:ring-blue-500"
+                  className="border-rule focus-visible:ring-blue-500"
                 />
               </div>
 
@@ -252,12 +252,12 @@ export default function TaxDownloadModal({
                     type="checkbox"
                     checked={dataConsent}
                     onChange={(e) => setDataConsent(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 rounded border-slate-300"
+                    className="mt-0.5 h-4 w-4 rounded border-rule"
                     data-testid="checkbox-data-consent"
                   />
-                  <span className="text-xs text-slate-600">
+                  <span className="text-xs text-ink/65">
                     I agree to AiTaxBot's{" "}
-                    <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                    <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-credit hover:underline">
                       Privacy Policy
                     </a>{" "}
                     and consent to my name, email, and mobile number being used to send me
@@ -269,10 +269,10 @@ export default function TaxDownloadModal({
                     type="checkbox"
                     checked={marketingConsent}
                     onChange={(e) => setMarketingConsent(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 rounded border-slate-300"
+                    className="mt-0.5 h-4 w-4 rounded border-rule"
                     data-testid="checkbox-marketing-consent"
                   />
-                  <span className="text-xs text-slate-600">
+                  <span className="text-xs text-ink/65">
                     Also send me occasional tax tips and deadline reminders by email (optional).
                   </span>
                 </label>
@@ -285,7 +285,7 @@ export default function TaxDownloadModal({
               <Button
                 type="submit"
                 disabled={loading || !dataConsent}
-                className="w-full bg-persian-blue-700 hover:bg-persian-blue-800 text-white font-semibold py-2.5 disabled:opacity-50"
+                className="w-full bg-ink hover:bg-credit text-white font-semibold py-2.5 disabled:opacity-50"
               >
                 {loading ? (
                   <span className="flex items-center gap-2">
@@ -313,7 +313,7 @@ export default function TaxDownloadModal({
               </div>
 
               <a href={signInUrl}>
-                <Button className="w-full bg-persian-blue-700 hover:bg-persian-blue-800 text-white font-semibold">
+                <Button className="w-full bg-ink hover:bg-credit text-white font-semibold">
                   <LogIn className="h-4 w-4 mr-2" />
                   Sign In & Download
                 </Button>
@@ -321,10 +321,10 @@ export default function TaxDownloadModal({
 
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-slate-200" />
+                  <div className="w-full border-t border-rule" />
                 </div>
                 <div className="relative flex justify-center text-xs">
-                  <span className="bg-white px-2 text-slate-500">or</span>
+                  <span className="bg-card px-2 text-ink/55">or</span>
                 </div>
               </div>
 
@@ -336,7 +336,7 @@ export default function TaxDownloadModal({
                 Use a different email
               </Button>
 
-              <Button variant="ghost" onClick={handleClose} className="w-full text-slate-500 hover:text-slate-600">
+              <Button variant="ghost" onClick={handleClose} className="w-full text-ink/55 hover:text-ink/65">
                 Cancel
               </Button>
             </div>
@@ -351,25 +351,25 @@ export default function TaxDownloadModal({
                 </p>
               </div>
 
-              <div className="bg-gradient-to-br from-persian-blue-50 to-blue-50 border border-persian-blue-100 rounded-xl p-5 space-y-3">
-                <div className="flex items-center gap-2 text-persian-blue-800 font-semibold">
+              <div className="bg-gradient-to-br from-paper to-blue-50 border border-rule rounded-xl p-5 space-y-3">
+                <div className="flex items-center gap-2 text-ink font-semibold">
                   <Sparkles className="h-4 w-4" />
                   <span className="text-sm">Create your free AiTaxBot account</span>
                 </div>
-                <ul className="text-sm text-persian-blue-800 space-y-1 list-none pl-0">
+                <ul className="text-sm text-ink space-y-1 list-none pl-0">
                   <li className="flex items-center gap-2">✓ Save & revisit all your calculations</li>
                   <li className="flex items-center gap-2">✓ Get personalised tax-saving tips</li>
                   <li className="flex items-center gap-2">✓ Download PDFs directly — no form needed</li>
                 </ul>
                 <a href={signUpUrl}>
-                  <Button className="w-full bg-persian-blue-700 hover:bg-persian-blue-800 text-white font-semibold">
+                  <Button className="w-full bg-ink hover:bg-credit text-white font-semibold">
                     Create Free Account
                     <ArrowRight className="h-4 w-4 ml-2" />
                   </Button>
                 </a>
               </div>
 
-              <Button variant="ghost" onClick={handleClose} className="w-full text-slate-500 hover:text-slate-600">
+              <Button variant="ghost" onClick={handleClose} className="w-full text-ink/55 hover:text-ink/65">
                 Maybe later
               </Button>
             </div>
