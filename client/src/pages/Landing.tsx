@@ -1,113 +1,84 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { Helmet } from "react-helmet-async";
-import { useQuery } from "@tanstack/react-query";
 import {
-  Calculator,
+  FileSpreadsheet,
+  ShieldCheck,
+  House,
+  Receipt,
   TrendingUp,
-  ArrowRight,
-  FileText,
   PiggyBank,
-  Shield,
-  Zap,
-  Clock,
-  CheckCircle2,
-  Newspaper,
-  Home as HomeIcon,
-  Send,
-  Mail,
-  Phone,
-  MapPin,
-  Linkedin,
-  Instagram,
-  BookOpen,
-  BarChart2,
-  Users,
-  ChevronDown,
-  UserCheck,
-  Layers,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import logoImage from "@assets/aitaxbot-logo-lovable.png";
 import { trackPageView } from "@/lib/analytics";
 import { generateHomePageSchema } from "@/lib/structuredData";
-import { blogPosts } from "@/data/blogPosts";
-import { useTranslation } from "@/lib/i18n";
 import TaxCalculator from "@/components/calculators/TaxCalculator";
 import KeyDates from "@/components/KeyDates";
 import HRACalculator from "@/components/calculators/HRACalculator";
 import SIPCalculator from "@/components/calculators/SIPCalculator";
 import SWPCalculator from "@/components/calculators/SWPCalculator";
-import { SUCCESS, NAVY, INTERACTIVE, SLATE_200 } from "@/lib/chartColors";
-
-interface NewsItem {
-  title: string;
-  link: string;
-  source: string;
-  date: string;
-  snippet?: string;
-  thumbnail?: string;
-}
 
 interface LandingProps {
   activeModal?: string | null;
   setActiveModal?: (modal: string | null) => void;
 }
 
-const latestBlogPosts = [...blogPosts]
-  .reverse()
-  .slice(0, 3)
-  .map(p => ({
-    slug: p.slug,
-    title: p.metaTitle.replace(/\s*[|—–-]\s*AiTaxBot.*$/i, "").trim(),
-    readTime: `${p.readingTimeMinutes} min`,
-    tag: p.tags[0] || "General",
-  }));
-
 /**
- * This grid previously assigned nine different icon colours — blue, violet,
- * cyan, emerald, red, orange, navy, green, navy — to nine adjacent cards. A
- * rainbow inside a design system whose stated first principle is "trust through
- * restraint", and it broke the one hard rule in the palette: green means money
- * gained, so colouring "Find a Verified CA" green made the colour meaningless.
- *
- * Every card is now navy on a navy tint. Emphasis is carried by the "Popular"
- * and "New" badges, which is what badges are for — and with the colour noise
- * gone they actually stand out.
+ * This whole page is a word-for-word structural port of Lovable's homepage
+ * (clear-tax-answers.lovable.app, "Warm Ledger" extended layout, ported
+ * 2026-09-05 per explicit request to match it exactly, section for
+ * section, markup for markup). The one line drawn: numbers and factual
+ * claims are still ours, never theirs — see calcTax below and the two
+ * tool-card descriptions that were adjusted because the Lovable copy
+ * described behaviour our calculators don't actually have (noted inline).
  */
 const TOOLS = [
-  { icon: Calculator, name: "Income Tax Calculator",  desc: "Old vs New Regime, 87A rebate, cess — AY 2027-28 ready.",           href: "/calculators/income-tax",  badge: "Popular" },
-  { icon: HomeIcon,   name: "HRA Calculator",         desc: "Section 10(13A) — 8 metro cities, actual rent, IT Act 2025.",       href: "/calculators/hra"          },
-  { icon: TrendingUp, name: "SIP Calculator",         desc: "Project mutual fund corpus with annual step-ups.",                  href: "/calculators/sip"          },
-  { icon: PiggyBank,  name: "NPS Calculator",         desc: "Model retirement corpus + ₹50K extra deduction under 80CCD(1B).",   href: "/calculators/nps"          },
-  { icon: BarChart2,  name: "Trading Tax Calculator", desc: "STCG, LTCG and F&O tax for equity, MF, and VDA under IT Act 2025.", href: "/calculators/trading-tax"  },
-  { icon: FileText,   name: "Rent Receipt Generator", desc: "Generate stamped, AO-ready rent receipts as PDFs instantly.",       href: "/tools/rent-receipt"       },
-  { icon: Layers,     name: "AIS · 26AS · Form 16",   desc: "AI spots mismatches across all three documents before notices.",    href: "/tools/ais-26as-form16", badge: "New" },
-  { icon: UserCheck,  name: "Find a Verified CA",     desc: "Free introductions — capital gains, NRI filing, notice response.",  href: "/find-ca"                  },
-  { icon: BookOpen,   name: "Tax Guides & Blog",      desc: `${blogPosts.length} in-depth articles on ITR, HRA, capital gains, and IT Act 2025.`, href: "/blog"                     },
+  {
+    icon: FileSpreadsheet,
+    badge: "Core",
+    name: "Income Tax Computation",
+    desc: "Slab-by-slab working for both regimes, with surcharge, marginal relief, cess and the 87A rebate as separate lines.",
+    href: "/calculators/income-tax",
+  },
+  {
+    icon: ShieldCheck,
+    badge: "New",
+    name: "AIS · 26AS · Form 16",
+    desc: "Upload all three and see, line by line, where the department's records disagree with your salary certificate.",
+    href: "/tools/ais-26as-form16",
+  },
+  {
+    icon: House,
+    badge: null,
+    name: "HRA Exemption",
+    // Lovable's copy here read "computed month by month for mid-year rent or
+    // city changes" — our HRA calculator takes one annual figure, it doesn't
+    // do a monthly breakdown, so that claim would be false for this product.
+    // Replaced with what the calculator actually does.
+    desc: "The least-of-three test under Section 10(13A), with the 8-metro-city rule applied automatically.",
+    href: "/calculators/hra",
+  },
+  {
+    icon: Receipt,
+    badge: null,
+    name: "Rent Receipt Generator",
+    desc: "Dated, numbered receipts with landlord PAN handling, formatted the way payroll teams expect them.",
+    href: "/tools/rent-receipt",
+  },
+  {
+    icon: TrendingUp,
+    badge: null,
+    name: "SIP Projection",
+    desc: "Maturity value of a monthly investment plan, with the invested amount and gain separated.",
+    href: "/calculators/sip",
+  },
+  {
+    icon: PiggyBank,
+    badge: null,
+    name: "NPS Corpus & Annuity",
+    desc: "Corpus at 60, the annuity you can expect, and the extra ₹50,000 deduction under 80CCD(1B).",
+    href: "/calculators/nps",
+  },
 ] as const;
-
-/**
- * The ITR deadline shown in the banner and the reconciliation CTA.
- *
- * Computed, not hardcoded. The previous literal "July 31, 2026" was still on
- * the page in September 2026 — by then it was both in the past AND wrong for
- * the FY 2026-27 / AY 2027-28 framing used everywhere else on this page (that
- * AY's regular deadline is 31 Jul 2027). A hardcoded date on a tax site goes
- * stale silently and reads as an abandoned product.
- *
- * ITR calendar for a non-audit individual:
- *   FY ends 31 Mar -> regular return due 31 Jul of the AY
- *                  -> belated/revised return due 31 Dec of the AY
- * So from 1 Aug to 31 Dec the only live deadline is the belated one for the
- * year just ended, which is exactly what a visitor in that window needs.
- */
-function itrDeadline(now: Date = new Date()): { label: string; date: string } {
-  const y = now.getFullYear();
-  // getMonth() is 0-indexed: 6 = July.
-  if (now.getMonth() <= 6) return { label: "ITR Deadline", date: `July 31, ${y}` };
-  return { label: "Belated ITR Deadline", date: `December 31, ${y}` };
-}
 
 function slab(income: number, tiers: [number, number][]): number {
   let tax = 0, prev = 0;
@@ -135,31 +106,6 @@ function inr(n: number): string {
   return "₹" + Math.round(n).toLocaleString("en-IN");
 }
 
-const useCountUp = (target: number, duration = 900) => {
-  const [count, setCount] = useState(0);
-  const ref = useRef<HTMLDivElement>(null);
-  const started = useRef(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting && !started.current) {
-        started.current = true;
-        const t0 = performance.now();
-        const tick = (now: number) => {
-          const p = Math.min((now - t0) / duration, 1);
-          setCount(Math.round(p * target));
-          if (p < 1) requestAnimationFrame(tick);
-        };
-        requestAnimationFrame(tick);
-      }
-    }, { threshold: 0.3 });
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [target, duration]);
-  return { count, ref };
-};
-
 const useAnimatedNumber = (target: number, duration = 600): number => {
   const [display, setDisplay] = useState(target);
   const prevRef = useRef(target);
@@ -182,94 +128,90 @@ const useAnimatedNumber = (target: number, duration = 600): number => {
   return display;
 };
 
-function SavingsCard() {
+function RegimeComparisonCard() {
   const [salary, setSalary] = useState(1500000);
   const result = calcTax(salary);
   const animSaving = useAnimatedNumber(result.saving);
-  const pct = ((salary - 300000) / (5000000 - 300000)) * 100;
+  const maxTax = Math.max(result.oldTax, result.newTax) || 1;
+  const oldPct = (result.oldTax / maxTax) * 100;
+  const newPct = (result.newTax / maxTax) * 100;
 
   return (
-    <div className="bg-white rounded-[1.75rem] border border-slate-200 overflow-hidden"
-      style={{ boxShadow: "0 20px 44px -16px rgba(15,42,74,0.28)" }}>
-      <div className="flex items-center justify-between px-5 py-4 bg-slate-50 border-b border-slate-200">
-        <div className="flex items-center gap-2">
-          <Calculator className="h-4 w-4 text-blue-600" />
-          <span className="text-sm font-bold text-slate-800">Tax Savings Calculator</span>
-        </div>
-        <span className="text-xs font-bold text-green-700 bg-green-50 border border-green-100 px-2.5 py-1 rounded-full">AY 2027-28</span>
+    <div className="bento p-6 sm:p-8">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 className="font-display text-xl font-bold sm:text-2xl">Regime comparison</h2>
+        <span className="rounded-full bg-secondary px-4 py-1.5 text-xs font-semibold text-ink/70">
+          FY 2026-27 · AY 2027-28
+        </span>
       </div>
-      <div className="p-5 space-y-4">
-        <div className="flex items-baseline justify-between">
-          <span className="text-sm text-slate-500">Annual gross income</span>
-          <span className="text-2xl font-black text-slate-900 tabular-nums">{inr(salary)}</span>
-        </div>
-        <div>
-          <input
-            type="range" min={300000} max={5000000} step={50000} value={salary}
-            onChange={e => setSalary(+e.target.value)}
-            className="w-full h-1.5 rounded-full appearance-none cursor-pointer"
-            style={{ background: `linear-gradient(90deg,${SUCCESS} 0%,${SUCCESS} ${pct}%,${SLATE_200} ${pct}%,${SLATE_200} 100%)` }}
-          />
-          <div className="flex justify-between text-xs text-slate-500 mt-1.5"><span>₹3L</span><span>₹50L</span></div>
-        </div>
-        <div className="rounded-2xl border border-slate-200 overflow-hidden divide-y divide-slate-100">
-          {([
-            { label: "New Regime", value: result.newTax, better: result.newBetter },
-            { label: "Old Regime", value: result.oldTax, better: !result.newBetter },
-          ] as const).map(({ label, value, better }) => (
-            <div key={label} className="flex items-center justify-between px-4 py-3 bg-white">
-              <span className="flex items-center gap-2 text-sm text-slate-600">
-                {label}
-                {better && <span className="text-[10px] font-bold text-green-700 bg-green-50 border border-green-100 px-1.5 py-0.5 rounded-full">SAVES MORE</span>}
-              </span>
-              <span className={cn("text-base font-semibold tabular-nums", better ? "text-green-700" : "text-slate-500 line-through")}>{inr(value)}</span>
+      <div className="mt-7 grid gap-6 md:grid-cols-2">
+        <div className="space-y-5">
+          <div>
+            <label htmlFor="savings-income" className="field-label mb-2 block">
+              Annual gross income
+            </label>
+            <div className="rounded-2xl bg-paper px-5 py-4">
+              <div className="tabular-figures font-display text-3xl font-bold leading-none">{inr(salary)}</div>
+              <input
+                id="savings-income"
+                type="range"
+                min={300000}
+                max={5000000}
+                step={50000}
+                value={salary}
+                onChange={(e) => setSalary(+e.target.value)}
+                className="mt-4 h-1.5 w-full cursor-pointer appearance-none rounded-full bg-secondary accent-credit"
+              />
+              <div className="mt-2 flex justify-between text-[11px] font-medium text-ink/45">
+                <span>₹3,00,000</span>
+                <span>₹50,00,000</span>
+              </div>
             </div>
-          ))}
+          </div>
+          <div className="rounded-2xl bg-paper p-5">
+            <div className="mb-3 flex items-center justify-between">
+              <span className="text-sm font-medium">Old regime tax</span>
+              <span className="tabular-figures font-display text-lg font-bold">{inr(result.oldTax)}</span>
+            </div>
+            <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
+              <div className="h-full rounded-full bg-ink transition-[width] duration-500" style={{ width: `${oldPct}%` }} />
+            </div>
+          </div>
         </div>
-        <div className="rounded-2xl p-5 text-white" style={{ background: `linear-gradient(135deg,${SUCCESS} 0%,hsl(161 94% 38%) 100%)` }}>
-          <div className="text-xs font-bold uppercase tracking-widest opacity-80 mb-1.5">You save vs the other regime</div>
-          <div className="text-4xl font-black tabular-nums leading-none tracking-tight">{inr(animSaving)}</div>
-          <div className="text-xs mt-2 opacity-80">Assumes ₹1.5L 80C claimed (Old Regime) · FY 2026-27</div>
+        <div className="flex flex-col justify-between gap-4">
+          <div className="rounded-[1.5rem] bg-credit p-7 text-paper">
+            <span className="mb-2 block text-[11px] font-bold uppercase tracking-[0.14em] text-paper/80">
+              Difference in your favour
+            </span>
+            <div className="tabular-figures font-display text-4xl font-extrabold leading-none">{inr(animSaving)}</div>
+            <p className="mt-2 text-sm text-paper/85">
+              By choosing the {result.newBetter ? "new" : "old"} regime · assumes ₹1,50,000 under 80C
+            </p>
+          </div>
+          <div className="rounded-2xl bg-paper p-5">
+            <div className="mb-3 flex items-center justify-between">
+              <span className="text-sm font-medium text-credit">New regime tax</span>
+              <span className="tabular-figures font-display text-lg font-bold text-credit">{inr(result.newTax)}</span>
+            </div>
+            <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
+              <div className="h-full rounded-full bg-credit transition-[width] duration-500" style={{ width: `${newPct}%` }} />
+            </div>
+          </div>
         </div>
-        <Link href="/calculators/income-tax"
-          className="flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl bg-persian-blue-700 hover:bg-persian-blue-800 text-white text-sm font-semibold transition-colors">
-          <Calculator className="h-4 w-4" />See full computation<ArrowRight className="h-4 w-4" />
-        </Link>
       </div>
+      <Link
+        href="/calculators/income-tax"
+        className="mt-6 inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-paper transition-colors hover:bg-ink/90"
+      >
+        See the full computation <span aria-hidden="true">→</span>
+      </Link>
     </div>
   );
 }
 
 export default function Landing({ activeModal, setActiveModal }: LandingProps) {
-  const { t } = useTranslation();
   useEffect(() => { trackPageView("/", "Home - AiTaxBot"); }, []);
-
-  const { data: marketNewsData, isLoading: newsLoading } = useQuery<{ news: NewsItem[] }>({
-    queryKey: ["/api/tax-news"],
-    refetchInterval: () => document.visibilityState === "visible" ? 7200000 : false,
-    refetchOnWindowFocus: false,
-  });
-
-  const { data: calcStatsData } = useQuery<{ count: number }>({
-    queryKey: ["/api/stats/calculations-count"],
-    refetchInterval: false, refetchOnWindowFocus: false, staleTime: 5 * 60 * 1000,
-  });
-  const calcCount = calcStatsData?.count ?? 0;
-  const calcCountDisplay = calcCount > 0 ? calcCount.toLocaleString("en-IN") + "+" : "10,000+";
   const closeModal = () => setActiveModal?.(null);
-
-  // Recomputed on each render; the banner therefore rolls over on its own
-  // rather than needing an annual edit that nobody remembers to make.
-  const deadline = itrDeadline();
-
-  const s1 = useCountUp(12);
-  const s2 = useCountUp(75);
-  // 11, not 18: nine calculators (income-tax, hra, sip, swp, pf, nps,
-  // home-loan, vehicle-loan, trading-tax) plus two document tools
-  // (rent-receipt, ais-26as-form16) — see the routes in App.tsx. The old "18+"
-  // was contradicted by the nine cards rendered further down the same page.
-  const s3 = useCountUp(11);
-  const s4 = useCountUp(5);
 
   return (
     <>
@@ -287,460 +229,108 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
         <script type="application/ld+json">{JSON.stringify(generateHomePageSchema())}</script>
       </Helmet>
 
-      <div className="min-h-screen bg-paper">
-
-        {/* Trust Ribbon */}
-        <div className="bg-slate-900 text-slate-300 text-xs py-2.5 overflow-x-auto">
-          <div className="max-w-7xl mx-auto px-4 flex items-center justify-center gap-5 whitespace-nowrap min-w-max">
-            <span className="flex items-center gap-1.5"><Shield className="h-3.5 w-3.5 text-green-400 flex-shrink-0" />CA-reviewed calculators</span>
-            <span className="text-slate-700">·</span>
-            <span className="flex items-center gap-1.5"><Zap className="h-3.5 w-3.5 text-blue-400 flex-shrink-0" />IT Act 2025 &amp; IT Act 1961 ready</span>
-            <span className="text-slate-700">·</span>
-            <span className="flex items-center gap-1.5 text-orange-300 font-semibold"><Clock className="h-3.5 w-3.5 text-orange-400 flex-shrink-0" />{deadline.label}: {deadline.date}</span>
-            <span className="text-slate-700">·</span>
-            {/* Was "Runs in browser — data never stored", which is not true for
-                a signed-in user: every calculation persists a saved result via
-                /api/tool-usage. One accurate claim, repeated verbatim on the
-                calculator badge and the result gate. */}
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-green-400 flex-shrink-0" />Nothing saved unless you sign in</span>
-          </div>
-        </div>
-
+      <div className="mx-auto grid max-w-[1180px] grid-cols-12 gap-5 px-5 py-10 sm:gap-6 lg:py-14">
         {/* Hero */}
-        <section className="relative bg-paper overflow-hidden">
-          <div className="absolute inset-0 opacity-[0.025] pointer-events-none" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, #94A3B8 1px, transparent 0)", backgroundSize: "24px 24px" }} />
-          <div className="relative max-w-7xl mx-auto px-4 py-16 lg:py-24">
-            <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-              <div>
-                <div className="mb-5">
-                  <span className="text-xs font-bold text-blue-600 uppercase tracking-widest bg-blue-50 border border-blue-100 px-3 py-1.5 rounded-full">
-                    FY 2026-27 · AY 2027-28 · IT Act 2025 Ready
-                  </span>
-                </div>
-                <h1 className="font-display text-4xl md:text-5xl font-extrabold text-slate-900 leading-[1.1] tracking-tight mb-5">
-                  {t("hero.headline").split("\n")[0]}
-                  <span className="block mt-2 text-blue-600">{t("hero.headline").split("\n")[1] ?? "Indian Taxpayers"}</span>
-                </h1>
-                <p className="text-base lg:text-lg text-slate-600 mb-8 leading-relaxed max-w-xl">{t("hero.subheadline")}</p>
-                {/* ONE primary action. This was three same-height buttons —
-                    Calculate, AIS Reconciliation, Find a CA — which split the
-                    hero three ways at the exact moment the funnel is weakest:
-                    /calculators/income-tax is the front door (391 of 464 views
-                    in the 2026-08-01 audit vs 67 for this page), yet 101 of 123
-                    registered users never completed a single calculation. The
-                    two demoted destinations are also the two with the least to
-                    show a first-time visitor — the reconciliation tool had 0
-                    lifetime uses and the CA directory has 1 listed CA — so they
-                    stay reachable as quiet links rather than competing for the
-                    click that activation actually depends on. */}
-                <div className="mb-8">
-                  <Link href="/calculators/income-tax" data-testid="button-calculate-tax"
-                    className="inline-flex items-center gap-2 bg-persian-blue-700 hover:bg-persian-blue-800 text-white font-semibold px-6 py-3.5 rounded-xl transition-colors text-sm">
-                    <Calculator className="h-4 w-4" />{t("hero.cta")}
-                  </Link>
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 -ml-1">
-                    <Link href="/tools/ais-26as-form16" data-testid="button-ais-recon"
-                      className="inline-flex items-center gap-1.5 px-1 py-3 text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">
-                      <Layers className="h-4 w-4 text-slate-400" />AIS Reconciliation
-                      <span className="text-[10px] font-bold text-blue-600 bg-blue-50 border border-blue-100 px-1.5 py-0.5 rounded-full">New</span>
-                    </Link>
-                    <Link href="/find-ca" data-testid="button-find-ca-hero"
-                      className="inline-flex items-center gap-1.5 px-1 py-3 text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">
-                      <UserCheck className="h-4 w-4 text-slate-400" />Find a CA
-                    </Link>
-                  </div>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    { icon: <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />, text: t("hero.ctaFree") },
-                    { icon: <Shield className="h-3.5 w-3.5 text-blue-500" />, text: "CA-reviewed" },
-                    { icon: <Zap className="h-3.5 w-3.5 text-blue-500" />, text: "AI-powered" },
-                    { icon: <BarChart2 className="h-3.5 w-3.5 text-orange-500" />, text: `${calcCountDisplay} calculations` },
-                  ].map(({ icon, text }) => (
-                    <span key={text} className="flex items-center gap-1.5 text-xs text-slate-600 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-full">
-                      {icon}{text}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              <div className="lg:pl-4 space-y-5">
-                <SavingsCard />
-                <KeyDates />
-              </div>
-            </div>
-          </div>
-        </section>
+        <div className="col-span-12 mb-2">
+          <span className="inline-flex items-center gap-2 rounded-full bg-secondary px-4 py-1.5 text-xs font-semibold text-ink/70">
+            <span className="h-1.5 w-1.5 rounded-full bg-credit" aria-hidden="true" />
+            For individual taxpayers · AY 2027-28
+          </span>
+          <h1 className="mt-5 max-w-3xl font-display text-[clamp(2.2rem,5vw,3.75rem)] font-extrabold leading-[1.08] tracking-tight">
+            Maximise your savings, <span className="text-credit">minus the complexity.</span>
+          </h1>
+          <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-ink/70">
+            Every figure on AiTaxBot arrives with the line of the Act behind it. Compare the old and
+            new regimes, reconcile your AIS against Form 16, and see exactly where each rupee of
+            liability comes from.
+          </p>
+        </div>
 
-        {/* Stat Spine */}
-        <div className="py-2">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-slate-200 rounded-[1.75rem] border border-slate-200 bg-white shadow-[0_12px_34px_-18px_rgba(15,42,74,0.25)]">
-              {[
-                { val: `₹${s1.count}L`,  label: "Zero tax limit",     sub: "New Regime FY 2026-27",     ref: s1.ref },
-                { val: `₹${s2.count}K`,  label: "Standard deduction", sub: "For salaried employees",    ref: s2.ref },
-                { val: `${s3.count}+`,         label: "Free tools",         sub: "Calculators & generators",  ref: s3.ref },
-                { val: `${s4.count} min`,       label: "Time to clarity",    sub: "ITR complexity decoded",    ref: s4.ref },
-              ].map(({ val, label, sub, ref }) => (
-                <div key={label} ref={ref} className="text-center px-6 py-8">
-                  <div className="font-display tabular-figures text-3xl font-extrabold text-slate-900 tracking-tight mb-1">{val}</div>
-                  <div className="text-sm font-semibold text-slate-700 mb-0.5">{label}</div>
-                  <div className="text-xs text-slate-500">{sub}</div>
+        {/* Regime comparison */}
+        <div className="col-span-12 lg:col-span-8">
+          <RegimeComparisonCard />
+        </div>
+
+        {/* Dates to watch */}
+        <div className="col-span-12 lg:col-span-4">
+          <KeyDates />
+        </div>
+
+        {/* Everything you need */}
+        <div className="col-span-12 mt-4 flex flex-wrap items-end justify-between gap-3">
+          <h2 className="font-display text-2xl font-bold">Everything you need</h2>
+          <Link href="/calculators" className="text-sm font-semibold text-credit underline-offset-4 hover:underline">
+            View all 11 tools →
+          </Link>
+        </div>
+
+        {/* Tools grid */}
+        <div className="col-span-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {TOOLS.map(({ icon: Icon, badge, name, desc, href }) => (
+            <Link
+              key={href}
+              href={href}
+              className="group rounded-[1.5rem] border border-rule bg-card p-6 transition-all hover:-translate-y-0.5 hover:border-credit hover:shadow-[0_16px_34px_-18px] hover:shadow-ink/40"
+            >
+              <div className="flex items-start justify-between">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-paper text-ink transition-colors group-hover:bg-credit/10 group-hover:text-credit">
+                  <Icon className="h-5 w-5" aria-hidden="true" />
                 </div>
-              ))}
+                {badge && (
+                  <span
+                    className={
+                      badge === "New"
+                        ? "rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.1em] bg-credit/10 text-credit"
+                        : "rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.1em] bg-secondary text-ink/60"
+                    }
+                  >
+                    {badge}
+                  </span>
+                )}
+              </div>
+              <h3 className="mt-5 font-display text-base font-bold">{name}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-ink/65">{desc}</p>
+            </Link>
+          ))}
+        </div>
+
+        {/* How the numbers are checked */}
+        <div className="col-span-12 mt-4 rounded-[2rem] border border-rule bg-card p-8 sm:p-10">
+          <h2 className="font-display text-2xl font-bold">How the numbers are checked</h2>
+          <div className="mt-7 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div>
+              <h3 className="font-display text-base font-bold">Reviewed by CAs</h3>
+              <p className="mt-2 text-sm leading-relaxed text-ink/65">
+                Each computation is signed off against the bare Act and the current Finance Act before it ships.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-display text-base font-bold">Both Acts supported</h3>
+              <p className="mt-2 text-sm leading-relaxed text-ink/65">
+                Income Tax Act 1961 and the Income Tax Act 2025 run side by side through the transition years.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-display text-base font-bold">Working shown</h3>
+              <p className="mt-2 text-sm leading-relaxed text-ink/65">
+                Slabs, surcharge, marginal relief and cess appear as separate lines you can audit.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-display text-base font-bold">Private by default</h3>
+              <p className="mt-2 text-sm leading-relaxed text-ink/65">
+                Calculations run in your browser as a guest. Once you sign in, your result and figures
+                are saved to your account automatically so your dashboard can show your history.
+              </p>
             </div>
           </div>
         </div>
-
-        {/* Tax News */}
-        {/* Hide the whole section unless the feed has enough genuinely relevant
-            items to look deliberate. Measured 2026-09-04: newsdata.io returned
-            10 items for the tax query and only ONE was Indian tax news — the
-            rest were Guidewire earnings, US Social Security, a Michigan land
-            sale, UiPath, and Premier League TV money. country=in does not
-            reliably filter to Indian publishers and the q match is loose, so
-            the server now drops off-topic items (server/routes.ts, tax-news).
-            That is the right call for accuracy but can leave one lonely card
-            under a "CA-reviewed" badge, which looks more broken than absent. */}
-        {(newsLoading || (marketNewsData?.news?.length ?? 0) >= 3) && (
-          <section className="py-10 border-t border-slate-100">
-            <div className="max-w-7xl mx-auto px-4">
-              <div className="flex items-center gap-2 mb-5">
-                <Newspaper className="h-5 w-5 text-blue-600" />
-                <h2 className="text-lg font-bold text-slate-900">Tax &amp; Finance News</h2>
-              </div>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {newsLoading
-                  ? Array.from({ length: 6 }).map((_, i) => <div key={i} className="animate-pulse bg-slate-100 rounded-xl p-4 h-20" />)
-                  : marketNewsData!.news.slice(0, 6).map((item: NewsItem, i: number) => (
-                    <a key={i} href={item.link} target="_blank" rel="noopener noreferrer"
-                      className="block p-4 bg-white rounded-xl border border-slate-200 hover:border-slate-300 hover:shadow-sm transition-all group"
-                      data-testid={`news-card-${i}`}>
-                      <h4 className="text-sm font-medium text-slate-800 group-hover:text-blue-600 transition-colors line-clamp-2 mb-2">{item.title}</h4>
-                      <div className="flex items-center justify-between text-xs text-slate-500">
-                        <span className="font-medium truncate max-w-[120px]">{item.source}</span>
-                        <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{item.date}</span>
-                      </div>
-                    </a>
-                  ))}
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* Blog Posts */}
-        <section className="py-16 lg:py-20">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <p className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-2">Tax Guides &amp; Blog</p>
-                <h2 className="font-display text-2xl font-extrabold text-slate-900 tracking-tight">Latest from AiTaxBot</h2>
-              </div>
-              <Link href="/blog" className="hidden sm:flex items-center gap-1.5 text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">
-                View all {blogPosts.length} guides <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {latestBlogPosts.map(post => (
-                <Link key={post.slug} href={`/blog/${post.slug}`}
-                  className="group block bg-white rounded-[1.5rem] border border-slate-200 hover:border-blue-200 hover:shadow-[0_16px_34px_-18px_rgba(15,42,74,0.4)] p-6 transition-all duration-200">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="text-xs bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full font-semibold border border-blue-100">{post.tag}</span>
-                    <span className="text-xs text-slate-500 flex items-center gap-1"><Clock className="h-3 w-3" />{post.readTime}</span>
-                  </div>
-                  <h3 className="text-base font-bold text-slate-900 group-hover:text-blue-600 transition-colors leading-snug line-clamp-2 mb-3">{post.title}</h3>
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-blue-600 group-hover:gap-2.5 transition-all">
-                    Read guide <ArrowRight className="h-3.5 w-3.5" />
-                  </div>
-                </Link>
-              ))}
-            </div>
-            <div className="mt-6 text-center sm:hidden">
-              <Link href="/blog" className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600">View all {blogPosts.length} guides <ArrowRight className="h-4 w-4" /></Link>
-            </div>
-          </div>
-        </section>
-
-        {/* Tools Section */}
-        <section className="py-16 lg:py-20">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="text-center mb-10">
-              <p className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-3">All Tools</p>
-              <h2 className="font-display text-3xl font-extrabold text-slate-900 tracking-tight mb-3">Everything you need for taxes &amp; investments</h2>
-              <p className="text-slate-500 max-w-xl mx-auto text-sm">Calculators, document tools, CA directory — all free, all built for India.</p>
-            </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {TOOLS.map(({ icon: Icon, name, desc, href, badge }: any) => (
-                <Link key={href} href={href}
-                  className="group flex gap-4 p-5 bg-white rounded-[1.5rem] border border-slate-200 hover:border-persian-blue-300 hover:shadow-[0_16px_34px_-18px_rgba(15,42,74,0.4)] transition-all duration-200">
-                  <div className="w-11 h-11 rounded-2xl bg-persian-blue-50 flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
-                    <Icon className="h-5 w-5 text-persian-blue-700" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors">{name}</span>
-                      {badge && <span className="text-[10px] font-bold text-blue-600 bg-blue-50 border border-blue-100 px-1.5 py-0.5 rounded-full">{badge}</span>}
-                    </div>
-                    <p className="text-xs text-slate-500 leading-relaxed">{desc}</p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* AIS Recon Dark Section */}
-        <section className="py-16 lg:py-20 bg-slate-900">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              <div>
-                <span className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-300 bg-blue-900/50 border border-blue-800 px-3 py-1.5 rounded-full mb-5">
-                  <Zap className="h-3 w-3" />AI-Powered Document Analysis
-                </span>
-                <h2 className="text-3xl lg:text-4xl font-bold text-white leading-tight tracking-tight mb-5">
-                  AIS · 26AS · Form 16
-                  <span className="block text-blue-400">Reconciliation in minutes</span>
-                </h2>
-                <p className="text-slate-300 leading-relaxed mb-8 text-sm lg:text-base">
-                  Upload all three PDFs. Our AI parses them in parallel, spots every mismatch, and flags which ones could trigger a notice — before you file.
-                </p>
-                <div className="space-y-3 mb-8">
-                  {[
-                    "Parses locked TRACES PDFs with AI — no manual entry",
-                    "Flags income mismatches and TDS discrepancies",
-                    "Classifies issues as Critical / Warning / Info",
-                    "AI summary explains each gap in plain language",
-                    "Download reconciliation report as PDF",
-                  ].map(check => (
-                    <div key={check} className="flex items-start gap-3">
-                      <CheckCircle2 className="h-5 w-5 text-green-400 flex-shrink-0 mt-0.5" />
-                      <span className="text-sm text-slate-300">{check}</span>
-                    </div>
-                  ))}
-                </div>
-                <Link href="/tools/ais-26as-form16"
-                  className="inline-flex items-center gap-2 bg-persian-blue-700 hover:bg-persian-blue-800 text-white font-semibold px-6 py-3.5 rounded-xl transition-colors text-sm">
-                  <Layers className="h-4 w-4" />Try AIS Reconciliation<ArrowRight className="h-4 w-4" />
-                </Link>
-              </div>
-              <div>
-                <div className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden">
-                  <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-700">
-                    <div className="flex gap-1.5">
-                      <div className="w-3 h-3 rounded-full bg-slate-600" />
-                      <div className="w-3 h-3 rounded-full bg-slate-600" />
-                      <div className="w-3 h-3 rounded-full bg-slate-600" />
-                    </div>
-                    <span className="text-xs text-slate-500 ml-2">AIS Reconciliation Report</span>
-                  </div>
-                  <div className="p-5 space-y-2.5">
-                    {[
-                      { label: "Gross Salary",    ais: "₹8,20,000", f16: "₹8,20,000", ok: true  },
-                      { label: "Interest (Bank)", ais: "₹12,400",   f16: "—",          ok: false },
-                      { label: "TDS Deducted",    ais: "₹82,000",   f16: "₹82,000",   ok: true  },
-                      { label: "Dividend Income", ais: "₹3,800",    f16: "—",          ok: false },
-                    ].map(({ label, ais, f16, ok }) => (
-                      <div key={label} className={cn("flex items-center justify-between px-3 py-2.5 rounded-lg text-xs", ok ? "bg-green-900/30 border border-green-800/50" : "bg-red-900/30 border border-red-800/50")}>
-                        <span className="text-slate-300 font-medium">{label}</span>
-                        <div className="flex items-center gap-3">
-                          <span className="text-slate-400 tabular-nums">{ais}</span>
-                          <span className="text-slate-400 tabular-nums">{f16}</span>
-                          <span className={cn("font-bold text-base leading-none", ok ? "text-green-400" : "text-red-400")}>{ok ? "✓" : "⚠"}</span>
-                        </div>
-                      </div>
-                    ))}
-                    <div className="pt-2 flex items-center justify-between text-xs border-t border-slate-700">
-                      <span className="text-red-400 font-semibold">2 discrepancies found</span>
-                      <span className="text-slate-500">AIS · 26AS · Form 16</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Find a CA */}
-        <section className="py-12 lg:py-16 bg-blue-50 border-t border-blue-100">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-8 justify-between">
-              <div>
-                <p className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-2">CA Directory</p>
-                <h2 className="text-2xl font-bold text-slate-900 tracking-tight mb-3">Need a CA for ITR filing?</h2>
-                <p className="text-slate-600 max-w-lg text-sm leading-relaxed">
-                  Connect with a verified, practicing Chartered Accountant near you — for complex ITR, capital gains, NRI filing, or notice responses. Free introduction.
-                </p>
-              </div>
-              <div className="flex-shrink-0">
-                <div className="space-y-2.5 mb-4">
-                  <div className="flex items-center gap-2 text-sm text-slate-700"><CheckCircle2 className="h-4 w-4 text-green-500" />ICAI-verified Chartered Accountants</div>
-                  <div className="flex items-center gap-2 text-sm text-slate-700"><CheckCircle2 className="h-4 w-4 text-green-500" />Free introduction — no platform fees</div>
-                  <div className="flex items-center gap-2 text-sm text-orange-700"><Clock className="h-4 w-4 text-orange-500" />{deadline.label}: {deadline.date} — act now</div>
-                </div>
-                <Link href="/find-ca"
-                  className="inline-flex items-center gap-2 bg-persian-blue-700 hover:bg-persian-blue-800 text-white font-semibold px-6 py-3.5 rounded-xl transition-colors text-sm">
-                  <UserCheck className="h-4 w-4" />Find a CA near you<ArrowRight className="h-4 w-4" />
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* CTA Band */}
-        <section className="py-14 lg:py-16" style={{ background: `linear-gradient(135deg,${NAVY} 0%,${INTERACTIVE} 100%)` }}>
-          <div className="max-w-7xl mx-auto px-4 text-center">
-            <h2 className="text-3xl font-bold text-white tracking-tight mb-3">Ready to file smarter?</h2>
-            <p className="text-white/80 mb-8 text-base max-w-xl mx-auto">Free calculators, CA-reviewed logic, AI document reconciliation — all in one place.</p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Link href="/calculators/income-tax"
-                className="inline-flex items-center gap-2 bg-white text-blue-700 hover:bg-slate-50 font-bold px-7 py-3.5 rounded-xl transition-colors text-sm">
-                <Calculator className="h-4 w-4" />Calculate My Tax
-              </Link>
-              <Link href="/tools/ais-26as-form16"
-                className="inline-flex items-center gap-2 bg-transparent border-2 border-white/40 hover:border-white/80 text-white font-bold px-7 py-3.5 rounded-xl transition-colors text-sm">
-                <Layers className="h-4 w-4" />Reconcile Documents
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        {/* How It Works */}
-        <section className="py-16 lg:py-20">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="text-center mb-10">
-              <p className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-3">How It Works</p>
-              <h2 className="text-2xl font-bold text-slate-900 tracking-tight">3 simple steps to your tax answer</h2>
-            </div>
-            <div className="grid md:grid-cols-3 gap-6">
-              {[
-                { num: "01", icon: <FileText className="h-6 w-6 text-blue-600" />,     bg: "bg-blue-50",    title: "Enter your income",  desc: "Input your salary, business, capital gains, or other income. Takes 10 seconds." },
-                { num: "02", icon: <Calculator className="h-6 w-6 text-emerald-600" />, bg: "bg-emerald-50", title: "Enter deductions",    desc: "Add 80C, HRA, home loan interest — only what applies to you." },
-                { num: "03", icon: <BarChart2 className="h-6 w-6 text-orange-500" />,   bg: "bg-orange-50",  title: "See your result",     desc: "Get a side-by-side Old vs New Regime comparison with personalized AI tax tips." },
-              ].map(({ num, icon, bg, title, desc }) => (
-                <div key={num} className="relative p-6 bg-white rounded-2xl border border-slate-200">
-                  <div className="text-6xl font-black text-slate-100 absolute top-4 right-4 leading-none select-none">{num}</div>
-                  <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center mb-4", bg)}>{icon}</div>
-                  <h3 className="text-base font-bold text-slate-900 mb-2">{title}</h3>
-                  <p className="text-sm text-slate-500 leading-relaxed">{desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* FAQ */}
-        <section className="py-16 border-t border-slate-100" id="faq">
-          <div className="max-w-4xl mx-auto px-4">
-            <div className="text-center mb-10">
-              <p className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-3">FAQ</p>
-              <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Frequently asked questions</h2>
-            </div>
-            <div className="space-y-3">
-              {[
-                { q: "Which regime — Old or New — is better for me?", a: "It depends on your deductions. If your total 80C + HRA + home loan deductions exceed ₹3.75 lakh, the Old Regime usually saves more. Below that threshold, the New Regime is typically better. Use our calculator above to get your exact answer in seconds." },
-                { q: "Is income up to ₹12 lakh really tax-free in FY 2026-27?", a: "Yes — under the New Regime for FY 2026-27, the rebate under Section 87A has been enhanced so that taxpayers with net taxable income up to ₹12 lakh pay zero tax. The ₹75,000 standard deduction means a salaried person earning up to ₹12.75 lakh pays no tax." },
-                { q: "What is the 87A rebate and am I eligible?", a: "Section 87A gives a full rebate on tax if your net taxable income is within the specified limit (₹12 lakh under New Regime for FY 2026-27). Our calculator automatically applies this rebate and shows you whether you qualify." },
-                { q: "Can I switch between Old and New Regime every year?", a: "Salaried individuals with no business income can choose their regime every year at the time of filing. If you have business or professional income, you can switch only once. Our calculator shows you both options so you can decide each year." },
-                { q: "Is the data I enter in the calculator saved anywhere?", a: "It depends on whether you are signed in. As a guest, the calculation runs entirely in your browser and nothing is sent to us. Once you sign in, we save the result and the figures you entered to your account, so your dashboard can show your history — that is what makes saved calculations work. We never store the documents you upload to the reconciliation tool, and you can delete your account and everything in it at any time from your profile." },
-                { q: "How is AY (Assessment Year) different from FY (Financial Year)?", a: "Financial Year (FY) is when you earn the income — e.g., FY 2026-27 runs April 2026 to March 2027. Assessment Year (AY) is when you file and pay tax on that income — so AY 2027-28 corresponds to FY 2026-27." },
-              ].map(({ q, a }, i) => (
-                <details key={i} className="group rounded-xl border border-slate-200 bg-white open:border-blue-200 transition-all">
-                  <summary className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold text-slate-800 list-none [&::-webkit-details-marker]:hidden focus:outline-none">
-                    {q}<ChevronDown className="h-4 w-4 flex-shrink-0 text-slate-500 transition-transform group-open:rotate-180" />
-                  </summary>
-                  <div className="px-5 pb-5 pt-3 text-sm text-slate-600 leading-relaxed border-t border-slate-100">{a}</div>
-                </details>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* How the numbers are checked — visual structure ported from
-            Lovable's index.tsx `method` section (2026-09-04); copy is ours,
-            not theirs. Their "Private by default" card read "Calculations
-            run in your browser. Nothing is retained unless you sign in and
-            save it." — same false-implication shape as the FAQ answer this
-            session already corrected elsewhere (auto-persists on every
-            calculation once signed in, no separate "save" step), so this
-            card states it the same accurate way instead of repeating it. */}
-        <section className="py-4">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="bento p-8 sm:p-10">
-              <h2 className="font-display text-2xl font-bold text-slate-900">How the numbers are checked</h2>
-              <div className="mt-7 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                <div>
-                  <h3 className="font-display text-base font-bold text-slate-900">Reviewed by CAs</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                    Each computation is signed off against the bare Act and the current Finance Act before it ships.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-display text-base font-bold text-slate-900">Both Acts supported</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                    Income Tax Act 1961 and the Income Tax Act 2025 run side by side through the transition years.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-display text-base font-bold text-slate-900">Working shown</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                    Slabs, surcharge, marginal relief and cess appear as separate lines you can audit.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-display text-base font-bold text-slate-900">Private by default</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                    Calculations run in your browser as a guest. Once you sign in, your result and figures are saved to your account automatically so your dashboard can show your history.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Contact */}
-        <section className="py-12 border-t border-slate-100">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="flex items-center gap-2 mb-6">
-              <Mail className="h-5 w-5 text-blue-600" />
-              <h2 className="text-xl font-bold text-slate-900">Get in Touch</h2>
-            </div>
-            <div className="grid md:grid-cols-3 gap-4 mb-6">
-              <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-slate-200 hover:border-blue-200 hover:shadow-sm transition-all">
-                <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0"><Mail className="h-5 w-5 text-blue-600" /></div>
-                <div>
-                  <p className="text-xs text-slate-500 mb-0.5">Email</p>
-                  <a href="mailto:admin@aitaxbot.co.in" className="text-sm font-semibold text-slate-800 hover:text-blue-600 transition-colors">
-                    admin@aitaxbot.co.in
-                  </a>
-                </div>
-              </div>
-              <a href="tel:+917899869036" className="flex items-center gap-3 p-4 bg-white rounded-xl border border-slate-200 hover:border-green-200 hover:shadow-sm transition-all group">
-                <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center flex-shrink-0"><Phone className="h-5 w-5 text-green-600" /></div>
-                <div><p className="text-xs text-slate-500 mb-0.5">Phone</p><p className="text-sm font-semibold text-slate-800 group-hover:text-green-600 transition-colors">+91 78998 69036</p></div>
-              </a>
-              <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-slate-200">
-                <div className="w-10 h-10 bg-orange-50 rounded-lg flex items-center justify-center flex-shrink-0"><MapPin className="h-5 w-5 text-orange-500" /></div>
-                <div><p className="text-xs text-slate-500 mb-0.5">Location</p><p className="text-sm font-semibold text-slate-800">Bengaluru, India</p></div>
-              </div>
-            </div>
-            <div className="flex items-center justify-between flex-wrap gap-4">
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-slate-500">Follow:</span>
-                <a href="https://www.linkedin.com/company/aitaxbot/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full p-2 transition-colors"><Linkedin className="h-4 w-4" /></a>
-                <a href="https://www.instagram.com/aitaxbot/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="bg-pink-100 hover:bg-pink-200 text-pink-600 rounded-full p-2 transition-colors"><Instagram className="h-4 w-4" /></a>
-              </div>
-              <Link href="/contact" className="inline-flex items-center gap-2 bg-persian-blue-700 hover:bg-persian-blue-800 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors">
-                <Send className="h-4 w-4" />Send a Message
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        {activeModal === "tax-calculator" && <TaxCalculator onClose={closeModal} />}
-        {activeModal === "hra-calculator" && <HRACalculator onClose={closeModal} onApplyHRA={() => {}} />}
-        {activeModal === "sip-calculator" && <SIPCalculator onClose={closeModal} />}
-        {activeModal === "swp-calculator" && <SWPCalculator onClose={closeModal} />}
-
       </div>
+
+      {activeModal === "tax-calculator" && <TaxCalculator onClose={closeModal} />}
+      {activeModal === "hra-calculator" && <HRACalculator onClose={closeModal} onApplyHRA={() => {}} />}
+      {activeModal === "sip-calculator" && <SIPCalculator onClose={closeModal} />}
+      {activeModal === "swp-calculator" && <SWPCalculator onClose={closeModal} />}
     </>
   );
 }

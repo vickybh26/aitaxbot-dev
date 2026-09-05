@@ -149,7 +149,7 @@ export default function Header({ showModal }: HeaderProps = {}) {
               className={navLink}
               data-testid="link-header-blog"
             >
-              Blog
+              Guides
             </Link>
 
             {/* Find a CA — prominent direct link */}
@@ -214,7 +214,7 @@ export default function Header({ showModal }: HeaderProps = {}) {
               className="bg-ink hover:bg-credit text-paper text-sm px-4 py-2 rounded-full font-medium transition-colors whitespace-nowrap"
               data-testid="button-header-tax-calculator"
             >
-              Tax Calculator
+              Compute tax
             </Link>
 
             {/* The हिंदी / EN switcher used to sit here and has been removed.
@@ -322,7 +322,7 @@ export default function Header({ showModal }: HeaderProps = {}) {
               <FileText className="w-4 h-4" />AIS Reconciliation
             </Link>
             <Link href="/accounting" onClick={() => setMobileMenuOpen(false)} aria-current={mobileNavLink("/accounting")["aria-current"]} className={`py-2.5 text-sm font-medium block ${mobileNavLink("/accounting").className}`}>Accounting</Link>
-            <Link href="/blog" onClick={() => setMobileMenuOpen(false)} aria-current={mobileNavLink("/blog")["aria-current"]} className={`py-2.5 text-sm font-medium block ${mobileNavLink("/blog").className}`}>Blog</Link>
+            <Link href="/blog" onClick={() => setMobileMenuOpen(false)} aria-current={mobileNavLink("/blog")["aria-current"]} className={`py-2.5 text-sm font-medium block ${mobileNavLink("/blog").className}`}>Guides</Link>
             <Link href="/find-ca" onClick={() => { trackButtonClick("Find a CA", "Mobile Header"); setMobileMenuOpen(false); }} aria-current={mobileNavLink("/find-ca")["aria-current"]} className={`flex items-center gap-2 py-2.5 text-sm font-medium ${mobileNavLink("/find-ca").className}`}>
               <UserCheck className="w-4 h-4" />Find a CA
             </Link>
@@ -338,7 +338,7 @@ export default function Header({ showModal }: HeaderProps = {}) {
                 onClick={() => setMobileMenuOpen(false)}
                 className="block bg-ink text-paper text-center text-sm font-medium px-4 py-3 rounded-full hover:bg-credit transition-colors"
               >
-                Tax Calculator
+                Compute tax
               </Link>
               {isAuthenticated ? (
                 <>

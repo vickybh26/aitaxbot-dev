@@ -1,206 +1,112 @@
 import { Link } from "wouter";
-import { Linkedin, Instagram } from "lucide-react";
 import logoImagePng from "@assets/aitaxbot-logo-white.png";
 import logoImageWebP from "@assets/aitaxbot-logo-white.webp";
 
+/**
+ * Word-for-word port of Lovable's footer card (2026-09-05) — same
+ * rounded-[2rem] bg-ink card, same 4-column grid, same copy. Two
+ * deliberate departures from their exact text, both to avoid regressing
+ * something real:
+ *  - Email is admin@aitaxbot.co.in, not their support@ — that's the one
+ *    address every backend flow (Brevo, grievance officer, DPDP contact)
+ *    is already wired to.
+ *  - The bottom disclaimer keeps our "not affiliated with CBDT or the
+ *    Income Tax Department" line appended to theirs — a real compliance
+ *    disclaimer their static demo has no reason to carry.
+ * The "For CAs" column this replaces (the CA-directory supply-side entry
+ * point) still lives in the header's "More" dropdown, desktop and mobile —
+ * see Header.tsx — so that path isn't lost, just no longer duplicated here.
+ */
 export default function Footer() {
   const calculators: [string, string][] = [
     ["Income Tax", "/calculators/income-tax"],
-    ["HRA Calculator", "/calculators/hra"],
-    ["SIP Calculator", "/calculators/sip"],
-    ["SWP Calculator", "/calculators/swp"],
-    ["NPS Calculator", "/calculators/nps"],
-    ["PF Calculator", "/calculators/pf"],
-    ["Home Loan", "/calculators/home-loan"],
-    ["Trading Tax", "/calculators/trading-tax"],
+    ["HRA Exemption", "/calculators/hra"],
+    ["SIP", "/calculators/sip"],
+    ["NPS", "/calculators/nps"],
+    ["Full index", "/calculators"],
   ];
 
   const tools: [string, string][] = [
-    ["Rent Receipt", "/tools/rent-receipt"],
-    ["AIS Reconciliation", "/tools/ais-26as-form16"],
-    ["Find a CA", "/find-ca"],
+    ["AIS / 26AS / Form 16", "/tools/ais-26as-form16"],
+    ["Rent Receipts", "/tools/rent-receipt"],
+    ["CA Directory", "/find-ca"],
     ["NRI Corner", "/nri"],
-    ["GST Invoicing", "/accounting"],
-    ["Tax Guides", "/blog"],
-  ];
-
-  // Supply side of the CA directory. Until now /ca/register was linked from
-  // exactly two places, both inside /find-ca — a page built for taxpayers, so
-  // no Chartered Accountant ever reached the registration form. The directory
-  // sat on a single profile for two months as a result.
-  const forCAs: [string, string][] = [
-    ["List Your Practice", "/ca/register"],
-    ["My CA Profile", "/ca/my-profile"],
-    ["Browse the Directory", "/find-ca"],
   ];
 
   const company: [string, string][] = [
-    ["About Us", "/about"],
+    ["About", "/about"],
+    ["Guides", "/blog"],
     ["Contact", "/contact"],
-    ["Privacy Policy", "/privacy-policy"],
-    ["Terms of Service", "/terms-of-service"],
+    ["Privacy", "/privacy-policy"],
+    ["Terms", "/terms-of-service"],
   ];
 
   return (
-    <>
-      {/* Disclaimer */}
-      <div className="py-4 border-t border-rule bg-white">
-        <div className="max-w-7xl mx-auto px-4">
-          <p className="text-xs text-ink/45 leading-relaxed">
-            Calculations are indicative only — not professional tax advice. AiTaxBot is not affiliated with the Income Tax Department or CBDT.{" "}
-            <Link href="/privacy-policy" className="underline hover:text-ink/70">Privacy Policy</Link>
-            {" · "}
-            <Link href="/about" className="underline hover:text-ink/70">About Us</Link>
+    <footer className="px-4 pb-6 pt-10">
+      <div className="mx-auto max-w-[1180px] rounded-[2rem] bg-ink px-7 py-12 text-paper sm:px-10">
+        <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+          <div>
+            <Link href="/" aria-label="AiTaxBot home">
+              <picture>
+                <source srcSet={logoImageWebP} type="image/webp" />
+                <img src={logoImagePng} alt="AiTaxBot" className="h-9 w-auto" width={320} height={195} loading="lazy" />
+              </picture>
+            </Link>
+            <p className="mt-5 max-w-xs text-sm leading-relaxed text-paper/65">
+              Indian tax computation, reviewed by practising Chartered Accountants — for FY 2026-27
+              (AY 2027-28) under the Income Tax Act 2025.
+            </p>
+            <a
+              href="mailto:admin@aitaxbot.co.in"
+              className="mt-5 inline-block rounded-full bg-paper/10 px-4 py-2 text-sm text-paper/85 transition-colors hover:bg-paper/20 hover:text-paper"
+            >
+              admin@aitaxbot.co.in
+            </a>
+          </div>
+
+          <div>
+            <h2 className="text-[11px] font-bold uppercase tracking-[0.14em] text-paper/50">Calculators</h2>
+            <ul className="mt-4 space-y-2.5">
+              {calculators.map(([name, href]) => (
+                <li key={href}>
+                  <Link href={href} className="text-sm text-paper/70 transition-colors hover:text-paper">{name}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h2 className="text-[11px] font-bold uppercase tracking-[0.14em] text-paper/50">Tools</h2>
+            <ul className="mt-4 space-y-2.5">
+              {tools.map(([name, href]) => (
+                <li key={href}>
+                  <Link href={href} className="text-sm text-paper/70 transition-colors hover:text-paper">{name}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h2 className="text-[11px] font-bold uppercase tracking-[0.14em] text-paper/50">Company</h2>
+            <ul className="mt-4 space-y-2.5">
+              {company.map(([name, href]) => (
+                <li key={href}>
+                  <Link href={href} className="text-sm text-paper/70 transition-colors hover:text-paper">{name}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <div className="mt-12 grid gap-4 border-t border-paper/15 pt-6 text-xs leading-relaxed text-paper/45 md:grid-cols-[1fr_auto]">
+          <p className="max-w-2xl">
+            Figures produced here are informational computations, not professional advice. Verify
+            against your Form 16, AIS and 26AS, or consult a qualified Chartered Accountant, before
+            filing. AiTaxBot is not affiliated with the Income Tax Department or CBDT.
           </p>
+          <p>© {new Date().getFullYear()} AiTaxBot</p>
         </div>
       </div>
-
-      {/* Footer — bg-ink (was bg-slate-900, a cool gray-black; ink is the
-          same warm navy used everywhere else, matching Lovable's footer
-          exactly rather than a separate near-black). All 5 columns kept —
-          "For CAs" in particular is the CA-directory supply-side entry
-          point (see its own comment below); Lovable's simpler 3-column
-          footer has no direct equivalent to drop in its place, so this is
-          a re-skin of real content, not a content cut to match. */}
-      <footer className="bg-ink text-paper pt-12 pb-8 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 mb-10">
-
-            {/* Brand column */}
-            <div>
-              <Link href="/" aria-label="AiTaxBot home">
-                <picture>
-                  <source srcSet={logoImageWebP} type="image/webp" />
-                  <img
-                    src={logoImagePng}
-                    alt="AiTaxBot"
-                    className="h-16 w-auto mb-3"
-                    width={328}
-                    height={200}
-                    loading="lazy"
-                    data-testid="logo-footer"
-                  />
-                </picture>
-              </Link>
-              <p className="text-paper/65 text-sm leading-relaxed mb-4">
-                AI-powered tax tools for India. CA-reviewed, IT Act 2025 ready.
-              </p>
-              <div className="flex gap-2">
-                <a
-                  href="https://www.linkedin.com/company/aitaxbot/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="LinkedIn"
-                  className="bg-paper/10 hover:bg-paper/15 text-paper/80 rounded-lg p-2 transition-colors"
-                >
-                  <Linkedin className="h-4 w-4" />
-                </a>
-                <a
-                  href="https://www.instagram.com/aitaxbot/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Instagram"
-                  className="bg-paper/10 hover:bg-paper/15 text-paper/80 rounded-lg p-2 transition-colors"
-                >
-                  <Instagram className="h-4 w-4" />
-                </a>
-              </div>
-            </div>
-
-            {/* Calculators column */}
-            <div>
-              <h4 className="text-xs font-bold uppercase tracking-widest text-paper/50 mb-4">
-                Calculators
-              </h4>
-              <ul className="space-y-2.5">
-                {calculators.map(([name, href]) => (
-                  <li key={href}>
-                    <Link href={href} className="text-sm text-paper/65 hover:text-paper transition-colors">
-                      {name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Tools & Services column */}
-            <div>
-              <h4 className="text-xs font-bold uppercase tracking-widest text-paper/50 mb-4">
-                Tools &amp; Services
-              </h4>
-              <ul className="space-y-2.5">
-                {tools.map(([name, href]) => (
-                  <li key={href}>
-                    <Link href={href} className="text-sm text-paper/65 hover:text-paper transition-colors">
-                      {name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* For CAs column — the supply-side entry point for the directory */}
-            <div>
-              <h4 className="text-xs font-bold uppercase tracking-widest text-paper/50 mb-4">
-                For CAs
-              </h4>
-              <ul className="space-y-2.5">
-                {forCAs.map(([name, href]) => (
-                  <li key={href}>
-                    <Link href={href} className="text-sm text-paper/65 hover:text-paper transition-colors">
-                      {name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-3 text-xs text-paper/50 leading-relaxed">
-                Free listing. No platform fee, no commission.
-              </p>
-            </div>
-
-            {/* Company column */}
-            <div>
-              <h4 className="text-xs font-bold uppercase tracking-widest text-paper/50 mb-4">
-                Company
-              </h4>
-              <ul className="space-y-2.5">
-                {company.map(([name, href]) => (
-                  <li key={href}>
-                    <Link href={href} className="text-sm text-paper/65 hover:text-paper transition-colors">
-                      {name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-6 p-3 bg-paper/10 rounded-lg">
-                {/* One address, on the canonical domain. There used to be two —
-                    info@aitaxbot.in and admin@aitaxbot.co.in — with no
-                    indication of which to use for what. On a page where people
-                    are deciding whether to trust you with financial data, a
-                    second address on a different TLD reads as either a typo or
-                    a different organisation. */}
-                <p className="text-xs text-paper/65 mb-1">Email us</p>
-                <a
-                  href="mailto:admin@aitaxbot.co.in"
-                  className="text-xs text-credit hover:text-credit/80 transition-colors"
-                >
-                  admin@aitaxbot.co.in
-                </a>
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom bar */}
-          <div className="border-t border-paper/15 pt-6 flex flex-col md:flex-row items-center justify-between gap-3">
-            <p className="text-xs text-paper/50">
-              © {new Date().getFullYear()} AiTaxBot. Not affiliated with CBDT or the Income Tax Department of India.
-            </p>
-            <p className="text-xs text-paper/50">
-              FY 2026-27 / AY 2027-28 Compliant · IT Act 2025 Ready
-            </p>
-          </div>
-        </div>
-      </footer>
-    </>
+    </footer>
   );
 }
