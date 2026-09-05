@@ -12,6 +12,21 @@ interface State {
   info: string;
 }
 
+// Every route is React.lazy()-loaded (see App.tsx), which fetches a
+// content-hashed JS chunk on first navigation to that route. Every deploy
+// changes those hashes. A tab already open from before a deploy — or one
+// that just loaded an old cached index.html — asks the server for a chunk
+// filename that no longer exists, the dynamic import() rejects, and React
+// surfaces that rejection as a render error, landing here. The browser's
+// own URL has already changed (wouter updates history on click, before the
+// lazy import resolves), so a plain reload at the current location fixes
+// it — which is exactly what "click Reload and it works" was doing by
+// hand. Auto-reload once instead of asking for that click; the sessionStorage
+// guard stops an infinite loop if the real page is broken for some other
+// reason and reloading doesn't help.
+const CHUNK_ERROR_PATTERN = /dynamically imported module|loading chunk|loading css chunk|importing a module script failed/i;
+const CHUNK_RELOAD_FLAG = "aitaxbot-chunk-reload-attempted";
+
 /**
  * Global Error Boundary — catches any unhandled React render error.
  *
@@ -20,7 +35,9 @@ interface State {
  * to debug in production.
  *
  * This boundary logs the error to the console and shows a friendly recovery
- * UI with the error message (to help diagnose issues quickly).
+ * UI with the error message (to help diagnose issues quickly) — unless the
+ * error looks like a stale post-deploy chunk load failure, in which case it
+ * reloads automatically instead (see the note above).
  */
 export class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
@@ -32,9 +49,24 @@ export class ErrorBoundary extends Component<Props, State> {
     return { hasError: true, error };
   }
 
+  componentDidMount() {
+    // The guard exists to stop one bad chunk from reload-looping forever.
+    // Clearing it once the app has stayed up for a few seconds means a
+    // *later* deploy (same tab, still open) still gets the same one free
+    // auto-reload rather than falling straight to the error screen.
+    window.setTimeout(() => sessionStorage.removeItem(CHUNK_RELOAD_FLAG), 5000);
+  }
+
   componentDidCatch(error: Error, { componentStack }: { componentStack: string }) {
     console.error("[ErrorBoundary] Uncaught React error:", error);
     console.error("[ErrorBoundary] Component stack:", componentStack);
+
+    if (CHUNK_ERROR_PATTERN.test(error.message) && !sessionStorage.getItem(CHUNK_RELOAD_FLAG)) {
+      sessionStorage.setItem(CHUNK_RELOAD_FLAG, "1");
+      window.location.reload();
+      return;
+    }
+
     this.setState({ info: componentStack ?? "" });
   }
 
