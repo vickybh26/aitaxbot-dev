@@ -64,6 +64,13 @@ export default {
         debit: "hsl(var(--destructive))",
         rule: "hsl(var(--border))",
         notice: "hsl(var(--warning-orange))",
+        /* Wash = the tinted panel a coloured figure sits on (Lovable's
+           --credit-wash / --debit-wash / --notice-wash). Kept as named
+           utilities rather than bg-credit/10 so the tint is one value
+           site-wide instead of a per-component opacity guess. */
+        "credit-wash": "hsl(var(--success-green-light))",
+        "debit-wash": "hsl(var(--destructive-light))",
+        "notice-wash": "hsl(var(--warning-orange-light))",
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",

@@ -560,11 +560,26 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
         ],
         inputs: {
           ageGroup: formData.ageGroup,
+          // Saved so the dashboard can label the figure with the year it was
+          // actually computed for. Without it the panel would have to assume
+          // the FY in progress, which silently mislabels a calculation run
+          // for a previous year — the same failure mode as the hardcoded
+          // "2025-26" strings the reconciliation parsers had to be freed of.
+          financialYear: formData.financialYear,
           salaryIncome: formData.salaryIncome,
           housePropertyIncome: formData.housePropertyIncome,
           businessIncome: formData.businessIncome,
           capitalGainsIncome: formData.capitalGainsIncome,
           otherIncome: formData.otherIncome,
+          // Deduction figures are stored alongside the income ones so the
+          // dashboard's "Still left to claim" cards can show the real gap
+          // between what this person actually claimed and the statutory
+          // ceiling, instead of quoting the ceiling at everybody. They are
+          // Old-Regime-only deductions, and the dashboard gates on that.
+          section80C: formData.section80C,
+          section80D: formData.section80D,
+          section80CCD1B: formData.section80CCD1B,
+          homeLoanInterest: formData.homeLoanInterest,
         },
       }
     );

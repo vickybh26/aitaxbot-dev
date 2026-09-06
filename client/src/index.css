@@ -82,6 +82,13 @@
     --warning-orange: 25 95% 53%;
     --warning-orange-light: 25 95% 95%;
 
+    /* Tinted "wash" backing for a coloured figure — the soft panel behind a
+       saved amount or a flagged mismatch. Lovable names these --credit-wash /
+       --debit-wash / --notice-wash and the dashboard port uses them directly
+       (bg-credit-wash, bg-debit-wash); the first two map onto the ramps
+       already declared above, so only the destructive wash is new here. */
+    --destructive-light: 0 74% 96%;
+
     /* Legacy alias — purple is retired; mapped to navy so any component
        still referencing --accent-purple degrades to brand navy instead of
        reintroducing the old gradient. Remove references over time. */
