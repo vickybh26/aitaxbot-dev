@@ -131,6 +131,10 @@ const RULE = "#E5E0D6";
 const BODY_TEXT = "#1F2937";
 const MUTED = "#5B6572";
 const CREDIT = "#0B7A55";
+// Distinct from CREDIT (green) on purpose — CREDIT means "money the user
+// gains," and a marketing badge isn't that. Matches the teal Lovable settled
+// on for the same two badges (2026-09-06, /email-preview/*).
+const BADGE_TEAL = "#0F766E";
 const FONT_DISPLAY = "Sora, 'Segoe UI', Helvetica, Arial, sans-serif";
 const FONT_BODY = "Manrope, 'Segoe UI', Helvetica, Arial, sans-serif";
 
@@ -154,20 +158,44 @@ function brandHeader(): string {
 }
 
 /**
- * The AIS/26AS/Form 16 reconciliation tool is genuinely without a direct
- * equivalent among the free Indian tax sites AiTaxBot competes with (see
- * CLAUDE.md's competitor notes — INDmoney and others compute liability, none
- * cross-check the taxpayer's own documents against the department's records
- * the way this does). Reused across all three emails as the one differentiator
- * worth repeating, rather than restating it three different ways.
+ * Two differentiators worth repeating across all three emails: the Income
+ * Tax Calculator (genuinely one of the most complete free ones in India —
+ * both regimes, every slab, surcharge, and the 87A rebate, each shown as its
+ * own line) and the AIS/26AS/Form 16 reconciliation tool, which has no
+ * direct equivalent among the free Indian tax sites AiTaxBot competes with
+ * (see CLAUDE.md's competitor notes — INDmoney and others compute liability,
+ * none cross-check the taxpayer's own documents against the department's
+ * records the way this does).
+ *
+ * Card visual pattern — bordered box, uppercase pill badge, bold heading,
+ * one-line pitch, text link with an arrow — matches Lovable's build of the
+ * same two cards (2026-09-06, /email-preview/*), teal badge included; the
+ * copy is ours, describing what our own calculator/tool actually does.
  */
-function aisPromoCard(): string {
-  return `<table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color:${CREDIT}0D;border:1px solid ${CREDIT}40;border-radius:12px;padding:20px 22px;margin:24px 0"><tbody><tr><td>
-    <p style="font-size:11px;line-height:16px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:${CREDIT};margin:0 0 8px">Only on AiTaxBot</p>
-    <p style="font-size:14px;line-height:22px;color:${BODY_TEXT};margin:0 0 12px">Upload your AIS, 26AS and Form 16 and we'll flag exactly where they disagree — the mismatches that trigger a notice — before you file. No other free Indian tax site checks your documents against each other like this.</p>
-    ${ctaButton("https://www.aitaxbot.co.in/tools/ais-26as-form16", "Try AIS reconciliation")}
+function promoCard(badge: string, title: string, body: string, href: string, linkLabel: string): string {
+  return `<table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color:${CARD};border:2px solid ${INK};border-radius:12px;padding:20px 20px 22px;margin-top:16px"><tbody><tr><td>
+    <p style="font-size:11px;line-height:24px;display:inline-block;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:${CARD};background-color:${BADGE_TEAL};border-radius:999px;padding:4px 10px;margin:0 0 10px">${badge}</p>
+    <p style="font-size:17px;line-height:24px;font-family:${FONT_DISPLAY};font-weight:700;color:${INK};margin:0 0 6px;letter-spacing:-0.01em">${title}</p>
+    <p style="font-size:14px;line-height:22px;color:${BODY_TEXT};margin:0 0 12px">${body}</p>
+    <a href="${href}" style="color:${INK};text-decoration-line:none;font-size:14px;font-weight:600" target="_blank">${linkLabel} →</a>
   </td></tr></tbody></table>`;
 }
+
+const incomeTaxPromo = () => promoCard(
+  "Best in the market",
+  "Income Tax Calculator",
+  "Old vs new regime side by side, every slab, surcharge and rebate handled — the most complete calculator you'll find, and it explains each number instead of just showing a total.",
+  "https://www.aitaxbot.co.in/calculators/income-tax",
+  "Calculate my taxes"
+);
+
+const aisPromo = () => promoCard(
+  "One of a kind",
+  "AIS Reconciliation",
+  "Upload your AIS, 26AS and Form 16 and we match every entry against each other, so mismatches surface before the department finds them. Nothing else does this for Indian filers.",
+  "https://www.aitaxbot.co.in/tools/ais-26as-form16",
+  "Reconcile my AIS"
+);
 
 /**
  * Outlook desktop renders `<a>` styled as a button inconsistently (wrong
@@ -206,24 +234,25 @@ export function buildWelcomeEmail(user: { firstName?: string | null }): EmailCon
             ${brandHeader()}
             <table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color:${CARD};border:1px solid ${RULE};border-radius:12px;padding:32px 28px"><tbody><tr><td>
               <h1 style="font-family:${FONT_DISPLAY};font-size:24px;font-weight:700;color:${INK};line-height:32px;margin:0 0 12px;letter-spacing:-0.01em">Welcome, ${name}.</h1>
-              <p style="font-size:15px;line-height:24px;color:${BODY_TEXT};margin:0 0 8px">Thanks for joining AiTaxBot. You now have one of the most detailed income tax calculators available in India — full slab-by-slab working, marginal relief, surcharge, and the 87A rebate, all computed automatically and shown as separate lines you can check yourself.</p>
-              <p style="font-size:15px;line-height:24px;color:${BODY_TEXT};margin:0 0 24px">A good first step: compare the old and new tax regimes with your own numbers. It takes about two minutes.</p>
-              ${ctaButton("https://www.aitaxbot.co.in/calculators/income-tax", "Compare my tax regimes")}
+              <p style="font-size:15px;line-height:24px;color:${BODY_TEXT};margin:0 0 8px">Thanks for joining AiTaxBot. You now have clear, CA-reviewed answers to Indian income-tax questions — plus calculators that do the maths for you.</p>
+              <p style="font-size:15px;line-height:24px;color:${BODY_TEXT};margin:0 0 24px">A good first step: run your own numbers through our Income Tax Calculator. It takes about two minutes.</p>
+              ${ctaButton("https://www.aitaxbot.co.in/calculators/income-tax", "Calculate my taxes")}
+              ${incomeTaxPromo()}
+              ${aisPromo()}
               <hr style="width:100%;border:none;border-top:1px solid ${RULE};margin:28px 0"/>
-              <p style="font-size:12px;line-height:24px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:${MUTED};margin:0 0 12px">What you can do here</p>
-              <p style="font-size:14px;line-height:22px;color:${BODY_TEXT};margin:0 0 6px">· Compare Old vs New tax regime with the Income Tax Calculator</p>
+              <p style="font-size:12px;line-height:24px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:${MUTED};margin:0 0 12px">What else you can do here</p>
+              <p style="font-size:14px;line-height:22px;color:${BODY_TEXT};margin:0 0 6px">· Work out capital gains on shares and mutual funds</p>
               <p style="font-size:14px;line-height:22px;color:${BODY_TEXT};margin:0 0 6px">· Check your HRA exemption and NPS deductions</p>
-              <p style="font-size:14px;line-height:22px;color:${BODY_TEXT};margin:0 0 6px">· Reconcile your AIS, 26AS and Form 16 before you file</p>
-              <p style="font-size:14px;line-height:22px;color:${BODY_TEXT};margin:0">· Find a verified CA when you want a human to file for you</p>
+              <p style="font-size:14px;line-height:22px;color:${BODY_TEXT};margin:0 0 6px">· Find a verified CA when you want a human to file for you</p>
+              <p style="font-size:14px;line-height:22px;color:${BODY_TEXT};margin:0">· Keep an eye on every tax deadline that matters</p>
             </td></tr></tbody></table>
-            ${aisPromoCard()}
             <p style="font-size:12px;line-height:18px;color:${MUTED};margin:24px 0 0">Questions? Just reply to this email — a person reads every message. You can also reach us at <a href="mailto:admin@aitaxbot.co.in" style="color:${INK};text-decoration-line:none">admin@aitaxbot.co.in</a>.</p>
             <p style="font-size:12px;line-height:18px;color:${MUTED};margin:8px 0 0">AiTaxBot · Smart Tax Tools for India</p>
           </td></tr></tbody></table>
         </td></tr></tbody></table>
       </body></html>
     `,
-    textContent: `Welcome, ${user.firstName || "there"}.\n\nThanks for joining AiTaxBot. You now have one of the most detailed income tax calculators available in India — full slab-by-slab working, marginal relief, surcharge, and the 87A rebate, all computed automatically.\n\nA good first step: compare the old and new tax regimes with your own numbers. It takes about two minutes.\nCompare my tax regimes: https://www.aitaxbot.co.in/calculators/income-tax\n\nWhat you can do here:\n· Compare Old vs New tax regime with the Income Tax Calculator\n· Check your HRA exemption and NPS deductions\n· Reconcile your AIS, 26AS and Form 16 before you file\n· Find a verified CA when you want a human to file for you\n\nOnly on AiTaxBot: upload your AIS, 26AS and Form 16 and we'll flag exactly where they disagree — before you file. No other free Indian tax site checks your documents against each other like this.\nTry AIS reconciliation: https://www.aitaxbot.co.in/tools/ais-26as-form16\n\nQuestions? Just reply to this email, or reach us at admin@aitaxbot.co.in.\n\n-- AiTaxBot Team`,
+    textContent: `Welcome, ${user.firstName || "there"}.\n\nThanks for joining AiTaxBot. You now have clear, CA-reviewed answers to Indian income-tax questions — plus calculators that do the maths for you.\n\nA good first step: run your own numbers through our Income Tax Calculator. It takes about two minutes.\nCalculate my taxes: https://www.aitaxbot.co.in/calculators/income-tax\n\nBest in the market — Income Tax Calculator: old vs new regime side by side, every slab, surcharge and rebate handled. https://www.aitaxbot.co.in/calculators/income-tax\n\nOne of a kind — AIS Reconciliation: upload your AIS, 26AS and Form 16 and we match every entry against each other, so mismatches surface before the department finds them. https://www.aitaxbot.co.in/tools/ais-26as-form16\n\nWhat else you can do here:\n· Work out capital gains on shares and mutual funds\n· Check your HRA exemption and NPS deductions\n· Find a verified CA when you want a human to file for you\n· Keep an eye on every tax deadline that matters\n\nQuestions? Just reply to this email, or reach us at admin@aitaxbot.co.in.\n\n-- AiTaxBot Team`,
   };
 }
 
@@ -257,8 +286,13 @@ export function buildCalculatorResultEmail(
     .map((d) => `<tr><td style="padding:6px 0;color:${MUTED};font-size:13px">${escapeHtml(d.label)}</td><td style="padding:6px 0;text-align:right;font-size:13px;font-weight:600;color:${BODY_TEXT}">${escapeHtml(d.value)}</td></tr>`)
     .join("");
   const resultUrl = `https://www.aitaxbot.co.in${result.route}`;
-  // Don't promote the reconciliation tool to someone who just used it.
+  // Don't promote a tool to someone who just used that exact tool.
   const isReconciliation = result.kind === "reconciliation";
+  const isIncomeTax = result.route === "/calculators/income-tax";
+  const promoCards = [
+    isIncomeTax ? "" : incomeTaxPromo(),
+    isReconciliation ? "" : aisPromo(),
+  ].filter(Boolean).join("\n");
 
   return {
     subject: `Your ${toolName} result — AiTaxBot`,
@@ -280,13 +314,13 @@ export function buildCalculatorResultEmail(
               ${ctaButton(resultUrl, "Open this calculator again")}
               <p style="font-size:12px;line-height:20px;color:${MUTED};margin:16px 0 0">This result is also saved on your <a href="https://www.aitaxbot.co.in/dashboard" style="color:${INK}">dashboard</a>. This is an estimate, not a filed return.</p>
             </td></tr></tbody></table>
-            ${isReconciliation ? "" : aisPromoCard()}
+            ${promoCards}
             <p style="font-size:12px;line-height:18px;color:${MUTED};margin:24px 0 0">AiTaxBot · Bengaluru, Karnataka, India</p>
           </td></tr></tbody></table>
         </td></tr></tbody></table>
       </body></html>
     `,
-    textContent: `Hi ${user.firstName || "there"},\n\n${result.toolName} result:\n${result.headline.label}: ${result.headline.value}\n${(result.details ?? []).map((d) => `${d.label}: ${d.value}`).join("\n")}\n\nOpen again: ${resultUrl}\nDashboard: https://www.aitaxbot.co.in/dashboard\n${isReconciliation ? "" : "\nOnly on AiTaxBot: upload your AIS, 26AS and Form 16 and we'll flag exactly where they disagree — before you file.\nTry AIS reconciliation: https://www.aitaxbot.co.in/tools/ais-26as-form16\n"}\n-- AiTaxBot Team`,
+    textContent: `Hi ${user.firstName || "there"},\n\n${result.toolName} result:\n${result.headline.label}: ${result.headline.value}\n${(result.details ?? []).map((d) => `${d.label}: ${d.value}`).join("\n")}\n\nOpen again: ${resultUrl}\nDashboard: https://www.aitaxbot.co.in/dashboard\n${isIncomeTax ? "" : "\nBest in the market — Income Tax Calculator: old vs new regime side by side, every slab, surcharge and rebate handled. https://www.aitaxbot.co.in/calculators/income-tax\n"}${isReconciliation ? "" : "\nOne of a kind — AIS Reconciliation: upload your AIS, 26AS and Form 16 and we match every entry against each other. https://www.aitaxbot.co.in/tools/ais-26as-form16\n"}\n-- AiTaxBot Team`,
   };
 }
 
@@ -328,8 +362,13 @@ export function buildWeeklyDigestEmail(
     ? `<p style="font-size:12px;line-height:24px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:${MUTED};margin:20px 0 8px">Your recent calculations</p><table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">${usageRows}</table>`
     : "";
 
-  // Only pitch the reconciliation tool to someone who hasn't already used it.
+  // Only pitch a tool to someone who hasn't already used it this recap.
   const hasUsedReconciliation = content.usage.some((r) => r.kind === "reconciliation");
+  const hasUsedIncomeTax = content.usage.some((r) => r.route === "/calculators/income-tax");
+  const promoCards = [
+    hasUsedIncomeTax ? "" : incomeTaxPromo(),
+    hasUsedReconciliation ? "" : aisPromo(),
+  ].filter(Boolean).join("\n");
 
   return {
     subject: "Your AiTaxBot weekly update",
@@ -348,7 +387,7 @@ export function buildWeeklyDigestEmail(
               ${usageSection}
               <div style="margin:24px 0 0">${ctaButton("https://www.aitaxbot.co.in/dashboard", "View your dashboard")}</div>
             </td></tr></tbody></table>
-            ${hasUsedReconciliation ? "" : aisPromoCard()}
+            ${promoCards}
             <p style="font-size:12px;line-height:18px;color:${MUTED};margin:24px 0 0">
               AiTaxBot · Bengaluru, Karnataka, India<br/>
               <a href="${unsubscribeUrl(user.id)}" style="color:${MUTED}">Unsubscribe from this weekly email</a>
@@ -357,7 +396,7 @@ export function buildWeeklyDigestEmail(
         </td></tr></tbody></table>
       </body></html>
     `,
-    textContent: `Hi ${user.firstName || "there"},\n\nDates to watch:\n${content.dates.map((d) => `${d.day} ${d.monthLabel} — ${d.title} (${d.detail})`).join("\n")}\n${content.usage.length ? `\nYour recent calculations:\n${content.usage.map((r) => `${r.toolName}: ${r.headline.value}`).join("\n")}\n` : ""}\nDashboard: https://www.aitaxbot.co.in/dashboard\n${hasUsedReconciliation ? "" : "\nOnly on AiTaxBot: upload your AIS, 26AS and Form 16 and we'll flag exactly where they disagree — before you file.\nTry AIS reconciliation: https://www.aitaxbot.co.in/tools/ais-26as-form16\n"}\nUnsubscribe: ${unsubscribeUrl(user.id)}\n\n-- AiTaxBot Team`,
+    textContent: `Hi ${user.firstName || "there"},\n\nDates to watch:\n${content.dates.map((d) => `${d.day} ${d.monthLabel} — ${d.title} (${d.detail})`).join("\n")}\n${content.usage.length ? `\nYour recent calculations:\n${content.usage.map((r) => `${r.toolName}: ${r.headline.value}`).join("\n")}\n` : ""}\nDashboard: https://www.aitaxbot.co.in/dashboard\n${hasUsedIncomeTax ? "" : "\nBest in the market — Income Tax Calculator: old vs new regime side by side, every slab, surcharge and rebate handled. https://www.aitaxbot.co.in/calculators/income-tax\n"}${hasUsedReconciliation ? "" : "\nOne of a kind — AIS Reconciliation: upload your AIS, 26AS and Form 16 and we match every entry against each other. https://www.aitaxbot.co.in/tools/ais-26as-form16\n"}\nUnsubscribe: ${unsubscribeUrl(user.id)}\n\n-- AiTaxBot Team`,
   };
 }
 
