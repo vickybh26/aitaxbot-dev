@@ -168,7 +168,15 @@ export class FirestoreStorage implements IStorage {
     }
   }
 
-  async upsertUser(userData: UpsertUser): Promise<User> {
+  /**
+   * `isNewUser` in the return value is `existingDoc.exists === false` at the
+   * time of this call — the only reliable "this account was just created"
+   * signal in the codebase, since there's no Firebase Auth Cloud Function
+   * (onCreate) trigger wired up. It fires exactly once per user, on their
+   * first /api/user/sync call after signup. The welcome email is gated on
+   * this, not on any client-side "just signed up" flag.
+   */
+  async upsertUser(userData: UpsertUser): Promise<{ user: User; isNewUser: boolean }> {
     const userId = userData.id || randomUUID();
     const docRef = this.db.collection('users').doc(userId);
     const existingDoc = await docRef.get();
@@ -184,7 +192,7 @@ export class FirestoreStorage implements IStorage {
         updatedAt: new Date(),
       };
       await docRef.update(authUpdate);
-      return { id: userId, ...existingDoc.data(), ...authUpdate } as unknown as User;
+      return { user: { id: userId, ...existingDoc.data(), ...authUpdate } as unknown as User, isNewUser: false };
     }
 
     // New user — initialise all fields from the auth token payload.
@@ -205,7 +213,7 @@ export class FirestoreStorage implements IStorage {
       updatedAt: new Date(),
     };
     await docRef.set(user);
-    return user;
+    return { user, isNewUser: true };
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {

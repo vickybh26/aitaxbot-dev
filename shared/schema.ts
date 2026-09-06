@@ -29,6 +29,9 @@ export interface User {
   isProfileComplete?: boolean;
   tags?: string[];
   lastNudgedAt?: Date | string | null;
+  /** Opted out of the weekly digest email (deadlines + usage summary). Unset/false = subscribed. */
+  digestOptOut?: boolean;
+  digestOptOutAt?: Date | string | null;
   createdAt?: Date | string;
   updatedAt?: Date | string;
 }

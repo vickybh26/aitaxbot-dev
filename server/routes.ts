@@ -8,7 +8,7 @@ import fs from "fs";
 import crypto from "crypto";
 import rateLimit from "express-rate-limit";
 import accountingRoutes from "./accountingRoutes";
-import adminRoutes, { verifyUnsubToken } from "./adminRoutes";
+import adminRoutes from "./adminRoutes";
 import whatsappRoutes from "./whatsapp/whatsappRoutes";
 import caRoutes from "./caRoutes";
 import leadRoutes from "./leadRoutes";
@@ -20,6 +20,7 @@ import ragRoutes from "./ragRoutes";
 import { getFirestore, verifyFirebaseToken, admin } from "./firebase";
 import { COLLECTIONS } from "./firestoreHelper";
 import { TransactionalEmailsApi, TransactionalEmailsApiApiKeys } from '@getbrevo/brevo';
+import { escapeHtml, verifyUnsubToken, sendWelcomeEmail, SENDERS } from "./emailService";
 import { seedTaxRates, getTaxSlabsForCalculation } from "./seedTaxRates";
 import { generateTaxComputationPDF, savePDFToStorage, generateRentReceiptPDF, type TaxComputationData, type RentReceiptData } from "./pdfGenerator";
 import { geminiTaxService, type TaxAdviceInput } from "./geminiTaxService";
@@ -29,13 +30,6 @@ import { authenticateFirebaseToken, appCheckGuard, type AuthenticatedRequest } f
 // ─────────────────────────────────────────────────────────────────────
 // Security helpers
 // ─────────────────────────────────────────────────────────────────────
-
-/** Escape user-supplied text before inserting into HTML (email bodies, etc.). */
-function escapeHtml(input: unknown): string {
-  return String(input ?? "").replace(/[&<>"']/g, (c) => (
-    { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c] as string
-  ));
-}
 
 /** Produce a safe filename for disk storage — never include user input. */
 function safeUploadFilename(fileId: string, originalname: string): string {
@@ -272,7 +266,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const uid = String(req.query.uid || "");
       const token = String(req.query.t || "");
-      if (!uid || !token || !verifyUnsubToken(uid, token)) {
+      if (!uid || !token || !verifyUnsubToken(uid, token, "digest")) {
         return res.status(400).type("html").send(
           page("Invalid unsubscribe link", "This link is not valid or has been altered. Please use the link exactly as it appears in the email, or contact admin@aitaxbot.co.in.", false)
         );
@@ -284,12 +278,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!snap.exists) {
         // Still report success — the desired end state (no more mail) holds,
         // and confirming or denying that an id exists would leak information.
-        return res.type("html").send(page("You're unsubscribed", "You will not receive any further profile reminder emails from AiTaxBot.", true));
+        return res.type("html").send(page("You're unsubscribed", "You will not receive the weekly digest email from AiTaxBot.", true));
       }
 
-      await ref.update({ nudgeOptOut: true, nudgeOptOutAt: new Date() });
+      await ref.update({ digestOptOut: true, digestOptOutAt: new Date() });
       return res.type("html").send(
-        page("You're unsubscribed", "You will not receive any further profile reminder emails. This does not affect your account, and you'll still get essential mail such as password resets.", true)
+        page("You're unsubscribed", "You will not receive the weekly digest email. This does not affect your account, and you'll still get essential mail such as calculator results and password resets.", true)
       );
     } catch (err) {
       console.error("[Email] Unsubscribe error:", err);
@@ -534,7 +528,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const firstName = nameParts[0] || null;
       const lastName = nameParts.slice(1).join(' ') || null;
 
-      const user = await storage.upsertUser({
+      const { user, isNewUser } = await storage.upsertUser({
         id: decodedToken.uid,
         email: decodedToken.email || null,
         firstName,
@@ -545,6 +539,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         createdAt: new Date(),
         updatedAt: new Date(),
       } as any);
+
+      if (isNewUser) {
+        // Fire-and-forget — a slow or failed welcome email must never delay
+        // or break the sync response a fresh signup is waiting on.
+        sendWelcomeEmail(user).catch((err) => console.error("[Email] Welcome email failed:", err));
+      }
 
       res.json(user);
     } catch (error) {
@@ -724,7 +724,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const apiInstance = new TransactionalEmailsApi();
           apiInstance.setApiKey(TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY);
 
-          const senderEmail = process.env.BREVO_SENDER_EMAIL || 'info@aitaxbot.in';
+          const senderEmail = process.env.BREVO_SENDER_EMAIL || SENDERS.transactional.email;
           const senderName  = process.env.BREVO_SENDER_NAME  || 'AiTaxBot';
           const adminEmail  = process.env.BREVO_ADMIN_EMAIL  || senderEmail; // where YOU receive alerts
           const submittedAt = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
@@ -889,7 +889,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const apiInstance = new TransactionalEmailsApi();
       apiInstance.setApiKey(TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY);
 
-      const senderEmail = process.env.BREVO_SENDER_EMAIL || "info@aitaxbot.in";
+      const senderEmail = process.env.BREVO_SENDER_EMAIL || SENDERS.transactional.email;
       const senderName  = process.env.BREVO_SENDER_NAME  || "AiTaxBot";
 
       const name = recipientName || receipts[0].tenantName || "there";

@@ -16,8 +16,8 @@
 import { Router } from "express";
 import { getFirestore, verifyFirebaseToken, admin } from "./firebase";
 import { COLLECTIONS } from "./firestoreHelper";
-import { TransactionalEmailsApi, TransactionalEmailsApiApiKeys } from "@getbrevo/brevo";
-import { createHmac, timingSafeEqual } from "crypto";
+import { sendEmail } from "./emailService";
+import { sendWeeklyDigests } from "./weeklyDigest";
 
 const router = Router();
 
@@ -444,8 +444,10 @@ router.delete("/users/:id/notes/:noteId", adminL1, async (req: any, res) => {
 //
 // `lastNudgedAt` / `nudgeOptOut` are left on existing user documents rather
 // than migrated away — harmless, and they preserve the record of who was
-// mailed. sendBrevoEmail() stays because other routes use it, and the
-// unsubscribe endpoint stays valid for anyone who received the old mail.
+// mailed. The unsubscribe token signature was later scoped by mail category
+// (see emailService.ts, 2026-09-06) and repurposed for the weekly digest —
+// any old nudge-email unsubscribe link no longer verifies, which is fine
+// since no more nudge mail is sent for it to matter.
 
 // ─────────────────────────────────────────────
 // GET /api/admin/export/users — CSV download (L1 + L2)
@@ -518,44 +520,9 @@ router.get("/tags", adminL3, async (_req: any, res) => {
 // CA DIRECTORY MANAGEMENT
 // ─────────────────────────────────────────────────────────────────────────────
 
-/**
- * Signed unsubscribe token.
- *
- * The unsubscribe link has to work from an email client with no session, so
- * the user id travels in the URL. Signing it stops anyone from unsubscribing
- * another user (or enumerating ids) by editing the query string — without a
- * valid signature the endpoint refuses.
- *
- * Falls back to the Brevo key as signing material if no dedicated secret is
- * set, purely so this cannot silently degrade to an unsigned link in an
- * environment that hasn't been given EMAIL_TOKEN_SECRET yet.
- */
-export function unsubToken(uid: string): string {
-  const secret = process.env.EMAIL_TOKEN_SECRET || process.env.BREVO_API_KEY || "aitaxbot-unsub";
-  return createHmac("sha256", secret).update(`unsub:${uid}`).digest("hex").slice(0, 32);
-}
-
-export function verifyUnsubToken(uid: string, token: string): boolean {
-  const expected = unsubToken(uid);
-  if (token.length !== expected.length) return false;
-  // Constant-time compare — avoids leaking the correct token through timing.
-  return timingSafeEqual(Buffer.from(expected), Buffer.from(token));
-}
-
-async function sendBrevoEmail(params: {
-  to: { email: string; name: string }[];
-  subject: string;
-  htmlContent: string;
-}) {
-  const apiInstance = new TransactionalEmailsApi();
-  apiInstance.setApiKey(TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY!);
-  await apiInstance.sendTransacEmail({
-    sender: { email: process.env.BREVO_SENDER_EMAIL || "noreply@aitaxbot.co.in", name: "AiTaxBot" },
-    to: params.to,
-    subject: params.subject,
-    htmlContent: params.htmlContent,
-  });
-}
+// Signed unsubscribe tokens and the shared sendEmail() helper both moved to
+// emailService.ts on 2026-09-06, to break a circular import once this file
+// started sending mail through the same shared module other routes use.
 
 // GET /api/admin/ca/list — list all CA profiles, filterable by status
 router.get("/ca/list", adminL3, async (req: any, res) => {
@@ -611,7 +578,7 @@ router.post("/ca/:id/approve", adminL2, async (req: any, res) => {
 
     // Email the CA
     try {
-      await sendBrevoEmail({
+      await sendEmail({
         to: [{ email: ca.email, name: ca.fullName }],
         subject: "🎉 Your AiTaxBot CA Profile is Approved!",
         htmlContent: `
@@ -647,7 +614,7 @@ router.post("/ca/:id/reject", adminL2, async (req: any, res) => {
     await ref.update({ status: "rejected", rejectedReason: reason });
 
     try {
-      await sendBrevoEmail({
+      await sendEmail({
         to: [{ email: ca.email, name: ca.fullName }],
         subject: "AiTaxBot CA Profile — Action Required",
         htmlContent: `
@@ -756,6 +723,23 @@ router.get("/leads", adminL3, async (_req: any, res) => {
   } catch (err) {
     console.error("[Admin] Leads list error:", err);
     res.status(500).json({ error: "Failed to fetch leads" });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// WEEKLY DIGEST — manual trigger for testing without waiting for Monday's cron
+// (see server/index.ts for the scheduled run). L1 only: this emails every
+// non-opted-out registered user, so it isn't something a Level 2/3 admin
+// should be able to fire by accident.
+// ─────────────────────────────────────────────────────────────────────────────
+
+router.post("/weekly-digest/trigger", adminL1, async (_req: any, res) => {
+  try {
+    const result = await sendWeeklyDigests();
+    res.json({ success: true, ...result });
+  } catch (err) {
+    console.error("[Admin] Weekly digest manual trigger failed:", err);
+    res.status(500).json({ error: "Failed to send weekly digest" });
   }
 });
 

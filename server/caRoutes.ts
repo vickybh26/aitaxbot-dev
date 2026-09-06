@@ -10,7 +10,7 @@ import { Router, type Request, type Response } from "express";
 import { randomUUID } from "crypto";
 import { getFirestore, verifyFirebaseToken } from "./firebase";
 import { COLLECTIONS } from "./firestoreHelper";
-import { TransactionalEmailsApi, TransactionalEmailsApiApiKeys } from "@getbrevo/brevo";
+import { sendEmail } from "./emailService";
 import {
   insertCAProfileSchema,
   insertCAContactRequestSchema,
@@ -52,28 +52,8 @@ async function requireAdmin(req: any, res: any, next: any): Promise<any> {
   }
 }
 
-// ─── Helpers ───────────────────────────────────────────────────────────────
-
-async function sendBrevoEmail(params: {
-  to: { email: string; name: string }[];
-  subject: string;
-  htmlContent: string;
-}) {
-  const apiInstance = new TransactionalEmailsApi();
-  apiInstance.setApiKey(
-    TransactionalEmailsApiApiKeys.apiKey,
-    process.env.BREVO_API_KEY!
-  );
-  await apiInstance.sendTransacEmail({
-    sender: {
-      email: process.env.BREVO_SENDER_EMAIL || "noreply@aitaxbot.co.in",
-      name: "AiTaxBot",
-    },
-    to: params.to,
-    subject: params.subject,
-    htmlContent: params.htmlContent,
-  });
-}
+// sendBrevoEmail() moved to emailService.ts (2026-09-06) — see sendEmail()
+// there, now shared by every route that sends mail.
 
 // ─── POST /api/ca/register ─────────────────────────────────────────────────
 // Public — CA submits their profile for admin approval
@@ -138,7 +118,7 @@ router.post("/register", async (req: Request, res: Response) => {
 
     // Notify admin
     try {
-      await sendBrevoEmail({
+      await sendEmail({
         to: [{ email: "vickybh26@gmail.com", name: "AiTaxBot Admin" }],
         subject: `New CA Registration — ${profileData.fullName} (${profileData.icaiMembershipNumber})`,
         htmlContent: `
@@ -168,7 +148,7 @@ router.post("/register", async (req: Request, res: Response) => {
 
     // Confirm to CA
     try {
-      await sendBrevoEmail({
+      await sendEmail({
         to: [{ email: profileData.email, name: profileData.fullName }],
         subject: "Your AiTaxBot CA profile is under review",
         htmlContent: `
@@ -277,7 +257,7 @@ router.post("/contact", async (req: Request, res: Response) => {
 
     // Email to CA
     try {
-      await sendBrevoEmail({
+      await sendEmail({
         to: [{ email: data.caEmail, name: data.caName }],
         subject: `New client introduction from AiTaxBot — ${data.userName}`,
         htmlContent: `
@@ -304,7 +284,7 @@ router.post("/contact", async (req: Request, res: Response) => {
 
     // Confirmation to user
     try {
-      await sendBrevoEmail({
+      await sendEmail({
         to: [{ email: data.userEmail, name: data.userName }],
         subject: `Your introduction request to ${data.caName} has been sent`,
         htmlContent: `
@@ -344,7 +324,7 @@ router.patch("/:id/approve", requireAdmin, async (req: Request, res: Response) =
 
     // Notify CA
     try {
-      await sendBrevoEmail({
+      await sendEmail({
         to: [{ email: profile.email, name: profile.fullName }],
         subject: "Your AiTaxBot CA profile is now live!",
         htmlContent: `
@@ -494,7 +474,7 @@ router.put("/my-profile", async (req: Request, res: Response) => {
 
     // Notify admin
     try {
-      await sendBrevoEmail({
+      await sendEmail({
         to: [{ email: "vickybh26@gmail.com", name: "AiTaxBot Admin" }],
         subject: `CA Profile Updated — ${existing.fullName} (${existing.icaiMembershipNumber})`,
         htmlContent: `
@@ -513,7 +493,7 @@ router.put("/my-profile", async (req: Request, res: Response) => {
 
     // Confirm to CA
     try {
-      await sendBrevoEmail({
+      await sendEmail({
         to: [{ email: existing.email, name: existing.fullName }],
         subject: "Your AiTaxBot CA profile update is under review",
         htmlContent: `

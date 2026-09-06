@@ -39,6 +39,7 @@
  */
 
 import { getFirestore } from "./firebase";
+import { sendCalculatorResultEmail } from "./emailService";
 
 export const SAVED_RESULTS_COLLECTION = "savedResults";
 
@@ -77,6 +78,8 @@ export interface SavedResult extends SavedResultInput {
   id: string;
   userId: string;
   updatedAt: string;
+  /** Set only when a result email actually went out — see maybeSendResultEmail(). */
+  lastEmailedAt?: string;
 }
 
 const MAX_DETAILS = 5;
@@ -128,6 +131,16 @@ export async function saveLastResult(
     if (!userId || !input?.toolKey) return;
     const db = getFirestore();
     const id = docIdFor(userId, input.toolKey);
+    const ref = db.collection(SAVED_RESULTS_COLLECTION).doc(id);
+
+    // This is a full-document .set(), not a merge — every field below is
+    // explicit so a shrinking `details`/`inputs` array actually shrinks in
+    // Firestore too. lastEmailedAt has to be carried forward by hand for
+    // that reason: it isn't part of SavedResultInput, so without this it
+    // would be silently wiped on every recalculation, and
+    // maybeSendResultEmail()'s throttle would never actually throttle.
+    const existing = await ref.get();
+    const lastEmailedAt = existing.exists ? (existing.data() as SavedResult).lastEmailedAt : undefined;
 
     const record: SavedResult = {
       id,
@@ -150,11 +163,55 @@ export async function saveLastResult(
       })),
       inputs: sanitiseInputs(input.inputs),
       updatedAt: new Date().toISOString(),
+      ...(lastEmailedAt ? { lastEmailedAt } : {}),
     };
 
-    await db.collection(SAVED_RESULTS_COLLECTION).doc(id).set(record);
+    await ref.set(record);
   } catch (err) {
     console.error("[SavedResults] save failed (non-fatal):", err);
+  }
+}
+
+/**
+ * Throttle window for the "your result" email per (user, tool). Without
+ * this, dragging a slider on e.g. the SIP calculator — which calls
+ * saveLastResult() on every settled change via useTrackToolUse()'s 1.2s
+ * debounce — would fire an email every ~1.2 seconds. 30 minutes is long
+ * enough to cover one active session without spamming the inbox, short
+ * enough that coming back tomorrow and recalculating gets a fresh email.
+ */
+const RESULT_EMAIL_THROTTLE_MS = 30 * 60 * 1000;
+
+/**
+ * Fire the "your result" email for one (user, tool), unless one was already
+ * sent for this tool within the throttle window. Called after
+ * saveLastResult() has already written the fresh headline/details — reads
+ * them back off the doc rather than taking them as a parameter, so this
+ * stays a thin wrapper instead of a second copy of the save call's shape.
+ *
+ * Deliberately swallows its own errors, same as saveLastResult() — a failed
+ * or throttled email must never affect the calculation the user just ran.
+ */
+export async function maybeSendResultEmail(userId: string, toolKey: string): Promise<void> {
+  try {
+    const db = getFirestore();
+    const ref = db.collection(SAVED_RESULTS_COLLECTION).doc(docIdFor(userId, toolKey));
+    const snap = await ref.get();
+    if (!snap.exists) return;
+
+    const data = snap.data() as SavedResult;
+    const lastSent = data.lastEmailedAt ? new Date(data.lastEmailedAt).getTime() : 0;
+    if (Date.now() - lastSent < RESULT_EMAIL_THROTTLE_MS) return;
+
+    const userSnap = await db.collection("users").doc(userId).get();
+    if (!userSnap.exists) return;
+    const user = userSnap.data() as { email?: string | null; firstName?: string | null };
+    if (!user.email) return;
+
+    const { sent } = await sendCalculatorResultEmail(user, data);
+    if (sent) await ref.update({ lastEmailedAt: new Date().toISOString() });
+  } catch (err) {
+    console.error("[SavedResults] result email failed (non-fatal):", err);
   }
 }
 

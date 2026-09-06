@@ -15,7 +15,7 @@ import { Router } from "express";
 import { randomUUID } from "crypto";
 import { getFirestore } from "./firebase";
 import { COLLECTIONS } from "./firestoreHelper";
-import { saveLastResult, type SavedResultInput } from "./savedResults";
+import { saveLastResult, maybeSendResultEmail, type SavedResultInput } from "./savedResults";
 import { authenticateFirebaseToken, type AuthenticatedRequest } from "./middleware/auth.js";
 
 const router = Router();
@@ -51,6 +51,11 @@ router.post("/", authenticateFirebaseToken, async (req: AuthenticatedRequest, re
         route: saved.route || (route ? String(route) : ""),
         toolName: saved.toolName || String(tool),
       });
+      // Fire-and-forget: never let a slow or failed email hold up the
+      // response for the calculation the user is actually waiting on.
+      maybeSendResultEmail(req.userId!, saved.toolKey).catch((err) =>
+        console.error("[ToolUsage] result email failed:", err)
+      );
     }
 
     return res.status(201).json({ success: true, id });

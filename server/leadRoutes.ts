@@ -9,7 +9,7 @@ import { Router, type Request, type Response } from "express";
 import { randomUUID } from "crypto";
 import { getFirestore, verifyFirebaseToken } from "./firebase";
 import { COLLECTIONS } from "./firestoreHelper";
-import { TransactionalEmailsApi, TransactionalEmailsApiApiKeys } from "@getbrevo/brevo";
+import { sendEmail } from "./emailService";
 import { insertLeadSchema, type Lead } from "@shared/schema";
 
 const router = Router();
@@ -44,26 +44,8 @@ async function requireAdmin(req: any, res: any, next: any): Promise<any> {
   }
 }
 
-async function sendBrevoEmail(params: {
-  to: { email: string; name: string }[];
-  subject: string;
-  htmlContent: string;
-}) {
-  const apiInstance = new TransactionalEmailsApi();
-  apiInstance.setApiKey(
-    TransactionalEmailsApiApiKeys.apiKey,
-    process.env.BREVO_API_KEY!
-  );
-  await apiInstance.sendTransacEmail({
-    sender: {
-      email: process.env.BREVO_SENDER_EMAIL || "noreply@aitaxbot.co.in",
-      name: "AiTaxBot",
-    },
-    to: params.to,
-    subject: params.subject,
-    htmlContent: params.htmlContent,
-  });
-}
+// sendBrevoEmail() moved to emailService.ts (2026-09-06) — see sendEmail()
+// there, now shared by every route that sends mail.
 
 // ─── POST /api/leads/capture ───────────────────────────────────────────────
 
@@ -131,7 +113,7 @@ router.post("/capture", async (req: Request, res: Response) => {
 
     // Welcome email to user
     try {
-      await sendBrevoEmail({
+      await sendEmail({
         to: [{ email: data.email, name: data.name }],
         subject: `Your ${data.source} result — AiTaxBot`,
         htmlContent: `
