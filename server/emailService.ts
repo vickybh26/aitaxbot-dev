@@ -55,7 +55,19 @@ export interface SendEmailParams extends EmailContent {
   attachment?: { content: string; name: string }[];
   sender?: { email: string; name: string };
   replyTo?: { email: string; name?: string };
+  bcc?: { email: string; name?: string }[];
 }
+
+/**
+ * BCC target for every user-facing email (welcome, calculator results,
+ * weekly digest) so Vicky's own Google Workspace inbox becomes the sent+
+ * received log — Gmail threads a reply against this copy automatically
+ * (both carry the same Brevo-issued Message-ID), no separate email-log
+ * infrastructure needed. Decided 2026-09-06 specifically because BCC-ing
+ * the sender address is the only way to get a copy of your own outbound
+ * mail; being the "From" address does not do that on its own.
+ */
+const ADMIN_BCC = { email: "admin@aitaxbot.co.in", name: "AiTaxBot Admin" };
 
 /**
  * Every call is wrapped so a Brevo outage or missing API key never turns a
@@ -80,6 +92,7 @@ export async function sendEmail(params: SendEmailParams): Promise<{ sent: boolea
       ...(params.textContent ? { textContent: params.textContent } : {}),
       ...(params.attachment ? { attachment: params.attachment } : {}),
       ...(params.replyTo ? { replyTo: params.replyTo } : {}),
+      ...(params.bcc ? { bcc: params.bcc } : {}),
     });
     return { sent: true };
   } catch (err: any) {
@@ -261,6 +274,7 @@ export async function sendWelcomeEmail(user: { email?: string | null; firstName?
   return sendEmail({
     to: [{ email: user.email, name: user.firstName || undefined }],
     sender: SENDERS.transactional,
+    bcc: [ADMIN_BCC],
     ...buildWelcomeEmail(user),
   });
 }
@@ -332,6 +346,7 @@ export async function sendCalculatorResultEmail(
   return sendEmail({
     to: [{ email: user.email, name: user.firstName || undefined }],
     sender: SENDERS.transactional,
+    bcc: [ADMIN_BCC],
     ...buildCalculatorResultEmail(user, result),
   });
 }
@@ -408,6 +423,7 @@ export async function sendWeeklyDigestEmail(
   return sendEmail({
     to: [{ email: user.email, name: user.firstName || undefined }],
     sender: SENDERS.digest,
+    bcc: [ADMIN_BCC],
     ...buildWeeklyDigestEmail(user, content),
   });
 }
