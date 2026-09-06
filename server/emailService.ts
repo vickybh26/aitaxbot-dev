@@ -10,6 +10,13 @@
  * for anything account-triggered (welcome, calculator results), and
  * `info@aitaxbot.in` for the weekly digest. SENDERS below is the one place
  * that decision lives.
+ *
+ * Each email is a `buildX()` (pure — returns {subject, htmlContent,
+ * textContent}, no network call) plus a thin `sendX()` wrapper that calls
+ * `sendEmail(buildX(...))`. The split exists so scripts/previewEmails.mjs
+ * can render real HTML to local files for review without ever touching the
+ * Brevo API — useful review here means never accidentally emailing a real
+ * user while looking at a subject line.
  */
 
 import { TransactionalEmailsApi, TransactionalEmailsApiApiKeys } from "@getbrevo/brevo";
@@ -37,11 +44,14 @@ export function escapeHtml(input: unknown): string {
   ));
 }
 
-export interface SendEmailParams {
-  to: { email: string; name?: string }[];
+export interface EmailContent {
   subject: string;
   htmlContent: string;
   textContent?: string;
+}
+
+export interface SendEmailParams extends EmailContent {
+  to: { email: string; name?: string }[];
   attachment?: { content: string; name: string }[];
   sender?: { email: string; name: string };
   replyTo?: { email: string; name?: string };
@@ -111,13 +121,9 @@ function unsubscribeUrl(uid: string): string {
 //    isNewUser check in storage.upsertUser() / the /api/user/sync handler).
 // ─────────────────────────────────────────────────────────────────────────
 
-export async function sendWelcomeEmail(user: { email?: string | null; firstName?: string | null }) {
-  if (!user.email) return { sent: false, reason: "no_email" as const };
+export function buildWelcomeEmail(user: { firstName?: string | null }): EmailContent {
   const name = escapeHtml(user.firstName || "there");
-
-  return sendEmail({
-    to: [{ email: user.email, name: user.firstName || undefined }],
-    sender: SENDERS.transactional,
+  return {
     subject: "Welcome to AiTaxBot 👋",
     htmlContent: `
       <!DOCTYPE html>
@@ -147,6 +153,15 @@ export async function sendWelcomeEmail(user: { email?: string | null; firstName?
       </body></html>
     `,
     textContent: `Hi ${user.firstName || "there"},\n\nWelcome to AiTaxBot! Your account is ready.\n\nIncome Tax Calculator: https://www.aitaxbot.co.in/calculators/income-tax\nHRA Calculator: https://www.aitaxbot.co.in/calculators/hra\nAIS/26AS/Form 16 reconciliation: https://www.aitaxbot.co.in/tools/ais-26as-form16\n\nEvery result you calculate while signed in is saved to your dashboard: https://www.aitaxbot.co.in/dashboard\n\n-- AiTaxBot Team`,
+  };
+}
+
+export async function sendWelcomeEmail(user: { email?: string | null; firstName?: string | null }) {
+  if (!user.email) return { sent: false, reason: "no_email" as const };
+  return sendEmail({
+    to: [{ email: user.email, name: user.firstName || undefined }],
+    sender: SENDERS.transactional,
+    ...buildWelcomeEmail(user),
   });
 }
 
@@ -157,11 +172,12 @@ export async function sendWelcomeEmail(user: { email?: string | null; firstName?
 //    later needs no change here.
 // ─────────────────────────────────────────────────────────────────────────
 
-export async function sendCalculatorResultEmail(
-  user: { email?: string | null; firstName?: string | null },
-  result: Pick<SavedResult, "toolName" | "route" | "headline" | "details" | "kind">
-) {
-  if (!user.email) return { sent: false, reason: "no_email" as const };
+type CalculatorResultInput = Pick<SavedResult, "toolName" | "route" | "headline" | "details" | "kind">;
+
+export function buildCalculatorResultEmail(
+  user: { firstName?: string | null },
+  result: CalculatorResultInput
+): EmailContent {
   const name = escapeHtml(user.firstName || "there");
   const toolName = escapeHtml(result.toolName);
   const headlineLabel = escapeHtml(result.headline.label);
@@ -171,9 +187,7 @@ export async function sendCalculatorResultEmail(
     .join("");
   const resultUrl = `https://www.aitaxbot.co.in${result.route}`;
 
-  return sendEmail({
-    to: [{ email: user.email, name: user.firstName || undefined }],
-    sender: SENDERS.transactional,
+  return {
     subject: `Your ${toolName} result — AiTaxBot`,
     htmlContent: `
       <!DOCTYPE html>
@@ -200,6 +214,18 @@ export async function sendCalculatorResultEmail(
       </body></html>
     `,
     textContent: `Hi ${user.firstName || "there"},\n\n${result.toolName} result:\n${result.headline.label}: ${result.headline.value}\n${(result.details ?? []).map((d) => `${d.label}: ${d.value}`).join("\n")}\n\nOpen again: ${resultUrl}\nDashboard: https://www.aitaxbot.co.in/dashboard\n\n-- AiTaxBot Team`,
+  };
+}
+
+export async function sendCalculatorResultEmail(
+  user: { email?: string | null; firstName?: string | null },
+  result: CalculatorResultInput
+) {
+  if (!user.email) return { sent: false, reason: "no_email" as const };
+  return sendEmail({
+    to: [{ email: user.email, name: user.firstName || undefined }],
+    sender: SENDERS.transactional,
+    ...buildCalculatorResultEmail(user, result),
   });
 }
 
@@ -209,11 +235,12 @@ export async function sendCalculatorResultEmail(
 //    carries a working unsubscribe link (DPDP hygiene for recurring mail).
 // ─────────────────────────────────────────────────────────────────────────
 
-export async function sendWeeklyDigestEmail(
-  user: { id: string; email?: string | null; firstName?: string | null },
-  content: { dates: KeyDateItem[]; usage: SavedResult[] }
-) {
-  if (!user.email) return { sent: false, reason: "no_email" as const };
+type DigestContent = { dates: KeyDateItem[]; usage: SavedResult[] };
+
+export function buildWeeklyDigestEmail(
+  user: { id: string; firstName?: string | null },
+  content: DigestContent
+): EmailContent {
   const name = escapeHtml(user.firstName || "there");
 
   const datesRows = content.dates
@@ -228,9 +255,7 @@ export async function sendWeeklyDigestEmail(
     ? `<h3 style="font-size:14px;color:#1e293b;margin:20px 0 8px">Your recent calculations</h3><table style="width:100%;border-collapse:collapse">${usageRows}</table>`
     : "";
 
-  return sendEmail({
-    to: [{ email: user.email, name: user.firstName || undefined }],
-    sender: SENDERS.digest,
+  return {
     subject: "Your AiTaxBot weekly update",
     htmlContent: `
       <!DOCTYPE html>
@@ -255,5 +280,17 @@ export async function sendWeeklyDigestEmail(
       </body></html>
     `,
     textContent: `Hi ${user.firstName || "there"},\n\nDates to watch:\n${content.dates.map((d) => `${d.day} ${d.monthLabel} — ${d.title} (${d.detail})`).join("\n")}\n${content.usage.length ? `\nYour recent calculations:\n${content.usage.map((r) => `${r.toolName}: ${r.headline.value}`).join("\n")}\n` : ""}\nDashboard: https://www.aitaxbot.co.in/dashboard\n\nUnsubscribe: ${unsubscribeUrl(user.id)}\n\n-- AiTaxBot Team`,
+  };
+}
+
+export async function sendWeeklyDigestEmail(
+  user: { id: string; email?: string | null; firstName?: string | null },
+  content: DigestContent
+) {
+  if (!user.email) return { sent: false, reason: "no_email" as const };
+  return sendEmail({
+    to: [{ email: user.email, name: user.firstName || undefined }],
+    sender: SENDERS.digest,
+    ...buildWeeklyDigestEmail(user, content),
   });
 }

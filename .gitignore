@@ -16,6 +16,9 @@ server/public
 uploads/
 *.pdf
 
+# Generated local email previews (scripts/previewEmails.ts output)
+scripts/email-previews/
+
 # Firebase credentials
 firebase-adminsdk-*.json
 serviceAccountKey.json
