@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { logout } from "@/lib/firebase";
 import { cn } from "@/lib/utils";
-import logoImage from "@assets/aitaxbot-logo.png";
+import logoImage from "@assets/aitaxbot-icon.png";
 import ModalShell from "@/components/ui/modal-shell";
 
 const navItems = [
@@ -57,7 +57,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     >
       {/* Logo */}
       <div className="flex items-center gap-3 px-5 py-5 border-b border-rule">
-        <img src={logoImage} alt="AiTaxBot" className="h-8 w-8 rounded-lg" />
+        <img src={logoImage} alt="AiTaxBot" className="h-8 w-8 object-contain" />
         <div>
           <div className="font-bold text-white text-sm">AiTaxBot</div>
           <div className="text-ink/45 text-xs">Admin Panel</div>

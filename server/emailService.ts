@@ -138,12 +138,17 @@ const FONT_BODY = "Manrope, 'Segoe UI', Helvetica, Arial, sans-serif";
 // @assets/* imports used on-site (those get a build-hashed filename, so the
 // URL changes every deploy and can't be relied on inside an email that might
 // sit unread for weeks).
-const LOGO_URL = "https://www.aitaxbot.co.in/images/aitaxbot-logo.png";
+const LOGO_URL = "https://www.aitaxbot.co.in/images/aitaxbot-icon.png";
+// Native size 268x400 (see scripts/logo-work/ for the crop from the source
+// logo) — displayed at a fixed small height, width computed to match its
+// aspect ratio so it isn't squashed into a square.
+const LOGO_DISPLAY_HEIGHT = 28;
+const LOGO_DISPLAY_WIDTH = Math.round((LOGO_DISPLAY_HEIGHT * 268) / 400);
 
 /** Icon + wordmark, used at the top of every email. */
 function brandHeader(): string {
   return `<table border="0" cellpadding="0" cellspacing="0" role="presentation" style="margin:0 0 32px"><tbody><tr>
-    <td style="vertical-align:middle;padding-right:8px"><img src="${LOGO_URL}" width="28" height="28" alt="" style="display:block;border:0"/></td>
+    <td style="vertical-align:middle;padding-right:8px"><img src="${LOGO_URL}" width="${LOGO_DISPLAY_WIDTH}" height="${LOGO_DISPLAY_HEIGHT}" alt="" style="display:block;border:0"/></td>
     <td style="vertical-align:middle;font-size:18px;line-height:24px;font-family:${FONT_DISPLAY};font-weight:700;color:${INK};letter-spacing:-0.01em">AiTaxBot</td>
   </tr></tbody></table>`;
 }

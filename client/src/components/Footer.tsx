@@ -1,6 +1,5 @@
 import { Link } from "wouter";
-import logoImagePng from "@assets/aitaxbot-logo-white.png";
-import logoImageWebP from "@assets/aitaxbot-logo-white.webp";
+import logoIconWhite from "@assets/aitaxbot-icon-white.png";
 
 /**
  * Word-for-word port of Lovable's footer card (2026-09-05) — same
@@ -46,11 +45,9 @@ export default function Footer() {
       <div className="mx-auto max-w-[1180px] rounded-[2rem] bg-ink px-7 py-12 text-paper sm:px-10">
         <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
-            <Link href="/" aria-label="AiTaxBot home">
-              <picture>
-                <source srcSet={logoImageWebP} type="image/webp" />
-                <img src={logoImagePng} alt="AiTaxBot" className="h-9 w-auto" width={320} height={195} loading="lazy" />
-              </picture>
+            <Link href="/" aria-label="AiTaxBot home" className="flex items-center">
+              <img src={logoIconWhite} alt="" className="h-8 w-auto" width={268} height={400} loading="lazy" />
+              <span className="ml-2 font-display text-lg font-bold text-paper tracking-tight">AiTaxBot</span>
             </Link>
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-paper/65">
               Indian tax computation, reviewed by practising Chartered Accountants — for FY 2026-27
