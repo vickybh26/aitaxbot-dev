@@ -121,38 +121,72 @@ function unsubscribeUrl(uid: string): string {
 //    isNewUser check in storage.upsertUser() / the /api/user/sync handler).
 // ─────────────────────────────────────────────────────────────────────────
 
+// Warm Ledger tokens, matching the site (index.css / tailwind.config.ts).
+// Email clients don't run our CSS, so these are the literal hex values, not
+// var() references — kept in one place here rather than repeated per string.
+const INK = "#0F2A4A";
+const PAPER = "#FAF8F4";
+const CARD = "#FFFFFF";
+const RULE = "#E5E0D6";
+const BODY_TEXT = "#1F2937";
+const MUTED = "#5B6572";
+const FONT_DISPLAY = "Sora, 'Segoe UI', Helvetica, Arial, sans-serif";
+const FONT_BODY = "Manrope, 'Segoe UI', Helvetica, Arial, sans-serif";
+
+/**
+ * Outlook desktop renders `<a>` styled as a button inconsistently (wrong
+ * padding, no border-radius). This is the standard bulletproof-button
+ * pattern — a real anchor for every other client, plus MSO-only conditional
+ * comments that give Outlook a precise VML-free width/line-height instead —
+ * ported from Lovable's React-Email output for the same template
+ * (2026-09-06 — see /email-preview/welcome on their site).
+ */
+function ctaButton(href: string, label: string): string {
+  return `<a href="${href}" style="line-height:100%;text-decoration:none;display:inline-block;max-width:100%;mso-padding-alt:0px;background-color:${INK};color:${CARD};font-size:14px;font-weight:600;padding:12px 24px;border-radius:8px" target="_blank"><span><!--[if mso]><i style="mso-font-width:400%;mso-text-raise:18" hidden>&#8202;&#8202;&#8202;</i><![endif]--></span><span style="max-width:100%;display:inline-block;line-height:120%;mso-padding-alt:0px;mso-text-raise:9px">${label}</span><span><!--[if mso]><i style="mso-font-width:400%" hidden>&#8202;&#8202;&#8202;&#8203;</i><![endif]--></span></a>`;
+}
+
+/**
+ * Hidden preheader text — controls the one-line snippet an inbox list shows
+ * next to the subject, which is otherwise whatever plain text happens to
+ * come first in the body. The zero-width padding after it stops the email
+ * client from appending real body text to fill out the snippet length.
+ */
+function preheader(text: string): string {
+  const pad = "‌​‍‎‏﻿".repeat(20);
+  return `<div style="display:none;overflow:hidden;line-height:1px;opacity:0;max-height:0;max-width:0" data-skip-in-text="true">${escapeHtml(text)}<div>${pad}</div></div>`;
+}
+
 export function buildWelcomeEmail(user: { firstName?: string | null }): EmailContent {
   const name = escapeHtml(user.firstName || "there");
   return {
-    subject: "Welcome to AiTaxBot 👋",
+    subject: "Welcome to AiTaxBot — your taxes, made clear",
     htmlContent: `
       <!DOCTYPE html>
-      <html><body style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:20px;color:#1e293b">
-        <div style="background:#1E3A8A;padding:20px;border-radius:8px 8px 0 0;text-align:center">
-          <h1 style="color:#fff;margin:0;font-size:22px">AiTaxBot</h1>
-          <p style="color:#93C5FD;margin:4px 0 0;font-size:13px">www.aitaxbot.co.in · Smart Tax Tools for India</p>
-        </div>
-        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-top:none;padding:24px;border-radius:0 0 8px 8px">
-          <p style="font-size:16px;margin:0 0 12px">Hi <strong>${name}</strong>,</p>
-          <p style="font-size:14px;line-height:1.6;color:#475569">
-            Welcome to AiTaxBot! Your account is ready. Here's what you can do right away:
-          </p>
-          <ul style="font-size:14px;line-height:1.9;color:#475569;padding-left:20px">
-            <li>Compare Old vs New tax regime with the <a href="https://www.aitaxbot.co.in/calculators/income-tax" style="color:#2563eb">Income Tax Calculator</a></li>
-            <li>Work out your HRA exemption with the <a href="https://www.aitaxbot.co.in/calculators/hra" style="color:#2563eb">HRA Calculator</a></li>
-            <li>Check your AIS, 26AS and Form 16 against each other with our <a href="https://www.aitaxbot.co.in/tools/ais-26as-form16" style="color:#2563eb">reconciliation tool</a></li>
-          </ul>
-          <p style="font-size:13px;color:#64748b">Every result you calculate while signed in is saved to your <a href="https://www.aitaxbot.co.in/dashboard" style="color:#2563eb">dashboard</a> automatically.</p>
-          <div style="margin:20px 0;text-align:center">
-            <a href="https://www.aitaxbot.co.in/calculators" style="background:#1E3A8A;color:#fff;padding:10px 24px;border-radius:6px;text-decoration:none;font-size:14px;font-weight:bold;display:inline-block">Explore all calculators →</a>
-          </div>
-          <hr style="border:none;border-top:1px solid #e2e8f0;margin:20px 0">
-          <p style="font-size:12px;color:#94a3b8;margin:0">Questions? Reply to this email or reach us at admin@aitaxbot.co.in.</p>
-        </div>
-        <p style="text-align:center;font-size:11px;color:#94a3b8;margin-top:12px">AiTaxBot · Bengaluru, Karnataka, India</p>
+      <html dir="ltr" lang="en"><head><meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/><meta name="x-apple-disable-message-reformatting"/></head>
+      <body style="background-color:${PAPER};margin:0;padding:0">
+        ${preheader("Welcome to AiTaxBot — your taxes, made clear.")}
+        <table border="0" width="100%" cellpadding="0" cellspacing="0" role="presentation" align="center"><tbody><tr><td style="margin:0;padding:0;background-color:${PAPER}">
+          <table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="max-width:560px;margin:0 auto;padding:40px 24px;font-family:${FONT_BODY}"><tbody><tr style="width:100%"><td>
+            <p style="font-size:18px;line-height:24px;font-family:${FONT_DISPLAY};font-weight:700;color:${INK};margin:0 0 32px;letter-spacing:-0.01em">AiTaxBot</p>
+            <table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color:${CARD};border:1px solid ${RULE};border-radius:12px;padding:32px 28px"><tbody><tr><td>
+              <h1 style="font-family:${FONT_DISPLAY};font-size:24px;font-weight:700;color:${INK};line-height:32px;margin:0 0 12px;letter-spacing:-0.01em">Welcome, ${name}.</h1>
+              <p style="font-size:15px;line-height:24px;color:${BODY_TEXT};margin:0 0 8px">Thanks for joining AiTaxBot. You now have clear, CA-reviewed answers to Indian income-tax questions — plus calculators that do the maths for you.</p>
+              <p style="font-size:15px;line-height:24px;color:${BODY_TEXT};margin:0 0 24px">A good first step: compare the old and new tax regimes with your own numbers. It takes about two minutes.</p>
+              ${ctaButton("https://www.aitaxbot.co.in/calculators/income-tax", "Compare my tax regimes")}
+              <hr style="width:100%;border:none;border-top:1px solid ${RULE};margin:28px 0"/>
+              <p style="font-size:12px;line-height:24px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:${MUTED};margin:0 0 12px">What you can do here</p>
+              <p style="font-size:14px;line-height:22px;color:${BODY_TEXT};margin:0 0 6px">· Compare Old vs New tax regime with the Income Tax Calculator</p>
+              <p style="font-size:14px;line-height:22px;color:${BODY_TEXT};margin:0 0 6px">· Check your HRA exemption and NPS deductions</p>
+              <p style="font-size:14px;line-height:22px;color:${BODY_TEXT};margin:0 0 6px">· Reconcile your AIS, 26AS and Form 16 before you file</p>
+              <p style="font-size:14px;line-height:22px;color:${BODY_TEXT};margin:0">· Find a verified CA when you want a human to file for you</p>
+            </td></tr></tbody></table>
+            <p style="font-size:12px;line-height:18px;color:${MUTED};margin:24px 0 0">Questions? Just reply to this email — a person reads every message. You can also reach us at <a href="mailto:admin@aitaxbot.co.in" style="color:${INK};text-decoration-line:none">admin@aitaxbot.co.in</a>.</p>
+            <p style="font-size:12px;line-height:18px;color:${MUTED};margin:8px 0 0">AiTaxBot · Smart Tax Tools for India</p>
+          </td></tr></tbody></table>
+        </td></tr></tbody></table>
       </body></html>
     `,
-    textContent: `Hi ${user.firstName || "there"},\n\nWelcome to AiTaxBot! Your account is ready.\n\nIncome Tax Calculator: https://www.aitaxbot.co.in/calculators/income-tax\nHRA Calculator: https://www.aitaxbot.co.in/calculators/hra\nAIS/26AS/Form 16 reconciliation: https://www.aitaxbot.co.in/tools/ais-26as-form16\n\nEvery result you calculate while signed in is saved to your dashboard: https://www.aitaxbot.co.in/dashboard\n\n-- AiTaxBot Team`,
+    textContent: `Welcome, ${user.firstName || "there"}.\n\nThanks for joining AiTaxBot. You now have clear, CA-reviewed answers to Indian income-tax questions — plus calculators that do the maths for you.\n\nA good first step: compare the old and new tax regimes with your own numbers. It takes about two minutes.\nCompare my tax regimes: https://www.aitaxbot.co.in/calculators/income-tax\n\nWhat you can do here:\n· Compare Old vs New tax regime with the Income Tax Calculator\n· Check your HRA exemption and NPS deductions\n· Reconcile your AIS, 26AS and Form 16 before you file\n· Find a verified CA when you want a human to file for you\n\nQuestions? Just reply to this email, or reach us at admin@aitaxbot.co.in.\n\n-- AiTaxBot Team`,
   };
 }
 
