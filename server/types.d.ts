@@ -6,35 +6,9 @@
 // (types provided by the package's own lib/index.d.ts stub — see node_modules)
 
 // ── @getbrevo/brevo ────────────────────────────────────────────────────────
-declare module '@getbrevo/brevo' {
-  export class TransactionalEmailsApi {
-    setApiKey(keyId: number, apiKey: string): void;
-    sendTransacEmail(sendSmtpEmail: SendSmtpEmail): Promise<{ response: unknown; body: { messageId?: string } }>;
-  }
-  export class SendSmtpEmail {
-    to?: Array<{ email: string; name?: string }>;
-    cc?: Array<{ email: string; name?: string }>;
-    bcc?: Array<{ email: string; name?: string }>;
-    sender?: { email: string; name?: string };
-    replyTo?: { email: string; name?: string };
-    subject?: string;
-    htmlContent?: string;
-    textContent?: string;
-    attachment?: Array<{ name: string; content: string }>;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    params?: Record<string, any>;
-  }
-  export enum TransactionalEmailsApiApiKeys {
-    apiKey = 0,
-  }
-  export class AccountApi {
-    setApiKey(keyId: number, apiKey: string): void;
-    getAccount(): Promise<{ response: unknown; body: unknown }>;
-  }
-  export enum AccountApiApiKeys {
-    apiKey = 0,
-  }
-}
+// Removed 2026-09-07 along with the dependency. Mail now goes through
+// ZeptoMail via plain fetch() in server/emailService.ts, which needs no
+// ambient declaration because it has no SDK.
 
 // ── @google/genai ──────────────────────────────────────────────────────────
 declare module '@google/genai' {

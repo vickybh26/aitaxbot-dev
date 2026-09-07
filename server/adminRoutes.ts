@@ -17,7 +17,13 @@ import { Router } from "express";
 import { getFirestore, verifyFirebaseToken, admin } from "./firebase";
 import { COLLECTIONS } from "./firestoreHelper";
 import { sendEmail } from "./emailService";
-import { sendWeeklyDigests } from "./weeklyDigest";
+import {
+  sendMonthlyDigests, getDigestRecipients, getIssue, listIssues,
+  saveIssue, markIssueSent, deleteIssue,
+} from "./monthlyDigest";
+import { buildMonthlyDigestEmail } from "./emailService";
+import { getUpcomingKeyDates } from "@shared/keyDates";
+import { emptyIssue, validateIssue, type DigestIssue } from "@shared/digest";
 
 const router = Router();
 
@@ -727,19 +733,173 @@ router.get("/leads", adminL3, async (_req: any, res) => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// WEEKLY DIGEST — manual trigger for testing without waiting for Monday's cron
-// (see server/index.ts for the scheduled run). L1 only: this emails every
-// non-opted-out registered user, so it isn't something a Level 2/3 admin
-// should be able to fire by accident.
+// MONTHLY DIGEST
+//
+// Replaced the weekly-digest cron trigger on 2026-09-07. Nothing here fires
+// on a schedule — an issue is written, previewed, test-sent, and only then
+// sent to everyone, each step an explicit request.
+//
+// Level split: L2 may write and preview drafts and send tests to themselves.
+// Only L1 may send to every registered user or delete an issue. The UI hides
+// what you cannot do, but that is a courtesy — these checks are the actual
+// boundary, since a hidden button is still a reachable endpoint.
 // ─────────────────────────────────────────────────────────────────────────────
 
-router.post("/weekly-digest/trigger", adminL1, async (_req: any, res) => {
+/** Sanitise an issue coming off the wire. Never trust the editor's shape. */
+function coerceIssue(id: string, body: any): DigestIssue {
+  const base = emptyIssue(id);
+  return {
+    ...base,
+    subject: String(body?.subject ?? base.subject).slice(0, 200),
+    preheader: String(body?.preheader ?? "").slice(0, 200),
+    intro: String(body?.intro ?? "").slice(0, 4000),
+    sections: (Array.isArray(body?.sections) ? body.sections : [])
+      .slice(0, 12)
+      .map((sec: any) => ({
+        heading: String(sec?.heading ?? "").slice(0, 200),
+        body: String(sec?.body ?? "").slice(0, 20000),
+      })),
+    includeDates: body?.includeDates !== false,
+    includeUsage: body?.includeUsage !== false,
+  };
+}
+
+// How many people an issue would actually reach right now.
+router.get("/digest/recipients", adminL2, async (_req: any, res) => {
   try {
-    const result = await sendWeeklyDigests();
+    const recipients = await getDigestRecipients();
+    res.json({ count: recipients.length });
+  } catch (err) {
+    console.error("[Admin] Digest recipient count failed:", err);
+    res.status(500).json({ error: "Failed to count recipients" });
+  }
+});
+
+router.get("/digest/issues", adminL2, async (_req: any, res) => {
+  try {
+    res.json(await listIssues());
+  } catch (err) {
+    console.error("[Admin] Digest list failed:", err);
+    res.status(500).json({ error: "Failed to list issues" });
+  }
+});
+
+// Returns a blank issue rather than 404 for a month not yet written, so the
+// editor opens ready to type instead of having to handle a missing document.
+router.get("/digest/issues/:id", adminL2, async (req: any, res) => {
+  try {
+    res.json((await getIssue(req.params.id)) || emptyIssue(req.params.id));
+  } catch (err) {
+    console.error("[Admin] Digest fetch failed:", err);
+    res.status(500).json({ error: "Failed to fetch issue" });
+  }
+});
+
+router.put("/digest/issues/:id", adminL2, async (req: any, res) => {
+  try {
+    const saved = await saveIssue(coerceIssue(req.params.id, req.body));
+    res.json(saved);
+  } catch (err) {
+    console.error("[Admin] Digest save failed:", err);
+    res.status(500).json({ error: "Failed to save issue" });
+  }
+});
+
+router.delete("/digest/issues/:id", adminL1, async (req: any, res) => {
+  try {
+    await deleteIssue(req.params.id);
+    res.json({ success: true });
+  } catch (err) {
+    console.error("[Admin] Digest delete failed:", err);
+    res.status(500).json({ error: "Failed to delete issue" });
+  }
+});
+
+/**
+ * Rendered HTML for the preview pane. Built from the request body rather than
+ * the stored document so the preview tracks unsaved edits, and rendered by
+ * the same buildMonthlyDigestEmail() the send uses — a preview drawn by
+ * separate code would eventually stop matching what actually goes out, which
+ * would make it worse than no preview at all.
+ */
+router.post("/digest/preview", adminL2, async (req: any, res) => {
+  try {
+    const issue = coerceIssue(String(req.body?.id || "preview"), req.body);
+    const { htmlContent, subject } = buildMonthlyDigestEmail(
+      { id: "preview-user", firstName: req.adminEmail?.split("@")[0] || "there" },
+      { issue, dates: getUpcomingKeyDates(), usage: [] }
+    );
+    res.json({ subject, html: htmlContent, errors: validateIssue(issue) });
+  } catch (err) {
+    console.error("[Admin] Digest preview failed:", err);
+    res.status(500).json({ error: "Failed to render preview" });
+  }
+});
+
+/**
+ * Test send — to the requesting admin's own address only. The address comes
+ * from the verified Firebase token, never from the request body, so this
+ * cannot be turned into an open relay for arbitrary recipients.
+ *
+ * The admin must also be a digest recipient themselves (a real user document,
+ * not opted out) because sendMonthlyDigests filters to real users. That is
+ * intentional: a test that bypassed the recipient filter would not be testing
+ * the path a real send takes.
+ */
+router.post("/digest/issues/:id/test", adminL2, async (req: any, res) => {
+  try {
+    const issue = coerceIssue(req.params.id, req.body);
+    const errors = validateIssue(issue);
+    if (errors.length) return res.status(400).json({ error: errors.join(" ") });
+
+    const result = await sendMonthlyDigests(issue, { onlyTo: [req.adminEmail] });
+    if (result.sent === 0) {
+      return res.status(400).json({
+        error: result.failures[0]?.reason
+          || `No email sent. ${req.adminEmail} must exist as a registered user and not be unsubscribed.`,
+      });
+    }
+    res.json({ success: true, to: req.adminEmail, ...result });
+  } catch (err) {
+    console.error("[Admin] Digest test send failed:", err);
+    res.status(500).json({ error: "Failed to send test" });
+  }
+});
+
+/**
+ * The real send. L1 only.
+ *
+ * Refuses an already-sent issue: without that guard a double-click, a browser
+ * retry, or a second admin on the same screen mails everyone twice, and there
+ * is no recalling it. `force` exists for the genuine resend case and has to be
+ * passed deliberately.
+ */
+router.post("/digest/issues/:id/send", adminL1, async (req: any, res) => {
+  try {
+    const issue = coerceIssue(req.params.id, req.body);
+    const errors = validateIssue(issue);
+    if (errors.length) return res.status(400).json({ error: errors.join(" ") });
+
+    const existing = await getIssue(req.params.id);
+    if (existing?.status === "sent" && !req.body?.force) {
+      return res.status(409).json({
+        error: `This issue was already sent on ${existing.sentAt}. Pass force to send it again.`,
+      });
+    }
+
+    // Persist before sending, so what went out is what is on record even if
+    // the process dies mid-broadcast.
+    await saveIssue(issue);
+    const result = await sendMonthlyDigests(issue);
+    await markIssueSent(req.params.id, {
+      sent: result.sent, skipped: result.skipped, failed: result.failed,
+    });
+
+    console.log(`[Admin] Digest ${req.params.id} sent by ${req.adminEmail}: ${result.sent} delivered, ${result.failed} failed`);
     res.json({ success: true, ...result });
   } catch (err) {
-    console.error("[Admin] Weekly digest manual trigger failed:", err);
-    res.status(500).json({ error: "Failed to send weekly digest" });
+    console.error("[Admin] Digest send failed:", err);
+    res.status(500).json({ error: "Failed to send digest" });
   }
 });
 

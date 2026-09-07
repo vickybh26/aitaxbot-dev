@@ -57,6 +57,7 @@ const AdminUsers = lazy(() => import("@/pages/admin/AdminUsers"));
 const AdminAnalytics = lazy(() => import("@/pages/admin/AdminAnalytics"));
 const AdminCAs = lazy(() => import("@/pages/admin/AdminCAs"));
 const AdminAIReview = lazy(() => import("@/pages/admin/AdminAIReview"));
+const AdminDigest = lazy(() => import("@/pages/admin/AdminDigest"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 
 // Minimal full-screen spinner shown while a lazy chunk loads
@@ -160,6 +161,12 @@ function Router() {
           </Route>
           <Route path="/admin/ai-review">
             {() => <AdminRoute component={AdminAIReview} minLevel={3} />}
+          </Route>
+          {/* Level 2: managers may write and preview an issue and send a test
+              to themselves. The send-to-all button inside is Level 1, enforced
+              server-side by adminL1 on POST /digest/issues/:id/send. */}
+          <Route path="/admin/digest">
+            {() => <AdminRoute component={AdminDigest} minLevel={2} />}
           </Route>
         </Switch>
       </Suspense>

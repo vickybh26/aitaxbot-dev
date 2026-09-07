@@ -2,13 +2,11 @@ import express, { type Request, Response, NextFunction } from "express";
 import compression from "compression";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
-import cron from "node-cron";
 import { randomBytes } from "crypto";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { initializeFirebase } from "./firebase";
 import { cleanStalePdfs } from "./pdfGenerator";
-import { sendWeeklyDigests } from "./weeklyDigest";
 
 // Initialize Firebase on startup
 try {
@@ -24,18 +22,24 @@ try {
 // Remove any temp PDFs left over from previous server runs (older than 5 min)
 cleanStalePdfs();
 
-// ── Weekly digest ─────────────────────────────────────────────────────────────
-// Every Monday 9am IST. This is the only scheduled/recurring job in the app —
-// everything else runs on request or once at boot (tax-rate seeding above,
-// stale-PDF cleanup). Railway keeps this process running continuously (it's
-// not serverless), so an in-process cron is the simplest correct option; a
-// separate Railway cron service hitting a protected endpoint would be the
-// alternative if this process ever needs to scale to multiple instances,
-// since node-cron would then fire once per instance instead of once total.
-cron.schedule("0 9 * * 1", () => {
-  log("[WeeklyDigest] cron: starting scheduled run");
-  sendWeeklyDigests().catch((err) => console.error("[WeeklyDigest] cron run failed:", err));
-}, { timezone: "Asia/Kolkata" });
+// ── No scheduled email ────────────────────────────────────────────────────────
+// There was a cron here until 2026-09-07: `cron.schedule("0 9 * * 1", ...)`,
+// which sent the weekly digest to every registered user each Monday at 9am
+// IST with nobody having read it first. It was removed on the founder's
+// instruction after the 2026-09-07 run, and the reason is worth keeping:
+// the problems in that send — an unlabelled ₹1.59 crore PF projection
+// rendered beside a ₹3,51,000 tax bill as though they were comparable — were
+// only found by reading the copy that arrived in his own inbox, hours after
+// 146 other people had already received it.
+//
+// The digest is now monthly, written per issue, and sent by hand from
+// /admin/digest. See server/monthlyDigest.ts. Do not reintroduce a schedule
+// here without asking: welcome and calculator-result emails still fire
+// automatically, and those are the ones that should, because each is a 1:1
+// reply to something the user just did rather than a broadcast.
+//
+// cleanStalePdfs() above still runs once at boot; there is no recurring job
+// left in this process.
 
 // ── Security startup warnings ─────────────────────────────────────────────────
 if (process.env.NODE_ENV === 'production' && process.env.APP_CHECK_ENFORCE !== 'true') {

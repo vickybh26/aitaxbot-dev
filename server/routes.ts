@@ -19,8 +19,7 @@ import { registerTaxReconcileRoutes } from "./taxReconcileRoutes.js";
 import ragRoutes from "./ragRoutes";
 import { getFirestore, verifyFirebaseToken, admin } from "./firebase";
 import { COLLECTIONS } from "./firestoreHelper";
-import { TransactionalEmailsApi, TransactionalEmailsApiApiKeys } from '@getbrevo/brevo';
-import { escapeHtml, verifyUnsubToken, sendWelcomeEmail, SENDERS } from "./emailService";
+import { escapeHtml, verifyUnsubToken, sendWelcomeEmail, sendEmail, SENDERS } from "./emailService";
 import { seedTaxRates, getTaxSlabsForCalculation } from "./seedTaxRates";
 import { generateTaxComputationPDF, savePDFToStorage, generateRentReceiptPDF, type TaxComputationData, type RentReceiptData } from "./pdfGenerator";
 import { geminiTaxService, type TaxAdviceInput } from "./geminiTaxService";
@@ -718,19 +717,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // ── Send emails via Brevo ──────────────────────────────────────────────
       try {
-        if (!process.env.BREVO_API_KEY) {
-          console.warn('⚠️ BREVO_API_KEY not set — contact saved to Firestore only. Add it in Railway to enable emails.');
+        if (!process.env.ZEPTOMAIL_TOKEN) {
+          console.warn('⚠️ ZEPTOMAIL_TOKEN not set — contact saved to Firestore only. Add it in Railway to enable emails.');
         } else {
-          const apiInstance = new TransactionalEmailsApi();
-          apiInstance.setApiKey(TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY);
-
-          const senderEmail = process.env.BREVO_SENDER_EMAIL || SENDERS.transactional.email;
-          const senderName  = process.env.BREVO_SENDER_NAME  || 'AiTaxBot';
-          const adminEmail  = process.env.BREVO_ADMIN_EMAIL  || senderEmail; // where YOU receive alerts
+          // Goes through emailService.sendEmail() rather than talking to the
+          // provider directly — that is the only place the transport is
+          // named, which is what made the 2026-09-07 Brevo→ZeptoMail swap a
+          // one-file change everywhere except right here.
+          const senderEmail = SENDERS.transactional.email;
+          const senderName  = SENDERS.transactional.name;
+          const adminEmail  = process.env.MAIL_ADMIN_EMAIL || process.env.BREVO_ADMIN_EMAIL || senderEmail; // where YOU receive alerts
           const submittedAt = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
 
           // ── 1. Admin notification ────────────────────────────────────────
-          await apiInstance.sendTransacEmail({
+          await sendEmail({
             sender:  { email: senderEmail, name: senderName },
             to:      [{ email: adminEmail, name: 'AiTaxBot Team' }],
             replyTo: { email, name },
@@ -764,7 +764,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
 
           // ── 2. Auto-reply to the user ────────────────────────────────────
-          await apiInstance.sendTransacEmail({
+          await sendEmail({
             sender:  { email: senderEmail, name: senderName },
             to:      [{ email, name }],
             subject: `We received your message — AiTaxBot`,
@@ -881,16 +881,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userExists = !!existingUser;
 
       // 3. Send email via Brevo
-      if (!process.env.BREVO_API_KEY) {
-        console.warn("⚠️ BREVO_API_KEY not set — email not sent");
-        return res.json({ success: true, userExists, emailSent: false, message: "PDF generated but email not sent (BREVO_API_KEY missing)" });
+      if (!process.env.ZEPTOMAIL_TOKEN) {
+        console.warn("⚠️ ZEPTOMAIL_TOKEN not set — email not sent");
+        return res.json({ success: true, userExists, emailSent: false, message: "PDF generated but email not sent (ZEPTOMAIL_TOKEN missing)" });
       }
 
-      const apiInstance = new TransactionalEmailsApi();
-      apiInstance.setApiKey(TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY);
-
-      const senderEmail = process.env.BREVO_SENDER_EMAIL || SENDERS.transactional.email;
-      const senderName  = process.env.BREVO_SENDER_NAME  || "AiTaxBot";
+      const senderEmail = SENDERS.transactional.email;
+      const senderName  = SENDERS.transactional.name;
 
       const name = recipientName || receipts[0].tenantName || "there";
       const periodLabel = receipts.length === 1
@@ -912,7 +909,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ? "Your rent receipt is attached. You can also view all your saved documents in your AiTaxBot dashboard."
         : "Your rent receipt is attached below. Create a free AiTaxBot account to save your receipts, claim HRA exemption, and access all our free tax calculators — no credit card required.";
 
-      await apiInstance.sendTransacEmail({
+      await sendEmail({
         sender: { email: senderEmail, name: senderName },
         to: [{ email, name }],
         subject: `Your Rent Receipt for ${periodLabel} — AiTaxBot`,

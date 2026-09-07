@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
 import {
+  Mail,
   LayoutDashboard,
   Users,
   BarChart3,
@@ -28,6 +29,7 @@ const navItems = [
   // backend capture endpoints and the Firestore `leads` collection are
   // untouched; only this UI entry point is gone.
   { href: "/admin/ai-review", label: "AI Answer Review", icon: Scale, minLevel: 3 },
+  { href: "/admin/digest", label: "Monthly Digest", icon: Mail, minLevel: 2 },
 ];
 
 const LEVEL_LABELS: Record<number, { label: string; color: string }> = {

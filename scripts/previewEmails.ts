@@ -15,8 +15,9 @@ import { resolve } from "path";
 import {
   buildWelcomeEmail,
   buildCalculatorResultEmail,
-  buildWeeklyDigestEmail,
+  buildMonthlyDigestEmail,
 } from "../server/emailService";
+import type { DigestIssue } from "@shared/digest";
 import { getUpcomingKeyDates } from "../shared/keyDates";
 import type { SavedResult } from "../server/savedResults";
 
@@ -64,10 +65,33 @@ const sampleUsage: SavedResult[] = [
   },
 ];
 
+// A representative issue — enough prose to show how a real one wraps, and a
+// heading/body pair per section so the spacing is honest. The send itself is
+// manual now (see server/monthlyDigest.ts); this only renders HTML to disk.
+const sampleIssue: DigestIssue = {
+  id: "2026-09",
+  subject: "Advance tax, explained without the jargon",
+  preheader: "Who actually has to pay it, and what happens if you skip it.",
+  intro: "Most salaried people never think about advance tax, and mostly that is fine — TDS handles it. It stops being fine the moment you have income nobody is deducting tax from.",
+  sections: [
+    {
+      heading: "What it actually is",
+      body: "Advance tax is the tax you pay during the year you earn the income, rather than after that year ends.\n\nIf your total tax for the year, after subtracting the TDS already deducted for you, comes to Rs.10,000 or more, you are expected to pay it in instalments across the year rather than in one go at the end.",
+    },
+    {
+      heading: "Who it catches out",
+      body: "Freelancers and consultants, anyone with meaningful capital gains, people earning rent, and salaried people with large interest or dividend income their employer knows nothing about.\n\nIf every rupee you earn already has tax deducted at source, this is usually not your problem.",
+    },
+  ],
+  includeDates: true,
+  includeUsage: true,
+  status: "draft",
+};
+
 const pages: { file: string; label: string; content: { subject: string; htmlContent: string; textContent?: string } }[] = [
   { file: "1-welcome.html", label: "Welcome email", content: buildWelcomeEmail(sampleUser) },
   { file: "2-calculator-result.html", label: "Calculator-result email", content: buildCalculatorResultEmail(sampleUser, sampleResult) },
-  { file: "3-weekly-digest.html", label: "Weekly digest email", content: buildWeeklyDigestEmail(sampleUser, { dates: getUpcomingKeyDates(), usage: sampleUsage }) },
+  { file: "3-monthly-digest.html", label: "Monthly digest email", content: buildMonthlyDigestEmail(sampleUser, { issue: sampleIssue, dates: getUpcomingKeyDates(), usage: sampleUsage }) },
 ];
 
 for (const { file, label, content } of pages) {

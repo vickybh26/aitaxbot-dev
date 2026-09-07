@@ -8,32 +8,53 @@
  * `noreply@aitaxbot.co.in` — nobody had decided which address means what,
  * so it drifted per file. Vicky settled it 2026-09-06: `admin@aitaxbot.co.in`
  * for anything account-triggered (welcome, calculator results), and
- * `info@aitaxbot.in` for the weekly digest. SENDERS below is the one place
+ * `info@aitaxbot.in` for the monthly digest. SENDERS below is the one place
  * that decision lives.
+ *
+ * TRANSPORT: ZeptoMail (Zoho), moved off Brevo 2026-09-07. Brevo was a
+ * marketing platform being used purely as an SMTP API — we held 2 contacts
+ * and used none of its lists, campaigns or CRM — while its free tier's
+ * 300/day cap became the binding constraint the moment the digest reached
+ * 146 users: 146 recipients plus 146 admin BCC copies is 292 credits in one
+ * 9am burst, 97% of the day's allowance. ZeptoMail is transactional-only,
+ * bills in INR with a GST invoice, and its credits do not expire.
+ *
+ * There is no SDK here on purpose: ZeptoMail's send API is a single POST
+ * with a JSON body, so plain fetch() removes a dependency rather than
+ * adding one.
  *
  * Each email is a `buildX()` (pure — returns {subject, htmlContent,
  * textContent}, no network call) plus a thin `sendX()` wrapper that calls
  * `sendEmail(buildX(...))`. The split exists so scripts/previewEmails.mjs
  * can render real HTML to local files for review without ever touching the
- * Brevo API — useful review here means never accidentally emailing a real
+ * mail API — useful review here means never accidentally emailing a real
  * user while looking at a subject line.
  */
 
-import { TransactionalEmailsApi, TransactionalEmailsApiApiKeys } from "@getbrevo/brevo";
 import { createHmac, timingSafeEqual } from "crypto";
-import type { KeyDateItem } from "@shared/keyDates";
+import { daysUntil, type KeyDateItem } from "@shared/keyDates";
+import { issueLabel, type DigestIssue } from "@shared/digest";
 import type { SavedResult } from "./savedResults";
 
 export const SENDERS = {
   // Account-triggered mail: welcome on signup, calculator results.
   transactional: {
-    email: process.env.BREVO_SENDER_TRANSACTIONAL || process.env.BREVO_SENDER_EMAIL || "admin@aitaxbot.co.in",
-    name: process.env.BREVO_SENDER_NAME || "AiTaxBot",
+    email: process.env.MAIL_SENDER_TRANSACTIONAL || process.env.BREVO_SENDER_TRANSACTIONAL || process.env.BREVO_SENDER_EMAIL || "admin@aitaxbot.co.in",
+    name: process.env.MAIL_SENDER_NAME || process.env.BREVO_SENDER_NAME || "AiTaxBot",
   },
-  // Recurring/broadcast mail: the weekly digest.
+  // Recurring/broadcast mail: the monthly digest.
+  //
+  // co.in, NOT the aitaxbot.in this used to be. ZeptoMail will only accept a
+  // From address on a domain verified in that account, and as of 2026-09-07
+  // the account has exactly one domain: aitaxbot.co.in. Sending the digest
+  // from info@aitaxbot.in would be rejected outright — the sender split from
+  // 2026-09-06 assumed Brevo, which never enforced this.
+  //
+  // To go back to the .in address: add aitaxbot.in as a second ZeptoMail
+  // domain, publish its DKIM + bounce records, then set MAIL_SENDER_DIGEST.
   digest: {
-    email: process.env.BREVO_SENDER_DIGEST || "info@aitaxbot.in",
-    name: process.env.BREVO_SENDER_NAME || "AiTaxBot",
+    email: process.env.MAIL_SENDER_DIGEST || "info@aitaxbot.co.in",
+    name: process.env.MAIL_SENDER_NAME || process.env.BREVO_SENDER_NAME || "AiTaxBot",
   },
 } as const;
 
@@ -59,45 +80,102 @@ export interface SendEmailParams extends EmailContent {
 }
 
 /**
- * BCC target for every user-facing email (welcome, calculator results,
- * weekly digest) so Vicky's own Google Workspace inbox becomes the sent+
- * received log — Gmail threads a reply against this copy automatically
- * (both carry the same Brevo-issued Message-ID), no separate email-log
- * infrastructure needed. Decided 2026-09-06 specifically because BCC-ing
- * the sender address is the only way to get a copy of your own outbound
- * mail; being the "From" address does not do that on its own.
+ * BCC target for the two ONE-TO-ONE emails (welcome, calculator results) so
+ * Vicky's Google Workspace inbox becomes the sent+received log — Gmail
+ * threads a user's reply against this copy automatically, no separate
+ * email-log infrastructure needed. BCC-ing the sender address is the only
+ * way to get a copy of your own outbound mail; being the "From" address
+ * does not do that on its own.
+ *
+ * DELIBERATELY NOT ON THE DIGEST. Gmail threads on subject + participants
+ * and every digest copy shares both, so the 2026-09-07 send collapsed all
+ * 146 BCC copies into two threads of 46 and 100 messages. That is not a log,
+ * it is a blob you cannot search or attribute, and it doubled the send cost
+ * for the privilege. The digest's record is the send history written by
+ * server/monthlyDigest.ts and shown on /admin/digest — strictly more useful,
+ * because it records who was skipped and what failed, neither of which a
+ * BCC copy can tell you.
  */
 const ADMIN_BCC = { email: "admin@aitaxbot.co.in", name: "AiTaxBot Admin" };
 
 /**
- * Every call is wrapped so a Brevo outage or missing API key never turns a
+ * ZeptoMail's send endpoint. Defaults to the India data centre (.in) — the
+ * account is Indian and the DC is fixed at signup, so a wrong host here
+ * fails auth with a confusing 401 rather than an obvious routing error.
+ * Override with ZEPTOMAIL_API_URL if the account lives in another DC.
+ */
+const ZEPTOMAIL_URL = process.env.ZEPTOMAIL_API_URL || "https://api.zeptomail.in/v1.1/email";
+
+/** ZeptoMail wants an explicit mime_type per attachment; Brevo inferred it. */
+function mimeFor(filename: string): string {
+  const ext = filename.toLowerCase().split(".").pop() || "";
+  return ({
+    pdf: "application/pdf", csv: "text/csv", txt: "text/plain",
+    png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg",
+  } as Record<string, string>)[ext] || "application/octet-stream";
+}
+
+const zAddr = (a: { email: string; name?: string }) => ({
+  email_address: { address: a.email, ...(a.name ? { name: a.name } : {}) },
+});
+
+/**
+ * Every call is wrapped so a provider outage or missing API key never turns a
  * successful request (form saved, PDF generated, account created) into a
  * failed one — callers get `{sent: false}` back and log it, not a thrown
  * exception. Matches the pattern every route already followed individually
  * before this file existed.
+ *
+ * The failure `reason` carries ZeptoMail's own response body, truncated.
+ * That matters more than it sounds: the likeliest failure on day one is an
+ * unverified sending domain, and ZeptoMail says exactly that in the body
+ * while the status code alone would just read 400.
  */
 export async function sendEmail(params: SendEmailParams): Promise<{ sent: boolean; reason?: string }> {
-  if (!process.env.BREVO_API_KEY) {
-    console.warn(`[Email] BREVO_API_KEY not set — skipping "${params.subject}" to ${params.to.map((t) => t.email).join(", ")}`);
+  const token = process.env.ZEPTOMAIL_TOKEN;
+  if (!token) {
+    console.warn(`[Email] ZEPTOMAIL_TOKEN not set — skipping "${params.subject}" to ${params.to.map((t) => t.email).join(", ")}`);
     return { sent: false, reason: "missing_api_key" };
   }
+
+  const sender = params.sender ?? SENDERS.transactional;
+  const payload = {
+    from: { address: sender.email, name: sender.name },
+    to: params.to.map(zAddr),
+    ...(params.bcc?.length ? { bcc: params.bcc.map(zAddr) } : {}),
+    ...(params.replyTo
+      ? { reply_to: [{ address: params.replyTo.email, ...(params.replyTo.name ? { name: params.replyTo.name } : {}) }] }
+      : {}),
+    subject: params.subject,
+    htmlbody: params.htmlContent,
+    ...(params.textContent ? { textbody: params.textContent } : {}),
+    ...(params.attachment?.length
+      ? { attachments: params.attachment.map((a) => ({ name: a.name, content: a.content, mime_type: mimeFor(a.name) })) }
+      : {}),
+  };
+
   try {
-    const apiInstance = new TransactionalEmailsApi();
-    apiInstance.setApiKey(TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY);
-    await apiInstance.sendTransacEmail({
-      sender: params.sender ?? SENDERS.transactional,
-      to: params.to,
-      subject: params.subject,
-      htmlContent: params.htmlContent,
-      ...(params.textContent ? { textContent: params.textContent } : {}),
-      ...(params.attachment ? { attachment: params.attachment } : {}),
-      ...(params.replyTo ? { replyTo: params.replyTo } : {}),
-      ...(params.bcc ? { bcc: params.bcc } : {}),
+    const res = await fetch(ZEPTOMAIL_URL, {
+      method: "POST",
+      headers: {
+        // The dashboard shows this token already prefixed on some screens and
+        // bare on others; accept either rather than failing on a paste.
+        Authorization: token.startsWith("Zoho-enczapikey") ? token : `Zoho-enczapikey ${token}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(payload),
     });
+
+    if (!res.ok) {
+      const detail = (await res.text().catch(() => "")).slice(0, 400);
+      console.error(`[Email] ZeptoMail send failed (${res.status}) for "${params.subject}":`, detail);
+      return { sent: false, reason: `http_${res.status}: ${detail}` };
+    }
     return { sent: true };
   } catch (err: any) {
-    const detail = err?.response?.text || err?.message || String(err);
-    console.error(`[Email] Brevo send failed for "${params.subject}":`, detail);
+    const detail = err?.message || String(err);
+    console.error(`[Email] ZeptoMail send failed for "${params.subject}":`, detail);
     return { sent: false, reason: detail };
   }
 }
@@ -114,6 +192,11 @@ export async function sendEmail(params: SendEmailParams): Promise<{ sent: boolea
 // ─────────────────────────────────────────────────────────────────────────
 
 export function unsubToken(uid: string, type: string = "digest"): string {
+  // BREVO_API_KEY stays in this chain even though Brevo is gone: the 146
+  // unsubscribe links sent on 2026-09-07 were signed with it, and dropping it
+  // would silently reject every one of them. Keep the old key set in the
+  // environment until those links have aged out, or set EMAIL_TOKEN_SECRET
+  // and accept that the already-sent links stop working.
   const secret = process.env.EMAIL_TOKEN_SECRET || process.env.BREVO_API_KEY || "aitaxbot-unsub";
   return createHmac("sha256", secret).update(`unsub:${type}:${uid}`).digest("hex").slice(0, 32);
 }
@@ -352,70 +435,169 @@ export async function sendCalculatorResultEmail(
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// 3. Weekly digest — deadlines (always) + a short usage recap (only the
-//    tools this user has actually used). Sent from SENDERS.digest, always
-//    carries a working unsubscribe link (DPDP hygiene for recurring mail).
+// 3. Monthly digest — a written piece first, computed dates second.
+//
+// Replaced the weekly digest 2026-09-07. Two things changed and they are
+// related. It is monthly rather than weekly because there is not a week's
+// worth of worth-reading tax material and a thin recurring email trains
+// people to ignore the sender. And it leads with prose a person wrote,
+// because the generated version's whole substance was a date table the
+// reader could not act on — the 2026-09-07 send went out one week before
+// the 15 September advance-tax instalment and gave that fact exactly the
+// same visual weight as a deadline six months away.
+//
+// Sent from SENDERS.digest, never automatically (see server/monthlyDigest.ts),
+// and always with a working unsubscribe link — DPDP hygiene for recurring
+// mail, and the one thing that must not break when the template changes.
 // ─────────────────────────────────────────────────────────────────────────
 
-type DigestContent = { dates: KeyDateItem[]; usage: SavedResult[] };
+type DigestContent = { issue: DigestIssue; dates: KeyDateItem[]; usage: SavedResult[] };
 
-export function buildWeeklyDigestEmail(
+/**
+ * Author-written plain text to HTML paragraphs. Escaped first, so a `<` in a
+ * draft cannot produce broken markup or an injection path in mail addressed
+ * to every registered user; blank lines become paragraphs and single
+ * newlines become breaks, which is the whole formatting vocabulary the
+ * admin editor offers.
+ */
+function prose(text: string | undefined, size = 15): string {
+  return String(text || "")
+    .split(/\n\s*\n/)
+    .map((para) => para.trim())
+    .filter(Boolean)
+    .map((para) =>
+      `<p style="font-size:${size}px;line-height:${Math.round(size * 1.6)}px;color:${BODY_TEXT};margin:0 0 14px">${escapeHtml(para).replace(/\n/g, "<br/>")}</p>`)
+    .join("");
+}
+
+/**
+ * One "dates to watch" row. Anything inside a week is promoted — bold, ink
+ * rather than grey, and an explicit day count — because "15 Sept" alone
+ * reads identically whether it is tomorrow or six months out, which is the
+ * specific failure the September send demonstrated.
+ */
+function dateRow(d: KeyDateItem): string {
+  const days = daysUntil(new Date(d.date));
+  const urgent = days >= 0 && days <= 7;
+  const when = days === 0 ? "today" : days === 1 ? "tomorrow" : `in ${days} days`;
+  return `<tr>
+    <td style="padding:9px 0;font-size:13px;line-height:20px;color:${urgent ? INK : BODY_TEXT};${urgent ? "font-weight:600" : ""}">
+      <strong>${d.day} ${d.monthLabel}</strong> — ${escapeHtml(d.title)}
+      ${urgent ? `<span style="color:${CREDIT};font-weight:700"> · ${when}</span>` : ""}
+    </td>
+    <td style="padding:9px 0;text-align:right;font-size:12px;line-height:20px;color:${MUTED};white-space:nowrap">${escapeHtml(d.detail)}</td>
+  </tr>`;
+}
+
+export function buildMonthlyDigestEmail(
   user: { id: string; firstName?: string | null },
   content: DigestContent
 ): EmailContent {
   const name = escapeHtml(user.firstName || "there");
+  const { issue, dates, usage } = content;
 
-  const datesRows = content.dates
-    .map((d) => `<tr><td style="padding:8px 0;font-size:13px;color:${BODY_TEXT}"><strong>${d.day} ${d.monthLabel}</strong> — ${escapeHtml(d.title)}</td><td style="padding:8px 0;text-align:right;font-size:12px;color:${MUTED}">${escapeHtml(d.detail)}</td></tr>`)
+  const sections = (issue.sections || [])
+    .filter((sec) => sec.heading?.trim() && sec.body?.trim())
+    .map((sec) => `
+      <h2 style="font-family:${FONT_DISPLAY};font-size:17px;line-height:24px;font-weight:700;color:${INK};margin:26px 0 10px;letter-spacing:-0.01em">${escapeHtml(sec.heading)}</h2>
+      ${prose(sec.body)}`)
     .join("");
 
-  const usageRows = content.usage
-    .map((r) => `<tr><td style="padding:6px 0;font-size:13px;color:${BODY_TEXT}">${escapeHtml(r.toolName)}</td><td style="padding:6px 0;text-align:right;font-size:13px;font-weight:600;color:${BODY_TEXT}">${escapeHtml(r.headline.value)}</td></tr>`)
-    .join("");
-
-  const usageSection = usageRows
-    ? `<p style="font-size:12px;line-height:24px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:${MUTED};margin:20px 0 8px">Your recent calculations</p><table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">${usageRows}</table>`
+  const datesSection = issue.includeDates && dates.length
+    ? `<table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color:${CARD};border:1px solid ${RULE};border-radius:12px;padding:24px 28px;margin-top:16px"><tbody><tr><td>
+        <p style="font-size:12px;line-height:24px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:${MUTED};margin:0 0 4px">Dates to watch</p>
+        <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">${dates.map(dateRow).join("")}</table>
+      </td></tr></tbody></table>`
     : "";
 
-  // Only pitch a tool to someone who hasn't already used it this recap.
-  const hasUsedReconciliation = content.usage.some((r) => r.kind === "reconciliation");
-  const hasUsedIncomeTax = content.usage.some((r) => r.route === "/calculators/income-tax");
+  // headline.label is what says WHAT the figure is — "Your tax · New Regime"
+  // against "Projected corpus". The weekly template dropped it and rendered
+  // tool name against bare value, which put a ₹1.59 crore PF projection and a
+  // ₹3,51,000 tax bill in the same two columns as though they were the same
+  // kind of number. Never render one of these figures without its label.
+  const usageRows = usage
+    .map((r) => `<tr>
+      <td style="padding:9px 0;font-size:13px;line-height:18px;color:${BODY_TEXT}">
+        ${escapeHtml(r.toolName)}
+        <span style="display:block;font-size:11px;line-height:16px;color:${MUTED}">${escapeHtml(r.headline.label)}</span>
+      </td>
+      <td style="padding:9px 0;text-align:right;font-size:14px;font-weight:600;color:${INK};white-space:nowrap">${escapeHtml(r.headline.value)}</td>
+    </tr>`)
+    .join("");
+
+  const usageSection = issue.includeUsage && usageRows
+    ? `<table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color:${CARD};border:1px solid ${RULE};border-radius:12px;padding:24px 28px;margin-top:16px"><tbody><tr><td>
+        <p style="font-size:12px;line-height:24px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:${MUTED};margin:0 0 4px">Where you left off</p>
+        <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">${usageRows}</table>
+        <div style="margin:18px 0 0">${ctaButton("https://www.aitaxbot.co.in/dashboard", "View your dashboard")}</div>
+      </td></tr></tbody></table>`
+    : "";
+
+  // Only pitch a tool to someone who hasn't already used it.
+  const hasUsedReconciliation = usage.some((r) => r.kind === "reconciliation");
+  const hasUsedIncomeTax = usage.some((r) => r.route === "/calculators/income-tax");
   const promoCards = [
     hasUsedIncomeTax ? "" : incomeTaxPromo(),
     hasUsedReconciliation ? "" : aisPromo(),
   ].filter(Boolean).join("\n");
 
   return {
-    subject: "Your AiTaxBot weekly update",
+    subject: issue.subject,
     htmlContent: `
       <!DOCTYPE html>
       <html dir="ltr" lang="en"><head><meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/><meta name="x-apple-disable-message-reformatting"/></head>
       <body style="background-color:${PAPER};margin:0;padding:0">
-        ${preheader("Your weekly deadlines and calculations, in one place.")}
+        ${preheader(issue.preheader || issue.subject)}
         <table border="0" width="100%" cellpadding="0" cellspacing="0" role="presentation" align="center"><tbody><tr><td style="margin:0;padding:0;background-color:${PAPER}">
           <table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="max-width:560px;margin:0 auto;padding:40px 24px;font-family:${FONT_BODY}"><tbody><tr style="width:100%"><td>
             ${brandHeader()}
             <table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color:${CARD};border:1px solid ${RULE};border-radius:12px;padding:32px 28px"><tbody><tr><td>
-              <h1 style="font-family:${FONT_DISPLAY};font-size:24px;font-weight:700;color:${INK};line-height:32px;margin:0 0 20px;letter-spacing:-0.01em">Hi ${name}, here's your weekly update</h1>
-              <p style="font-size:12px;line-height:24px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:${MUTED};margin:0 0 8px">Dates to watch</p>
-              <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">${datesRows}</table>
-              ${usageSection}
-              <div style="margin:24px 0 0">${ctaButton("https://www.aitaxbot.co.in/dashboard", "View your dashboard")}</div>
+              <p style="font-size:11px;line-height:20px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:${MUTED};margin:0 0 8px">Monthly update · ${escapeHtml(issueLabel(issue.id))}</p>
+              <h1 style="font-family:${FONT_DISPLAY};font-size:24px;font-weight:700;color:${INK};line-height:32px;margin:0 0 16px;letter-spacing:-0.01em">${escapeHtml(issue.subject)}</h1>
+              <p style="font-size:15px;line-height:24px;color:${BODY_TEXT};margin:0 0 4px">Hi ${name},</p>
+              ${prose(issue.intro)}
+              ${sections}
             </td></tr></tbody></table>
+            ${datesSection}
+            ${usageSection}
             ${promoCards}
             <p style="font-size:12px;line-height:18px;color:${MUTED};margin:24px 0 0">
               AiTaxBot · Bengaluru, Karnataka, India<br/>
-              <a href="${unsubscribeUrl(user.id)}" style="color:${MUTED}">Unsubscribe from this weekly email</a>
+              <a href="${unsubscribeUrl(user.id)}" style="color:${MUTED}">Unsubscribe from this monthly email</a>
             </p>
           </td></tr></tbody></table>
         </td></tr></tbody></table>
       </body></html>
     `,
-    textContent: `Hi ${user.firstName || "there"},\n\nDates to watch:\n${content.dates.map((d) => `${d.day} ${d.monthLabel} — ${d.title} (${d.detail})`).join("\n")}\n${content.usage.length ? `\nYour recent calculations:\n${content.usage.map((r) => `${r.toolName}: ${r.headline.value}`).join("\n")}\n` : ""}\nDashboard: https://www.aitaxbot.co.in/dashboard\n${hasUsedIncomeTax ? "" : "\nBest in the market — Income Tax Calculator: old vs new regime side by side, every slab, surcharge and rebate handled. https://www.aitaxbot.co.in/calculators/income-tax\n"}${hasUsedReconciliation ? "" : "\nOne of a kind — AIS Reconciliation: upload your AIS, 26AS and Form 16 and we match every entry against each other. https://www.aitaxbot.co.in/tools/ais-26as-form16\n"}\nUnsubscribe: ${unsubscribeUrl(user.id)}\n\n-- AiTaxBot Team`,
+    textContent: [
+      `Hi ${user.firstName || "there"},`,
+      "",
+      issue.subject,
+      issue.intro ? `\n${issue.intro}` : "",
+      ...(issue.sections || [])
+        .filter((sec) => sec.heading?.trim() && sec.body?.trim())
+        .map((sec) => `\n${sec.heading}\n${sec.body}`),
+      issue.includeDates && dates.length
+        ? `\nDates to watch:\n${dates.map((d) => `${d.day} ${d.monthLabel} — ${d.title} (${d.detail})`).join("\n")}`
+        : "",
+      issue.includeUsage && usage.length
+        ? `\nWhere you left off:\n${usage.map((r) => `${r.toolName} — ${r.headline.label}: ${r.headline.value}`).join("\n")}`
+        : "",
+      `\nDashboard: https://www.aitaxbot.co.in/dashboard`,
+      hasUsedIncomeTax ? "" : `\nBest in the market — Income Tax Calculator: old vs new regime side by side, every slab, surcharge and rebate handled. https://www.aitaxbot.co.in/calculators/income-tax`,
+      hasUsedReconciliation ? "" : `\nOne of a kind — AIS Reconciliation: upload your AIS, 26AS and Form 16 and we match every entry against each other. https://www.aitaxbot.co.in/tools/ais-26as-form16`,
+      `\nUnsubscribe: ${unsubscribeUrl(user.id)}`,
+      "",
+      "-- AiTaxBot Team",
+    ].filter((line) => line !== "").join("\n"),
   };
 }
 
-export async function sendWeeklyDigestEmail(
+/**
+ * No ADMIN_BCC here — see the note on ADMIN_BCC above for why the digest is
+ * the one email that must not carry it.
+ */
+export async function sendMonthlyDigestEmail(
   user: { id: string; email?: string | null; firstName?: string | null },
   content: DigestContent
 ) {
@@ -423,7 +605,6 @@ export async function sendWeeklyDigestEmail(
   return sendEmail({
     to: [{ email: user.email, name: user.firstName || undefined }],
     sender: SENDERS.digest,
-    bcc: [ADMIN_BCC],
-    ...buildWeeklyDigestEmail(user, content),
+    ...buildMonthlyDigestEmail(user, content),
   });
 }

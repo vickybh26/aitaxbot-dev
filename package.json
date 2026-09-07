@@ -15,7 +15,6 @@
   "dependencies": {
     "@adobe/pdfservices-node-sdk": "^4.1.0",
     "@anthropic-ai/sdk": "^0.37.0",
-    "@getbrevo/brevo": "^3.0.1",
     "@google-cloud/storage": "^7.18.0",
     "@google/genai": "^1.13.0",
     "@hookform/resolvers": "^3.10.0",
