@@ -44,16 +44,25 @@ export const SENDERS = {
   },
   // Recurring/broadcast mail: the monthly digest.
   //
-  // co.in, NOT the aitaxbot.in this used to be. ZeptoMail will only accept a
-  // From address on a domain verified in that account, and as of 2026-09-07
-  // the account has exactly one domain: aitaxbot.co.in. Sending the digest
-  // from info@aitaxbot.in would be rejected outright — the sender split from
-  // 2026-09-06 assumed Brevo, which never enforced this.
+  // There are exactly two real mailboxes, on two different mail systems:
+  // admin@aitaxbot.co.in (Google Workspace) and info@aitaxbot.in (GoDaddy,
+  // MX -> secureserver.net). No other address exists — do not invent one.
   //
-  // To go back to the .in address: add aitaxbot.in as a second ZeptoMail
-  // domain, publish its DKIM + bounce records, then set MAIL_SENDER_DIGEST.
+  // The digest is therefore sent from admin@ rather than the info@ the
+  // 2026-09-06 split intended. ZeptoMail only accepts a From address on a
+  // domain verified in the account, and that account has one domain,
+  // aitaxbot.co.in. info@aitaxbot.in would be rejected outright, and
+  // info@aitaxbot.co.in — briefly the default here on 2026-09-07 — is worse
+  // than rejected: the domain would pass, so mail would go out from an
+  // address with no mailbox behind it, and every reply would bounce. On an
+  // email whose whole pitch is that a person reads replies, that is the one
+  // failure mode to avoid.
+  //
+  // To restore the split: add aitaxbot.in in ZeptoMail, publish its DKIM TXT
+  // and bounce CNAME on that zone (it is GoDaddy-hosted, separate from the
+  // Cloudflare zone for co.in), then set MAIL_SENDER_DIGEST=info@aitaxbot.in.
   digest: {
-    email: process.env.MAIL_SENDER_DIGEST || "info@aitaxbot.co.in",
+    email: process.env.MAIL_SENDER_DIGEST || "admin@aitaxbot.co.in",
     name: process.env.MAIL_SENDER_NAME || process.env.BREVO_SENDER_NAME || "AiTaxBot",
   },
 } as const;
