@@ -48,21 +48,23 @@ export const SENDERS = {
   // admin@aitaxbot.co.in (Google Workspace) and info@aitaxbot.in (GoDaddy,
   // MX -> secureserver.net). No other address exists — do not invent one.
   //
-  // The digest is therefore sent from admin@ rather than the info@ the
-  // 2026-09-06 split intended. ZeptoMail only accepts a From address on a
-  // domain verified in the account, and that account has one domain,
-  // aitaxbot.co.in. info@aitaxbot.in would be rejected outright, and
-  // info@aitaxbot.co.in — briefly the default here on 2026-09-07 — is worse
-  // than rejected: the domain would pass, so mail would go out from an
-  // address with no mailbox behind it, and every reply would bounce. On an
-  // email whose whole pitch is that a person reads replies, that is the one
-  // failure mode to avoid.
+  // Both domains are verified in ZeptoMail as of 2026-09-07, so the digest
+  // sends from info@ as originally intended.
   //
-  // To restore the split: add aitaxbot.in in ZeptoMail, publish its DKIM TXT
-  // and bounce CNAME on that zone (it is GoDaddy-hosted, separate from the
-  // Cloudflare zone for co.in), then set MAIL_SENDER_DIGEST=info@aitaxbot.in.
+  // Note what "verified" does and does not buy: it proves the DNS records,
+  // but a domain must ALSO be associated with the mail agent whose token is
+  // in ZEPTOMAIL_TOKEN before that agent may send from it. A verified but
+  // unassociated domain is rejected at send time.
+  //
+  // Never point either of these at an address that is not a real mailbox.
+  // info@aitaxbot.co.in was briefly the default here and was the worst
+  // option available precisely because it would not have failed: ZeptoMail
+  // checks the domain, not the mailbox, so mail would have gone out normally
+  // from an address with nothing behind it and every reply would have
+  // bounced. The digest offers a reply as its support channel, so a From
+  // address that cannot receive is the one failure worth engineering against.
   digest: {
-    email: process.env.MAIL_SENDER_DIGEST || "admin@aitaxbot.co.in",
+    email: process.env.MAIL_SENDER_DIGEST || "info@aitaxbot.in",
     name: process.env.MAIL_SENDER_NAME || process.env.BREVO_SENDER_NAME || "AiTaxBot",
   },
 } as const;
