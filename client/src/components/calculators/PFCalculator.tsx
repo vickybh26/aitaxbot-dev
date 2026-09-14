@@ -502,7 +502,9 @@ export default function PFCalculator() {
                       <p className="font-medium mb-1">EPF Contribution Split:</p>
                       <ul className="space-y-1 text-xs">
                         <li>Employee: 12% of Basic + DA (goes to EPF)</li>
-                        <li>Employer: 12% split as - 3.67% to EPF + 8.33% to EPS (capped at ₹1,250/month)</li>
+                        <li>Employer: 12% of Basic + DA in total. EPS takes 8.33% but only up to the ₹15,000 statutory wage ceiling (so never more than ₹1,250/month); EPF receives whatever is left of the 12%.</li>
+                        <li>At or below ₹15,000 Basic + DA that is the familiar 3.67% / 8.33% split. Above it the EPS share stops growing, so more of the employer's 12% lands in EPF — at ₹50,000 the effective split is 9.5% to EPF and 2.5% to EPS.</li>
+                        <li>Assumes the statutory ceiling applies. If you are enrolled for higher pension on actual wages, your EPS will be larger and EPF correspondingly smaller.</li>
                         <li>Employer also pays 0.50% for EDLI insurance (not included in your PF balance)</li>
                       </ul>
                     </div>
@@ -594,15 +596,39 @@ export default function PFCalculator() {
                     </div>
                     {pfType === "epf" && (
                       <>
+                        {/* The 3.67% / 8.33% split is only true while Basic + DA
+                            is at or below the ₹15,000 EPS wage ceiling. Above it,
+                            EPS is frozen at ₹1,250 (8.33% OF THE CEILING, not of
+                            actual wages) and EPF takes the remainder of the
+                            employer's 12% — so at ₹50,000 the real split is 9.5%
+                            and 2.5%. These labels were previously hardcoded, which
+                            made the figures contradict their own captions: the
+                            amounts were right, but "8.33%" sat beside ₹1,250 when
+                            8.33% of ₹50,000 is ₹4,165. On a calculator a CA is
+                            checking, a caption that disagrees with its own number
+                            reads as a broken computation rather than a wording
+                            slip, so the label follows the ceiling. */}
                         <div className="flex justify-between">
-                          <span className="text-sm">Employer EPF (3.67%):</span>
+                          <span className="text-sm">
+                            {result.monthlyBasicDA > 15000
+                              ? "Employer EPF (12% less EPS):"
+                              : "Employer EPF (3.67%):"}
+                          </span>
                           <span className="font-medium text-green-600">{formatCurrencyFull(result.employerEPFMonthly)}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-sm">Employer EPS (8.33%):</span>
+                          <span className="text-sm">
+                            {result.monthlyBasicDA > 15000
+                              ? "Employer EPS (8.33% of ₹15,000 ceiling):"
+                              : "Employer EPS (8.33%):"}
+                          </span>
                           <span className="font-medium text-ink/55">{formatCurrencyFull(result.employerEPSMonthly)}</span>
                         </div>
-                        <p className="text-xs text-ink/55">EPS goes to pension fund, not your PF balance</p>
+                        <p className="text-xs text-ink/55">
+                          {result.monthlyBasicDA > 15000
+                            ? "EPS goes to the pension fund, not your PF balance. It is capped at 8.33% of the ₹15,000 statutory wage ceiling (₹1,250/month), so the rest of the employer's 12% goes to EPF."
+                            : "EPS goes to pension fund, not your PF balance"}
+                        </p>
                       </>
                     )}
                     {vpfPercent > 0 && (
