@@ -92,7 +92,21 @@ export default function NPSCalculator() {
     // claimed under (1), which is why it is computed from the remainder.
     const under80CCD1 = Math.min(annualContrib, 150000, annualSalary * 0.10);
     const under80CCD1B = Math.min(Math.max(0, annualContrib - under80CCD1), 50000);
-    const under80CCD2 = Math.min(annualEmployerContrib, annualSalary * 0.14);
+    // 80CCD(2) is 14% of salary under the NEW regime for every employer, but
+    // under the OLD regime 14% is available only to Central/State Government
+    // employers — a non-government employee is limited to 10%. This applied 14%
+    // in both regimes, so a private-sector employee comparing regimes was shown
+    // relief on 14% of salary under the old regime where the law allows 10%,
+    // overstating the old-regime case in a screen whose entire purpose is
+    // choosing between them.
+    //
+    // 10% is the conservative default for the old regime because the private
+    // sector is the larger population here and over-claiming is the costlier
+    // error; government employees are told about their 14% in the note below
+    // the result. Same approach as the parents'-age proxy on 80D in
+    // TaxCalculator.tsx — state the assumption rather than invent an input.
+    const rate80CCD2 = regime === 'new' ? 0.14 : 0.10;
+    const under80CCD2 = Math.min(annualEmployerContrib, annualSalary * rate80CCD2);
 
     // Cess is due on the tax saved, so the effective rate is rate × 1.04.
     // HomeLoanCalculator uses 0.312 for the same concept; this used a bare 0.30.
@@ -203,7 +217,7 @@ export default function NPSCalculator() {
           )}
           {regime === 'old' && (
             <p className="text-xs text-green-700 mt-2 bg-green-50 border border-green-200 rounded p-2">
-              ✅ Under Old Regime, all three NPS deductions are available: 80CCD(1) / S.124(1), 80CCD(1B) / S.124(3) (extra ₹50,000), and 80CCD(2) / S.124(1) employer contribution (ITA 1961 / ITA 2025 section numbers respectively).
+              ✅ Under Old Regime, all three NPS deductions are available: 80CCD(1) / S.124(1), 80CCD(1B) / S.124(3) (extra ₹50,000), and 80CCD(2) / S.124(1) employer contribution (ITA 1961 / ITA 2025 section numbers respectively). Employer contribution is capped at <strong>10% of salary</strong> here — that is the limit for non-government employers under the old regime. If you are a Central or State Government employee, your old-regime limit is 14% and this figure understates your deduction.
             </p>
           )}
         </div>

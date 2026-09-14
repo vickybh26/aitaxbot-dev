@@ -11,11 +11,19 @@
  *
  * NOTE: There is a separate, older Firestore-backed tax-rates system
  * (server/seedTaxRates.ts + storage.getTaxRates) that stores slabs per
- * assessment year. It disagrees with this file for AY 2026-27 (its rebate
- * limit is stuck at the pre-Budget-2025 ₹7L/₹25,000, not the current
- * ₹12L/₹60,000 rebate) — it looks like a one-time seed that was never
- * updated after the Budget 2025 change. Deliberately NOT used here for that
- * reason; flagged separately for cleanup.
+ * assessment year, served by GET /api/tax-rates/:ay/:regime/:ageGroup.
+ *
+ * This note used to say that seed was stuck on the pre-Budget-2025
+ * ₹7L/₹25,000 rebate for AY 2026-27. That is no longer true — re-checked
+ * 2026-09-14: the seed carries ₹12L/₹60,000 for AY 2026-27 and AY 2027-28,
+ * and its ₹7L/₹25,000 rows are correctly scoped to AY 2025-26, where those
+ * are the right figures. It was fixed and this comment was not.
+ *
+ * Leaving the stale warning in place was its own hazard: it invited a future
+ * reader either to distrust correct data or to "fix" it into being wrong.
+ * This file still does not read from that system — one implementation of the
+ * ladder is the point — but the two now agree, and if you change either,
+ * check the other.
  */
 
 export type TaxRegime = "old" | "new";

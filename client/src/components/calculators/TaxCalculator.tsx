@@ -214,7 +214,13 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
   const getTaxSlabs = (regime: 'old' | 'new', year: string, ageGroup?: string) => {
     if (regime === 'new') {
       if (year === '2025-26' || year === '2026-27') {
-        // New Regime FY 2025-26 & FY 2026-27 (Income Tax Act, 2025 - Section 202)
+        // New Regime, FY 2025-26 and FY 2026-27. Identical slabs, but NOT the
+        // same statute: FY 2025-26 is governed by s.115BAC of the ITA 1961,
+        // while the ITA 2025 (where the new regime is s.202) applies only to
+        // income earned from 1 April 2026 — FY 2026-27 onward. The ladder is
+        // the same either way so no figure changes, but this comment used to
+        // cite ITA 2025 for both years, which is the same year-blind citation
+        // error that put "Rule 280" into production answers.
         // Same slabs for all ages under new regime
         return [
           { min: 0, max: 400000, rate: 0 },
@@ -421,11 +427,16 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
     const slabs = getTaxSlabs(regime, formData.financialYear, formData.ageGroup);
     const { totalTax: incomeTax, breakdown: taxBreakdown } = calculateTaxForSlab(taxableAmount, slabs);
 
-    // Correct order per Income Tax Act, 2025 (ITA 2025):
-    // Step 1: Compute slab-wise income tax (Section 202 — new regime; Schedule I — old regime)
-    // Step 2: Apply Section 156 rebate BEFORE cess (formerly Section 87A of ITA 1961)
-    // Step 3: Apply marginal relief if applicable (New Regime FY 2025-26+)
-    // Step 4: Compute 4% Health & Education Cess on the NET tax (after rebate & relief)
+    // Statutory sequence. It is identical under both Acts; only the section
+    // numbers differ, so the year decides which citation is correct:
+    //   FY 2025-26 and earlier → ITA 1961 (s.115BAC new regime, s.87A rebate)
+    //   FY 2026-27 onward      → ITA 2025 (s.202 new regime, s.156 rebate)
+    // Step 1: Slab-wise income tax (s.115BAC / s.202; Schedule I for old regime)
+    // Step 2: Rebate BEFORE cess (s.87A / s.156)
+    // Step 3: Marginal relief where applicable (new regime, FY 2025-26+)
+    // Step 4: 4% Health & Education Cess on the NET tax (after rebate & relief)
+    // The user-facing label already picks the right section by year — see the
+    // rebateSection assignment further down.
 
     // ── Rebate / marginal relief / surcharge / cess ────────────────────────
     //

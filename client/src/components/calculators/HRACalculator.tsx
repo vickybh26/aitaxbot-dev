@@ -20,6 +20,21 @@ interface HRACalculatorProps {
   onApplyHRA?: (hraAmount: number) => void;
 }
 
+/** Rule 2A, IT Rules 1962 (ITA 1961) — governs FY 2025-26 and earlier. */
+const METRO_CITIES_RULE_2A: string[] = ["Delhi", "Mumbai", "Kolkata", "Chennai"];
+/** Rule 279, IT Rules 2026 (ITA 2025) — governs FY 2026-27 onward. */
+const METRO_CITIES_RULE_279: string[] = [
+  ...METRO_CITIES_RULE_2A, "Bengaluru", "Hyderabad", "Pune", "Ahmedabad",
+];
+/** Every city we name explicitly; anything else is "Other city". */
+const LISTED_CITIES: string[] = METRO_CITIES_RULE_279;
+
+const FY_TO_AY: Record<string, string> = {
+  "2024-25": "2025-26",
+  "2025-26": "2026-27",
+  "2026-27": "2027-28",
+};
+
 interface HRAResult {
   basicSalary: number;
   hraReceived: number;
@@ -50,7 +65,29 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
   const [basicSalary, setBasicSalary] = useState<number>(600000);
   const [hraReceived, setHraReceived] = useState<number>(240000);
   const [actualRentPaid, setActualRentPaid] = useState<number>(300000);
-  const [cityType, setCityType] = useState<string>("metro");
+  // Which cities qualify for the 50% limb changed with the Act. Rule 2A of the
+  // IT Rules 1962 (ITA 1961) recognises four metros and governs FY 2025-26 and
+  // earlier; Rule 279 of the notified IT Rules 2026 (ITA 2025) widens that to
+  // eight from FY 2026-27 — verified against the gazette,
+  // En-Notified-IT-Rules-2026-20-03-2026.pdf p.1776.
+  //
+  // This used to be a bare metro/non-metro dropdown with no year input, and the
+  // helper text listed all eight cities. Someone in Bengaluru computing
+  // FY 2025-26 — which is live until the 31 Dec 2026 belated deadline — was
+  // therefore told to claim 50% where the law allows 40%. Deriving the limb
+  // from (city, year) makes that mistake unreachable rather than merely
+  // documented.
+  const [financialYear, setFinancialYear] = useState<string>("2026-27");
+  const [city, setCity] = useState<string>("Mumbai");
+
+  const metroList: string[] =
+    financialYear === "2026-27" ? METRO_CITIES_RULE_279 : METRO_CITIES_RULE_2A;
+  const cityType = metroList.includes(city) ? "metro" : "non-metro";
+  /** Selected a city that only becomes a metro from FY 2026-27, on an earlier year. */
+  const cityBecomesMetroLater =
+    financialYear !== "2026-27" &&
+    METRO_CITIES_RULE_279.includes(city) &&
+    !METRO_CITIES_RULE_2A.includes(city);
   const [inputMode, setInputMode] = useState<'annual' | 'monthly'>('annual');
   const [result, setResult] = useState<HRAResult | null>(null);
   const [recommendations, setRecommendations] = useState<AIRecommendation[]>([]);
@@ -203,7 +240,8 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
     setBasicSalary(600000);
     setHraReceived(240000);
     setActualRentPaid(300000);
-    setCityType("metro");
+    setCity("Mumbai");
+    setFinancialYear("2026-27");
     setInputMode('annual');
     setResult(null);
     setRecommendations([]);
@@ -224,8 +262,11 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({
           calculationType: 'hra',
-          assessmentYear: new Date().getFullYear() + '-' + (new Date().getFullYear() + 1),
-          inputData: { basicSalary: result.basicSalary, hraReceived: result.hraReceived, actualRentPaid: result.actualRentPaid, cityType },
+          // The AY now follows the year the user actually computed, rather than
+          // the wall clock — a saved FY 2025-26 working was previously stamped
+          // with whatever year it happened to be opened in.
+          assessmentYear: FY_TO_AY[financialYear] || '2027-28',
+          inputData: { basicSalary: result.basicSalary, hraReceived: result.hraReceived, actualRentPaid: result.actualRentPaid, cityType, city, financialYear },
           oldRegimeResult: {
             hraExemption: result.hraExemption,
             taxableHRA: result.taxableHRA,
@@ -343,8 +384,16 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
                 <CardContent className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
+                      {/* "Salary" for this computation is Basic + DA (where DA
+                          enters into retirement benefits), not basic alone and not
+                          gross. The embedded copy in TaxCalculator.tsx has always
+                          asked for "Basic Salary + DA"; this one said just "Basic
+                          Salary", so the same person got two different exemptions
+                          from two of our own tools — and the standalone one
+                          under-claimed for anyone drawing DA, which is most
+                          government employees. */}
                       <Label htmlFor="basicSalary">
-                        Basic Salary {inputMode === 'monthly' ? '(Monthly)' : '(Annual)'}
+                        Basic Salary + DA {inputMode === 'monthly' ? '(Monthly)' : '(Annual)'}
                       </Label>
                       <Input
                         id="basicSalary"
@@ -356,7 +405,7 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
                           const typed = Math.max(0, parseFloat(e.target.value) || 0);
                           setBasicSalary(toAnnual(typed));
                         }}
-                        placeholder="Enter basic salary"
+                        placeholder="Enter basic + DA"
                         className="text-lg"
                       />
                     </div>
@@ -401,21 +450,60 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="cityType">City Type</Label>
-                    <Select value={cityType} onValueChange={setCityType}>
-                      <SelectTrigger id="cityType">
+                    <Label htmlFor="financialYear">Financial Year</Label>
+                    <Select value={financialYear} onValueChange={setFinancialYear}>
+                      <SelectTrigger id="financialYear">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="metro">Metro City (50%)</SelectItem>
-                        <SelectItem value="non-metro">Non-Metro City (40%)</SelectItem>
+                        <SelectItem value="2024-25">FY 2024-25 (AY 2025-26)</SelectItem>
+                        <SelectItem value="2025-26">FY 2025-26 (AY 2026-27)</SelectItem>
+                        <SelectItem value="2026-27">FY 2026-27 (AY 2027-28)</SelectItem>
                       </SelectContent>
                     </Select>
                     <p className="text-xs text-muted-foreground mt-1">
-                      <span className="font-semibold">Metro cities (50%) from FY 2026-27:</span>{" "}
-                      Delhi, Mumbai, Kolkata, Chennai, Bangalore, Hyderabad, Pune, Ahmedabad.{" "}
-                      All other cities are Non-Metro (40%).{" "}
-                      <span className="text-amber-600 font-medium">Updated under Income Tax Rules 2026.</span>
+                      The list of cities qualifying for the 50% limb widened from
+                      FY 2026-27, so the year decides the answer.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="city">City where you rent</Label>
+                    <Select value={city} onValueChange={setCity}>
+                      <SelectTrigger id="city">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {LISTED_CITIES.map((c) => (
+                          <SelectItem key={c} value={c}>{c}</SelectItem>
+                        ))}
+                        <SelectItem value="Other">Other city</SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    <p className="text-xs text-muted-foreground mt-1">
+                      <span className="font-semibold">
+                        {city === "Other" ? "Other city" : city} in FY {financialYear}:
+                      </span>{" "}
+                      {cityType === "metro"
+                        ? "Metro — the 50% limb applies."
+                        : "Non-metro — the 40% limb applies."}
+                    </p>
+
+                    {cityBecomesMetroLater && (
+                      <p className="text-xs text-amber-700 mt-1">
+                        {city} is non-metro for FY {financialYear} under Rule 2A of the
+                        IT Rules 1962, so only 40% applies. It becomes a metro at 50%
+                        from FY 2026-27, when Rule 279 of the IT Rules 2026 widens the
+                        list to eight cities. Claiming 50% for this year would overstate
+                        the exemption.
+                      </p>
+                    )}
+
+                    <p className="text-xs text-muted-foreground mt-1">
+                      <span className="font-semibold">Metro (50%) list —</span>{" "}
+                      up to FY 2025-26: Delhi, Mumbai, Kolkata, Chennai.{" "}
+                      From FY 2026-27: those four plus Bengaluru, Hyderabad, Pune, Ahmedabad.
                     </p>
                   </div>
                 </CardContent>

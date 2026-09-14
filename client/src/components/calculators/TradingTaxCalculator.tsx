@@ -587,7 +587,19 @@ function IndianFOTab({ trades, setTrades, slabRate }: {
   const totalTurnover = trades.reduce((s, t) => s + Math.abs(t.netPL), 0);
   const taxableProfit = Math.max(0, totalPL);
   const estimatedTax = taxableProfit * (slabRate / 100) * 1.04;
-  const auditRequired = totalTurnover >= 10000000;
+  // s.44AB(a) is ₹1 crore, but its proviso lifts the threshold to ₹10 crore
+  // where cash receipts AND cash payments are each ≤5% of the total. Exchange-
+  // settled F&O runs entirely through banking channels, so that condition is
+  // satisfied for essentially every trader this tool serves and ₹10 crore is
+  // the operative figure. Flagging audit at ₹1 crore told the large majority of
+  // F&O traders they needed an audit they did not.
+  //
+  // Two carve-outs this does NOT model, both noted in the checklist: a trader
+  // with material cash dealings elsewhere in the same business falls back to
+  // ₹1 crore, and s.44AB(e) can require an audit far below either figure where
+  // s.44AD(4) applies after opting out of presumptive taxation.
+  const AUDIT_THRESHOLD_NON_CASH = 100000000; // ₹10 crore
+  const auditRequired = totalTurnover >= AUDIT_THRESHOLD_NON_CASH;
 
   const typeLabel: Record<IndianFOTrade["type"], string> = {
     "equity-fo": "Equity F&O",
@@ -1028,7 +1040,7 @@ function SummaryTab({ usStocks, usDividends, indianFO, usFO, forex, slabRate }: 
           { ok: hasAnyForeign, text: "Schedule FA: disclose all foreign assets held on 31 December", warn: !hasAnyForeign },
           { ok: usDividends.length === 0, text: "Form 67: file before ITR due date to claim US dividend DTAA credit", warn: usDividends.length > 0 },
           { ok: true, text: "FX rates: verify final figures against RBI/FBIL reference rates" },
-          { ok: indianFO.reduce((s, t) => s + Math.abs(t.netPL), 0) < 10000000, text: "Tax audit: required if Indian F&O turnover > ₹1 crore", warn: indianFO.reduce((s, t) => s + Math.abs(t.netPL), 0) >= 10000000 },
+          { ok: indianFO.reduce((s, t) => s + Math.abs(t.netPL), 0) < 100000000, text: "Tax audit (s.44AB): F&O is fully banked, so the ₹10 crore threshold applies, not ₹1 crore. Falls back to ₹1 crore only if cash receipts or payments exceed 5%. A s.44AD(4) opt-out can trigger an audit well below either figure — check with your CA.", warn: indianFO.reduce((s, t) => s + Math.abs(t.netPL), 0) >= 100000000 },
           { ok: true, text: "Advance tax: pay if total tax > ₹10,000 to avoid Sec 234B/C interest" },
         ].map((item, i) => (
           <div key={i} className={`flex gap-2.5 items-start text-sm ${item.warn ? "text-red-600 font-medium" : "text-ink/65"}`}>
