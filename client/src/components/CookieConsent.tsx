@@ -129,19 +129,33 @@ export default function CookieConsent() {
       data-nosnippet
     >
       <div className="bg-card/95 backdrop-blur-md border-t border-rule shadow-2xl">
-        <div className="max-w-7xl mx-auto px-4 py-6">
+        {/* py-4 on mobile, py-6 from md. Measured 2026-09-17 on the live site at
+            360x800: the banner was 314px tall - 39% of the viewport - sitting
+            directly over the income calculator, which is the one thing this page
+            exists to get someone to use. Consent must be clear; it need not
+            occupy two-fifths of a phone screen. */}
+        <div className="max-w-7xl mx-auto px-4 py-4 md:py-6">
           {!showPreferences ? (
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div className="flex items-start gap-4 flex-1">
-                <Cookie className="w-8 h-8 text-ink flex-shrink-0 mt-1" />
+                <Cookie className="w-8 h-8 text-ink flex-shrink-0 mt-1 hidden md:block" />
                 <div>
-                  <h3 className="font-semibold text-ink mb-1">
+                  {/* sr-only on mobile, not hidden: the dialog already carries
+                      aria-label="Cookie Consent", and the body text below states
+                      the purpose in full, so on a 360px screen this heading costs
+                      a line of height and adds no information a reader needs. It
+                      stays in the accessibility tree and returns visually at md. */}
+                  <h3 className="sr-only font-semibold text-ink md:not-sr-only md:mb-1">
                     We Value Your Privacy
                   </h3>
                   <p className="text-sm text-ink/80 leading-relaxed">
-                    We use cookies to enhance your browsing experience, serve personalized ads or content, 
-                    and analyze our traffic. By clicking "Accept All", you consent to our use of cookies. 
-                    You can manage your preferences or learn more in our{" "}
+                    {/* Trimmed from 40 words to 25. Half the old length restated
+                        what the buttons already say ("By clicking Accept All, you
+                        consent..."), which is length without notice. The purpose,
+                        the essential/non-essential split the preferences panel
+                        implements, and the policy link all survive. */}
+                    We use cookies to analyse traffic and to personalise content and ads.
+                    Essential cookies always run; the rest only with your consent. Read our{" "}
                     <a 
                       href="/privacy-policy" 
                       className="text-ink hover:text-credit underline font-medium"
@@ -153,39 +167,43 @@ export default function CookieConsent() {
                 </div>
               </div>
               
-              <div className="flex flex-wrap items-center gap-3 md:flex-shrink-0">
+              {/* Reject and Accept sit side by side at equal width and weight.
+                  That equality is deliberate and should not be "improved": making
+                  Accept easier to reach than Reject is the textbook consent dark
+                  pattern, and under the DPDP Act consent must be as easy to
+                  withhold as to give. Manage Preferences stays visible as a
+                  full-width third option rather than being tucked away.
+                  Every control is min-h-[44px]; they were 36px. */}
+              <div className="grid w-full grid-cols-2 gap-2 md:flex md:w-auto md:items-center md:gap-3 md:flex-shrink-0">
                 <Button
                   variant="outline"
-                  size="sm"
-                  onClick={() => setShowPreferences(true)}
-                  className="text-sm"
-                  data-testid="button-manage-preferences"
-                >
-                  Manage Preferences
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
                   onClick={handleRejectNonEssential}
-                  className="text-sm"
+                  className="min-h-[44px] w-full text-sm md:w-auto"
                   data-testid="button-reject-all"
                 >
                   Reject Non-Essential
                 </Button>
                 <Button
-                  size="sm"
                   onClick={handleAcceptAll}
-                  className="bg-ink hover:bg-ink text-white text-sm"
+                  className="min-h-[44px] w-full bg-ink text-white hover:bg-ink text-sm md:w-auto"
                   data-testid="button-accept-all"
                 >
                   Accept All
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => setShowPreferences(true)}
+                  className="col-span-2 min-h-[44px] w-full text-sm underline underline-offset-4 md:col-span-1 md:w-auto md:no-underline"
+                  data-testid="button-manage-preferences"
+                >
+                  Manage Preferences
                 </Button>
               </div>
               
               <button
                 onClick={handleRejectNonEssential}
-                className="absolute top-4 right-4 text-ink/65 hover:text-ink/65 transition-colors"
-                aria-label="Close"
+                className="absolute top-1 right-1 inline-flex h-11 w-11 items-center justify-center text-ink/65 transition-colors hover:text-ink"
+                aria-label="Close and reject non-essential cookies"
                 data-testid="button-close-banner"
               >
                 <X className="w-5 h-5" />
