@@ -66,7 +66,7 @@ export default function Footer() {
             <ul className="mt-4 space-y-2.5">
               {calculators.map(([name, href]) => (
                 <li key={href}>
-                  <Link href={href} className="inline-flex min-h-[44px] items-center text-sm text-paper/70 transition-colors hover:text-paper md:min-h-0 md:py-1">{name}</Link>
+                  <Link href={href} className="inline-flex min-h-[44px] min-w-[44px] items-center text-sm text-paper/70 transition-colors hover:text-paper md:min-h-0 md:min-w-0 md:py-1">{name}</Link>
                 </li>
               ))}
             </ul>
@@ -77,7 +77,7 @@ export default function Footer() {
             <ul className="mt-4 space-y-2.5">
               {tools.map(([name, href]) => (
                 <li key={href}>
-                  <Link href={href} className="inline-flex min-h-[44px] items-center text-sm text-paper/70 transition-colors hover:text-paper md:min-h-0 md:py-1">{name}</Link>
+                  <Link href={href} className="inline-flex min-h-[44px] min-w-[44px] items-center text-sm text-paper/70 transition-colors hover:text-paper md:min-h-0 md:min-w-0 md:py-1">{name}</Link>
                 </li>
               ))}
             </ul>
@@ -88,7 +88,7 @@ export default function Footer() {
             <ul className="mt-4 space-y-2.5">
               {company.map(([name, href]) => (
                 <li key={href}>
-                  <Link href={href} className="inline-flex min-h-[44px] items-center text-sm text-paper/70 transition-colors hover:text-paper md:min-h-0 md:py-1">{name}</Link>
+                  <Link href={href} className="inline-flex min-h-[44px] min-w-[44px] items-center text-sm text-paper/70 transition-colors hover:text-paper md:min-h-0 md:min-w-0 md:py-1">{name}</Link>
                 </li>
               ))}
             </ul>
