@@ -78,6 +78,13 @@
        body text at 3.84:1; the new one clears AA (4.5:1) with room. */
     --success-green: 160 82% 26%;       /* #0B7A55 profit green */
     --success-green-light: 160 40% 94%;
+    /* Same hue (160), lightened for DARK surfaces. --success-green is tuned for
+       light backgrounds and measures only 1.73:1 against the admin sidebar's
+       active row (rgb 50,73,98) — using it there would recreate the invisible-
+       text bug it was meant to mark. This variant is 4.89:1 on that row and
+       7.66:1 on the sidebar itself, clearing the 3:1 non-text floor.
+       Use on navy/ink surfaces only; on white it is far too light. */
+    --success-green-on-dark: 160 65% 52%;  /* #35D49F */
 
     --warning-orange: 25 95% 53%;
     --warning-orange-light: 25 95% 95%;

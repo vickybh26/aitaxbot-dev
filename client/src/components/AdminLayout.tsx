@@ -110,9 +110,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                    was already there, and aria-current for anything not looking
                    at pixels. */
                 className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-all",
+                  "relative flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-all",
                   isActive
-                    ? "bg-paper/15 text-paper font-semibold shadow-md"
+                    /* Green left bar as a pseudo-element rather than a border-l:
+                       it sits inside the rounded-xl without fighting the corner
+                       radius, and adds no box width, so active and inactive rows
+                       stay aligned to the same 16px text origin. */
+                    ? "bg-paper/15 text-paper font-semibold shadow-md before:absolute before:left-0 before:top-1/2 before:h-6 before:w-1 before:-translate-y-1/2 before:rounded-full before:bg-credit-on-dark before:content-['']"
                     : "text-paper/70 font-medium hover:bg-paper/10 hover:text-paper"
                 )}
               >

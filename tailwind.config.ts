@@ -61,6 +61,8 @@ export default {
            value (see index.css, 2026-09-04 "Warm Ledger" port). */
         ink: "hsl(var(--primary))",
         credit: "hsl(var(--success-green))",
+        /* credit for dark surfaces — see the note beside --success-green-on-dark */
+        "credit-on-dark": "hsl(var(--success-green-on-dark))",
         debit: "hsl(var(--destructive))",
         rule: "hsl(var(--border))",
         notice: "hsl(var(--warning-orange))",
