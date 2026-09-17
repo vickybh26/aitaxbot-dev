@@ -289,7 +289,7 @@ export default function Calculators() {
         {/* Page header */}
         <header className="bg-card border-b border-rule">
           <div className="max-w-7xl mx-auto px-6 pt-4">
-            <nav className="flex items-center gap-1.5 text-xs text-ink/55" aria-label="Breadcrumb">
+            <nav className="flex items-center gap-1.5 text-xs text-ink/65" aria-label="Breadcrumb">
               <Link href="/" className="hover:text-credit transition-colors">Home</Link>
               <span className="text-ink/25">/</span>
               <span className="text-ink/70 font-medium">Calculators</span>

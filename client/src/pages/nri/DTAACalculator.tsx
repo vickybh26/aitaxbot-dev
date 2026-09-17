@@ -213,7 +213,7 @@ export default function DTAACalculator() {
                     onChange={(e) => setAnnualIncome(Number(e.target.value))}
                     className="w-full px-4 py-2 border border-rule rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   />
-                  <p className="text-xs text-ink/55 mt-1">₹{annualIncome.toLocaleString("en-IN")}</p>
+                  <p className="text-xs text-ink/65 mt-1">₹{annualIncome.toLocaleString("en-IN")}</p>
                 </div>
 
                 {/* TDS Percentage */}
@@ -229,7 +229,7 @@ export default function DTAACalculator() {
                     max="100"
                     className="w-full px-4 py-2 border border-rule rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   />
-                  <p className="text-xs text-ink/55 mt-1">Default: {tdsPratesByType[incomeType as keyof typeof tdsPratesByType]}% for {incomeType.replace("-", " ")}</p>
+                  <p className="text-xs text-ink/65 mt-1">Default: {tdsPratesByType[incomeType as keyof typeof tdsPratesByType]}% for {incomeType.replace("-", " ")}</p>
                 </div>
 
                 {/* Foreign Tax Rate */}
@@ -245,7 +245,7 @@ export default function DTAACalculator() {
                     max="100"
                     className="w-full px-4 py-2 border border-rule rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   />
-                  <p className="text-xs text-ink/55 mt-1">Marginal tax rate in your country</p>
+                  <p className="text-xs text-ink/65 mt-1">Marginal tax rate in your country</p>
                 </div>
               </div>
             </div>

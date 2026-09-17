@@ -205,7 +205,7 @@ export default function NRICorner() {
               <details key={i} className="bg-card border border-rule rounded-xl p-5 group">
                 <summary className="font-semibold text-ink cursor-pointer list-none flex items-center justify-between">
                   {item.question}
-                  <ChevronRight className="h-4 w-4 text-ink/55 group-open:rotate-90 transition-transform" />
+                  <ChevronRight className="h-4 w-4 text-ink/65 group-open:rotate-90 transition-transform" />
                 </summary>
                 <p className="mt-3 text-ink/80 text-sm leading-relaxed">{item.answer}</p>
               </details>

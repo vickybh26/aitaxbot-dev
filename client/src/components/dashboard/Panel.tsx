@@ -33,7 +33,7 @@ export default function Panel({
       <header className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 sm:flex sm:flex-wrap sm:items-center sm:justify-between">
         <div className="min-w-0">
           <h2 className="font-display text-lg font-bold text-ink">{title}</h2>
-          {meta && <p className="mt-1 text-xs text-ink/55">{meta}</p>}
+          {meta && <p className="mt-1 text-xs text-ink/65">{meta}</p>}
         </div>
         {action}
       </header>

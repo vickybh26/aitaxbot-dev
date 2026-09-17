@@ -89,7 +89,7 @@ export default function FYAndHeadsStep({
           })}
         </div>
         {!hasAtLeastOneIncomeHead(incomeHeads) && (
-          <p className="text-xs text-ink/55 mt-2">Select at least one to continue.</p>
+          <p className="text-xs text-ink/65 mt-2">Select at least one to continue.</p>
         )}
       </div>
     </div>

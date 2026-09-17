@@ -134,7 +134,7 @@ export default function CARegister() {
               Free Listing · ICAI Act Compliant
             </div>
             <h1 className="text-3xl font-bold text-ink mb-2">Register as a CA</h1>
-            <p className="text-ink/55 max-w-lg mx-auto">
+            <p className="text-ink/65 max-w-lg mx-auto">
               List your practice on AiTaxBot's free CA directory. Connect with qualified taxpayers
               who are actively looking for help filing their ITR.
             </p>
@@ -201,7 +201,7 @@ export default function CARegister() {
                         <option key={s} value={s}>{s}</option>
                       ))}
                     </select>
-                    <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-ink/55 pointer-events-none" />
+                    <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-ink/65 pointer-events-none" />
                   </div>
                   {errors.state && <p className="text-red-500 text-xs mt-1">{errors.state.message}</p>}
                 </div>
@@ -297,7 +297,7 @@ export default function CARegister() {
                     placeholder="e.g. Practising CA with focus on individual taxation, ITR filing, and NRI tax matters."
                     className="mt-1"
                   />
-                  <p className="text-xs text-ink/55 mt-1">Factual practice description only. No marketing claims.</p>
+                  <p className="text-xs text-ink/65 mt-1">Factual practice description only. No marketing claims.</p>
                   {errors.bio && <p className="text-red-500 text-xs mt-1">{errors.bio.message}</p>}
                 </div>
               </div>
@@ -338,14 +338,14 @@ export default function CARegister() {
               {loading ? "Submitting…" : "Submit for Review"}
             </Button>
 
-            <p className="text-center text-xs text-ink/55">
+            <p className="text-center text-xs text-ink/65">
               Profile goes live after admin verification of your ICAI membership number (1–2 business days).
               Free listing. No charges. No hidden fees.
             </p>
           </form>
 
           {/* ICAI verify link */}
-          <p className="text-center text-xs text-ink/55 mt-4">
+          <p className="text-center text-xs text-ink/65 mt-4">
             Verify ICAI membership at{" "}
             <a
               href="https://www.icai.org/post.html?post_id=11967"

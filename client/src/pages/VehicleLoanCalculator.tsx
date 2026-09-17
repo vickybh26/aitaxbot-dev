@@ -139,7 +139,7 @@ export default function VehicleLoanCalculatorPage() {
                 </tbody>
               </table>
             </div>
-            <p className="text-xs text-ink/55 mb-6">*At 12.5% p.a. Actual rates vary by lender and credit profile.</p>
+            <p className="text-xs text-ink/65 mb-6">*At 12.5% p.a. Actual rates vary by lender and credit profile.</p>
 
             {/* Car Loan Table */}
             <h3 className="text-xl font-semibold text-ink mb-2">Car Loan EMI Table (at 9.25% p.a.)</h3>
@@ -171,7 +171,7 @@ export default function VehicleLoanCalculatorPage() {
                 </tbody>
               </table>
             </div>
-            <p className="text-xs text-ink/55 mb-8">*At 9.25% p.a. Actual rates vary by lender and credit profile.</p>
+            <p className="text-xs text-ink/65 mb-8">*At 9.25% p.a. Actual rates vary by lender and credit profile.</p>
 
             {/* Flat vs Reducing explainer */}
             <h2 className="text-2xl font-bold text-ink mb-2">Flat Rate vs Reducing Balance — The Hidden Cost</h2>
@@ -235,7 +235,7 @@ export default function VehicleLoanCalculatorPage() {
                 </tbody>
               </table>
             </div>
-            <p className="text-xs text-ink/55 mb-4">*₹5 lakh loan at 9% p.a. Flat rate example shows ~80–90% higher total interest than reducing balance at the identical quoted rate.</p>
+            <p className="text-xs text-ink/65 mb-4">*₹5 lakh loan at 9% p.a. Flat rate example shows ~80–90% higher total interest than reducing balance at the identical quoted rate.</p>
 
             {/* Convert tip */}
             <div className="bg-secondary border border-rule rounded-xl p-4 mb-8 text-sm">

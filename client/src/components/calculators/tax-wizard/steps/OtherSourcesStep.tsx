@@ -63,7 +63,7 @@ export default function OtherSourcesStep({ value, onChange }: OtherSourcesStepPr
         </span>
       </div>
       {toAmount(value.savingsInterest) > 0 && (
-        <p className="text-xs text-ink/55">
+        <p className="text-xs text-ink/65">
           This is added to your income now — the 80TTA/80TTB deduction on your ₹
           {toAmount(value.savingsInterest).toLocaleString("en-IN")} savings interest comes off your total
           later, in the deductions step.

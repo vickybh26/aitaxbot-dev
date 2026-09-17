@@ -224,7 +224,7 @@ export default function IncomeTaxCalculatorPage() {
                   </tr>
                 </tbody>
               </table>
-              <p className="text-xs text-ink/55 mt-2">Plus 4% Health & Education Cess on final tax amount. Old Regime has different slabs and allows more deductions.</p>
+              <p className="text-xs text-ink/65 mt-2">Plus 4% Health & Education Cess on final tax amount. Old Regime has different slabs and allows more deductions.</p>
             </div>
 
             <h2 className="font-display text-2xl font-bold text-ink mb-6">New vs Old Regime — Which Should You Choose?</h2>
@@ -330,7 +330,7 @@ export default function IncomeTaxCalculatorPage() {
                 </h3>
                 <p className="text-sm text-ink/65 mb-4">Income ₹15L: Which regime saves more tax?</p>
                 <div className="space-y-1 text-sm">
-                  <div className="flex justify-between text-xs font-semibold text-ink/55 mb-2"><span>OLD REGIME</span><span>NEW REGIME</span></div>
+                  <div className="flex justify-between text-xs font-semibold text-ink/65 mb-2"><span>OLD REGIME</span><span>NEW REGIME</span></div>
                   <div className="flex justify-between"><span>Gross Income</span><span className="font-semibold">₹15,00,000 | ₹15,00,000</span></div>
                   <div className="flex justify-between"><span>Std deduction</span><span className="font-semibold">₹50,000 | ₹75,000</span></div>
                   <div className="flex justify-between"><span>80C + HRA</span><span className="font-semibold">₹2,00,000 | Nil</span></div>

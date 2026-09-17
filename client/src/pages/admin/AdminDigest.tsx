@@ -184,7 +184,7 @@ export default function AdminDigest() {
                     <option key={id} value={id}>{issueLabel(id)}</option>
                   ))}
                 </select>
-                {isFetching && <Loader2 className="w-4 h-4 animate-spin text-ink/55" />}
+                {isFetching && <Loader2 className="w-4 h-4 animate-spin text-ink/65" />}
                 {alreadySent && (
                   <span className="text-xs font-semibold bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full">
                     Sent {loaded?.sentAt?.slice(0, 10)} · {loaded?.stats?.sent ?? 0} delivered
@@ -220,11 +220,11 @@ export default function AdminDigest() {
             {draft.sections.map((sec, i) => (
               <div key={i} className="bg-card border border-rule rounded-xl p-4 space-y-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-ink/55">Section {i + 1}</span>
+                  <span className="text-xs font-bold text-ink/65">Section {i + 1}</span>
                   {draft.sections.length > 1 && (
                     <button type="button" title="Remove section"
                       onClick={() => setField("sections", draft.sections.filter((_, idx) => idx !== i))}
-                      className="ml-auto p-1 rounded text-ink/55 hover:text-red-600 hover:bg-red-50">
+                      className="ml-auto p-1 rounded text-ink/65 hover:text-red-600 hover:bg-red-50">
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   )}
@@ -295,7 +295,7 @@ export default function AdminDigest() {
                   <Send className="w-4 h-4 mr-1" />
                   Send to all {recipients?.count ?? ""}
                 </Button>
-                <p className="text-[11px] text-ink/55 mt-2 leading-snug">
+                <p className="text-[11px] text-ink/65 mt-2 leading-snug">
                   {canSend
                     ? "This cannot be undone. Send a test to yourself first."
                     : "Level 1 (Super Admin) only."}
@@ -304,9 +304,9 @@ export default function AdminDigest() {
             </div>
 
             <div className="bg-card border border-rule rounded-xl p-4">
-              <p className="text-xs font-bold uppercase tracking-wide text-ink/55 mb-3">Send history</p>
+              <p className="text-xs font-bold uppercase tracking-wide text-ink/65 mb-3">Send history</p>
               {issues.length === 0 ? (
-                <p className="text-xs text-ink/55">No issues yet.</p>
+                <p className="text-xs text-ink/65">No issues yet.</p>
               ) : (
                 <ul className="space-y-2">
                   {issues.map((it) => (
@@ -314,7 +314,7 @@ export default function AdminDigest() {
                       <button type="button" onClick={() => setIssueId(it.id)}
                         className="w-full text-left rounded-lg px-2 py-1.5 hover:bg-paper">
                         <span className="text-sm font-semibold text-ink">{issueLabel(it.id)}</span>
-                        <span className="block text-[11px] text-ink/55">
+                        <span className="block text-[11px] text-ink/65">
                           {it.status === "sent"
                             ? <>
                                 <CheckCircle2 className="w-3 h-3 inline mr-0.5 text-emerald-600" />
@@ -365,7 +365,7 @@ export default function AdminDigest() {
                 deliver a second copy to everyone.
               </p>
             )}
-            <p className="text-xs text-ink/55">Email cannot be recalled once sent.</p>
+            <p className="text-xs text-ink/65">Email cannot be recalled once sent.</p>
             <div className="flex gap-2 justify-end pt-2">
               <Button variant="outline" onClick={() => setConfirmOpen(false)} disabled={sendAll.isPending}>
                 Cancel

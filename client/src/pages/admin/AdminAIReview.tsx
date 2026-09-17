@@ -124,7 +124,7 @@ function TestQuestionBox() {
       <p className="text-xs font-semibold text-ink uppercase tracking-wide mb-2">
         Ask a test question
       </p>
-      <p className="text-xs text-ink/55 mb-3">
+      <p className="text-xs text-ink/65 mb-3">
         Runs the full AI pipeline (Gemini answer + graph shadow answer) and logs the comparison below for grading.
         Try questions on known topics — HRA, 80C, capital gains, advance tax.
       </p>
@@ -180,7 +180,7 @@ function AnswerCard({ title, text, accent }: { title: string; text: string | nul
     <div className="flex-1 min-w-0">
       <p className={`text-xs font-semibold uppercase tracking-wide mb-1.5 ${accent}`}>{title}</p>
       <div className="rounded-lg border border-rule bg-secondary p-3 text-sm text-ink/80 whitespace-pre-wrap leading-relaxed max-h-64 overflow-y-auto">
-        {text || <span className="text-ink/55 italic">No answer captured</span>}
+        {text || <span className="text-ink/65 italic">No answer captured</span>}
       </div>
     </div>
   );
@@ -197,7 +197,7 @@ function QueryRow({ item }: { item: AIQuery }) {
       <div className="flex items-start justify-between gap-4 flex-wrap mb-3">
         <div className="min-w-0">
           <p className="font-semibold text-ink break-words">{item.question}</p>
-          <p className="text-xs text-ink/55 mt-1">
+          <p className="text-xs text-ink/65 mt-1">
             {new Date(item.timestamp).toLocaleString("en-IN")} · concepts: {item.concepts_triggered.join(", ") || "none"}
             {item.source ? ` · source: ${item.source}` : ""}
           </p>
@@ -280,7 +280,7 @@ export default function AdminAIReview() {
           <Scale className="h-5 w-5 text-ink" />
           <h1 className="text-xl font-bold text-ink">AI Answer Review</h1>
         </div>
-        <p className="text-sm text-ink/55">
+        <p className="text-sm text-ink/65">
           Two kinds of comparisons land here. <span className="font-medium text-ink/65">Production analyses</span> —
           every time a user reconciles documents or gets calculator tax advice, the same situation is re-run through
           our RAG pipeline in shadow, so you can grade whether the RAG answer is good enough to replace the ad-hoc
@@ -293,8 +293,8 @@ export default function AdminAIReview() {
 
       {stats && (
         <div className="flex gap-3 flex-wrap mb-6">
-          <StatChip label="Total compared" value={stats.total} tone="text-ink/55" />
-          <StatChip label="Pending" value={stats.pending} tone="text-ink/55" />
+          <StatChip label="Total compared" value={stats.total} tone="text-ink/65" />
+          <StatChip label="Pending" value={stats.pending} tone="text-ink/65" />
           <StatChip label="Match" value={stats.match} tone="text-emerald-600" />
           <StatChip label="Partial" value={stats.partial} tone="text-amber-600" />
           <StatChip label="Mismatch" value={stats.mismatch} tone="text-red-600" />
@@ -327,7 +327,7 @@ export default function AdminAIReview() {
       )}
 
       {!isLoading && !isError && filtered.length === 0 && (
-        <p className="text-sm text-ink/55 text-center py-12">
+        <p className="text-sm text-ink/65 text-center py-12">
           No queries in this bucket yet — ask the AI something on the site that matches a known tax topic,
           then come back here.
         </p>

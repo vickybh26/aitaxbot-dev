@@ -67,7 +67,7 @@ export function SegmentedToggle({
               fullWidth && "flex-1 min-w-0",
               active
                 ? "bg-card text-primary shadow-sm"
-                : "bg-transparent text-ink/55 hover:text-ink/80"
+                : "bg-transparent text-ink/65 hover:text-ink/80"
             )}
           >
             {opt.label}

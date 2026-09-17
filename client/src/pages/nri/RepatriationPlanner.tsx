@@ -188,7 +188,7 @@ export default function RepatriationPlanner() {
                     placeholder="Enter amount"
                   />
                 </div>
-                <p className="text-xs text-ink/55 mt-2">
+                <p className="text-xs text-ink/65 mt-2">
                   Equivalent to: {calculator.currencyMode === "inr" ? `$${calculator.amountUsd.toLocaleString()}` : `₹${calculator.amountInr.toLocaleString()}`} (at {exchangeRate}/)
                 </p>
               </div>
@@ -650,7 +650,7 @@ export default function RepatriationPlanner() {
               <details key={idx} className="bg-card border border-rule rounded-lg p-6 group cursor-pointer hover:shadow-md transition-shadow">
                 <summary className="font-semibold text-ink flex items-start justify-between">
                   <span>{faq.q}</span>
-                  <ChevronRight size={20} className="text-ink/55 group-open:rotate-90 transition-transform flex-shrink-0 mt-1 ml-2" />
+                  <ChevronRight size={20} className="text-ink/65 group-open:rotate-90 transition-transform flex-shrink-0 mt-1 ml-2" />
                 </summary>
                 <p className="text-ink/80 mt-4">{faq.a}</p>
               </details>

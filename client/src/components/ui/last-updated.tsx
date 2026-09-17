@@ -41,7 +41,7 @@ export function LastUpdated({
         return {
           label: "Last updated",
           icon: <Clock className="w-3 h-3" />,
-          color: "text-ink/55"
+          color: "text-ink/65"
         };
     }
   };

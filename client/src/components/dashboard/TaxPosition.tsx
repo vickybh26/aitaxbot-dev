@@ -68,7 +68,7 @@ export default function TaxPosition() {
               {result.headline.value}
             </p>
             {gross && (
-              <p className="mt-2 text-xs text-ink/55">
+              <p className="mt-2 text-xs text-ink/65">
                 On gross income of <span className="tabular-figures">{gross}</span>
               </p>
             )}
@@ -84,7 +84,7 @@ export default function TaxPosition() {
                 {regime} regime
               </p>
               {gap !== null && gap > 0 && (
-                <p className="mt-2 text-xs text-ink/55">
+                <p className="mt-2 text-xs text-ink/65">
                   {inr(gap)} cheaper than the {regime === "new" ? "old" : "new"} regime this year.
                 </p>
               )}
@@ -102,7 +102,7 @@ export default function TaxPosition() {
           ) : (
             <div className="rounded-2xl bg-paper p-5 sm:col-span-1">
               <p className="field-label">Better regime</p>
-              <p className="mt-2 text-xs text-ink/55">
+              <p className="mt-2 text-xs text-ink/65">
                 Recompute to see both regimes side by side — this saved result predates the
                 comparison being stored.
               </p>

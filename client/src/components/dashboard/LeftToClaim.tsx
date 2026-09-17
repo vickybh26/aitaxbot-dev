@@ -135,7 +135,7 @@ export default function LeftToClaim() {
                 <p className="truncate text-sm font-bold text-ink">
                   {slot.section} · {slot.title}
                 </p>
-                <p className="mt-0.5 truncate text-xs text-ink/55">{slot.examples}</p>
+                <p className="mt-0.5 truncate text-xs text-ink/65">{slot.examples}</p>
               </div>
               <span className="tabular-figures shrink-0 text-xs font-semibold text-ink/65">
                 up to {inr(slot.limit)}
@@ -180,9 +180,9 @@ export default function LeftToClaim() {
                   <p className="truncate text-sm font-bold text-ink">
                     {row.section} · {row.title}
                   </p>
-                  <p className="mt-0.5 truncate text-xs text-ink/55">{row.examples}</p>
+                  <p className="mt-0.5 truncate text-xs text-ink/65">{row.examples}</p>
                 </div>
-                <span className="tabular-figures shrink-0 text-xs text-ink/55">
+                <span className="tabular-figures shrink-0 text-xs text-ink/65">
                   {inr(row.claimed)} / {inr(row.limit)}
                 </span>
               </div>

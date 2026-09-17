@@ -198,7 +198,7 @@ export default function TaxDownloadModal({
           {/* ── Step: Form ── */}
           {step === "form" && (
             <form onSubmit={handleSubmit} className="space-y-4">
-              <p className="text-sm text-ink/55 -mt-1">
+              <p className="text-sm text-ink/65 -mt-1">
                 Enter your details and we'll email you the full breakdown — Old Regime vs New Regime, deductions, and more.
               </p>
 
@@ -324,7 +324,7 @@ export default function TaxDownloadModal({
                   <div className="w-full border-t border-rule" />
                 </div>
                 <div className="relative flex justify-center text-xs">
-                  <span className="bg-card px-2 text-ink/55">or</span>
+                  <span className="bg-card px-2 text-ink/65">or</span>
                 </div>
               </div>
 
@@ -336,7 +336,7 @@ export default function TaxDownloadModal({
                 Use a different email
               </Button>
 
-              <Button variant="ghost" onClick={handleClose} className="w-full text-ink/55 hover:text-ink/65">
+              <Button variant="ghost" onClick={handleClose} className="w-full text-ink/65 hover:text-ink/65">
                 Cancel
               </Button>
             </div>
@@ -369,7 +369,7 @@ export default function TaxDownloadModal({
                 </a>
               </div>
 
-              <Button variant="ghost" onClick={handleClose} className="w-full text-ink/55 hover:text-ink/65">
+              <Button variant="ghost" onClick={handleClose} className="w-full text-ink/65 hover:text-ink/65">
                 Maybe later
               </Button>
             </div>

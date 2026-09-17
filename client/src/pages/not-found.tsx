@@ -75,7 +75,7 @@ export default function NotFound() {
             </div>
 
             <div className="mt-8 text-center">
-              <p className="text-sm text-ink/55">
+              <p className="text-sm text-ink/65">
                 Looking for something specific? Try our{" "}
                 <Link href="/calculators/income-tax" className="text-credit hover:underline font-medium">
                   Income Tax Calculator

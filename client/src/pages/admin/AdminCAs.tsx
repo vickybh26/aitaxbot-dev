@@ -148,7 +148,7 @@ export default function AdminCAs() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-ink">CA Directory</h1>
-            <p className="text-ink/55 text-sm mt-1">
+            <p className="text-ink/65 text-sm mt-1">
               Review and approve CA profile registrations
             </p>
           </div>
@@ -167,7 +167,7 @@ export default function AdminCAs() {
               className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === t.key
                   ? "border-blue-600 text-ink"
-                  : "border-transparent text-ink/55 hover:text-ink/80"
+                  : "border-transparent text-ink/65 hover:text-ink/80"
               }`}
             >
               {t.label}
@@ -177,11 +177,11 @@ export default function AdminCAs() {
 
         {/* Table */}
         {isLoading ? (
-          <div className="flex items-center justify-center py-20 text-ink/55">
+          <div className="flex items-center justify-center py-20 text-ink/65">
             <RefreshCw className="h-5 w-5 animate-spin mr-2" /> Loading…
           </div>
         ) : cas.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-ink/55 gap-2">
+          <div className="flex flex-col items-center justify-center py-20 text-ink/65 gap-2">
             <Users className="h-10 w-10 opacity-40" />
             <p>No CA profiles found for this filter.</p>
           </div>
@@ -213,11 +213,11 @@ export default function AdminCAs() {
                           </span>
                         ))}
                         {(ca.practiceAreas ?? []).length > 3 && (
-                          <span className="text-ink/55 text-xs">+{ca.practiceAreas.length - 3}</span>
+                          <span className="text-ink/65 text-xs">+{ca.practiceAreas.length - 3}</span>
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-ink/55 text-xs">
+                    <td className="px-4 py-3 text-ink/65 text-xs">
                       {ca.createdAt ? new Date(ca.createdAt).toLocaleDateString("en-IN") : "—"}
                     </td>
                     <td className="px-4 py-3">
@@ -230,7 +230,7 @@ export default function AdminCAs() {
                         <button
                           title="View profile"
                           onClick={() => { setSelected(ca); setViewOpen(true); }}
-                          className="p-1 text-ink/55 hover:text-credit transition-colors"
+                          className="p-1 text-ink/65 hover:text-credit transition-colors"
                         >
                           <Eye className="h-4 w-4" />
                         </button>
@@ -240,14 +240,14 @@ export default function AdminCAs() {
                               title="Approve"
                               onClick={() => approveMutation.mutate(ca.id)}
                               disabled={approveMutation.isPending}
-                              className="p-1 text-ink/55 hover:text-green-600 transition-colors disabled:opacity-40"
+                              className="p-1 text-ink/65 hover:text-green-600 transition-colors disabled:opacity-40"
                             >
                               <CheckCircle className="h-4 w-4" />
                             </button>
                             <button
                               title="Reject"
                               onClick={() => { setSelected(ca); setRejectOpen(true); }}
-                              className="p-1 text-ink/55 hover:text-red-600 transition-colors"
+                              className="p-1 text-ink/65 hover:text-red-600 transition-colors"
                             >
                               <XCircle className="h-4 w-4" />
                             </button>
@@ -257,7 +257,7 @@ export default function AdminCAs() {
                           <button
                             title="Delete permanently"
                             onClick={() => { setSelected(ca); setDeleteOpen(true); }}
-                            className="p-1 text-ink/55 hover:text-red-700 transition-colors"
+                            className="p-1 text-ink/65 hover:text-red-700 transition-colors"
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -345,7 +345,7 @@ export default function AdminCAs() {
             </p>
             <div className="bg-secondary rounded-lg p-3 text-sm">
               <p className="font-semibold">{selected?.fullName}</p>
-              <p className="text-ink/55">ICAI: {selected?.icaiMembershipNumber} · {selected?.email}</p>
+              <p className="text-ink/65">ICAI: {selected?.icaiMembershipNumber} · {selected?.email}</p>
             </div>
             <p className="text-sm text-red-600 font-medium">
               This action cannot be undone. The CA will need to re-register if deleted by mistake.
@@ -371,7 +371,7 @@ export default function AdminCAs() {
             <DialogTitle>Reject CA — {selected?.fullName}</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
-            <p className="text-sm text-ink/55">Provide a reason. This will be emailed to the CA.</p>
+            <p className="text-sm text-ink/65">Provide a reason. This will be emailed to the CA.</p>
             <Textarea
               aria-label="Reason for rejection"
               placeholder="e.g. ICAI membership number could not be verified. Please re-register with your valid membership details."
@@ -399,7 +399,7 @@ export default function AdminCAs() {
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex gap-3">
-      <span className="text-ink/55 w-32 shrink-0">{label}</span>
+      <span className="text-ink/65 w-32 shrink-0">{label}</span>
       <span className="text-ink font-medium">{value}</span>
     </div>
   );

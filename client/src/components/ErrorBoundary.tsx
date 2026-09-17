@@ -86,16 +86,16 @@ export class ErrorBoundary extends Component<Props, State> {
               <AlertTriangle className="w-12 h-12 text-amber-400" />
             </div>
             <h1 className="text-xl font-bold text-ink mb-2">Something went wrong</h1>
-            <p className="text-ink/55 text-sm mb-6">
+            <p className="text-ink/65 text-sm mb-6">
               AiTaxBot ran into an unexpected error. This has been logged. Try refreshing the page.
             </p>
 
             {this.state.error && (
               <details className="text-left bg-secondary rounded-lg p-4 mb-6 text-xs font-mono text-ink/65 overflow-auto max-h-40">
-                <summary className="cursor-pointer text-ink/55 mb-2">Error details</summary>
+                <summary className="cursor-pointer text-ink/65 mb-2">Error details</summary>
                 <p className="text-red-600 font-semibold">{this.state.error.message}</p>
                 {this.state.info && (
-                  <pre className="mt-2 text-ink/55 whitespace-pre-wrap text-xs">
+                  <pre className="mt-2 text-ink/65 whitespace-pre-wrap text-xs">
                     {this.state.info.trim()}
                   </pre>
                 )}
@@ -110,7 +110,7 @@ export class ErrorBoundary extends Component<Props, State> {
               Reload Page
             </button>
 
-            <p className="text-xs text-ink/55 mt-4">
+            <p className="text-xs text-ink/65 mt-4">
               If this keeps happening,{" "}
               <a href="/contact" className="underline hover:text-ink">contact us</a>.
             </p>

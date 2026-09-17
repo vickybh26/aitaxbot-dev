@@ -89,7 +89,7 @@ export default function LeadCaptureForm({ source, summaryText }: Props) {
       {/* Dismiss */}
       <button
         onClick={() => setDismissed(true)}
-        className="absolute top-3 right-3 text-ink/55 hover:text-ink/65 p-1 rounded-full hover:bg-card/60 transition-colors"
+        className="absolute top-3 right-3 text-ink/65 hover:text-ink/65 p-1 rounded-full hover:bg-card/60 transition-colors"
         aria-label="Dismiss"
       >
         <X className="w-4 h-4" />
@@ -104,7 +104,7 @@ export default function LeadCaptureForm({ source, summaryText }: Props) {
           <p className="font-semibold text-ink text-sm leading-tight">
             Get your result by email
           </p>
-          <p className="text-xs text-ink/55">
+          <p className="text-xs text-ink/65">
             + ITR deadline reminder &amp; free CA connect
           </p>
         </div>
@@ -119,30 +119,30 @@ export default function LeadCaptureForm({ source, summaryText }: Props) {
             onChange={(e) => setName(e.target.value)}
             placeholder="Your name"
             required
-            className="flex-1 h-9 px-3 rounded-lg border border-rule bg-card text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-ink/55"
+            className="flex-1 h-9 px-3 rounded-lg border border-rule bg-card text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-ink/65"
           />
           <div className="relative flex-1">
-            <Mail className="absolute left-2.5 top-2 w-4 h-4 text-ink/55" />
+            <Mail className="absolute left-2.5 top-2 w-4 h-4 text-ink/65" />
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email address"
               required
-              className="w-full h-9 pl-8 pr-3 rounded-lg border border-rule bg-card text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-ink/55"
+              className="w-full h-9 pl-8 pr-3 rounded-lg border border-rule bg-card text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-ink/65"
             />
           </div>
         </div>
 
         {/* WhatsApp (optional) */}
         <div className="relative">
-          <Phone className="absolute left-2.5 top-2 w-4 h-4 text-ink/55" />
+          <Phone className="absolute left-2.5 top-2 w-4 h-4 text-ink/65" />
           <input
             type="tel"
             value={whatsapp}
             onChange={(e) => setWhatsapp(e.target.value)}
             placeholder="WhatsApp number (optional — for filing reminders)"
-            className="w-full h-9 pl-8 pr-3 rounded-lg border border-rule bg-card text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-ink/55"
+            className="w-full h-9 pl-8 pr-3 rounded-lg border border-rule bg-card text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-ink/65"
           />
         </div>
 
@@ -162,7 +162,7 @@ export default function LeadCaptureForm({ source, summaryText }: Props) {
           )}
         </button>
 
-        <p className="text-xs text-ink/55 text-center">
+        <p className="text-xs text-ink/65 text-center">
           No spam. Unsubscribe anytime. We never share your details.
         </p>
       </form>

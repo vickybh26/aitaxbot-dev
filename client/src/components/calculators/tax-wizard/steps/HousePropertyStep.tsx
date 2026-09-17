@@ -123,7 +123,7 @@ export default function HousePropertyStep({ value, onChange }: HousePropertyStep
         </span>
       </div>
       {result.totalIncome < 0 && (
-        <p className="text-xs text-ink/55">
+        <p className="text-xs text-ink/65">
           A negative figure is a loss — it reduces your total taxable income (up to ₹2,00,000 can be
           set off against other income each year).
         </p>

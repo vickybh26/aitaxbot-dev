@@ -63,7 +63,7 @@ export default function Rail({
           {!collapsed && (
             <div className="px-2 pb-3 pt-1">
               <p className="truncate text-sm font-bold text-ink">{fullName}</p>
-              <p className="truncate text-xs text-ink/55">FY {financialYear}</p>
+              <p className="truncate text-xs text-ink/65">FY {financialYear}</p>
             </div>
           )}
           <ul className="space-y-1">
@@ -87,7 +87,7 @@ export default function Rail({
             onClick={() => setCollapsed((c) => !c)}
             aria-expanded={!collapsed}
             aria-label={collapsed ? "Expand section nav" : "Collapse section nav"}
-            className="mt-2 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl px-3 text-xs font-semibold text-ink/55 transition-colors hover:bg-secondary hover:text-ink"
+            className="mt-2 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl px-3 text-xs font-semibold text-ink/65 transition-colors hover:bg-secondary hover:text-ink"
           >
             <ChevronLeft
               className={`h-4 w-4 transition-transform ${collapsed ? "rotate-180" : ""}`}

@@ -84,7 +84,7 @@ export default function CapitalGainsStep({ value, onChange }: CapitalGainsStepPr
       )}
 
       {toAmount(value.debtFundGains) > 0 && (
-        <p className="text-xs text-ink/55">
+        <p className="text-xs text-ink/65">
           Your ₹{toAmount(value.debtFundGains).toLocaleString("en-IN")} debt fund gain will be added to
           your total income and taxed at your slab rate — it isn't shown separately above because it
           doesn't get a special rate.

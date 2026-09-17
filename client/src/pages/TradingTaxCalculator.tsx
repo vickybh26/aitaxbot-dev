@@ -190,7 +190,7 @@ export default function TradingTaxCalculatorPage() {
                 </tbody>
               </table>
             </div>
-            <p className="text-xs text-ink/55 mt-3">
+            <p className="text-xs text-ink/65 mt-3">
               * Rates applicable for Indian tax residents under ITA 1961 for FY 2025-26. LTCG rate of 12.5% introduced by Finance Act 2024 (effective July 23, 2024 for listed assets, applicable to all foreign equity per Finance Act 2024 amendments). Surcharge and cess apply on final tax liability.
             </p>
           </div>
@@ -224,7 +224,7 @@ export default function TradingTaxCalculatorPage() {
                 <p className="text-ink/65 text-sm">Held less than 24 months → STCG at slab rate. Held 24 months or more → LTCG at 12.5%.</p>
               </div>
             </div>
-            <p className="text-sm text-ink/55 mt-5 border-l-4 border-rule pl-4">
+            <p className="text-sm text-ink/65 mt-5 border-l-4 border-rule pl-4">
               Note: This calculator uses ECB/Frankfurter rates for convenience. For final ITR filing, use
               the official FBIL reference rate from <strong>fbil.org.in</strong> or the RBI website. Discrepancies
               between sources are typically minor but should be verified for large trades.
@@ -288,25 +288,25 @@ export default function TradingTaxCalculatorPage() {
               <Link href="/calculators/income-tax">
                 <div className="bg-card border border-rule hover:border-credit hover:shadow-sm rounded-lg p-4 transition-all cursor-pointer">
                   <p className="font-semibold text-ink text-sm">Income Tax Calculator</p>
-                  <p className="text-xs text-ink/55 mt-1">Add trading income to your salary and compute total tax liability</p>
+                  <p className="text-xs text-ink/65 mt-1">Add trading income to your salary and compute total tax liability</p>
                 </div>
               </Link>
               <Link href="/nri/dtaa-calculator">
                 <div className="bg-card border border-rule hover:border-credit hover:shadow-sm rounded-lg p-4 transition-all cursor-pointer">
                   <p className="font-semibold text-ink text-sm">DTAA Calculator</p>
-                  <p className="text-xs text-ink/55 mt-1">Compute Double Tax Avoidance Agreement relief on foreign income</p>
+                  <p className="text-xs text-ink/65 mt-1">Compute Double Tax Avoidance Agreement relief on foreign income</p>
                 </div>
               </Link>
               <Link href="/blog/capital-gains-itr-where-to-report">
                 <div className="bg-card border border-rule hover:border-credit hover:shadow-sm rounded-lg p-4 transition-all cursor-pointer">
                   <p className="font-semibold text-ink text-sm">Capital Gains in ITR — Where to Report</p>
-                  <p className="text-xs text-ink/55 mt-1">Step-by-step guide to reporting CG in Schedule CG of your ITR</p>
+                  <p className="text-xs text-ink/65 mt-1">Step-by-step guide to reporting CG in Schedule CG of your ITR</p>
                 </div>
               </Link>
               <Link href="/blog/capital-gains-tax-stocks-mutual-funds">
                 <div className="bg-card border border-rule hover:border-credit hover:shadow-sm rounded-lg p-4 transition-all cursor-pointer">
                   <p className="font-semibold text-ink text-sm">Capital Gains Tax on Stocks & Mutual Funds</p>
-                  <p className="text-xs text-ink/55 mt-1">Understand STCG vs LTCG rates, set-off rules, and exemptions</p>
+                  <p className="text-xs text-ink/65 mt-1">Understand STCG vs LTCG rates, set-off rules, and exemptions</p>
                 </div>
               </Link>
             </div>
@@ -316,7 +316,7 @@ export default function TradingTaxCalculatorPage() {
         {/* Disclaimer */}
         <section className="py-8 px-6 bg-card border-t border-rule">
           <div className="max-w-5xl mx-auto">
-            <p className="text-xs text-ink/55 leading-relaxed">
+            <p className="text-xs text-ink/65 leading-relaxed">
               <strong>Disclaimer:</strong> This calculator is for educational and informational purposes only. It uses
               approximate exchange rates from the ECB/Frankfurter API which may differ from official RBI/FBIL rates.
               Tax calculations are based on Indian tax law for FY 2025-26 (AY 2026-27). Surcharge and health &

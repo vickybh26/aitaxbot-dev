@@ -281,7 +281,7 @@ export default function TermsOfService() {
                 <p className="text-ink/80 mb-1">
                   🌐 <a href="https://www.aitaxbot.co.in" className="text-credit hover:underline">www.aitaxbot.co.in</a>
                 </p>
-                <p className="text-ink/55 text-sm mt-3">We respond to queries within 48 hours on business days.</p>
+                <p className="text-ink/65 text-sm mt-3">We respond to queries within 48 hours on business days.</p>
               </div>
             </section>
 

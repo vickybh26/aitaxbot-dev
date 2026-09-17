@@ -47,7 +47,7 @@ export default function NextUp() {
                 <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
                   <div className="min-w-0">
                     <p className="text-sm font-bold text-ink">{item.title}</p>
-                    <p className="mt-1 text-xs text-ink/55">{item.detail}</p>
+                    <p className="mt-1 text-xs text-ink/65">{item.detail}</p>
                   </div>
                   <span
                     className={`shrink-0 rounded-full px-3 py-1 text-[11px] font-bold ${
@@ -58,7 +58,7 @@ export default function NextUp() {
                   </span>
                 </div>
                 <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-                  <span className="text-xs text-ink/55">
+                  <span className="text-xs text-ink/65">
                     {item.date.toLocaleDateString("en-IN", {
                       day: "numeric",
                       month: "short",

@@ -286,7 +286,7 @@ export default function InvoiceGenerator({ firmId }: { firmId: string }) {
   });
 
   if (!firmId) {
-    return <div className="text-center py-8 text-ink/55">Please select a firm first</div>;
+    return <div className="text-center py-8 text-ink/65">Please select a firm first</div>;
   }
 
   return (

@@ -296,7 +296,7 @@ export default function RentReceiptGenerator() {
                   )}
                   <div>
                     <label htmlFor="rr-landlordPan" className="block text-xs font-semibold text-ink/65 mb-1">
-                      Landlord PAN {needsPan ? <span className="text-red-500">*</span> : <span className="text-ink/55">(optional)</span>}
+                      Landlord PAN {needsPan ? <span className="text-red-500">*</span> : <span className="text-ink/65">(optional)</span>}
                     </label>
                     <input id="rr-landlordPan" placeholder="AAAPL1234C" maxLength={10} className={inputClass(errors.landlordPan)}
                       {...field("landlordPan")}
@@ -312,7 +312,7 @@ export default function RentReceiptGenerator() {
                   <div>
                     <label htmlFor="rr-receiptPrefix" className="block text-xs font-semibold text-ink/65 mb-1">Receipt Prefix</label>
                     <input id="rr-receiptPrefix" placeholder="RR" maxLength={8} className={inputClass()} value={receiptPrefix} onChange={e => setReceiptPrefix(e.target.value.toUpperCase() || "RR")} />
-                    <p className="text-xs text-ink/55 mt-1">First receipt will be {receiptPrefix}-001</p>
+                    <p className="text-xs text-ink/65 mt-1">First receipt will be {receiptPrefix}-001</p>
                   </div>
                 </div>
 
@@ -344,7 +344,7 @@ export default function RentReceiptGenerator() {
                 <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
                   {months.map((entry, i) => (
                     <div key={i} className="flex items-center gap-2 bg-secondary rounded-xl px-3 py-2">
-                      <span className="text-xs font-bold text-ink/55 w-6">{i + 1}.</span>
+                      <span className="text-xs font-bold text-ink/65 w-6">{i + 1}.</span>
                       <select value={entry.month} onChange={e => updateMonth(i, "month", +e.target.value)}
                         className="flex-1 text-sm border border-rule rounded-lg px-2 py-1.5 bg-card focus:outline-none focus:ring-1 focus:ring-credit">
                         {MONTHS.map((m, mi) => <option key={mi + 1} value={mi + 1}>{m}</option>)}
@@ -353,7 +353,7 @@ export default function RentReceiptGenerator() {
                         className="w-24 text-sm border border-rule rounded-lg px-2 py-1.5 bg-card focus:outline-none focus:ring-1 focus:ring-credit">
                         {YEAR_OPTIONS.map(y => <option key={y}>{y}</option>)}
                       </select>
-                      <button onClick={() => removeMonth(i)} className="text-ink/55 hover:text-red-500 transition p-1">
+                      <button onClick={() => removeMonth(i)} className="text-ink/65 hover:text-red-500 transition p-1">
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
                     </div>
@@ -364,7 +364,7 @@ export default function RentReceiptGenerator() {
                   <Plus className="h-3.5 w-3.5" /> Add another month
                 </button>
                 {months.length > 1 && (
-                  <p className="text-xs text-ink/55 mt-2">Will generate {months.length} receipts as a single PDF ({months.length} pages)</p>
+                  <p className="text-xs text-ink/65 mt-2">Will generate {months.length} receipts as a single PDF ({months.length} pages)</p>
                 )}
               </div>
 
@@ -408,7 +408,7 @@ export default function RentReceiptGenerator() {
                         <p className={`text-xs font-semibold ${emailResult.userExists ? "text-ink" : "text-emerald-700"}`}>
                           {emailResult.userExists ? "Receipt sent + Dashboard link included" : "Receipt sent + Free account invite included"}
                         </p>
-                        <p className="text-xs text-ink/55 mt-0.5">
+                        <p className="text-xs text-ink/65 mt-0.5">
                           {emailResult.userExists
                             ? "We've included a link to your AiTaxBot dashboard where you can view this receipt."
                             : "We've included an invite to create your free AiTaxBot account to save receipts and access all calculators."}
@@ -445,7 +445,7 @@ export default function RentReceiptGenerator() {
                     { label: "Receipts", value: months.length > 0 ? `${months.length} month${months.length > 1 ? "s" : ""}` : "—" },
                   ].map(({ label, value }) => (
                     <div key={label} className="flex justify-between gap-2">
-                      <dt className="text-ink/55 flex-shrink-0">{label}</dt>
+                      <dt className="text-ink/65 flex-shrink-0">{label}</dt>
                       <dd className="text-ink font-medium text-right truncate max-w-[140px]">{value}</dd>
                     </div>
                   ))}

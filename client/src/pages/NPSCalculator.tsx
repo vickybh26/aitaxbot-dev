@@ -300,7 +300,7 @@ export default function NPSCalculatorPage() {
                   </tr>
                 </tbody>
               </table>
-              <p className="text-xs text-ink/55 mt-2">*EPF interest taxable if contribution exceeds ₹2.5L/year</p>
+              <p className="text-xs text-ink/65 mt-2">*EPF interest taxable if contribution exceeds ₹2.5L/year</p>
             </div>
 
             {/* NPS Corpus Projection Table */}
@@ -357,7 +357,7 @@ export default function NPSCalculatorPage() {
                 </tbody>
               </table>
             </div>
-            <p className="text-xs text-ink/55 mb-8">*Assumes 10% annual return compounded monthly. Does not include employer's 80CCD(2) contribution — add your employer's share to significantly increase these numbers. Past returns are not guaranteed.</p>
+            <p className="text-xs text-ink/65 mb-8">*Assumes 10% annual return compounded monthly. Does not include employer's 80CCD(2) contribution — add your employer's share to significantly increase these numbers. Past returns are not guaranteed.</p>
 
             {/* Where to Open NPS */}
             <h2 className="text-2xl font-bold text-ink mb-2">Where to Open Your NPS Account</h2>
@@ -387,7 +387,7 @@ export default function NPSCalculatorPage() {
                 <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded font-medium">Open via Zerodha →</span>
               </a>
             </div>
-            <p className="text-xs text-ink/55 mb-8">NPS is regulated by PFRDA (Pension Fund Regulatory and Development Authority). All platforms listed are official NPS Points of Presence (POPs). AiTaxBot does not provide investment advice.</p>
+            <p className="text-xs text-ink/65 mb-8">NPS is regulated by PFRDA (Pension Fund Regulatory and Development Authority). All platforms listed are official NPS Points of Presence (POPs). AiTaxBot does not provide investment advice.</p>
 
             {/* FAQs */}
             <h2 className="text-2xl font-bold text-ink mb-4">Frequently Asked Questions</h2>

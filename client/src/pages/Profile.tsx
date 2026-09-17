@@ -327,9 +327,9 @@ export default function Profile() {
 function InfoRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
     <div className="flex items-center gap-3">
-      <div className="text-ink/55 shrink-0">{icon}</div>
+      <div className="text-ink/65 shrink-0">{icon}</div>
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-ink/55">{label}</p>
+        <p className="text-xs text-ink/65">{label}</p>
         <p className="text-sm font-medium text-ink truncate">{value}</p>
       </div>
     </div>

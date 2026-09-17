@@ -243,7 +243,7 @@ export default function FirmSetup({ onFirmSelected }: { onFirmSelected: (firmId:
         ))}
 
         {firms.length === 0 && !isCreating && (
-          <div className="text-center py-8 text-ink/55">
+          <div className="text-center py-8 text-ink/65">
             No firms yet. Create your first firm to get started.
           </div>
         )}

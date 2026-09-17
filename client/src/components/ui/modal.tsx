@@ -43,7 +43,7 @@ export default function Modal({ isOpen, onClose, title, children, size = "4xl" }
               variant="ghost"
               size="sm"
               onClick={onClose}
-              className="text-ink/55 hover:text-ink/80"
+              className="text-ink/65 hover:text-ink/80"
               aria-label="Close"
               data-testid="button-close-modal"
             >

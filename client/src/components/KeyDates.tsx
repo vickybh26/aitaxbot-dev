@@ -24,7 +24,7 @@ export default function KeyDates() {
             <li key={`${d.title}-${d.date.toISOString()}`} className="flex gap-4">
               <div className="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-2xl bg-secondary leading-none">
                 <span className="tabular-figures font-display text-sm font-bold">{d.day}</span>
-                <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-ink/55">
+                <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-ink/65">
                   {d.monthLabel}
                 </span>
               </div>

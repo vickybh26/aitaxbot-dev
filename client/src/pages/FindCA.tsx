@@ -140,7 +140,7 @@ export default function FindCA() {
             {/* Search bar */}
             <div className="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-3 w-4 h-4 text-ink/55" />
+                <Search className="absolute left-3 top-3 w-4 h-4 text-ink/65" />
                 <Input
                   value={cityFilter}
                   onChange={(e) => setCityFilter(e.target.value)}
@@ -159,7 +159,7 @@ export default function FindCA() {
                     <option key={a} value={a}>{CA_PRACTICE_AREA_LABELS[a]}</option>
                   ))}
                 </select>
-                <ChevronDown className="absolute right-2 top-3 w-4 h-4 text-ink/55 pointer-events-none" />
+                <ChevronDown className="absolute right-2 top-3 w-4 h-4 text-ink/65 pointer-events-none" />
               </div>
             </div>
           </div>
@@ -189,7 +189,7 @@ export default function FindCA() {
         {/* Directory */}
         <div className="max-w-5xl mx-auto px-6 py-10">
           {loading && (
-            <div className="flex items-center justify-center py-20 text-ink/55">
+            <div className="flex items-center justify-center py-20 text-ink/65">
               <Loader2 className="w-6 h-6 animate-spin mr-2" />
               Loading directory…
             </div>
@@ -206,7 +206,7 @@ export default function FindCA() {
             <div className="text-center py-20">
               <div className="text-4xl mb-3">🔍</div>
               <h3 className="text-lg font-semibold text-ink/80">No CAs found</h3>
-              <p className="text-ink/55 mt-1">
+              <p className="text-ink/65 mt-1">
                 {profiles.length === 0
                   ? "The directory is being built. Check back soon!"
                   : "Try a different city or service filter."}
@@ -238,7 +238,7 @@ export default function FindCA() {
                 </div>
 
                 {/* Location */}
-                <div className="flex items-center gap-1.5 text-xs text-ink/55 mb-3">
+                <div className="flex items-center gap-1.5 text-xs text-ink/65 mb-3">
                   <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
                   <span>{ca.city}, {ca.state}</span>
                   <span className="mx-1">·</span>
@@ -261,14 +261,14 @@ export default function FindCA() {
                     </span>
                   ))}
                   {ca.practiceAreas.length > 4 && (
-                    <span className="text-xs px-2 py-0.5 bg-secondary text-ink/55 rounded-full">
+                    <span className="text-xs px-2 py-0.5 bg-secondary text-ink/65 rounded-full">
                       +{ca.practiceAreas.length - 4} more
                     </span>
                   )}
                 </div>
 
                 {/* Languages */}
-                <p className="text-xs text-ink/55 mb-4">
+                <p className="text-xs text-ink/65 mb-4">
                   {ca.languages.join(" · ")}
                 </p>
 
@@ -291,7 +291,7 @@ export default function FindCA() {
           {!loading && (
             <div className="mt-12 bg-gradient-to-r from-blue-50 to-paper border border-rule rounded-2xl p-6 text-center">
               <h3 className="font-semibold text-ink mb-1">Are you a Chartered Accountant?</h3>
-              <p className="text-sm text-ink/55 mb-4">
+              <p className="text-sm text-ink/65 mb-4">
                 List your profile for free. Users looking for CA help during ITR filing season will
                 be able to send you enquiries directly.
               </p>
@@ -304,7 +304,7 @@ export default function FindCA() {
           )}
 
           {/* ── Full Disclaimer ── */}
-          <div id="disclaimer" className="mt-10 bg-card border border-rule rounded-2xl p-6 text-xs text-ink/55 leading-relaxed space-y-3">
+          <div id="disclaimer" className="mt-10 bg-card border border-rule rounded-2xl p-6 text-xs text-ink/65 leading-relaxed space-y-3">
             <h2 className="text-sm font-semibold text-ink/80 mb-2 flex items-center gap-2">
               <BookOpen className="w-4 h-4" />
               Disclaimer — CA Directory &amp; Enquiry Service
@@ -390,7 +390,7 @@ export default function FindCA() {
               <Shield className="w-4 h-4 text-green-600" />
               How This Directory Complies with the ICAI Code of Ethics 2026
             </h2>
-            <p className="text-ink/55 mb-4">
+            <p className="text-ink/65 mb-4">
               AiTaxBot has designed this directory in accordance with the Chartered Accountants Act, 1949
               (First Schedule, Part I) and the ICAI Code of Ethics 2026 (13th Edition, effective 1 April 2026),
               including the Council Guidelines for Advertisement, 2008 (updated December 2025). The following
@@ -509,7 +509,7 @@ export default function FindCA() {
 
             </div>
 
-            <p className="mt-4 pt-3 border-t border-green-200 text-ink/55">
+            <p className="mt-4 pt-3 border-t border-green-200 text-ink/65">
               This compliance framework applies to CAs in practice (Certificate of Practice holders) who are
               subject to First Schedule Part I of the Chartered Accountants Act, 1949. Non-practising CAs
               are not subject to these restrictions and may list freely. Nothing in this compliance statement
@@ -532,11 +532,11 @@ export default function FindCA() {
             <div className="flex items-start justify-between p-6 pb-0">
               <div>
                 <h2 id="ca-enquiry-title" className="text-lg font-bold text-ink">Send an Enquiry</h2>
-                <p className="text-sm text-ink/55 mt-0.5">
+                <p className="text-sm text-ink/65 mt-0.5">
                   to <strong>{contactCA.fullName}</strong>
                 </p>
               </div>
-              <button onClick={closeModal} className="text-ink/55 hover:text-ink/65 p-1" aria-label="Close enquiry form">
+              <button onClick={closeModal} className="text-ink/65 hover:text-ink/65 p-1" aria-label="Close enquiry form">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -547,12 +547,12 @@ export default function FindCA() {
                   <CheckCircle2 className="w-7 h-7 text-green-600" />
                 </div>
                 <h3 className="font-semibold text-ink mb-1">Enquiry Sent!</h3>
-                <p className="text-sm text-ink/55 mb-4">
+                <p className="text-sm text-ink/65 mb-4">
                   Your enquiry has been forwarded to {contactCA.fullName}. The CA will contact you
                   directly at their discretion. Response times vary by individual CA.
                 </p>
                 <Button onClick={closeModal} variant="outline" className="w-full">Close</Button>
-                <p className="text-xs text-ink/55 mt-3">
+                <p className="text-xs text-ink/65 mt-3">
                   Please verify ICAI membership number at icai.org before engaging or paying any fees.
                 </p>
               </div>
@@ -639,7 +639,7 @@ export default function FindCA() {
                   )}
                 </Button>
 
-                <p className="text-xs text-ink/55 text-center">
+                <p className="text-xs text-ink/65 text-center">
                   By submitting, you consent to AiTaxBot forwarding your contact details and enquiry
                   to the selected CA for the sole purpose of enabling you to seek their professional
                   services. No fees are charged for this service.

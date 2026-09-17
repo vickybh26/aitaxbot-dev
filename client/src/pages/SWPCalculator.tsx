@@ -415,7 +415,7 @@ export default function SWPCalculatorPage() {
                 </tbody>
               </table>
             </div>
-            <p className="text-xs text-ink/55 mb-8">*At 9% annual return. "∞" = corpus never depletes. Green = safe zone. Red = corpus depletes in retirement. Target: always aim for ∞ or 30+ years.</p>
+            <p className="text-xs text-ink/65 mb-8">*At 9% annual return. "∞" = corpus never depletes. Green = safe zone. Red = corpus depletes in retirement. Target: always aim for ∞ or 30+ years.</p>
 
             {/* How Much Corpus Do I Need */}
             <h2 className="text-2xl font-bold text-ink mb-2">How Much Corpus Do I Need for My Target Monthly Income?</h2>

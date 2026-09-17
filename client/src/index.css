@@ -480,28 +480,68 @@
 }
 
 /* ── Range input ───────────────────────────────────────────────────────────
-   Used by the calculator sliders. */
-input[type="range"].premium-slider {
+   The visible track stays 6px, but the CONTROL is 44px tall so it can be
+   grabbed on a phone.
+
+   This replaces a .premium-slider rule that was defined here and referenced by
+   no component — dead CSS, while the one slider that ships (the homepage
+   income slider in Landing.tsx) used bare Tailwind and measured 230x6px at a
+   360x800 viewport. Six pixels is the entire vertical band a thumb has to land
+   in, on the single control fronting the page that takes ~84% of the site's
+   traffic. A missed drag there is a visitor who never sees a number.
+
+   The track is painted by the pseudo-elements rather than the element's own
+   background, because the element's box is now mostly transparent padding
+   whose only job is to catch the touch. */
+input[type="range"].range-touch {
   -webkit-appearance: none;
   appearance: none;
+  width: 100%;
+  height: 44px;
   background: transparent;
   cursor: pointer;
 }
 
-input[type="range"].premium-slider::-webkit-slider-thumb {
+input[type="range"].range-touch::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 9999px;
+  background: hsl(var(--secondary));
+}
+
+input[type="range"].range-touch::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   height: 20px;
   width: 20px;
   border-radius: 50%;
-  background: hsl(var(--primary-blue));
-  box-shadow: 0 0 0 4px hsl(var(--interactive-blue) / 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: all 0.15s ease;
+  background: hsl(var(--success-green));
+  /* centre the 20px thumb on the 6px track: (6 - 20) / 2 */
+  margin-top: -7px;
+  transition: transform 0.15s ease;
 }
 
-input[type="range"].premium-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.15);
-  box-shadow: 0 0 0 6px hsl(var(--interactive-blue) / 0.25), 0 3px 6px rgba(0, 0, 0, 0.15);
+input[type="range"].range-touch:hover::-webkit-slider-thumb {
+  transform: scale(1.1);
+}
+
+/* :focus-visible only — a mouse user dragging the thumb should not get a ring,
+   but a keyboard user must. Mirrors the existing :focus-visible policy above. */
+input[type="range"].range-touch:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 4px hsl(var(--success-green) / 0.3);
+}
+
+input[type="range"].range-touch::-moz-range-track {
+  height: 6px;
+  border-radius: 9999px;
+  background: hsl(var(--secondary));
+}
+
+input[type="range"].range-touch::-moz-range-thumb {
+  height: 20px;
+  width: 20px;
+  border: 0;
+  border-radius: 50%;
+  background: hsl(var(--success-green));
 }
 
 /* Smooth scrolling */

@@ -115,7 +115,7 @@ export default function SalaryStep({ value, onChange, financialYear }: SalarySte
             )}
             <StringMoneyInput id={`salary-${key}`} value={value[key]} onChange={(v) => update(key, v)} />
             {key === "hraReceived" && hint && (
-              <p className="mt-1.5 text-xs text-ink/55">{hint}</p>
+              <p className="mt-1.5 text-xs text-ink/65">{hint}</p>
             )}
           </>
         </Field>
@@ -156,7 +156,7 @@ export default function SalaryStep({ value, onChange, financialYear }: SalarySte
           ₹{grossSalary.toLocaleString("en-IN")}
         </span>
       </div>
-      <p className="text-xs text-ink/55">
+      <p className="text-xs text-ink/65">
         Standard deduction (₹75,000 New Regime / ₹50,000 Old Regime) and professional tax are applied
         automatically when we compute your result — you don't need to work those out yourself.
       </p>

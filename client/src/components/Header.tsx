@@ -106,7 +106,7 @@ export default function Header({ showModal }: HeaderProps = {}) {
           {/* ── Logo ── */}
           <Link
             href="/"
-            className="flex items-center hover:opacity-80 transition-opacity shrink-0"
+            className="flex min-h-[44px] items-center hover:opacity-80 transition-opacity shrink-0"
             onClick={() => trackButtonClick("Logo Home", "Header")}
             data-testid="link-home-logo"
           >
@@ -267,7 +267,7 @@ export default function Header({ showModal }: HeaderProps = {}) {
           <div className="md:hidden flex items-center gap-2">
             {/* Language switcher removed — see the note in the desktop nav above. */}
             <button
-              className="p-2 text-ink/70 hover:text-ink transition-colors"
+              className="p-3 text-ink/70 hover:text-ink transition-colors"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               data-testid="button-mobile-menu"
               aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}

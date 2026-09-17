@@ -98,7 +98,7 @@ export default function ResultAuthGate({ toolName, headline }: ResultAuthGatePro
             is saved to the account automatically so it's on the dashboard next
             visit. Saying "not saved unless you choose to" would misdescribe
             that, so the copy states plainly what happens and what doesn't. */}
-        <p className="text-xs text-ink/55 mt-4">
+        <p className="text-xs text-ink/65 mt-4">
           Free forever. Signing in saves your latest result to your dashboard —
           you can clear it any time.
         </p>

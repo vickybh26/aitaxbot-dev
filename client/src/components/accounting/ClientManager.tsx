@@ -65,7 +65,7 @@ export default function ClientManager({ firmId }: { firmId: string }) {
   });
 
   if (!firmId) {
-    return <div className="text-center py-8 text-ink/55">Please select a firm first</div>;
+    return <div className="text-center py-8 text-ink/65">Please select a firm first</div>;
   }
 
   if (isLoading) {
@@ -107,7 +107,7 @@ export default function ClientManager({ firmId }: { firmId: string }) {
                       maxLength={15}
                       placeholder="22AAAAA0000A1Z5"
                     />
-                    <p className="text-xs text-ink/55 mt-1">Leave empty for non-GST registered clients</p>
+                    <p className="text-xs text-ink/65 mt-1">Leave empty for non-GST registered clients</p>
                   </div>
                 )}
 
@@ -222,7 +222,7 @@ export default function ClientManager({ firmId }: { firmId: string }) {
         ))}
 
         {clients.length === 0 && !isCreating && (
-          <div className="text-center py-8 text-ink/55">
+          <div className="text-center py-8 text-ink/65">
             No clients yet. Add your first client to get started.
           </div>
         )}

@@ -296,7 +296,7 @@ export default function ResultStep({ state }: ResultStepProps) {
               </div>
               <div>
                 <h3 className="font-display font-bold text-ink text-sm">AI Tax Advisor</h3>
-                <p className="text-ink/55 text-xs">AI powered · personalised for you</p>
+                <p className="text-ink/65 text-xs">AI powered · personalised for you</p>
               </div>
             </div>
             {aiAdvice.maxPossibleSaving > 0 && (
@@ -371,7 +371,7 @@ export default function ResultStep({ state }: ResultStepProps) {
         </div>
       ) : null}
 
-      <p className="text-xs text-ink/55">
+      <p className="text-xs text-ink/65">
         This is an estimate based on the figures you entered. Marginal relief, surcharge, and cess are
         applied automatically per current tax rules. For filing, verify with a Chartered Accountant.
       </p>

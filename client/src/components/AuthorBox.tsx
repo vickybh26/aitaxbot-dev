@@ -10,7 +10,7 @@ export default function AuthorBox() {
             <Award className="h-7 w-7 text-ink" />
           </div>
           <div>
-            <p className="text-sm text-ink/55 mb-1">Prepared and reviewed by</p>
+            <p className="text-sm text-ink/65 mb-1">Prepared and reviewed by</p>
             <p className="text-lg font-semibold text-ink">AiTaxBot Expert Team</p>
             <p className="text-sm text-ink/65">Chartered Accountants & Tax Professionals</p>
             <Link href="/about" className="text-sm text-ink hover:text-credit underline mt-1 inline-block">

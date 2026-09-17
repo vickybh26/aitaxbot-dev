@@ -257,14 +257,14 @@ export default function SWPCalculator({ onClose }: SWPCalculatorProps = {}) {
 
               <div className="grid grid-cols-2 gap-3">
                 <Card className="bg-card p-4">
-                  <div className="text-xs text-ink/55">Starting Withdrawal/mo</div>
+                  <div className="text-xs text-ink/65">Starting Withdrawal/mo</div>
                   <div className="text-lg font-bold text-ink" data-testid="text-monthly-withdrawal">
                     {formatCurrency(result.startingMonthlyWithdrawal)}
                   </div>
                 </Card>
                 {result.inflationAdjusted && (
                   <Card className="bg-card p-4">
-                    <div className="text-xs text-ink/55">Final Withdrawal/mo</div>
+                    <div className="text-xs text-ink/65">Final Withdrawal/mo</div>
                     <div className="text-lg font-bold text-orange-500">
                       {formatCurrency(result.finalMonthlyWithdrawal)}
                     </div>
@@ -284,13 +284,13 @@ export default function SWPCalculator({ onClose }: SWPCalculatorProps = {}) {
 
               <div className="grid grid-cols-2 gap-3">
                 <Card className="bg-card p-4">
-                  <div className="text-xs text-ink/55">Total Withdrawals</div>
+                  <div className="text-xs text-ink/65">Total Withdrawals</div>
                   <div className="text-base font-bold text-orange-600" data-testid="text-total-withdrawals">
                     {formatCurrency(result.totalWithdrawals)}
                   </div>
                 </Card>
                 <Card className="bg-card p-4">
-                  <div className="text-xs text-ink/55">Remaining Corpus</div>
+                  <div className="text-xs text-ink/65">Remaining Corpus</div>
                   <div className="text-base font-bold text-ink/65" data-testid="text-remaining-corpus">
                     {formatCurrency(result.remainingCorpus)}
                   </div>
@@ -307,7 +307,7 @@ export default function SWPCalculator({ onClose }: SWPCalculatorProps = {}) {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b text-left text-ink/55 text-xs">
+                  <tr className="border-b text-left text-ink/65 text-xs">
                     <th className="pb-2">Year</th>
                     <th className="pb-2 text-right">Monthly</th>
                     <th className="pb-2 text-right">Corpus</th>

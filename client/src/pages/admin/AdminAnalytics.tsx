@@ -106,7 +106,7 @@ export default function AdminAnalytics() {
         {/* Header */}
         <div>
           <h1 className="text-2xl font-bold text-ink">Analytics</h1>
-          <p className="text-ink/55 text-sm mt-1">
+          <p className="text-ink/65 text-sm mt-1">
             User demographics — occupation, geography, and sign-in method breakdown.
           </p>
         </div>
@@ -220,13 +220,13 @@ export default function AdminAnalytics() {
                 { title: "Auth Provider", rows: data.authProviders },
               ].map(({ title, rows }) => (
                 <div key={title}>
-                  <p className="text-xs font-semibold text-ink/55 uppercase tracking-wide mb-2">{title}</p>
+                  <p className="text-xs font-semibold text-ink/65 uppercase tracking-wide mb-2">{title}</p>
                   <table className="w-full text-sm">
                     <tbody>
                       {rows.map(({ name, value }) => (
                         <tr key={name} className="border-b border-rule">
                           <td className="py-1.5 text-ink/80">{name}</td>
-                          <td className="py-1.5 text-right text-ink/55 font-medium">{value}</td>
+                          <td className="py-1.5 text-right text-ink/65 font-medium">{value}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -244,7 +244,7 @@ export default function AdminAnalytics() {
 function EmptyChart({ label }: { label: string }) {
   return (
     <div className="h-52 flex items-center justify-center">
-      <p className="text-ink/55 text-sm text-center max-w-xs">{label}</p>
+      <p className="text-ink/65 text-sm text-center max-w-xs">{label}</p>
     </div>
   );
 }

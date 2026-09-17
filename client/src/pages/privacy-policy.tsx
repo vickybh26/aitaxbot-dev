@@ -305,7 +305,7 @@ export default function PrivacyPolicy() {
                     </a>
                   </li>
                 </ul>
-                <p className="text-ink/55 text-sm mt-4">
+                <p className="text-ink/65 text-sm mt-4">
                   Opting out means ads won't be personalised — you will still see ads.
                 </p>
               </div>

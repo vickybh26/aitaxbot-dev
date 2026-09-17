@@ -237,7 +237,7 @@ export default function NPSCalculator() {
               onChange={(e) => setCurrentAge(Number(e.target.value))}
               className="w-full"
             />
-            <p className="text-xs text-ink/55 mt-1">Min 18, Max 59</p>
+            <p className="text-xs text-ink/65 mt-1">Min 18, Max 59</p>
           </div>
 
           <div>
@@ -253,7 +253,7 @@ export default function NPSCalculator() {
               onChange={(e) => setRetirementAge(Number(e.target.value))}
               className="w-full"
             />
-            <p className="text-xs text-ink/55 mt-1">NPS matures at 60, extendable to 75</p>
+            <p className="text-xs text-ink/65 mt-1">NPS matures at 60, extendable to 75</p>
           </div>
 
           <div>
@@ -269,7 +269,7 @@ export default function NPSCalculator() {
               onChange={(e) => setMonthlyContribution(Number(e.target.value))}
               className="w-full"
             />
-            <p className="text-xs text-ink/55 mt-1">Minimum ₹500/month for Tier I</p>
+            <p className="text-xs text-ink/65 mt-1">Minimum ₹500/month for Tier I</p>
           </div>
 
           <div>
@@ -285,7 +285,7 @@ export default function NPSCalculator() {
               onChange={(e) => setEmployerContribution(Number(e.target.value))}
               className="w-full"
             />
-            <p className="text-xs text-ink/55 mt-1">
+            <p className="text-xs text-ink/65 mt-1">
               Leave 0 if self-employed.{" "}
               {regime === 'new'
                 ? <span className="text-green-700 font-medium">New Regime: deductible up to 14% of salary for all employers (ITA 2025, S.124(2)).</span>
@@ -307,7 +307,7 @@ export default function NPSCalculator() {
               onChange={(e) => setExpectedReturn(Number(e.target.value))}
               className="w-full"
             />
-            <p className="text-xs text-ink/55 mt-1">Historical NPS equity: 10–12%</p>
+            <p className="text-xs text-ink/65 mt-1">Historical NPS equity: 10–12%</p>
           </div>
 
           <div>
@@ -323,7 +323,7 @@ export default function NPSCalculator() {
               onChange={(e) => setAnnuityRate(Number(e.target.value))}
               className="w-full"
             />
-            <p className="text-xs text-ink/55 mt-1">Current annuity rates: 5–7%</p>
+            <p className="text-xs text-ink/65 mt-1">Current annuity rates: 5–7%</p>
           </div>
 
           {/* Salary drives the percentage caps: 80CCD(1) is limited to 10% of
@@ -341,7 +341,7 @@ export default function NPSCalculator() {
               onChange={(e) => { setAnnualSalary(Number(e.target.value)); setResult(null); }}
               className="w-full"
             />
-            <p className="text-xs text-ink/55 mt-1">
+            <p className="text-xs text-ink/65 mt-1">
               80CCD(1) is capped at 10% of this figure, and employer 80CCD(2) at 14%.
             </p>
           </div>
@@ -373,7 +373,7 @@ export default function NPSCalculator() {
                 </>
               )}
             </select>
-            <p className="text-xs text-ink/55 mt-1">Your top slab rate — used to estimate tax savings</p>
+            <p className="text-xs text-ink/65 mt-1">Your top slab rate — used to estimate tax savings</p>
           </div>
 
         </div>
@@ -458,22 +458,22 @@ export default function NPSCalculator() {
             <div className={`grid gap-4 ${regime === 'new' ? 'md:grid-cols-1' : 'md:grid-cols-3'}`}>
               {regime === 'old' && (
                 <div className="bg-green-50 p-4 rounded-lg">
-                  <p className="text-xs text-ink/55 mb-1">80CCD(1) — Your NPS contribution</p>
+                  <p className="text-xs text-ink/65 mb-1">80CCD(1) — Your NPS contribution</p>
                   <p className="text-xl font-bold text-green-700">{formatCurrency(result.taxSaving80CCD1)}</p>
-                  <p className="text-xs text-ink/55 mt-1">Up to 10% of salary, within ₹1.5L 80C limit</p>
+                  <p className="text-xs text-ink/65 mt-1">Up to 10% of salary, within ₹1.5L 80C limit</p>
                 </div>
               )}
               {regime === 'old' && (
                 <div className="bg-secondary p-4 rounded-lg">
-                  <p className="text-xs text-ink/55 mb-1">80CCD(1B) — Extra NPS deduction</p>
+                  <p className="text-xs text-ink/65 mb-1">80CCD(1B) — Extra NPS deduction</p>
                   <p className="text-xl font-bold text-ink">{formatCurrency(result.taxSaving80CCD1B)}</p>
-                  <p className="text-xs text-ink/55 mt-1">Additional ₹50,000 over & above 80C</p>
+                  <p className="text-xs text-ink/65 mt-1">Additional ₹50,000 over & above 80C</p>
                 </div>
               )}
               <div className="bg-paper p-4 rounded-lg">
-                <p className="text-xs text-ink/55 mb-1">80CCD(2) — Employer contribution</p>
+                <p className="text-xs text-ink/65 mb-1">80CCD(2) — Employer contribution</p>
                 <p className="text-xl font-bold text-ink">{formatCurrency(result.taxSaving80CCD2)}</p>
-                <p className="text-xs text-ink/55 mt-1">
+                <p className="text-xs text-ink/65 mt-1">
                   {regime === 'new'
                     ? 'Available in New Regime — up to 14% of salary for ALL employers (S.124(2), ITA 2025)'
                     : 'Old Regime: up to 14% for Govt employees; 10% for private employers (S.124(1))'}

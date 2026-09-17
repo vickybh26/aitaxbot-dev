@@ -18,7 +18,7 @@ export default function FindCABanner({ context = "filing your ITR" }: Props) {
         <p className="font-semibold text-ink text-sm">
           Need expert help {context}?
         </p>
-        <p className="text-xs text-ink/55 mt-0.5">
+        <p className="text-xs text-ink/65 mt-0.5">
           Connect with a practicing CA near you — free introduction, no platform fee.
         </p>
       </div>

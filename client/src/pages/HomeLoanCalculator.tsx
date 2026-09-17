@@ -174,7 +174,7 @@ export default function HomeLoanCalculatorPage() {
                 </tbody>
               </table>
             </div>
-            <p className="text-xs text-ink/55 mb-8">*At 8.75% p.a. interest. Monthly EMI figures. Actual rates vary by lender and credit profile.</p>
+            <p className="text-xs text-ink/65 mb-8">*At 8.75% p.a. interest. Monthly EMI figures. Actual rates vary by lender and credit profile.</p>
 
             {/* Home Loan Tax Benefits Table */}
             <h2 className="text-2xl font-bold text-ink mb-4">Home Loan Tax Benefits — Section 24 & Section 80C (Old Regime)</h2>

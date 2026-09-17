@@ -298,7 +298,7 @@ export default function SIPCalculatorPage() {
                 </div>
               </div>
             </div>
-            <p className="text-xs text-ink/55 mb-8">*Category-level historical averages. Individual fund performance varies. This is educational information, not investment advice. Consult a SEBI Registered Investment Adviser before investing.</p>
+            <p className="text-xs text-ink/65 mb-8">*Category-level historical averages. Individual fund performance varies. This is educational information, not investment advice. Consult a SEBI Registered Investment Adviser before investing.</p>
 
             {/* Where to Start Your SIP */}
             <h2 className="text-2xl font-bold text-ink mb-2">Where to Start Your SIP — Top Platforms in India</h2>
@@ -327,7 +327,7 @@ export default function SIPCalculatorPage() {
                 <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded font-medium">Start SIP →</span>
               </a>
             </div>
-            <p className="text-xs text-ink/55 mb-8">AiTaxBot does not recommend specific funds or schemes. The platforms listed are SEBI-registered and widely used in India. Always read the SID/KIM before investing.</p>
+            <p className="text-xs text-ink/65 mb-8">AiTaxBot does not recommend specific funds or schemes. The platforms listed are SEBI-registered and widely used in India. Always read the SID/KIM before investing.</p>
 
             {/* SIP vs Lump Sum Comparison */}
             <h2 className="text-2xl font-bold text-ink mb-4">SIP vs Lump Sum — When to Choose What</h2>
@@ -442,7 +442,7 @@ export default function SIPCalculatorPage() {
                 </tbody>
               </table>
             </div>
-            <p className="text-xs text-ink/55 mb-8">*Assumes 12% annual return, compounded monthly. Past performance does not guarantee future returns. LTCG tax applicable on equity fund gains above ₹1.25L/year.</p>
+            <p className="text-xs text-ink/65 mb-8">*Assumes 12% annual return, compounded monthly. Past performance does not guarantee future returns. LTCG tax applicable on equity fund gains above ₹1.25L/year.</p>
 
             {/* How Much SIP to Reach ₹1 Crore */}
             <h2 className="text-2xl font-bold text-ink mb-2">How Much SIP Do I Need to Reach ₹1 Crore?</h2>

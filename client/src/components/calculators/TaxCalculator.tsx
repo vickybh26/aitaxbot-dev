@@ -1242,7 +1242,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                       onChange={(e) => updateFormData('capitalGainsIncome', e.target.value)}
                       data-testid="input-capital-gains-income"
                     />
-                    <p className="text-xs text-ink/55 mt-1">
+                    <p className="text-xs text-ink/65 mt-1">
                       Debt funds, unlisted shares, property — gains taxed at your slab rate.
                       Listed shares and equity mutual funds go in the two fields below.
                     </p>
@@ -1266,7 +1266,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                       onChange={(e) => updateFormData('ltcgEquity', e.target.value)}
                       data-testid="input-ltcg-equity"
                     />
-                    <p className="text-xs text-ink/55 mt-1">
+                    <p className="text-xs text-ink/65 mt-1">
                       Held over 12 months. Section 112A — first ₹1,25,000 exempt each
                       year, balance taxed at 12.5%. Not eligible for the rebate.
                     </p>
@@ -1285,7 +1285,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                       onChange={(e) => updateFormData('stcgEquity', e.target.value)}
                       data-testid="input-stcg-equity"
                     />
-                    <p className="text-xs text-ink/55 mt-1">
+                    <p className="text-xs text-ink/65 mt-1">
                       Held 12 months or less. Section 111A — taxed at 20%.
                     </p>
                   </div>
@@ -1547,7 +1547,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                       onChange={(e) => updateFormData('basicSalary', e.target.value)}
                       data-testid="input-basic-salary"
                     />
-                    <p className="text-xs text-ink/55 mt-1">
+                    <p className="text-xs text-ink/65 mt-1">
                       {parseFloat(formData.basicSalary) > 0
                         ? 'Used for the HRA exemption — the law computes it on basic + DA, not gross salary.'
                         : 'Needed for an accurate HRA exemption. Left blank, we fall back to gross salary, which overstates the exemption.'}
@@ -1744,10 +1744,10 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                     </div>
                     {itr.blockers.length > 0 && (
                       <div className="mt-3 pt-3 border-t border-rule">
-                        <p className="text-xs font-semibold text-ink/55 mb-1.5">Why not the simpler form:</p>
+                        <p className="text-xs font-semibold text-ink/65 mb-1.5">Why not the simpler form:</p>
                         <ul className="space-y-1">
                           {itr.blockers.map((b, i) => (
-                            <li key={i} className="text-xs text-ink/55 flex items-start gap-1.5">
+                            <li key={i} className="text-xs text-ink/65 flex items-start gap-1.5">
                               <span className="mt-1 w-1 h-1 rounded-full bg-ink/40 flex-shrink-0" />
                               {b}
                             </li>

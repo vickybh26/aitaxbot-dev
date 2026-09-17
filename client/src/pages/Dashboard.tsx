@@ -534,7 +534,7 @@ export default function Dashboard() {
                         >
                           {tile.value}
                         </p>
-                        <p className="mt-1 text-xs text-ink/55">{tile.note}</p>
+                        <p className="mt-1 text-xs text-ink/65">{tile.note}</p>
                       </div>
                     ))}
                   </div>

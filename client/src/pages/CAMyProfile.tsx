@@ -181,7 +181,7 @@ export default function CAMyProfile() {
               <UserCog className="w-7 h-7 text-credit" />
             </div>
             <h1 className="text-3xl font-bold text-ink">Update My CA Profile</h1>
-            <p className="text-ink/55 mt-2 text-sm">
+            <p className="text-ink/65 mt-2 text-sm">
               Verify your identity, then update your listing in the AiTaxBot directory.
             </p>
           </div>
@@ -191,7 +191,7 @@ export default function CAMyProfile() {
             {[1, 2, 3].map((s) => (
               <div key={s} className="flex items-center gap-3">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold
-                  ${step === s ? "bg-ink text-white" : step > s ? "bg-green-500 text-white" : "bg-secondary text-ink/55"}`}>
+                  ${step === s ? "bg-ink text-white" : step > s ? "bg-green-500 text-white" : "bg-secondary text-ink/65"}`}>
                   {step > s ? "✓" : s}
                 </div>
                 {s < 3 && <div className={`w-12 h-0.5 ${step > s ? "bg-green-500" : "bg-secondary"}`} />}
@@ -236,7 +236,7 @@ export default function CAMyProfile() {
                 <Button onClick={handleVerify} disabled={verifying} className="w-full">
                   {verifying ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Verifying…</> : "Verify & Continue"}
                 </Button>
-                <p className="text-xs text-ink/55 text-center">
+                <p className="text-xs text-ink/65 text-center">
                   Can't access your registered email?{" "}
                   <Link href="/contact" className="text-credit hover:underline">Contact support</Link>.
                 </p>
@@ -337,7 +337,7 @@ export default function CAMyProfile() {
                     className="mt-1"
                     placeholder="Brief description of your expertise and services (max 600 characters)"
                   />
-                  <p className="text-xs text-ink/55 mt-1 text-right">{form.bio.length}/600</p>
+                  <p className="text-xs text-ink/65 mt-1 text-right">{form.bio.length}/600</p>
                 </div>
 
                 <div className="flex gap-3 pt-2">

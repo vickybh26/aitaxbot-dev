@@ -114,15 +114,15 @@ function UserRow({
             <img src={user.profileImageUrl} className="w-8 h-8 rounded-full object-cover" alt="" />
           ) : (
             <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
-              <UserCircle className="w-5 h-5 text-ink/55" />
+              <UserCircle className="w-5 h-5 text-ink/65" />
             </div>
           )}
           <div>
             <div className="font-medium text-ink text-sm">
               {user.firstName ?? ""} {user.lastName ?? ""}
-              {!user.firstName && !user.lastName && <span className="text-ink/55">No name</span>}
+              {!user.firstName && !user.lastName && <span className="text-ink/65">No name</span>}
             </div>
-            <div className="text-ink/55 text-xs">{user.email}</div>
+            <div className="text-ink/65 text-xs">{user.email}</div>
           </div>
         </div>
       </td>
@@ -157,12 +157,12 @@ function UserRow({
           // nothing anywhere in the codebase, so completing a profile changed
           // nothing for the user. Zero recipients completed their profile.
           // The status is still shown because it is useful admin context.
-          <span className="flex items-center gap-1 text-ink/55 text-xs">
+          <span className="flex items-center gap-1 text-ink/65 text-xs">
             <Circle className="w-3.5 h-3.5" /> Incomplete
           </span>
         )}
       </td>
-      <td className="px-4 py-3 text-xs text-ink/55">{joinedDate}</td>
+      <td className="px-4 py-3 text-xs text-ink/65">{joinedDate}</td>
     </tr>
   );
 }
@@ -285,7 +285,7 @@ function CRMDrawer({
         <div className="flex items-center justify-between px-5 py-4 border-b border-rule">
           <h3 id="admin-user-drawer-title" className="font-semibold text-ink">User Profile &amp; CRM</h3>
           <button onClick={onClose} className="p-1 rounded-lg hover:bg-secondary" aria-label="Close user profile">
-            <X className="w-4 h-4 text-ink/55" />
+            <X className="w-4 h-4 text-ink/65" />
           </button>
         </div>
 
@@ -302,16 +302,16 @@ function CRMDrawer({
                   <img src={user.profileImageUrl} className="w-14 h-14 rounded-2xl object-cover" alt="" />
                 ) : (
                   <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center">
-                    <UserCircle className="w-8 h-8 text-ink/55" />
+                    <UserCircle className="w-8 h-8 text-ink/65" />
                   </div>
                 )}
                 <div>
                   <div className="font-semibold text-ink">
                     {user.firstName ?? ""} {user.lastName ?? ""}
-                    {!user.firstName && !user.lastName && <span className="text-ink/55">No name</span>}
+                    {!user.firstName && !user.lastName && <span className="text-ink/65">No name</span>}
                   </div>
-                  <div className="text-ink/55 text-sm">{user.email}</div>
-                  {user.mobile && <div className="text-ink/55 text-xs mt-0.5">{user.mobile}</div>}
+                  <div className="text-ink/65 text-sm">{user.email}</div>
+                  {user.mobile && <div className="text-ink/65 text-xs mt-0.5">{user.mobile}</div>}
                 </div>
               </div>
 
@@ -325,7 +325,7 @@ function CRMDrawer({
                   { label: "Joined", value: joinedDate },
                 ].map(({ label, value }) => (
                   <div key={label}>
-                    <p className="text-xs text-ink/55 font-medium uppercase tracking-wide">{label}</p>
+                    <p className="text-xs text-ink/65 font-medium uppercase tracking-wide">{label}</p>
                     <p className="text-ink/80 mt-0.5">{value ?? "—"}</p>
                   </div>
                 ))}
@@ -334,7 +334,7 @@ function CRMDrawer({
               {/* Tags */}
               <div>
                 <div className="flex items-center gap-1.5 mb-3">
-                  <Tag className="w-4 h-4 text-ink/55" />
+                  <Tag className="w-4 h-4 text-ink/65" />
                   <span className="text-sm font-semibold text-ink/80">Tags</span>
                 </div>
                 <div className="flex flex-wrap gap-2 mb-3">
@@ -349,7 +349,7 @@ function CRMDrawer({
                           "text-xs px-3 py-1.5 rounded-full font-medium border transition-all",
                           active
                             ? `${tagColor(tag)} border-transparent shadow-sm`
-                            : "bg-card border-rule text-ink/55 hover:border-credit"
+                            : "bg-card border-rule text-ink/65 hover:border-credit"
                         )}
                       >
                         {tag}
@@ -377,9 +377,9 @@ function CRMDrawer({
               {/* Notes */}
               <div>
                 <div className="flex items-center gap-1.5 mb-3">
-                  <StickyNote className="w-4 h-4 text-ink/55" />
+                  <StickyNote className="w-4 h-4 text-ink/65" />
                   <span className="text-sm font-semibold text-ink/80">Notes</span>
-                  <span className="ml-auto text-xs text-ink/55">{user.notes?.length ?? 0} note(s)</span>
+                  <span className="ml-auto text-xs text-ink/65">{user.notes?.length ?? 0} note(s)</span>
                 </div>
 
                 {canWrite && (
@@ -422,7 +422,7 @@ function CRMDrawer({
                         >
                           <p className="text-ink/80 text-sm leading-relaxed">{note.text}</p>
                           <div className="flex items-center justify-between mt-2">
-                            <div className="text-xs text-ink/55">
+                            <div className="text-xs text-ink/65">
                               {note.adminEmail} · {noteDate}
                             </div>
                             {adminLevel === 1 && (
@@ -438,7 +438,7 @@ function CRMDrawer({
                       );
                     })
                   ) : (
-                    <p className="text-ink/55 text-xs italic">No notes yet.</p>
+                    <p className="text-ink/65 text-xs italic">No notes yet.</p>
                   )}
                 </div>
               </div>
@@ -583,7 +583,7 @@ export default function AdminUsers() {
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
             <h1 className="text-2xl font-bold text-ink">Users &amp; CRM</h1>
-            <p className="text-ink/55 text-sm mt-1">
+            <p className="text-ink/65 text-sm mt-1">
               {data?.total ?? "—"} users · Click a row to open CRM panel
             </p>
           </div>
@@ -603,7 +603,7 @@ export default function AdminUsers() {
         <div className="bg-card rounded-2xl p-4 shadow-sm border border-rule">
           <div className="flex flex-wrap gap-3 items-center">
             <div className="relative flex-1 min-w-48">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink/55" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink/65" />
               <Input
                 aria-label="Search users by name, email or phone"
                 placeholder="Search name, email, phone…"
@@ -633,7 +633,7 @@ export default function AdminUsers() {
             {(occupationFilter || stateFilter || tagFilter || debouncedSearch) && (
               <button
                 onClick={() => { setOccupationFilter(""); setStateFilter(""); setTagFilter(""); setSearch(""); setDebouncedSearch(""); setPage(1); }}
-                className="flex items-center gap-1 text-xs text-ink/55 hover:text-ink/65"
+                className="flex items-center gap-1 text-xs text-ink/65 hover:text-ink/65"
               >
                 <X className="w-3.5 h-3.5" /> Clear filters
               </button>
@@ -668,7 +668,7 @@ export default function AdminUsers() {
                   <thead>
                     <tr className="border-b border-rule bg-secondary">
                       {["User", "Occupation", "Location", "Tags", "Profile", "Joined"].map((h) => (
-                        <th key={h} className="px-4 py-3 text-xs font-semibold text-ink/55 uppercase tracking-wide">
+                        <th key={h} className="px-4 py-3 text-xs font-semibold text-ink/65 uppercase tracking-wide">
                           {h}
                         </th>
                       ))}
@@ -687,7 +687,7 @@ export default function AdminUsers() {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={6} className="px-4 py-12 text-center text-ink/55 text-sm">
+                        <td colSpan={6} className="px-4 py-12 text-center text-ink/65 text-sm">
                           No users found.
                         </td>
                       </tr>
@@ -699,7 +699,7 @@ export default function AdminUsers() {
               {/* Pagination */}
               {data && data.totalPages > 1 && (
                 <div className="flex items-center justify-between px-4 py-3 border-t border-rule">
-                  <p className="text-sm text-ink/55">
+                  <p className="text-sm text-ink/65">
                     Page {data.page} of {data.totalPages} · {data.total} users
                   </p>
                   <div className="flex gap-2">

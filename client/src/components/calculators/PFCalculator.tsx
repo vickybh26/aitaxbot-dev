@@ -332,7 +332,7 @@ export default function PFCalculator() {
                       className="h-12"
                       data-testid="input-monthly-basic-da"
                     />
-                    <p className="text-xs text-ink/55">Base for EPF contribution calculation</p>
+                    <p className="text-xs text-ink/65">Base for EPF contribution calculation</p>
                   </div>
 
                   <div className="space-y-2">
@@ -367,7 +367,7 @@ export default function PFCalculator() {
                       className="h-12"
                       data-testid="input-interest-rate"
                     />
-                    <p className="text-xs text-ink/55">FY 2026-27 EPF rate: 8.25% (declared by EPFO · governed by EPF &amp; MP Act, 1952)</p>
+                    <p className="text-xs text-ink/65">FY 2026-27 EPF rate: 8.25% (declared by EPFO · governed by EPF &amp; MP Act, 1952)</p>
                   </div>
 
                   <div className="space-y-2">
@@ -401,7 +401,7 @@ export default function PFCalculator() {
                       className="h-12"
                       data-testid="input-vpf-percent"
                     />
-                    <p className="text-xs text-ink/55">Optional: Extra voluntary contribution at same interest rate</p>
+                    <p className="text-xs text-ink/65">Optional: Extra voluntary contribution at same interest rate</p>
                   </div>
 
                   <div className="space-y-2">
@@ -418,7 +418,7 @@ export default function PFCalculator() {
                       className="h-12"
                       data-testid="input-existing-balance"
                     />
-                    <p className="text-xs text-ink/55">Current accumulated PF balance, if any</p>
+                    <p className="text-xs text-ink/65">Current accumulated PF balance, if any</p>
                   </div>
                 </div>
               ) : (
@@ -437,7 +437,7 @@ export default function PFCalculator() {
                       className="h-12"
                       data-testid="input-ppf-yearly"
                     />
-                    <p className="text-xs text-ink/55">Min ₹500, Max ₹1,50,000 per year</p>
+                    <p className="text-xs text-ink/65">Min ₹500, Max ₹1,50,000 per year</p>
                   </div>
 
                   <div className="space-y-2">
@@ -455,7 +455,7 @@ export default function PFCalculator() {
                       className="h-12"
                       data-testid="input-interest-rate"
                     />
-                    <p className="text-xs text-ink/55">Current PPF rate: 7.1% (Q1 FY 2026-27 · governed by PPF Scheme, 2019 under PFMS Act)</p>
+                    <p className="text-xs text-ink/65">Current PPF rate: 7.1% (Q1 FY 2026-27 · governed by PPF Scheme, 2019 under PFMS Act)</p>
                   </div>
 
                   <div className="space-y-2">
@@ -472,7 +472,7 @@ export default function PFCalculator() {
                       className="h-12"
                       data-testid="input-pf-years"
                     />
-                    <p className="text-xs text-ink/55">Minimum 15 years, extendable in blocks of 5</p>
+                    <p className="text-xs text-ink/65">Minimum 15 years, extendable in blocks of 5</p>
                   </div>
 
                   <div className="space-y-2">
@@ -489,7 +489,7 @@ export default function PFCalculator() {
                       className="h-12"
                       data-testid="input-existing-balance"
                     />
-                    <p className="text-xs text-ink/55">Current PPF balance, if any</p>
+                    <p className="text-xs text-ink/65">Current PPF balance, if any</p>
                   </div>
                 </div>
               )}
@@ -622,9 +622,9 @@ export default function PFCalculator() {
                               ? "Employer EPS (8.33% of ₹15,000 ceiling):"
                               : "Employer EPS (8.33%):"}
                           </span>
-                          <span className="font-medium text-ink/55">{formatCurrencyFull(result.employerEPSMonthly)}</span>
+                          <span className="font-medium text-ink/65">{formatCurrencyFull(result.employerEPSMonthly)}</span>
                         </div>
-                        <p className="text-xs text-ink/55">
+                        <p className="text-xs text-ink/65">
                           {result.monthlyBasicDA > 15000
                             ? "EPS goes to the pension fund, not your PF balance. It is capped at 8.33% of the ₹15,000 statutory wage ceiling (₹1,250/month), so the rest of the employer's 12% goes to EPF."
                             : "EPS goes to pension fund, not your PF balance"}
@@ -684,7 +684,7 @@ export default function PFCalculator() {
               </div>
             </>
           ) : (
-            <div className="text-center py-12 text-ink/55">
+            <div className="text-center py-12 text-ink/65">
               <Calculator className="w-12 h-12 mx-auto mb-4 text-ink/35" />
               <p>Enter your details and click "Calculate PF Corpus" to see results</p>
             </div>
@@ -742,7 +742,7 @@ export default function PFCalculator() {
               </CardContent>
             </Card>
           ) : (
-            <div className="text-center py-12 text-ink/55">
+            <div className="text-center py-12 text-ink/65">
               <PieChart className="w-12 h-12 mx-auto mb-4 text-ink/35" />
               <p>Calculate PF to see year-wise breakdown</p>
             </div>
@@ -762,7 +762,7 @@ export default function PFCalculator() {
               </CardContent>
             </Card>
           ) : (
-            <div className="text-center py-12 text-ink/55">
+            <div className="text-center py-12 text-ink/65">
               <TrendingUp className="w-12 h-12 mx-auto mb-4 text-ink/35" />
               <p>Calculate PF to see growth chart</p>
             </div>

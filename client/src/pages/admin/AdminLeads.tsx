@@ -74,7 +74,7 @@ export default function AdminLeads() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-ink">Leads</h1>
-            <p className="text-ink/55 text-sm mt-1">
+            <p className="text-ink/65 text-sm mt-1">
               {leads.length} lead{leads.length !== 1 ? "s" : ""} captured from tax calculation download prompts
             </p>
           </div>
@@ -94,7 +94,7 @@ export default function AdminLeads() {
 
         {/* Table */}
         {isLoading ? (
-          <div className="flex items-center justify-center py-20 text-ink/55">
+          <div className="flex items-center justify-center py-20 text-ink/65">
             <RefreshCw className="h-5 w-5 animate-spin mr-2" /> Loading…
           </div>
         ) : isError ? (
@@ -105,7 +105,7 @@ export default function AdminLeads() {
             <button onClick={() => refetch()} className="text-xs text-ink hover:underline">Retry</button>
           </div>
         ) : leads.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-ink/55 gap-2">
+          <div className="flex flex-col items-center justify-center py-20 text-ink/65 gap-2">
             <Users className="h-10 w-10 opacity-40" />
             <p>No leads yet. They'll appear here once users calculate their tax and enter their details.</p>
           </div>
@@ -132,11 +132,11 @@ export default function AdminLeads() {
                       </a>
                     </td>
                     <td className="px-4 py-3 text-ink/65">{lead.whatsapp ?? "—"}</td>
-                    <td className="px-4 py-3 text-ink/55 text-xs">{lead.source ?? "—"}</td>
-                    <td className="px-4 py-3 text-ink/55 text-xs max-w-xs truncate" title={lead.summaryText ?? ""}>
+                    <td className="px-4 py-3 text-ink/65 text-xs">{lead.source ?? "—"}</td>
+                    <td className="px-4 py-3 text-ink/65 text-xs max-w-xs truncate" title={lead.summaryText ?? ""}>
                       {lead.summaryText ?? "—"}
                     </td>
-                    <td className="px-4 py-3 text-ink/55 text-xs">
+                    <td className="px-4 py-3 text-ink/65 text-xs">
                       {lead.createdAt ? new Date(lead.createdAt).toLocaleDateString("en-IN") : "—"}
                     </td>
                   </tr>

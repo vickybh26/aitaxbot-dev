@@ -544,7 +544,7 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
                         <div className="text-3xl font-bold text-green-600">
                           ₹{result.hraExemption.toLocaleString()}
                         </div>
-                        <p className="text-sm text-ink/55 mt-2">
+                        <p className="text-sm text-ink/65 mt-2">
                           {result.exemptionPercentage.toFixed(1)}% of your HRA is exempt
                         </p>
                       </CardContent>
@@ -558,7 +558,7 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
                         <div className="text-3xl font-bold text-red-600">
                           ₹{result.taxableHRA.toLocaleString()}
                         </div>
-                        <p className="text-sm text-ink/55 mt-2">
+                        <p className="text-sm text-ink/65 mt-2">
                           {(100 - result.exemptionPercentage).toFixed(1)}% of your HRA is taxable
                         </p>
                       </CardContent>
@@ -575,21 +575,21 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
                         <div className="flex items-center justify-between p-3 bg-secondary rounded-lg">
                           <div>
                             <p className="font-medium text-sm">5% Bracket</p>
-                            <p className="text-xs text-ink/55">Savings</p>
+                            <p className="text-xs text-ink/65">Savings</p>
                           </div>
                           <p className="font-semibold">₹{(result.hraExemption * 0.05).toLocaleString()}</p>
                         </div>
                         <div className="flex items-center justify-between p-3 bg-secondary rounded-lg">
                           <div>
                             <p className="font-medium text-sm">20% Bracket</p>
-                            <p className="text-xs text-ink/55">Savings</p>
+                            <p className="text-xs text-ink/65">Savings</p>
                           </div>
                           <p className="font-semibold">₹{(result.hraExemption * 0.20).toLocaleString()}</p>
                         </div>
                         <div className="flex items-center justify-between p-3 bg-secondary rounded-lg">
                           <div>
                             <p className="font-medium text-sm">30% Bracket</p>
-                            <p className="text-xs text-ink/55">Savings</p>
+                            <p className="text-xs text-ink/65">Savings</p>
                           </div>
                           <p className="font-semibold">₹{(result.hraExemption * 0.30).toLocaleString()}</p>
                         </div>
@@ -744,7 +744,7 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
                       ))}
                     </div>
                   ) : (
-                    <p className="text-ink/55">No recommendations at this time.</p>
+                    <p className="text-ink/65">No recommendations at this time.</p>
                   )}
                 </CardContent>
               </Card>

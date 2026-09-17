@@ -68,7 +68,7 @@ export default function WhatsAppButton() {
         >
           <button
             onClick={dismiss}
-            className="absolute top-1.5 right-2 text-ink/55 hover:text-ink/80 text-xs leading-none"
+            className="absolute top-1.5 right-2 text-ink/65 hover:text-ink/80 text-xs leading-none"
             aria-label="Dismiss WhatsApp prompt"
           >
             ✕
@@ -76,7 +76,7 @@ export default function WhatsAppButton() {
           <p className="text-xs font-semibold text-ink leading-snug pr-4">
             Have a tax question?
           </p>
-          <p className="text-xs text-ink/55 mt-0.5 leading-snug">
+          <p className="text-xs text-ink/65 mt-0.5 leading-snug">
             Chat with AiTaxBot on WhatsApp — free, instant answers.
           </p>
           {/* Arrow pointing down-right */}

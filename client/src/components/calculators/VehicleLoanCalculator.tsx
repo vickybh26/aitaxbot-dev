@@ -246,11 +246,11 @@ export default function VehicleLoanCalculator() {
                 onChange={e => setOnRoadPrice(Number(e.target.value))}
                 className="mt-1"
               />
-              <p className="text-xs text-ink/55 mt-1">Include ex-showroom + RTO + insurance + accessories</p>
+              <p className="text-xs text-ink/65 mt-1">Include ex-showroom + RTO + insurance + accessories</p>
             </div>
             <div>
               <Label className="text-sm font-medium text-ink/80">
-                Down Payment (₹) <span className="text-ink/55 font-normal">— {downPct}% of price</span>
+                Down Payment (₹) <span className="text-ink/65 font-normal">— {downPct}% of price</span>
               </Label>
               <Input
                 type="number"
@@ -259,7 +259,7 @@ export default function VehicleLoanCalculator() {
                 onChange={e => setDownPayment(Number(e.target.value))}
                 className="mt-1"
               />
-              <p className="text-xs text-ink/55 mt-1">
+              <p className="text-xs text-ink/65 mt-1">
                 {vehicleType === "two-wheeler"
                   ? "Banks offer up to 90% financing on two-wheelers"
                   : "Banks offer up to 85–90% financing on cars"}
@@ -277,7 +277,7 @@ export default function VehicleLoanCalculator() {
                   min={1}
                   max={vehicleType === "two-wheeler" ? 5 : 7}
                 />
-                <p className="text-xs text-ink/55 mt-1">Max {vehicleType === "two-wheeler" ? "5" : "7"} years</p>
+                <p className="text-xs text-ink/65 mt-1">Max {vehicleType === "two-wheeler" ? "5" : "7"} years</p>
               </div>
               <div>
                 <Label className="text-sm font-medium text-ink/80">
@@ -296,7 +296,7 @@ export default function VehicleLoanCalculator() {
                 />
               </div>
             </div>
-            <p className="text-xs text-ink/55">{d.rateNote}</p>
+            <p className="text-xs text-ink/65">{d.rateNote}</p>
 
             <div className="bg-secondary rounded-lg p-3 text-sm">
               <div className="flex justify-between text-ink/65">
@@ -330,7 +330,7 @@ export default function VehicleLoanCalculator() {
                   <p className={`text-4xl font-bold mb-1 ${vehicleType === "four-wheeler" ? "text-ink" : "text-orange-600"}`}>
                     {formatINR(result.emi)}
                   </p>
-                  <p className="text-xs text-ink/55">for {tenure} years at {rate}% p.a. ({result.rateType === "reducing" ? "reducing balance" : "flat rate"})</p>
+                  <p className="text-xs text-ink/65">for {tenure} years at {rate}% p.a. ({result.rateType === "reducing" ? "reducing balance" : "flat rate"})</p>
                 </div>
 
                 {/* Breakdown */}
@@ -408,9 +408,9 @@ export default function VehicleLoanCalculator() {
               </div>
             ) : (
               <div className="flex items-center justify-center h-full min-h-[260px] bg-secondary rounded-xl border border-dashed border-rule">
-                <div className="text-center text-ink/55">
+                <div className="text-center text-ink/65">
                   <div className="text-5xl mb-3">{d.emoji}</div>
-                  <p className="font-medium text-ink/55">Enter details and click Calculate</p>
+                  <p className="font-medium text-ink/65">Enter details and click Calculate</p>
                   <p className="text-sm mt-1">Compare Reducing vs Flat rate impact</p>
                 </div>
               </div>

@@ -306,7 +306,7 @@ export default function BlogPost() {
                 <p className="text-sm font-semibold text-ink">
                   Written by AiTaxBot Editorial Team
                 </p>
-                <p className="text-xs text-ink/55">
+                <p className="text-xs text-ink/65">
                   Reviewed by a Chartered Accountant · Updated {post.publishedAt || "2025"} · All tax figures follow CBDT guidelines for FY 2026-27
                 </p>
               </div>
@@ -460,15 +460,15 @@ export default function BlogPost() {
           {/* Editorial Disclaimer — AdSense / E-E-A-T requirement */}
           <div className="mt-12 bg-secondary border border-rule rounded-xl p-5">
             <div className="flex items-start gap-3">
-              <ShieldCheck className="h-5 w-5 text-ink/55 mt-0.5 shrink-0" />
+              <ShieldCheck className="h-5 w-5 text-ink/65 mt-0.5 shrink-0" />
               <div>
                 <p className="text-xs font-semibold text-ink/80 uppercase tracking-wide mb-1">
                   Editorial Disclaimer
                 </p>
-                <p className="text-xs text-ink/55 leading-relaxed">
+                <p className="text-xs text-ink/65 leading-relaxed">
                   This article is intended for general informational purposes only and does not constitute professional tax, legal, or financial advice. Tax laws and rates may change — always verify figures with the latest CBDT notifications or consult a qualified Chartered Accountant before making tax or investment decisions. AiTaxBot does not accept liability for decisions made based on this content.
                 </p>
-                <p className="text-xs text-ink/55 mt-2">
+                <p className="text-xs text-ink/65 mt-2">
                   Last reviewed by AiTaxBot Editorial Team · {post.publishedAt || "2025"} · Figures based on Income Tax Act, 1961 &amp; Union Budget 2025 provisions.
                 </p>
               </div>

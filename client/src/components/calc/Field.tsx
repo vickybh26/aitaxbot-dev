@@ -26,7 +26,7 @@ export function Field({
     <label className="block">
       <span className="field-label">{label}</span>
       <div className="mt-2">{children}</div>
-      {hint && <p className="mt-1.5 text-xs text-ink/55">{hint}</p>}
+      {hint && <p className="mt-1.5 text-xs text-ink/65">{hint}</p>}
     </label>
   );
 }
@@ -161,7 +161,7 @@ export function ToggleCard({
       </span>
       <span>
         <span className="block text-sm font-medium text-ink">{title}</span>
-        {hint && <span className="block text-xs text-ink/55 mt-0.5">{hint}</span>}
+        {hint && <span className="block text-xs text-ink/65 mt-0.5">{hint}</span>}
       </span>
     </button>
   );

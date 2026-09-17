@@ -146,7 +146,7 @@ export default function PurchaseRegister({ firmId }: { firmId: string }) {
   });
 
   if (!firmId) {
-    return <div className="text-center py-8 text-ink/55">Please select a firm first</div>;
+    return <div className="text-center py-8 text-ink/65">Please select a firm first</div>;
   }
 
   if (isLoading) {
@@ -292,7 +292,7 @@ export default function PurchaseRegister({ firmId }: { firmId: string }) {
         </CardHeader>
         <CardContent>
           {registers.length === 0 ? (
-            <div className="text-center py-8 text-ink/55">
+            <div className="text-center py-8 text-ink/65">
               <TrendingDown className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <p>No purchase data yet.</p>
               <p className="text-sm mt-2">Add purchases to see your purchase register here.</p>

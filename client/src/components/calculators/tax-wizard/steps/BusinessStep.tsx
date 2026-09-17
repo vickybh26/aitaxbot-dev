@@ -59,7 +59,7 @@ export default function BusinessStep({ value, onChange }: BusinessStepProps) {
           options={SCHEME_OPTIONS}
         />
         {value.scheme && (
-          <p className="text-xs text-ink/55 mt-2">{SCHEME_DESCRIPTIONS[value.scheme]}</p>
+          <p className="text-xs text-ink/65 mt-2">{SCHEME_DESCRIPTIONS[value.scheme]}</p>
         )}
       </div>
 
@@ -164,7 +164,7 @@ export default function BusinessStep({ value, onChange }: BusinessStepProps) {
         </div>
       )}
 
-      <p className="text-xs text-ink/55">
+      <p className="text-xs text-ink/65">
         This is the minimum presumptive income the law requires. If your actual books show a higher
         profit, you can declare that instead — talk to your CA if that applies to you.
       </p>

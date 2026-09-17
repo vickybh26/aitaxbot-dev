@@ -244,7 +244,7 @@ export default function Login() {
                       <span className="w-full border-t" />
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-card px-2 text-ink/55">Or continue with</span>
+                      <span className="bg-card px-2 text-ink/65">Or continue with</span>
                     </div>
                   </div>
 
@@ -303,7 +303,7 @@ export default function Login() {
                         minLength={6}
                         data-testid="input-signup-password"
                       />
-                      <p className="text-xs text-ink/55 mt-1">Minimum 6 characters</p>
+                      <p className="text-xs text-ink/65 mt-1">Minimum 6 characters</p>
                     </div>
                     <label className="flex items-start gap-2 cursor-pointer">
                       <input
@@ -339,7 +339,7 @@ export default function Login() {
                       <span className="w-full border-t" />
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-card px-2 text-ink/55">Or continue with</span>
+                      <span className="bg-card px-2 text-ink/65">Or continue with</span>
                     </div>
                   </div>
 

@@ -45,7 +45,7 @@ export default function Footer() {
       <div className="mx-auto max-w-[1180px] rounded-[2rem] bg-ink px-7 py-12 text-paper sm:px-10">
         <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
-            <Link href="/" aria-label="AiTaxBot home" className="flex items-center">
+            <Link href="/" aria-label="AiTaxBot home" className="flex min-h-[44px] items-center">
               <img src={logoIconWhite} alt="" className="h-8 w-auto" width={268} height={400} loading="lazy" />
               <span className="ml-2 font-display text-lg font-bold text-paper tracking-tight">AiTaxBot</span>
             </Link>
@@ -55,7 +55,7 @@ export default function Footer() {
             </p>
             <a
               href="mailto:admin@aitaxbot.co.in"
-              className="mt-5 inline-block rounded-full bg-paper/10 px-4 py-2 text-sm text-paper/85 transition-colors hover:bg-paper/20 hover:text-paper"
+              className="mt-5 inline-flex min-h-[44px] items-center rounded-full bg-paper/10 px-4 py-2 text-sm text-paper/85 transition-colors hover:bg-paper/20 hover:text-paper"
             >
               admin@aitaxbot.co.in
             </a>
@@ -66,7 +66,7 @@ export default function Footer() {
             <ul className="mt-4 space-y-2.5">
               {calculators.map(([name, href]) => (
                 <li key={href}>
-                  <Link href={href} className="text-sm text-paper/70 transition-colors hover:text-paper">{name}</Link>
+                  <Link href={href} className="inline-flex min-h-[44px] items-center text-sm text-paper/70 transition-colors hover:text-paper md:min-h-0 md:py-1">{name}</Link>
                 </li>
               ))}
             </ul>
@@ -77,7 +77,7 @@ export default function Footer() {
             <ul className="mt-4 space-y-2.5">
               {tools.map(([name, href]) => (
                 <li key={href}>
-                  <Link href={href} className="text-sm text-paper/70 transition-colors hover:text-paper">{name}</Link>
+                  <Link href={href} className="inline-flex min-h-[44px] items-center text-sm text-paper/70 transition-colors hover:text-paper md:min-h-0 md:py-1">{name}</Link>
                 </li>
               ))}
             </ul>
@@ -88,7 +88,7 @@ export default function Footer() {
             <ul className="mt-4 space-y-2.5">
               {company.map(([name, href]) => (
                 <li key={href}>
-                  <Link href={href} className="text-sm text-paper/70 transition-colors hover:text-paper">{name}</Link>
+                  <Link href={href} className="inline-flex min-h-[44px] items-center text-sm text-paper/70 transition-colors hover:text-paper md:min-h-0 md:py-1">{name}</Link>
                 </li>
               ))}
             </ul>

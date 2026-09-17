@@ -53,7 +53,7 @@ export default function SalesRegister({ firmId }: { firmId: string }) {
   });
 
   if (!firmId) {
-    return <div className="text-center py-8 text-ink/55">Please select a firm first</div>;
+    return <div className="text-center py-8 text-ink/65">Please select a firm first</div>;
   }
 
   if (isLoading) {
@@ -115,7 +115,7 @@ export default function SalesRegister({ firmId }: { firmId: string }) {
         </CardHeader>
         <CardContent>
           {registers.length === 0 ? (
-            <div className="text-center py-8 text-ink/55">
+            <div className="text-center py-8 text-ink/65">
               <TrendingUp className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <p>No sales data yet.</p>
               <p className="text-sm mt-2">Create invoices to see your sales register here.</p>

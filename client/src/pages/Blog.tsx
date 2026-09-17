@@ -199,13 +199,13 @@ export default function Blog() {
             <h1 className="text-4xl md:text-5xl font-bold text-ink mb-3 leading-tight">
               Tax & Finance Insights
             </h1>
-            <p className="text-lg text-ink/55 max-w-2xl mb-8">
+            <p className="text-lg text-ink/65 max-w-2xl mb-8">
               CA-verified guides on income tax, ITR filing, investments, and the new Income Tax Act 2025 — written for Indian taxpayers.
             </p>
 
             {/* Search Bar */}
             <div className="relative max-w-md">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-ink/55" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-ink/65" />
               <input
                 type="text"
                 value={searchQuery}
@@ -216,7 +216,7 @@ export default function Blog() {
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-ink/55 hover:text-ink/65"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-ink/65 hover:text-ink/65"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -280,12 +280,12 @@ export default function Blog() {
                   <div className="p-8 md:w-3/5 flex flex-col justify-center">
                     <div className="flex items-center gap-2 mb-3">
                       <span className="text-xs font-bold bg-orange-100 text-orange-700 px-2.5 py-0.5 rounded-full">New</span>
-                      <span className="text-xs text-ink/55">{featuredPost.date}</span>
+                      <span className="text-xs text-ink/65">{featuredPost.date}</span>
                     </div>
                     <h2 className="text-2xl md:text-3xl font-bold text-ink group-hover:text-ink transition-colors leading-snug mb-4">
                       {featuredPost.title}
                     </h2>
-                    <p className="text-ink/55 leading-relaxed mb-6 line-clamp-3">
+                    <p className="text-ink/65 leading-relaxed mb-6 line-clamp-3">
                       {featuredPost.excerpt}
                     </p>
                     <span className="inline-flex items-center gap-2 text-sm font-semibold text-ink group-hover:gap-3 transition-all">
@@ -299,7 +299,7 @@ export default function Blog() {
 
           {/* ── Results count ─────────────────────────────────────────────── */}
           <div className="flex items-center justify-between mb-6">
-            <p className="text-sm text-ink/55">
+            <p className="text-sm text-ink/65">
               {searchQuery
                 ? `${filtered.length} result${filtered.length !== 1 ? "s" : ""} for "${searchQuery}"`
                 : selectedCategory === "All"
@@ -338,12 +338,12 @@ export default function Blog() {
                         </h3>
 
                         {/* Excerpt */}
-                        <p className="text-sm text-ink/55 leading-relaxed line-clamp-3 mb-5">
+                        <p className="text-sm text-ink/65 leading-relaxed line-clamp-3 mb-5">
                           {post.excerpt}
                         </p>
 
                         {/* Footer */}
-                        <div className="flex items-center justify-between text-xs text-ink/55 pt-4 border-t border-rule">
+                        <div className="flex items-center justify-between text-xs text-ink/65 pt-4 border-t border-rule">
                           <div className="flex items-center gap-3">
                             <span className="flex items-center gap-1">
                               <Calendar className="h-3.5 w-3.5" />{post.date}
@@ -363,7 +363,7 @@ export default function Blog() {
           ) : (
             <div className="text-center py-20 bg-card rounded-2xl border border-rule">
               <FileText className="h-10 w-10 text-ink/35 mx-auto mb-3" />
-              <p className="text-ink/55 font-medium">No articles found.</p>
+              <p className="text-ink/65 font-medium">No articles found.</p>
               <button
                 onClick={() => { setSelectedCategory("All"); setSearchQuery(""); }}
                 className="mt-4 text-sm text-ink hover:underline"

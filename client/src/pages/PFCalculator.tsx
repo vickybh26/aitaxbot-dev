@@ -212,7 +212,7 @@ export default function PFCalculatorPage() {
                   </tr>
                 </tbody>
               </table>
-              <p className="text-xs text-ink/55 mt-2">*Interest on EPF+VPF contributions exceeding ₹2.5L/year is taxable from FY 2021-22 onwards.</p>
+              <p className="text-xs text-ink/65 mt-2">*Interest on EPF+VPF contributions exceeding ₹2.5L/year is taxable from FY 2021-22 onwards.</p>
             </div>
 
             {/* How EPF Contribution Works */}
@@ -278,7 +278,7 @@ export default function PFCalculatorPage() {
                       <span>Total to Your PF Account</span>
                       <span className="text-emerald-600">₹7,835/month</span>
                     </div>
-                    <div className="flex justify-between py-1.5 text-ink/55">
+                    <div className="flex justify-between py-1.5 text-ink/65">
                       <span>EPS (goes to pension, not PF)</span>
                       <span>₹1,250/month</span>
                     </div>
@@ -302,7 +302,7 @@ export default function PFCalculatorPage() {
                   <div className="flex justify-between"><span>Return Assumed:</span><span className="font-semibold">8.25% p.a.</span></div>
                   <div className="border-t border-rule my-2"></div>
                   <div className="flex justify-between"><span>Corpus at Age 60:</span><span className="font-bold text-emerald-700">~₹60-70 Lakh</span></div>
-                  <div className="text-xs text-ink/55 mt-2">Note: Assumes no salary increases or VPF additions</div>
+                  <div className="text-xs text-ink/65 mt-2">Note: Assumes no salary increases or VPF additions</div>
                 </div>
               </div>
 
@@ -316,7 +316,7 @@ export default function PFCalculatorPage() {
                   <div className="border-t border-rule my-2"></div>
                   <div className="flex justify-between"><span>Corpus with VPF:</span><span className="font-bold text-emerald-700">~₹1.15-1.30 Cr</span></div>
                   <div className="flex justify-between"><span>Additional Gain from VPF:</span><span className="font-bold text-green-700">₹50-60 Lakh</span></div>
-                  <div className="text-xs text-ink/55 mt-2">VPF adds ₹5,000/month, earning 8.25% tax-free for 30 years</div>
+                  <div className="text-xs text-ink/65 mt-2">VPF adds ₹5,000/month, earning 8.25% tax-free for 30 years</div>
                 </div>
               </div>
 

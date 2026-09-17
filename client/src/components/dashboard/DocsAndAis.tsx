@@ -83,9 +83,9 @@ export default function DocsAndAis() {
                   </span>
                   <div className="min-w-0">
                     <p className="truncate text-sm font-semibold text-ink">{doc.name}</p>
-                    <p className="truncate text-xs text-ink/55">{doc.note}</p>
+                    <p className="truncate text-xs text-ink/65">{doc.note}</p>
                   </div>
-                  <span className="shrink-0 text-xs text-ink/55">
+                  <span className="shrink-0 text-xs text-ink/65">
                     {isIn ? "Checked" : "Not uploaded"}
                   </span>
                 </li>
@@ -100,7 +100,7 @@ export default function DocsAndAis() {
             <p className="mt-2 font-display text-lg font-bold text-ink">
               {recon.headline.value}
             </p>
-            <p className="text-xs text-ink/55">{recon.headline.label}</p>
+            <p className="text-xs text-ink/65">{recon.headline.label}</p>
 
             {clean ? (
               <div className="mt-3 rounded-2xl border border-rule bg-credit-wash px-4 py-3">

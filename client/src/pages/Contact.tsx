@@ -245,7 +245,7 @@ export default function Contact() {
                 </button>
               </form>
 
-              <div className="mt-6 text-sm text-ink/55">
+              <div className="mt-6 text-sm text-ink/65">
                 <p>* Required fields</p>
                 <p className="mt-2">We typically respond within 24 hours during business days.</p>
               </div>

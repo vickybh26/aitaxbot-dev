@@ -33,7 +33,7 @@ export default function IncomeTaxCalculatorWizardPage() {
 
       <div className="bg-card min-h-screen">
         <div className="max-w-xl mx-auto px-4 pt-4">
-          <nav className="flex items-center gap-1.5 text-xs text-ink/55 mb-2" aria-label="Breadcrumb">
+          <nav className="flex items-center gap-1.5 text-xs text-ink/65 mb-2" aria-label="Breadcrumb">
             <Link href="/" className="hover:text-[hsl(var(--interactive-blue))]">Home</Link>
             <span className="text-ink/35">/</span>
             <Link href="/calculators" className="hover:text-[hsl(var(--interactive-blue))]">Calculators</Link>

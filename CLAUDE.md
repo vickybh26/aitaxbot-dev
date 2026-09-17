@@ -73,14 +73,14 @@ Rules that are load-bearing:
 
 - **Navy** (`--primary-blue`, 214 52% 25%) — brand, structure, primary actions.
 - **Interactive blue** (`--interactive-blue`, 221 83% 53%) — links and secondary actions only. Note this is essentially Tailwind's `blue-600`; a primary CTA wearing it reads as a link.
-- **Green** (`--success-green`) — money the user gains, and genuine success states. Nothing else. When green also means "sign in here", it stops meaning "you saved money".
+- **Green** (`--success-green`) — two sanctioned roles and no third: (1) money the user gains and genuine success states, (2) the brand display type in the homepage hero. When green also means "sign in here", it stops meaning "you saved money". The hero exception is deliberate — audited 2026-09-17, it measures 5.11:1 on paper, clearing AAA at 51px — but it is the only decorative use permitted. Do not extend it to buttons, badges or icons.
 - **Purple is retired.** It is flagged as an anti-pattern for finance products. `--accent-purple` is a legacy alias mapped to navy; do not reintroduce it.
 - `tabular-figures` / `money` on every rupee amount, so digits stay aligned.
 
 ## Traps
 
 - **`bg-accent` is shadcn's neutral hover surface, not a brand colour.** It is paired with near-black `--accent-foreground` by every Radix component. Pointing it at a dark brand colour makes dropdowns, context menus and outline-button hovers invisible.
-- **Check whether a token is actually wired** before assuming a change will show. Roughly 88% of this site's colour is raw Tailwind palette that no CSS variable controls — a token change can be entirely inert. Verify with a count. **If you find a raw Tailwind class (e.g., `text-blue-600`) being used instead of the appropriate CSS variable, your FIX must dictate replacing the raw utility with the mapped semantic variable.**
+- **Check whether a token is actually wired** before assuming a change will show, and verify with a count. The migration is now essentially complete — measured 2026-09-17: **3,683 token utilities (`text-ink`/`bg-paper`/`border-rule`/`text-credit`) against 3 remaining raw `gray`/`slate` classes**. This note previously said "roughly 88% of this site's colour is raw Tailwind palette that no CSS variable controls", which was true when written and is now badly wrong; it would send an auditor hunting for a problem that no longer exists. A token change today almost always does show. **If you find a raw Tailwind class (e.g., `text-blue-600`) being used instead of the appropriate CSS variable, your FIX must dictate replacing the raw utility with the mapped semantic variable.**
 - **Mobile Touch Targets:** When evaluating layouts for the 360x800px baseline, strictly flag any primary interactive elements or touch targets that calculate to below 44x44px.
 - **`prefers-reduced-motion` and `:focus-visible` blocks already exist** in `index.css` and are deliberate. Do not remove them.
 

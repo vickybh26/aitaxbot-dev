@@ -138,7 +138,7 @@ export default function HomeLoanCalculator() {
                 className="mt-1"
                 placeholder="100000"
               />
-              <p className="text-xs text-ink/55 mt-1">Bank typically allows 50% of income towards all EMIs</p>
+              <p className="text-xs text-ink/65 mt-1">Bank typically allows 50% of income towards all EMIs</p>
             </div>
             <div>
               <Label className="text-sm font-medium text-ink/80">Existing Monthly EMIs (₹)</Label>
@@ -150,7 +150,7 @@ export default function HomeLoanCalculator() {
                 className="mt-1"
                 placeholder="0"
               />
-              <p className="text-xs text-ink/55 mt-1">Car loan, personal loan, education loan etc.</p>
+              <p className="text-xs text-ink/65 mt-1">Car loan, personal loan, education loan etc.</p>
             </div>
 
             <h3 className="font-semibold text-ink text-sm uppercase tracking-wide pt-2">Property & Loan Details</h3>
@@ -167,7 +167,7 @@ export default function HomeLoanCalculator() {
             </div>
             <div>
               <Label className="text-sm font-medium text-ink/80">
-                Down Payment (₹) <span className="text-ink/55 font-normal">— {downPaymentPct}% of price</span>
+                Down Payment (₹) <span className="text-ink/65 font-normal">— {downPaymentPct}% of price</span>
               </Label>
               <Input
                 type="number"
@@ -177,7 +177,7 @@ export default function HomeLoanCalculator() {
                 className="mt-1"
                 placeholder="1500000"
               />
-              <p className="text-xs text-ink/55 mt-1">Minimum 20% down payment (LTV 80%) required by most banks</p>
+              <p className="text-xs text-ink/65 mt-1">Minimum 20% down payment (LTV 80%) required by most banks</p>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
@@ -270,7 +270,7 @@ export default function HomeLoanCalculator() {
                 {/* Tax benefits */}
                 <div className="bg-green-50 rounded-xl p-4">
                   <h4 className="font-bold text-ink mb-1">Tax Benefits (Old Regime Only)</h4>
-                  <p className="text-xs text-ink/55 mb-3">Applicable in the financial year you pay interest/principal. Not available under New Regime.</p>
+                  <p className="text-xs text-ink/65 mb-3">Applicable in the financial year you pay interest/principal. Not available under New Regime.</p>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-ink/65">Interest paid (Year 1 est.):</span>
@@ -300,9 +300,9 @@ export default function HomeLoanCalculator() {
               </div>
             ) : (
               <div className="flex items-center justify-center h-full min-h-[300px] bg-secondary rounded-xl border border-dashed border-rule">
-                <div className="text-center text-ink/55">
+                <div className="text-center text-ink/65">
                   <div className="text-4xl mb-3">🏠</div>
-                  <p className="font-medium text-ink/55">Enter your details and click Calculate</p>
+                  <p className="font-medium text-ink/65">Enter your details and click Calculate</p>
                   <p className="text-sm mt-1">Get your eligibility, EMI and tax benefits instantly</p>
                 </div>
               </div>

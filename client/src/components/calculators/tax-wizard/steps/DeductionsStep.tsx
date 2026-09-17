@@ -103,7 +103,7 @@ export default function DeductionsStep({ value, otherSources, ageGroup, onChange
           ₹{Math.round(result.total).toLocaleString("en-IN")}
         </span>
       </div>
-      <p className="text-xs text-ink/55">
+      <p className="text-xs text-ink/65">
         Home loan interest isn't listed here — it already reduced your House Property income in that
         step, so it's not counted twice.
       </p>

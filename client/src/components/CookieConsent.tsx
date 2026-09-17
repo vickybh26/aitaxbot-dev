@@ -184,7 +184,7 @@ export default function CookieConsent() {
               
               <button
                 onClick={handleRejectNonEssential}
-                className="absolute top-4 right-4 text-ink/55 hover:text-ink/65 transition-colors"
+                className="absolute top-4 right-4 text-ink/65 hover:text-ink/65 transition-colors"
                 aria-label="Close"
                 data-testid="button-close-banner"
               >
@@ -207,7 +207,7 @@ export default function CookieConsent() {
                 </div>
                 <button
                   onClick={() => setShowPreferences(false)}
-                  className="text-ink/55 hover:text-ink/65 transition-colors"
+                  className="text-ink/65 hover:text-ink/65 transition-colors"
                   aria-label="Close"
                   data-testid="button-close-preferences"
                 >

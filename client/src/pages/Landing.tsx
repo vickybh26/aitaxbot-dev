@@ -165,9 +165,9 @@ function RegimeComparisonCard() {
               step={50000}
               value={salary}
               onChange={(e) => setSalary(+e.target.value)}
-              className="mt-4 h-1.5 w-full cursor-pointer appearance-none rounded-full bg-secondary accent-credit"
+              className="range-touch"
             />
-            <div className="mt-2 flex justify-between text-[11px] font-medium text-ink/45">
+            <div className="flex justify-between text-[11px] font-medium text-ink/65">
               <span>₹3,00,000</span>
               <span>₹50,00,000</span>
             </div>
@@ -261,7 +261,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
         {/* Everything you need */}
         <div className="col-span-12 mt-4 flex flex-wrap items-end justify-between gap-3">
           <h2 className="font-display text-2xl font-bold">Everything you need</h2>
-          <Link href="/calculators" className="text-sm font-semibold text-credit underline-offset-4 hover:underline">
+          <Link href="/calculators" className="inline-flex min-h-[44px] items-center text-sm font-semibold text-credit underline-offset-4 hover:underline">
             View all 11 tools →
           </Link>
         </div>
