@@ -715,10 +715,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const safeMessage = escapeHtml(message);
       const safeRefId   = escapeHtml(docRef.id);
 
-      // ── Send emails via Brevo ──────────────────────────────────────────────
+      // ── Send emails ────────────────────────────────────────────────────────
       try {
-        if (!process.env.ZEPTOMAIL_TOKEN) {
-          console.warn('⚠️ ZEPTOMAIL_TOKEN not set — contact saved to Firestore only. Add it in Railway to enable emails.');
+        if (!process.env.SMTP_PASSWORD) {
+          console.warn('⚠️ SMTP_PASSWORD not set — contact saved to Firestore only. Add it in Railway to enable emails.');
         } else {
           // Goes through emailService.sendEmail() rather than talking to the
           // provider directly — that is the only place the transport is
@@ -880,10 +880,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const existingUser = await storage.getUserByUsername(email);
       const userExists = !!existingUser;
 
-      // 3. Send email via Brevo
-      if (!process.env.ZEPTOMAIL_TOKEN) {
-        console.warn("⚠️ ZEPTOMAIL_TOKEN not set — email not sent");
-        return res.json({ success: true, userExists, emailSent: false, message: "PDF generated but email not sent (ZEPTOMAIL_TOKEN missing)" });
+      // 3. Send the receipt
+      if (!process.env.SMTP_PASSWORD) {
+        console.warn("⚠️ SMTP_PASSWORD not set — email not sent");
+        return res.json({ success: true, userExists, emailSent: false, message: "PDF generated but email not sent (SMTP_PASSWORD missing)" });
       }
 
       const senderEmail = SENDERS.transactional.email;

@@ -31,6 +31,7 @@
  * user while looking at a subject line.
  */
 
+import nodemailer, { type Transporter } from "nodemailer";
 import { createHmac, timingSafeEqual } from "crypto";
 import { daysUntil, type KeyDateItem } from "@shared/keyDates";
 import { issueLabel, type DigestIssue } from "@shared/digest";
@@ -48,13 +49,16 @@ export const SENDERS = {
   // admin@aitaxbot.co.in (Google Workspace) and info@aitaxbot.in (GoDaddy,
   // MX -> secureserver.net). No other address exists — do not invent one.
   //
-  // Both domains are verified in ZeptoMail as of 2026-09-07, so the digest
-  // sends from info@ as originally intended.
+  // Transport is now Google Workspace SMTP, which authenticates as ONE mailbox
+  // (SMTP_USER, admin@aitaxbot.co.in). Gmail will only send as that address or
+  // a verified "send mail as" alias of it — and where it cannot, it silently
+  // REWRITES the From rather than erroring.
   //
-  // Note what "verified" does and does not buy: it proves the DNS records,
-  // but a domain must ALSO be associated with the mail agent whose token is
-  // in ZEPTOMAIL_TOKEN before that agent may send from it. A verified but
-  // unassociated domain is rejected at send time.
+  // info@aitaxbot.in is on GoDaddy/Titan, not in Workspace, so digest mail
+  // currently leaves as admin@aitaxbot.co.in regardless of what is set here.
+  // sendEmail() warns once per process when that happens. To make the split
+  // real, add info@aitaxbot.in as a verified send-as alias on the Workspace
+  // account (Gmail → Settings → Accounts → Send mail as).
   //
   // Never point either of these at an address that is not a real mailbox.
   // info@aitaxbot.co.in was briefly the default here and was the worst
@@ -110,83 +114,117 @@ export interface SendEmailParams extends EmailContent {
 const ADMIN_BCC = { email: "admin@aitaxbot.co.in", name: "AiTaxBot Admin" };
 
 /**
- * ZeptoMail's send endpoint. Defaults to the India data centre (.in) — the
- * account is Indian and the DC is fixed at signup, so a wrong host here
- * fails auth with a confusing 401 rather than an obvious routing error.
- * Override with ZEPTOMAIL_API_URL if the account lives in another DC.
+ * TRANSPORT: SMTP through Google Workspace, via the mailbox we already pay for.
+ *
+ * Chosen 2026-09-17 after Brevo (free tier capped at 300/day, which one digest
+ * to 146 users exhausted) and ZeptoMail (transactional-only by policy, so the
+ * digest would have breached its terms). Workspace needs no new vendor, no KYC
+ * and no DNS work — aitaxbot.co.in is already Workspace-authenticated.
+ *
+ * Limits, so nobody has to re-derive them: smtp.gmail.com with an app password
+ * allows 2,000 messages/day on Workspace. That covers every current send,
+ * including the ~150-recipient monthly digest. The separate smtp-relay.gmail.com
+ * service allows 10,000 recipients/day but authenticates by IP, which Railway's
+ * changing egress makes impractical — so we use smtp.gmail.com deliberately,
+ * not by omission.
+ *
+ * The real ceiling is reputational, not numeric: this is the same mailbox the
+ * business corresponds from, so a spam complaint against a broadcast lands on
+ * the domain that also carries a user's calculator result. Fine at 150. Revisit
+ * before the list is thousands.
  */
-const ZEPTOMAIL_URL = process.env.ZEPTOMAIL_API_URL || "https://api.zeptomail.in/v1.1/email";
-
-/** ZeptoMail wants an explicit mime_type per attachment; Brevo inferred it. */
-function mimeFor(filename: string): string {
-  const ext = filename.toLowerCase().split(".").pop() || "";
-  return ({
-    pdf: "application/pdf", csv: "text/csv", txt: "text/plain",
-    png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg",
-  } as Record<string, string>)[ext] || "application/octet-stream";
-}
-
-const zAddr = (a: { email: string; name?: string }) => ({
-  email_address: { address: a.email, ...(a.name ? { name: a.name } : {}) },
-});
+const SMTP_HOST = process.env.SMTP_HOST || "smtp.gmail.com";
+const SMTP_PORT = Number(process.env.SMTP_PORT || 465);
+/** The authenticated mailbox. Gmail will only send AS this address or a verified send-as alias of it. */
+const SMTP_USER = process.env.SMTP_USER || "admin@aitaxbot.co.in";
 
 /**
- * Every call is wrapped so a provider outage or missing API key never turns a
- * successful request (form saved, PDF generated, account created) into a
+ * One pooled transporter for the process rather than one per send. Gmail
+ * throttles aggressively on connection churn, and the digest opens ~150 sends
+ * in a tight loop — without pooling that is 150 TLS handshakes.
+ */
+let transporter: Transporter | null = null;
+function getTransporter(): Transporter | null {
+  if (transporter) return transporter;
+  const pass = process.env.SMTP_PASSWORD;
+  if (!pass) return null;
+  transporter = nodemailer.createTransport({
+    host: SMTP_HOST,
+    port: SMTP_PORT,
+    secure: SMTP_PORT === 465, // 465 implicit TLS; 587 upgrades via STARTTLS
+    auth: { user: SMTP_USER, pass },
+    pool: true,
+    maxConnections: 3,
+    maxMessages: 50,
+  });
+  return transporter;
+}
+
+/**
+ * Gmail silently REWRITES the From header to the authenticated mailbox when
+ * asked to send as an address it does not own — it does not error. That makes
+ * a misconfigured sender invisible: mail goes out, just not from who you think.
+ *
+ * SENDERS.digest is info@aitaxbot.in, which lives on GoDaddy/Titan, not in
+ * Workspace. Until it is added as a verified send-as alias (Gmail → Settings →
+ * Accounts → Send mail as), digest mail will actually leave as SMTP_USER. Warn
+ * once per process so that is a known fact rather than a discovery.
+ */
+const warnedSenders = new Set<string>();
+function warnIfUnownedSender(from: string): void {
+  if (from === SMTP_USER || warnedSenders.has(from)) return;
+  warnedSenders.add(from);
+  console.warn(
+    `[Email] Sender ${from} is not the authenticated mailbox (${SMTP_USER}). ` +
+    `Gmail will rewrite the From header to ${SMTP_USER} unless ${from} is a ` +
+    `verified "send mail as" alias on that account. Mail will still send.`
+  );
+}
+
+/**
+ * Every call is wrapped so a provider outage or missing credential never turns
+ * a successful request (form saved, PDF generated, account created) into a
  * failed one — callers get `{sent: false}` back and log it, not a thrown
  * exception. Matches the pattern every route already followed individually
  * before this file existed.
  *
- * The failure `reason` carries ZeptoMail's own response body, truncated.
- * That matters more than it sounds: the likeliest failure on day one is an
- * unverified sending domain, and ZeptoMail says exactly that in the body
- * while the status code alone would just read 400.
+ * `reason` carries the SMTP server's own response where there is one. The
+ * likeliest day-one failure is an app password that was never set or has been
+ * revoked, and Gmail says exactly that ("Username and Password not accepted")
+ * where a bare status code would not.
  */
 export async function sendEmail(params: SendEmailParams): Promise<{ sent: boolean; reason?: string }> {
-  const token = process.env.ZEPTOMAIL_TOKEN;
-  if (!token) {
-    console.warn(`[Email] ZEPTOMAIL_TOKEN not set — skipping "${params.subject}" to ${params.to.map((t) => t.email).join(", ")}`);
-    return { sent: false, reason: "missing_api_key" };
+  const tx = getTransporter();
+  if (!tx) {
+    console.warn(`[Email] SMTP_PASSWORD not set — skipping "${params.subject}" to ${params.to.map((t) => t.email).join(", ")}`);
+    return { sent: false, reason: "missing_smtp_password" };
   }
 
   const sender = params.sender ?? SENDERS.transactional;
-  const payload = {
-    from: { address: sender.email, name: sender.name },
-    to: params.to.map(zAddr),
-    ...(params.bcc?.length ? { bcc: params.bcc.map(zAddr) } : {}),
-    ...(params.replyTo
-      ? { reply_to: [{ address: params.replyTo.email, ...(params.replyTo.name ? { name: params.replyTo.name } : {}) }] }
-      : {}),
-    subject: params.subject,
-    htmlbody: params.htmlContent,
-    ...(params.textContent ? { textbody: params.textContent } : {}),
-    ...(params.attachment?.length
-      ? { attachments: params.attachment.map((a) => ({ name: a.name, content: a.content, mime_type: mimeFor(a.name) })) }
-      : {}),
-  };
+  warnIfUnownedSender(sender.email);
+
+  const addr = (a: { email: string; name?: string }) =>
+    a.name ? { name: a.name, address: a.email } : a.email;
 
   try {
-    const res = await fetch(ZEPTOMAIL_URL, {
-      method: "POST",
-      headers: {
-        // The dashboard shows this token already prefixed on some screens and
-        // bare on others; accept either rather than failing on a paste.
-        Authorization: token.startsWith("Zoho-enczapikey") ? token : `Zoho-enczapikey ${token}`,
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify(payload),
+    await tx.sendMail({
+      from: { name: sender.name, address: sender.email },
+      to: params.to.map(addr),
+      ...(params.bcc?.length ? { bcc: params.bcc.map(addr) } : {}),
+      ...(params.replyTo ? { replyTo: addr(params.replyTo) } : {}),
+      subject: params.subject,
+      html: params.htmlContent,
+      ...(params.textContent ? { text: params.textContent } : {}),
+      // Callers hand us base64 already (the rent-receipt PDF and the
+      // reconciliation report both come off PDFKit as base64 strings).
+      ...(params.attachment?.length
+        ? { attachments: params.attachment.map((a) => ({ filename: a.name, content: a.content, encoding: "base64" as const })) }
+        : {}),
     });
-
-    if (!res.ok) {
-      const detail = (await res.text().catch(() => "")).slice(0, 400);
-      console.error(`[Email] ZeptoMail send failed (${res.status}) for "${params.subject}":`, detail);
-      return { sent: false, reason: `http_${res.status}: ${detail}` };
-    }
     return { sent: true };
   } catch (err: any) {
-    const detail = err?.message || String(err);
-    console.error(`[Email] ZeptoMail send failed for "${params.subject}":`, detail);
+    const detail = (err?.response || err?.message || String(err)).toString().slice(0, 400);
+    console.error(`[Email] SMTP send failed for "${params.subject}":`, detail);
     return { sent: false, reason: detail };
   }
 }
@@ -207,7 +245,9 @@ export function unsubToken(uid: string, type: string = "digest"): string {
   // unsubscribe links sent on 2026-09-07 were signed with it, and dropping it
   // would silently reject every one of them. Keep the old key set in the
   // environment until those links have aged out, or set EMAIL_TOKEN_SECRET
-  // and accept that the already-sent links stop working.
+  // and accept that the already-sent links stop working. SMTP_PASSWORD is
+  // deliberately NOT in this chain — rotating a mail credential must not
+  // invalidate every unsubscribe link in every inbox.
   const secret = process.env.EMAIL_TOKEN_SECRET || process.env.BREVO_API_KEY || "aitaxbot-unsub";
   return createHmac("sha256", secret).update(`unsub:${type}:${uid}`).digest("hex").slice(0, 32);
 }
