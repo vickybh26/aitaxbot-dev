@@ -62,7 +62,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <img src={logoImage} alt="AiTaxBot" className="h-8 w-8 object-contain" />
         <div>
           <div className="font-bold text-white text-sm">AiTaxBot</div>
-          <div className="text-ink/45 text-xs">Admin Panel</div>
+          <div className="text-paper/60 text-xs">Admin Panel</div>
         </div>
       </div>
 
@@ -78,7 +78,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <Shield className="w-3 h-3" />
             {levelInfo.label}
           </span>
-          <p className="text-ink/45 text-xs mt-1 truncate">{user?.email}</p>
+          <p className="text-paper/60 text-xs mt-1 truncate">{user?.email}</p>
         </div>
       )}
 
@@ -93,11 +93,27 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 key={item.href}
                 href={item.href}
                 onClick={() => setSidebarOpen(false)}
+                aria-current={isActive ? "page" : undefined}
+                /* This sidebar is bg-ink, so its text has to come from the PAPER
+                   scale, not the ink scale. It previously used text-ink/35 on
+                   bg-ink — navy on navy, which computes to 1.00:1. Not "low
+                   contrast": mathematically the same colour. Every nav item
+                   except the active one was invisible until hovered, because
+                   hover was the only rule that set a light colour.
+                   text-paper/70 on bg-ink is 7.43:1.
+
+                   The active row also used bg-ink on a bg-ink sidebar, so its
+                   "highlight" was the sidebar itself. No paper tint reaches the
+                   3:1 that non-text contrast wants (paper/35 peaks at 2.94:1),
+                   so active is marked four ways instead of by fill alone: a
+                   tint, full-strength text, heavier weight, the chevron that
+                   was already there, and aria-current for anything not looking
+                   at pixels. */
                 className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
+                  "flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-all",
                   isActive
-                    ? "bg-ink text-white shadow-md"
-                    : "text-ink/35 hover:bg-ink hover:text-white"
+                    ? "bg-paper/15 text-paper font-semibold shadow-md"
+                    : "text-paper/70 font-medium hover:bg-paper/10 hover:text-paper"
                 )}
               >
                 <item.icon className="w-4.5 h-4.5 flex-shrink-0" />
@@ -112,13 +128,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div className="px-3 py-4 border-t border-rule space-y-2">
         <Link
           href="/"
-          className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-ink/45 hover:bg-ink hover:text-white transition-all"
+          className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-paper/70 hover:bg-paper/10 hover:text-paper transition-all"
         >
           ← Back to Website
         </Link>
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-ink/45 hover:bg-red-900/40 hover:text-red-400 transition-all"
+          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-paper/70 hover:bg-red-900/40 hover:text-red-300 transition-all"
         >
           <LogOut className="w-4 h-4" />
           Sign Out
