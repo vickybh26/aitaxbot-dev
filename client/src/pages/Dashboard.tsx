@@ -49,7 +49,6 @@ import {
   Loader2,
   Trash2,
 } from "lucide-react";
-import jsPDF from "jspdf";
 
 /**
  * Personal dashboard stats — served by GET /api/dashboard/stats.
@@ -219,7 +218,10 @@ export default function Dashboard() {
     }
   };
 
-  const generatePDFFromHistory = (calc: TaxCalculationHistory) => {
+  const generatePDFFromHistory = async (calc: TaxCalculationHistory) => {
+    // Dynamic so the 133 KB vendor-pdf chunk loads on the Download click
+    // rather than with the dashboard itself.
+    const { default: jsPDF } = await import("jspdf");
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     let y = 20;

@@ -1,18 +1,7 @@
-import React, { useState } from 'react';
+import React, { lazy, Suspense, useState } from 'react';
 import { Calculator, PieChart, ClipboardList, User, Coins, Percent, RotateCcw } from 'lucide-react';
 import { SegmentedToggle } from '@/components/ui/segmented-toggle';
 import { Callout } from '@/components/ui/callout';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-  LabelList,
-} from 'recharts';
 import HRACalculatorModal from '@/components/calculators/HRACalculator';
 import { getClientTaxAdvice } from '@/lib/geminiAIService';
 import { Card } from '@/components/ui/card';
@@ -29,14 +18,12 @@ import Modal from '@/components/ui/modal';
 import { formatCurrency } from '@/lib/utils';
 import { LastUpdated } from '@/components/ui/last-updated';
 import { Download, Save, Loader2, Sparkles, TrendingDown, AlertTriangle, Info, Shield, CheckCircle } from 'lucide-react';
-import jsPDF from 'jspdf';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useTrackToolUse } from '@/hooks/useTrackToolUse';
 import { recommendITRForm, type ITRFormResult } from '@shared/itrFormSelector';
 import { computeTaxLiability, type AgeGroup } from '@shared/taxLiability';
 import ResultAuthGate from '@/components/ResultAuthGate';
-import { SUCCESS, INTERACTIVE, AXIS } from '@/lib/chartColors';
 
 interface AiTip {
   title: string;
@@ -100,63 +87,12 @@ interface TaxCalculatorProps {
   onGuestDownload?: () => void;
 }
 
-// ── Regime comparison bar chart ───────────────────────────────────────────────
-function RegimeChart({
-  oldTax,
-  newTax,
-  recommended,
-}: {
-  oldTax: number;
-  newTax: number;
-  recommended: 'old' | 'new';
-}) {
-  const fmt = (v: number) =>
-    '₹' + new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(v);
 
-  const data = [
-    { name: 'Old Regime', tax: oldTax, winner: recommended === 'old' },
-    { name: 'New Regime', tax: newTax, winner: recommended === 'new' },
-  ];
-
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload?.length) {
-      const { name, tax } = payload[0].payload;
-      return (
-        <div className="bg-card border border-rule rounded-lg px-3 py-2 text-xs shadow-md">
-          <p className="font-semibold text-ink/80">{name}</p>
-          <p className="text-ink font-bold">{fmt(tax)}</p>
-        </div>
-      );
-    }
-    return null;
-  };
-
-  return (
-    <ResponsiveContainer width="100%" height={180}>
-      <BarChart data={data} barCategoryGap="30%" margin={{ top: 20, right: 16, left: 0, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={AXIS.grid} />
-        <XAxis dataKey="name" tick={{ fontSize: 12, fill: AXIS.label }} axisLine={false} tickLine={false} />
-        <YAxis hide />
-        <Tooltip content={<CustomTooltip />} />
-        <Bar dataKey="tax" radius={[6, 6, 0, 0]}>
-          {data.map((entry, index) => (
-            <Cell
-              key={index}
-              fill={entry.winner ? SUCCESS : INTERACTIVE}
-              opacity={entry.winner ? 1 : 0.65}
-            />
-          ))}
-          <LabelList
-            dataKey="tax"
-            position="top"
-            formatter={fmt}
-            style={{ fontSize: 11, fontWeight: 600, fill: AXIS.emphasis }}
-          />
-        </Bar>
-      </BarChart>
-    </ResponsiveContainer>
-  );
-}
+/**
+ * recharts (104 KB) loads with the chart, not with the page. The chart only
+ * renders after a calculation, so most visitors never pay for it.
+ */
+const RegimeChart = lazy(() => import("./RegimeChart"));
 
 export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }: TaxCalculatorProps = {}) {
   const [activeTab, setActiveTab] = useState('calculator');
@@ -905,140 +841,13 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
     }
   };
   
-  const generatePDFLegacy = () => {
-    if (!result) return;
-
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
-    let y = 20;
-
-    const formatAmount = (amount: number) => {
-      return '₹' + amount.toLocaleString('en-IN');
-    };
-
-    const fyToAY: Record<string, string> = {
-      '2024-25': 'AY 2025-26',
-      '2025-26': 'AY 2026-27',
-      '2026-27': 'Tax Year 2026-27 / AY 2027-28'
-    };
-    const assessmentYear = fyToAY[formData.financialYear] || `AY ${parseInt(formData.financialYear.split('-')[0]) + 1}-${parseInt(formData.financialYear.split('-')[1]) + 1}`;
-    const rebateSection = formData.financialYear === "2026-27" ? "Section 156" : "Section 87A";
-
-    doc.setFontSize(22);
-    doc.setTextColor(30, 64, 175);
-    doc.text('AiTaxBot', pageWidth / 2, y, { align: 'center' });
-    y += 8;
-
-    doc.setFontSize(14);
-    doc.setTextColor(100, 100, 100);
-    doc.text('Income Tax Calculation Report', pageWidth / 2, y, { align: 'center' });
-    y += 6;
-
-    doc.setFontSize(10);
-    doc.text(`Financial Year: ${formData.financialYear} (${assessmentYear})`, pageWidth / 2, y, { align: 'center' });
-    y += 10;
-
-    doc.setDrawColor(200);
-    doc.line(20, y, pageWidth - 20, y);
-    y += 10;
-
-    doc.setFontSize(12);
-    doc.setTextColor(30, 64, 175);
-    doc.text('RECOMMENDATION', 20, y);
-    y += 6;
-
-    doc.setFontSize(11);
-    doc.setTextColor(0);
-    const regimeName = result.recommendedRegime === 'old' ? 'Old Tax Regime' : 'New Tax Regime';
-    doc.text(`Best Option: ${regimeName}`, 20, y);
-    y += 5;
-    doc.text(`Potential Savings: ${formatAmount(result.savings)}`, 20, y);
-    y += 12;
-
-    const drawRegimeSection = (regime: TaxResult, title: string, isRecommended: boolean, startY: number) => {
-      let currentY = startY;
-
-      doc.setFontSize(12);
-      doc.setTextColor(30, 64, 175);
-      doc.text(title + (isRecommended ? ' (Recommended)' : ''), 20, currentY);
-      currentY += 8;
-
-      doc.setFontSize(10);
-      doc.setTextColor(60, 60, 60);
-
-      const rows = [
-        ['Gross Income', formatAmount(regime.grossIncome)],
-        ['Total Deductions', '-' + formatAmount(regime.totalDeductions)],
-        ['Taxable Income', formatAmount(regime.taxableIncome)],
-        ['Income Tax', formatAmount(regime.incomeTax)],
-      ];
-
-      if (regime.rebate87A > 0) {
-        rows.push([`Rebate u/s ${rebateSection}`, '-' + formatAmount(regime.rebate87A)]);
-      }
-
-      if (regime.marginalRelief > 0) {
-        rows.push(['Marginal Relief', '-' + formatAmount(regime.marginalRelief)]);
-      }
-
-      rows.push(['Health & Education Cess (4%)', formatAmount(regime.cess)]);
-
-      rows.push(['Total Tax Payable', formatAmount(regime.totalTax)]);
-      rows.push(['Take Home (Annual)', formatAmount(regime.takeHome)]);
-      rows.push(['Effective Tax Rate', regime.effectiveRate.toFixed(1) + '%']);
-
-      rows.forEach(([label, value]) => {
-        doc.setTextColor(80, 80, 80);
-        doc.text(label, 25, currentY);
-        doc.setTextColor(0);
-        doc.text(value, pageWidth - 60, currentY, { align: 'right' });
-        currentY += 5;
-      });
-
-      return currentY;
-    };
-
-    y = drawRegimeSection(result.oldRegime, 'OLD TAX REGIME', result.recommendedRegime === 'old', y);
-    y += 8;
-
-    y = drawRegimeSection(result.newRegime, 'NEW TAX REGIME', result.recommendedRegime === 'new', y);
-    y += 10;
-
-    doc.setDrawColor(200);
-    doc.line(20, y, pageWidth - 20, y);
-    y += 8;
-
-    doc.setFontSize(10);
-    doc.setTextColor(30, 64, 175);
-    doc.text('TAX SLAB BREAKDOWN', 20, y);
-    y += 6;
-
-    doc.setFontSize(9);
-    doc.setTextColor(80, 80, 80);
-    doc.text('New Regime Slabs:', 25, y);
-    y += 5;
-
-    result.newRegime.taxBreakdown.forEach((slab) => {
-      doc.text(`${slab.slab}: ${slab.rate}% = ${formatAmount(slab.tax)}`, 30, y);
-      y += 4;
-    });
-
-    y += 10;
-    doc.setDrawColor(200);
-    doc.line(20, y, pageWidth - 20, y);
-    y += 8;
-
-    doc.setFontSize(8);
-    doc.setTextColor(120, 120, 120);
-    doc.text('Generated by AiTaxBot (https://www.aitaxbot.co.in)', pageWidth / 2, y, { align: 'center' });
-    y += 4;
-    doc.text(`Report Date: ${new Date().toLocaleDateString('en-IN')} at ${new Date().toLocaleTimeString('en-IN')}`, pageWidth / 2, y, { align: 'center' });
-    y += 4;
-    doc.text('Disclaimer: This is an indicative calculation. Please consult a tax professional for filing.', pageWidth / 2, y, { align: 'center' });
-
-    const fileName = `TaxCalculation_FY${formData.financialYear}_${new Date().toISOString().split('T')[0]}.pdf`;
-    doc.save(fileName);
-  };
+  // generatePDFLegacy() lived here: 138 lines building a tax-summary PDF
+  // with jsPDF. It had no callers — the guest download path it served was
+  // removed when calculator results went behind sign-in (2026-07-11), and
+  // the function was left behind. Its static `import jsPDF from "jspdf"`
+  // was still making the 133 KB vendor-pdf chunk a load-time dependency of
+  // this page for every visitor, to support code nothing could reach.
+  // Removed 2026-09-19. Logged-in PDF export lives in Dashboard.tsx.
 
   const calculatorContent = (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -1769,11 +1578,20 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
               {/* Regime Comparison Bar Chart */}
               <Card className="p-5 premium-glass-card premium-glass-card-hover transition-all duration-300">
                 <h3 className="text-sm font-semibold text-ink/80 mb-4">Tax Comparison — Old vs New Regime</h3>
-                <RegimeChart
-                  oldTax={result.oldRegime.totalTax}
-                  newTax={result.newRegime.totalTax}
-                  recommended={result.recommendedRegime}
-                />
+                <Suspense
+                  fallback={
+                    /* Reserves the chart's exact 180px so the card does not
+                       reflow when recharts lands — a layout shift here would
+                       be CLS on the page that takes most of our traffic. */
+                    <div className="h-[180px] w-full animate-pulse rounded-lg bg-secondary" aria-hidden="true" />
+                  }
+                >
+                  <RegimeChart
+                    oldTax={result.oldRegime.totalTax}
+                    newTax={result.newRegime.totalTax}
+                    recommended={result.recommendedRegime}
+                  />
+                </Suspense>
               </Card>
 
               {/* Side by Side Comparison */}

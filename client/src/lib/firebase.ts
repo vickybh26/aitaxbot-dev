@@ -57,7 +57,24 @@ export const auth = getAuth(app);
 // the worst case, because the symptom (sign-ups quietly not happening) shows up
 // in the metrics weeks later with nothing in the logs to explain it. We now
 // probe for a token once on load and report failures.
-if (typeof window !== 'undefined') {
+//
+// DEFERRED TO IDLE (2026-09-19). ReCaptchaV3Provider pulls Google's
+// recaptcha__en.js, measured at 346 KB — 42% of all JavaScript on
+// /calculators/income-tax, the page taking ~84% of site traffic, where total
+// JS was 825 KB and load completed at 6.8s. Initialising at module scope put
+// that download in direct competition with the app bundle during first paint.
+//
+// requestIdleCallback moves it after paint. This does NOT reduce the bytes —
+// only dropping reCAPTCHA-based App Check would, and that is a product
+// decision, not a build one. It reorders them.
+//
+// The 2s timeout is load-bearing: requestIdleCallback can be starved
+// indefinitely on a busy main thread, and App Check enforcement is ON
+// server-side, so a token that never arrives means sign-in and every guarded
+// API call fail. The timeout guarantees initialisation within 2s regardless.
+// Every real trigger (calculate, sign in, sign up) is a user interaction
+// seconds away, so the token is ready well before anything needs it.
+function initAppCheck(): void {
   try {
     const appCheck = initializeAppCheck(app, {
       provider: new ReCaptchaV3Provider(
@@ -86,6 +103,14 @@ if (typeof window !== 'undefined') {
     // App Check may fail in localhost dev if domain isn't whitelisted — non-fatal
     console.warn('[App Check] Initialization skipped:', e);
   }
+}
+
+if (typeof window !== 'undefined') {
+  const ric = (window as any).requestIdleCallback as
+    | ((cb: () => void, opts?: { timeout: number }) => number)
+    | undefined;
+  if (ric) ric(initAppCheck, { timeout: 2000 });
+  else setTimeout(initAppCheck, 1); // Safari < 16.4 has no requestIdleCallback
 }
 
 // Firebase AI Logic — Gemini Developer API
