@@ -783,7 +783,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   ${subject ? `<p style="font-size:13px;color:#64748b">Your inquiry: <em>${safeSubject}</em></p>` : ''}
                   <div style="background:#EFF6FF;border-left:4px solid #2563eb;padding:12px 16px;margin:16px 0;border-radius:0 6px 6px 0">
                     <p style="margin:0;font-size:13px;color:#1d4ed8">
-                      While you wait, you can explore our free tax calculators at <a href="https://aitaxbot.in" style="color:#1d4ed8">aitaxbot.in</a> — no sign-up required!
+                      While you wait, you can explore our free tax calculators at <a href="https://aitaxbot.in" style="color:#1d4ed8">aitaxbot.in</a> — free to use, with a quick sign-in to see your result.
                     </p>
                   </div>
                   <p style="font-size:13px;color:#64748b;margin:16px 0 4px">If you have an urgent query, you can also reach us directly:</p>

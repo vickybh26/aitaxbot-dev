@@ -19,7 +19,7 @@ const hubFAQs = [
     // This answer still described the old login wall — and it is emitted as
     // FAQPage structured data, so the stale version was eligible to surface in
     // Google results and put people off before they ever reached the tool.
-    answer: "Yes, all calculators on AiTaxBot are 100% free with unlimited usage — no fees, no paywall, ever. You'll see your result straight away, no account needed. Creating a free account unlocks the detailed breakdown, the old vs new regime comparison, saved history and PDF download. We offer Income Tax, HRA, SIP, SWP, NPS, PF, Home Loan, Vehicle Loan, and Trading Tax calculators updated for FY 2026-27 (AY 2027-28)."
+    answer: "Yes, all calculators on AiTaxBot are 100% free with unlimited usage — no fees, no paywall, ever. On the Income Tax Calculator you see your headline tax figure straight away without an account. A free account unlocks the detailed breakdown — slab-by-slab workings, the old vs new regime comparison, saved history and PDF download — and is needed to view the result on our other calculators. We offer Income Tax, HRA, SIP, SWP, NPS, PF, Home Loan, Vehicle Loan, and Trading Tax calculators updated for FY 2026-27 (AY 2027-28)."
   },
   {
     question: "Are the calculators updated for the latest tax rules?",

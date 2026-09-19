@@ -55,12 +55,12 @@ export default function About() {
 
                 <div className="bg-green-50 rounded-lg p-6">
                   <h3 className="text-xl font-semibold text-green-900 mb-3">🛠️ Financial Calculators</h3>
-                  <p className="text-ink/80">HRA exemption, SIP returns, SWP planning, NPS corpus, PF maturity, home loan EMI, vehicle loan — all free, all instant.</p>
+                  <p className="text-ink/80">HRA exemption, SIP returns, SWP planning, NPS corpus, PF maturity, home loan EMI, vehicle loan — all free, all updated for FY 2026-27.</p>
                 </div>
 
                 <div className="bg-teal-50 rounded-lg p-6">
                   <h3 className="text-xl font-semibold text-teal-900 mb-3">🧾 Rent Receipt Generator</h3>
-                  <p className="text-ink/80">Generate rent receipts as a PDF in seconds and get them emailed directly to you — no sign-up required for basic use.</p>
+                  <p className="text-ink/80">Generate rent receipts as a PDF in seconds and get them emailed directly to you — free, with a quick sign-in.</p>
                 </div>
 
                 <div className="bg-orange-50 rounded-lg p-6">

@@ -2682,10 +2682,10 @@ export const blogPosts = ([
     slug: "introducing-aitaxbot-free-tax-tools-india",
     status: "published",
     metaTitle: "Introducing AiTaxBot: Free AI-Powered Tax Tools for Every Indian | AiTaxBot",
-    metaDescription: "AiTaxBot is India's free AI-powered tax calculator platform. Calculate income tax, HRA, SIP, PF, NPS, generate rent receipts, and more — no login required.",
+    metaDescription: "AiTaxBot is India's free AI-powered tax calculator platform. Calculate income tax, HRA, SIP, PF, NPS, generate rent receipts, and more — free, with a quick sign-in.",
     keywords: ["aitaxbot free tax calculator india", "free income tax calculator india", "free hra calculator india", "free rent receipt generator india", "ai tax tools india"],
     ogTitle: "AiTaxBot: Free AI-Powered Tax Tools for Indians",
-    ogDescription: "Income tax, HRA, SIP, NPS, PF calculators + rent receipt generator. Free, no login, updated for Tax Year 2026-27.",
+    ogDescription: "Income tax, HRA, SIP, NPS, PF calculators + rent receipt generator. Free, updated for Tax Year 2026-27.",
     tags: ["AiTaxBot", "Tax Tools", "India"],
     readingTimeMinutes: 6,
     publishedAt: "March 28, 2026",
@@ -2694,7 +2694,7 @@ export const blogPosts = ([
       "@context": "https://schema.org",
       "@type": "Article",
       "headline": "Introducing AiTaxBot: Free AI-Powered Tax Tools for Every Indian",
-      "description": "AiTaxBot is India's free AI-powered tax calculator platform. Calculate income tax, HRA, SIP, PF, NPS, generate rent receipts, and more — no login required.",
+      "description": "AiTaxBot is India's free AI-powered tax calculator platform. Calculate income tax, HRA, SIP, PF, NPS, generate rent receipts, and more — free, with a quick sign-in.",
       "author": { "@type": "Organization", "name": "AiTaxBot" },
       "publisher": { "@type": "Organization", "name": "AiTaxBot", "url": "https://www.aitaxbot.co.in" },
       "datePublished": "2026-03-28",
@@ -2725,7 +2725,7 @@ export const blogPosts = ([
       {
         type: "h2",
         heading: "Why Free? And Who Builds This?",
-        content_md: "AiTaxBot is built and maintained by Vikrant Bhargav, a founder who believes that financial clarity should not be a privilege available only to those who can afford professional advice. The tools are free and will remain free.\n\nThe platform is supported by non-intrusive advertising (Google AdSense), which keeps the service running without charging users. There is no freemium paywall, no login required, and no data collected beyond what is necessary for the tools to function.\n\nAll tools are updated in real-time as tax laws change. The Income Tax Act, 2025 changes — including the new slabs, expanded HRA cities, TDS consolidation, and form renames — are already reflected across every relevant tool.\n\nAiTaxBot is entirely India-focused. Unlike global tax platforms that treat India as an afterthought, every feature, every calculation, and every article on this platform is built with the Indian tax system as the primary context — from the two-regime choice to the specifics of HRA for metro vs non-metro cities."
+        content_md: "AiTaxBot is built and maintained by Vikrant Bhargav, a founder who believes that financial clarity should not be a privilege available only to those who can afford professional advice. The tools are free and will remain free.\n\nThe platform is supported by non-intrusive advertising (Google AdSense), which keeps the service running without charging users. There is no freemium paywall and no data collected beyond what is necessary for the tools to function. A free account is needed to view your calculated result, which is what keeps that result on your own dashboard to come back to.\n\nAll tools are updated in real-time as tax laws change. The Income Tax Act, 2025 changes — including the new slabs, expanded HRA cities, TDS consolidation, and form renames — are already reflected across every relevant tool.\n\nAiTaxBot is entirely India-focused. Unlike global tax platforms that treat India as an afterthought, every feature, every calculation, and every article on this platform is built with the Indian tax system as the primary context — from the two-regime choice to the specifics of HRA for metro vs non-metro cities."
       },
       {
         type: "h2",
@@ -2762,7 +2762,7 @@ export const blogPosts = ([
       },
       {
         type: "cta",
-        content_md: "**Start calculating — free, no login required.**\n\nAll tools are updated for Tax Year 2026-27 under the Income Tax Act, 2025. Find out your exact tax liability in 60 seconds.",
+        content_md: "**Start calculating — free.**\n\nAll tools are updated for Tax Year 2026-27 under the Income Tax Act, 2025. Find out your exact tax liability in 60 seconds, then sign in free to see the full breakdown.",
         internal_links: [
           { label: "Income Tax Calculator", href: "/calculators/income-tax" },
           { label: "HRA Exemption Calculator", href: "/calculators/hra" },
@@ -3357,7 +3357,7 @@ export const blogPosts = ([
       },
       {
         type: "cta",
-        content_md: "**Before you file, compare which tax regime saves you more.**\n\nUse AiTaxBot's free Income Tax Calculator — enter your salary, deductions, and HRA details to see your tax under both regimes in seconds. No sign-up required.",
+        content_md: "**Before you file, compare which tax regime saves you more.**\n\nUse AiTaxBot's free Income Tax Calculator — enter your salary, deductions, and HRA details to see your tax in seconds. Sign in free to compare both regimes side by side.",
         internal_links: [
           { label: "Income Tax Calculator", href: "/calculators/income-tax" },
           { label: "HRA Exemption Calculator", href: "/calculators/hra" },
