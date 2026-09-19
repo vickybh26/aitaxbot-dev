@@ -6,6 +6,7 @@ import { type Server } from "http";
 import viteConfig from "../vite.config";
 import { nanoid } from "nanoid";
 import { SEO_CONTENT_BY_PATH, type SeoPageContent } from "@shared/seoContent";
+import { isKnownRoute } from "@shared/routes";
 
 const viteLogger = createLogger();
 
@@ -209,7 +210,12 @@ export async function setupVite(app: Express, server: Server) {
         page = injectNonce(page, nonce);
       }
 
-      res.status(200).set({ "Content-Type": "text/html" }).end(page);
+      // A path the SPA does not serve must answer 404, not 200. The React
+      // not-found view renders either way — what changes is what a crawler,
+      // a link checker or a monitoring probe is told.
+      const known = isKnownRoute(pathname);
+      if (!known) page = markNotFound(page);
+      res.status(known ? 200 : 404).set({ "Content-Type": "text/html" }).end(page);
     } catch (e) {
       vite.ssrFixStacktrace(e as Error);
       next(e);
@@ -228,6 +234,23 @@ function injectNonce(html: string, nonce: string): string {
     /<script\b(?![^>]*\btype=["']application\/ld\+json["'])/gi,
     `<script nonce="${nonce}"`,
   );
+}
+
+/**
+ * Rewrite the <title> and add a robots noindex for a path the app does not
+ * serve.
+ *
+ * Status alone is not enough. Before this, every invalid URL answered 200 AND
+ * carried the generic site title, so Googlebot saw an unbounded set of distinct
+ * URLs all claiming to be "AiTaxBot - Free ITR Filing & Income Tax Calculator
+ * India..." — duplicate titles at infinite scale. The 404 status stops it being
+ * indexed; the title stops it looking like the homepage while it is still in
+ * the index.
+ */
+function markNotFound(html: string): string {
+  return html
+    .replace(/<title>[\s\S]*?<\/title>/i, "<title>Page not found — AiTaxBot</title>")
+    .replace(/<\/head>/i, '  <meta name="robots" content="noindex, nofollow" />\n  </head>');
 }
 
 export function serveStatic(app: Express) {
@@ -266,10 +289,15 @@ export function serveStatic(app: Express) {
     const pathname = req.originalUrl.split("?")[0];
     let html = injectSeoContent(htmlTemplate, pathname);
 
+    // Same rule as the dev handler above: unknown path -> 404 + a title that
+    // says so. This is the branch the ad crawler actually reads.
+    const known = isKnownRoute(pathname);
+    if (!known) html = markNotFound(html);
+
     const nonce = res.locals.cspNonce as string | undefined;
     if (nonce) {
       html = injectNonce(html, nonce);
     }
-    res.set("Content-Type", "text/html").send(html);
+    res.status(known ? 200 : 404).set("Content-Type", "text/html").send(html);
   });
 }

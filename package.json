@@ -10,7 +10,8 @@
     "check": "tsc",
     "typecheck": "tsc --noEmit",
     "test:parsers": "node scripts/test-reconcile-parsers.mjs",
-    "test:calc": "node node_modules/tsx/dist/cli.mjs scripts/test-tax-calculations.ts"
+    "test:calc": "node node_modules/tsx/dist/cli.mjs scripts/test-tax-calculations.ts",
+    "test:routes": "node node_modules/tsx/dist/cli.mjs scripts/test-routes.ts"
   },
   "dependencies": {
     "@adobe/pdfservices-node-sdk": "^4.1.0",
