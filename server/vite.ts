@@ -5,7 +5,7 @@ import { createServer as createViteServer, createLogger } from "vite";
 import { type Server } from "http";
 import viteConfig from "../vite.config";
 import { nanoid } from "nanoid";
-import { SEO_CONTENT_BY_PATH, type SeoPageContent } from "@shared/seoContent";
+import { SEO_CONTENT_BY_PATH, SITE_NAV, type SeoPageContent } from "@shared/seoContent";
 import { isKnownRoute } from "@shared/routes";
 
 const viteLogger = createLogger();
@@ -124,11 +124,30 @@ export function injectSeoContent(html: string, pathname: string): string {
     })),
   };
 
+  // Hub pages (/blog, /tools) carry their own link list; every other page
+  // renders just the site nav below.
+  const pageLinksHtml = page.links?.length
+    ? `<h2>All Articles and Tools</h2><ul class="seo-page-links">${page.links
+        .map((l) => `<li><a href="${escapeAttr(l.href)}">${escapeHtml(l.label)}</a></li>`)
+        .join("")}</ul>`
+    : "";
+
+  // Real <a href> navigation on every crawler-visible page. The app's own
+  // header and footer render their links through wouter's <Link>, which emits
+  // nothing until React mounts — so without this block a crawler that does not
+  // run JS sees a page with no way out of it. Measured 2026-09-19: zero
+  // internal links in the static HTML of every page on the site.
+  const navHtml = `<nav class="seo-site-nav" aria-label="Site"><h2>AiTaxBot</h2><ul>${SITE_NAV.map(
+    (l) => `<li><a href="${escapeAttr(l.href)}">${escapeHtml(l.label)}</a></li>`,
+  ).join("")}</ul></nav>`;
+
   const staticBlock = `
     <div id="seo-static-content" style="max-width:960px;margin:0 auto;padding:24px 16px;font-family:system-ui,sans-serif;line-height:1.6;">
       <h1>${escapeHtml(page.h1)}</h1>
       <p>${escapeHtml(page.intro)}</p>
       ${page.faqs.length > 0 ? `<h2>Frequently Asked Questions</h2>\n      ${faqItemsHtml}` : ""}
+      ${pageLinksHtml}
+      ${navHtml}
     </div>
     <script>document.getElementById('seo-static-content')?.remove();</script>
     <script type="application/ld+json">${JSON.stringify(faqJsonLd)}</script>

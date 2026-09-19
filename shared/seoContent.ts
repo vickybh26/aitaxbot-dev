@@ -36,6 +36,11 @@ export interface SeoFaq {
   answer: string;
 }
 
+export interface SeoLink {
+  href: string;
+  label: string;
+}
+
 export interface SeoPageContent {
   path: string;
   title: string;
@@ -44,6 +49,14 @@ export interface SeoPageContent {
   h1: string;
   intro: string;
   faqs: SeoFaq[];
+  /**
+   * Crawlable links rendered as a real <ul><li><a> list after the intro.
+   *
+   * Only hub pages need this. It exists because /blog is the index for 36
+   * articles and, to a crawler that does not run JS, listed exactly none of
+   * them — the entire content library was unreachable by following links.
+   */
+  links?: SeoLink[];
 }
 
 export const SEO_CONTENT: SeoPageContent[] = [
@@ -69,11 +82,24 @@ export const SEO_CONTENT: SeoPageContent[] = [
     description: "Free tax & financial calculators for India, updated for FY 2026-27 (AY 2027-28). Income Tax, HRA, SIP, SWP & PF calculators. Reviewed by Chartered Accountant.",
     canonical: "https://www.aitaxbot.co.in/calculators",
     h1: "Free Tax & Financial Calculators India FY 2026-27",
-    intro: "AiTaxBot's calculator suite covers Indian Rupee-denominated income tax, HRA exemption, SIP and SWP mutual fund planning, PF (EPF/VPF/PPF) corpus projection, NPS pension planning, home and vehicle loan EMI, and capital-gains tax on equity and F&O trades — all updated for FY 2026-27 (AY 2027-28) under the Income Tax Act, 2025, and reviewed by a Chartered Accountant.",
+    intro: "AiTaxBot's calculator suite covers Indian Rupee-denominated income tax, HRA exemption, SIP and SWP mutual fund planning, PF (EPF/VPF/PPF) corpus projection, NPS pension planning, home and vehicle loan EMI, and capital-gains tax on equity and F&O trades — all updated for FY 2026-27 (AY 2027-28) under the Income Tax Act, 2025, and reviewed by a Chartered Accountant. Each calculator shows its workings, not only its answer, so the figure can be checked against the provision it comes from. The income tax calculator computes liability under both the old and the new regime for the year you select, applying the slab rates, the Section 87A rebate, marginal relief where income sits just above a rebate threshold, surcharge at the applicable rate, and the four per cent health and education cess. The HRA calculator applies the least-of-three test under Section 10(13A) and Rule 2A, using basic pay plus dearness allowance as the salary base and distinguishing metro from non-metro cities. The provident fund calculator splits the employer's twelve per cent between the pension scheme and the provident fund at the EPS wage ceiling of Rs. 15,000 a month, which is why the split stops tracking salary above that point. The trading tax calculator separates short-term from long-term capital gains on listed equity, treats futures and options as non-speculative business income, and applies the flat thirty per cent charge on virtual digital assets under Section 115BBH, where losses cannot be set off against anything. The SIP, SWP, NPS and loan calculators are financial-projection tools rather than tax computations: they assume a constant rate of return or interest, which real markets do not provide, and are useful for comparing options rather than for predicting an outcome. All of them are free, work on the Financial Year you choose, and are reviewed by a Chartered Accountant. None of them files anything or sends your figures to the Income Tax Department.",
     faqs: [
       { question: "Are the calculators updated for the latest tax rules?", answer: "Yes, all tax calculators cover FY 2026-27 (AY 2027-28) under Income Tax Act, 1961 and Tax Year 2026-27 under the new Income Tax Act, 2025. We update our tools immediately when tax laws or interest rates change." },
       { question: "Who reviews the calculator accuracy?", answer: "All calculators are prepared and reviewed by our team of Chartered Accountants (CAs) and tax professionals to ensure compliance with Indian tax laws and financial regulations." },
       { question: "Which calculator should I use first?", answer: "Start with the Income Tax Calculator to understand your overall tax liability. Then use the HRA Calculator if you're salaried and paying rent, and the PF Calculator to plan your retirement corpus. For investment planning, use the SIP and SWP calculators." },
+    ],
+    links: [
+      { href: "/calculators/income-tax", label: "Income Tax Calculator — Old vs New Regime" },
+      { href: "/calculators/hra", label: "HRA Exemption Calculator" },
+      { href: "/calculators/trading-tax", label: "Trading Tax Calculator — STCG, LTCG, F&O, Crypto" },
+      { href: "/calculators/sip", label: "SIP Calculator" },
+      { href: "/calculators/swp", label: "SWP Calculator" },
+      { href: "/calculators/pf", label: "Provident Fund (EPF) Calculator" },
+      { href: "/calculators/nps", label: "NPS Calculator" },
+      { href: "/calculators/home-loan", label: "Home Loan EMI Calculator" },
+      { href: "/calculators/vehicle-loan", label: "Vehicle Loan EMI Calculator" },
+      { href: "/tools/ais-26as-form16", label: "AIS / Form 26AS / Form 16 Reconciliation" },
+      { href: "/tools/rent-receipt", label: "Rent Receipt Generator" },
     ],
   },
   {
@@ -229,7 +255,7 @@ export const SEO_CONTENT: SeoPageContent[] = [
     description: "Complete NRI tax resource: DTAA calculator, NRO vs NRE account comparison, NRI income tax calculator, and repatriation planner. Tax tools for Indians living abroad.",
     canonical: "https://www.aitaxbot.co.in/nri",
     h1: "NRI Tax Corner — DTAA, NRO/NRE Accounts, Repatriation",
-    intro: "AiTaxBot's NRI Tax Corner covers Indian tax obligations for Non-Resident Indians: DTAA relief calculation, NRO vs NRE vs FCNR account taxation, NRI-specific income tax computation (including the fact that NRIs cannot claim the Section 87A/156 rebate available to residents), and a repatriation planner covering FEMA remittance limits. All figures are computed in Indian Rupees under the Income Tax Act, 2025 and current FEMA regulations, cross-checked against CBDT guidance where applicable.",
+    intro: "AiTaxBot's NRI Tax Corner covers Indian tax obligations for Non-Resident Indians: DTAA relief calculation, NRO vs NRE vs FCNR account taxation, NRI-specific income tax computation (including the fact that NRIs cannot claim the Section 87A/156 rebate available to residents), and a repatriation planner covering FEMA remittance limits. All figures are computed in Indian Rupees under the Income Tax Act, 2025 and current FEMA regulations, cross-checked against CBDT guidance where applicable. Residential status is decided by days of physical presence in India under the residence tests, not by citizenship, visa or where a salary is paid, and it is tested afresh every financial year. That single determination drives everything else: a resident is taxed in India on worldwide income, while a non-resident is taxed only on income that accrues in, arises in, or is received in India. Where the same income is taxable in two countries, relief comes from the Double Taxation Avoidance Agreement with the country concerned, either by exempting the income or by allowing credit for the foreign tax paid, and claiming it needs a Tax Residency Certificate plus Form 10F. The tools in this section work through those questions in order — status first, then the India tax charge, then treaty relief, then how much can actually be remitted abroad and under what documentation.",
     faqs: [
       { question: "Who is an NRI for Indian tax purposes?", answer: "An individual is an NRI (Non-Resident Indian) if they stay in India for less than 182 days in a financial year, or less than 60 days in the current year AND less than 365 days in the preceding 4 years. NRIs are taxed only on income earned or accrued in India." },
       { question: "Do NRIs need to file ITR in India?", answer: "NRIs must file ITR if their Indian income exceeds ₹2.5 lakh (basic exemption), or if they want to claim a refund of excess TDS, or to carry forward capital losses. Filing is also recommended for visa and loan applications." },
@@ -237,6 +263,14 @@ export const SEO_CONTENT: SeoPageContent[] = [
       { question: "Can NRIs invest in Indian mutual funds?", answer: "Yes. NRIs can invest in Indian mutual funds through NRE or NRO accounts. NRE-funded investments have no TDS on redemption (profits are freely repatriable). NRO-funded investments are subject to TDS. US and Canada-based NRIs face restrictions with some fund houses due to FATCA." },
       { question: "What is the FEMA annual repatriation limit?", answer: "NRIs can repatriate up to USD 1 million per financial year from their NRO accounts (combining all sources including property sale, NRO FDs, rental income). NRE and FCNR account funds are freely repatriable with no annual limit." },
       { question: "When does an NRI become RNOR (Resident but Not Ordinarily Resident)?", answer: "When an NRI returns to India, they initially get RNOR status for 2-3 years. RNOR individuals are taxed like NRIs on foreign income — only Indian-source income is taxable. After RNOR period, they become full Residents and global income becomes taxable in India." },
+    ],
+    links: [
+      { href: "/nri/income-tax-calculator", label: "NRI Income Tax Calculator" },
+      { href: "/nri/dtaa-calculator", label: "DTAA Relief Calculator" },
+      { href: "/nri/nro-nre-comparison", label: "NRO vs NRE Account Comparison" },
+      { href: "/nri/repatriation-planner", label: "Repatriation Planner" },
+      { href: "/calculators/trading-tax", label: "Trading Tax Calculator" },
+      { href: "/blog/us-stock-trading-tax-india", label: "US Stock Trading Tax in India" },
     ],
   },
   {
@@ -309,7 +343,7 @@ export const SEO_CONTENT: SeoPageContent[] = [
     description: "Generate professional rent receipts instantly. Download as PDF or email to yourself. Includes landlord PAN, revenue stamp reminder, and HRA exemption link. Free with a quick sign-in.",
     canonical: "https://www.aitaxbot.co.in/tools/rent-receipt",
     h1: "Free Rent Receipt Generator India — Download & Email PDF",
-    intro: "Rent receipts are the primary documentary evidence an employer or the tax department accepts for an HRA exemption claim under Section 10(13A). Indian tax rules require the landlord's PAN once annual rent exceeds ₹1,00,000, and a revenue stamp on any single cash payment above ₹5,000. This generator produces compliant, dated rent receipts in Indian Rupees, formatted for either employer submission or your own HRA exemption records.",
+    intro: "Rent receipts are the primary documentary evidence an employer or the tax department accepts for an HRA exemption claim under Section 10(13A). Indian tax rules require the landlord's PAN once annual rent exceeds ₹1,00,000, and a revenue stamp on any single cash payment above ₹5,000. This generator produces compliant, dated rent receipts in Indian Rupees, formatted for either employer submission or your own HRA exemption records. House Rent Allowance is exempt under Section 10(13A) of the Income-tax Act, 1961 read with Rule 2A, to the extent of the least of three amounts: the actual HRA received, rent paid less 10 per cent of salary, and 50 per cent of salary in a metro city or 40 per cent elsewhere. Salary for this test means basic pay plus dearness allowance where the terms of employment provide for it, not gross pay — a distinction that changes the exemption for anyone receiving DA. Employers ask for rent receipts as the evidence behind that claim, and will usually also ask for the landlord's PAN once annual rent crosses Rs. 1,00,000. A receipt that will survive scrutiny names the tenant and the landlord, states the property address, the period covered and the amount paid, and is signed by the landlord. This generator lays out those fields in the order payroll teams expect and produces a PDF you can email or print. Generate receipts for the months you actually paid rent; a full year of identical receipts created on one day is exactly the pattern an assessing officer looks for.",
     faqs: [
       { question: "Do I need my landlord's PAN on the rent receipt?", answer: "PAN of the landlord is mandatory if the total rent paid in the financial year exceeds ₹1,00,000 (roughly ₹8,333/month). Below that, PAN is not compulsory, though including it strengthens your HRA claim during assessment." },
       { question: "Is a revenue stamp required on a rent receipt?", answer: "A revenue stamp is required when a single cash rent payment exceeds ₹5,000. If rent is paid by bank transfer, cheque, or UPI, a revenue stamp is not needed regardless of amount." },
@@ -324,7 +358,7 @@ export const SEO_CONTENT: SeoPageContent[] = [
     description: "Upload your AIS, Form 26AS, and Form 16 to instantly detect mismatches, get AI-powered explanations, and prepare for error-free ITR filing.",
     canonical: "https://www.aitaxbot.co.in/tools/ais-26as-form16",
     h1: "AIS vs 26AS vs Form 16 Reconciliation",
-    intro: "This tool reconciles three CBDT-linked documents — your Annual Information Statement (AIS), Form 26AS, and Form 16 — to catch mismatches before you file. Discrepancies between what your employer reported in Form 16 and what appears in AIS/26AS are a common trigger for an automated intimation notice under Section 143(1)(a) once a return is processed. The tool flags each mismatch in Indian Rupee terms and explains, in plain language, what it means and how to correct it via the AIS feedback mechanism before filing.",
+    intro: "This tool reconciles three CBDT-linked documents — your Annual Information Statement (AIS), Form 26AS, and Form 16 — to catch mismatches before you file. Discrepancies between what your employer reported in Form 16 and what appears in AIS/26AS are a common trigger for an automated intimation notice under Section 143(1)(a) once a return is processed. The tool flags each mismatch in Indian Rupee terms and explains, in plain language, what it means and how to correct it via the AIS feedback mechanism before filing. The three documents exist for different reasons and routinely disagree. The Annual Information Statement is the department's own record of what banks, brokers, mutual funds and registrars reported about you under Section 285BB. Form 26AS is the tax credit statement — the ledger of TDS and advance tax actually deposited against your PAN. Form 16 is what one employer certifies about salary paid and tax deducted. None of the three is complete on its own: Form 16 knows nothing about your savings interest, the AIS may miss income nobody reported, and Form 26AS shows the tax withheld without the gross amount it was withheld from. Most notices issued under Section 143(1) trace back to a gap between these. Typical cases: fixed deposit interest the bank reported and the taxpayer never declared, a share sale captured in the AIS but absent from the broker's tax P&L because the statement was downloaded before year end, TDS under Section 194C on contract receipts where the gross receipt was never shown as business income, or two employers in one year each issuing a Form 16 that applies the standard deduction and the exemption limit in full. This tool reads all three, matches them head by head, and lists every gap with the amount and the deductor so you can resolve it before filing rather than after a notice.",
     faqs: [
       { question: "What is the difference between AIS, Form 26AS and Form 16?", answer: "Form 26AS shows tax deducted at source (TDS) and tax collected at source (TCS) against your PAN. AIS (Annual Information Statement) is broader — it also includes interest, dividends, securities transactions, and other financial data reported to the tax department. Form 16 is issued only by your employer and covers salary and TDS on salary specifically. The three should agree; when they don't, that mismatch is exactly what triggers scrutiny." },
       { question: "Why does a mismatch between AIS and Form 16 matter?", answer: "The return-processing system under Section 143(1)(a) cross-checks the income and TDS you declare against AIS and Form 26AS. A mismatch — say, salary in Form 16 not matching the AIS entry, or TDS claimed that doesn't appear in 26AS — is a common trigger for an automated intimation notice asking you to explain the difference before your refund is released." },
@@ -338,7 +372,8 @@ export const SEO_CONTENT: SeoPageContent[] = [
     description: "Learn about AiTaxBot — India's free AI-powered tax platform. Income tax calculator, HRA, SIP, NPS, rent receipt generator, CA directory and more. Built for Indian taxpayers.",
     canonical: "https://www.aitaxbot.co.in/about",
     h1: "About Us - AiTaxBot Free Tax Calculator & Financial Tools India",
-    intro: "AiTaxBot is an independent, India-focused tax-technology platform. Its calculators are designed and reviewed by a Chartered Accountant and updated for each Finance Act and CBDT notification affecting Indian income tax — most recently the Income Tax Act, 2025 for AY 2026-27. AiTaxBot has no affiliation with the Income Tax Department, CBDT, or any cryptocurrency, token, or blockchain project — it is a Rupee-denominated tax calculation and planning tool for Indian taxpayers and NRIs.",
+    intro:
+      "AiTaxBot is an independent, India-focused tax-technology platform operated as a sole proprietorship from Bengaluru, Karnataka, India, and founded by a practising Chartered Accountant. Its calculators are designed and reviewed by a Chartered Accountant and updated for each Finance Act and CBDT notification affecting Indian income tax. Every figure the platform produces is traceable to a provision: the income tax calculators apply the slab rates, the Section 87A rebate, marginal relief and surcharge as enacted, the HRA calculator applies the statutory least-of-three test and the eight metro cities notified under Rule 279 of the Income-tax Rules, 2026, and the provident fund calculator applies the EPS wage ceiling of Rs. 15,000 per month. Where a calculator makes an assumption, it says so on the page rather than burying it. On which law applies: returns being filed now are governed by the Income-tax Act, 1961. The Income-tax Act, 2025 applies to income earned from 1 April 2026 onward, so the first return filed under it falls in 2027. AiTaxBot computes under both and labels which is which, because conflating the two is the most common error in current Indian tax content. AiTaxBot is an educational and computational tool, not a substitute for advice on your own facts. It has no affiliation with the Income Tax Department, the Central Board of Direct Taxes, or any government body, and it does not file returns on your behalf. It is also not a cryptocurrency, token, coin or blockchain project, and has no connection to any digital-asset venture of a similar name — all amounts on this site are Indian Rupees. Questions, corrections and grievances go to admin@aitaxbot.co.in and are answered by a person.",
     faqs: [
       { question: "Who builds and reviews AiTaxBot's tax calculations?", answer: "AiTaxBot's calculators are designed and reviewed by a Chartered Accountant, and the underlying tax logic is updated each time the Finance Act or CBDT notifications change a slab, rebate, or deduction limit — most recently for the Income Tax Act, 2025 and AY 2026-27." },
       { question: "Is AiTaxBot affiliated with the Income Tax Department or CBDT?", answer: "No. AiTaxBot is an independent, privately built platform and is not affiliated with the Income Tax Department, CBDT, or any government body. It provides calculation and planning tools; it is not a substitute for filing your return through the official portal or consulting a qualified professional for your specific situation." },
@@ -451,6 +486,117 @@ export const BLOG_SEO_CONTENT: SeoPageContent[] = blogPosts
   .filter((p) => p.status === "published")
   .map(blogPostToSeoContent);
 
+/**
+ * The /blog index. Title/description/canonical are copied verbatim from the
+ * <Helmet> block in client/src/pages/Blog.tsx, same rule as every hand-written
+ * entry above; the link list is GENERATED from blogPosts so a new post appears
+ * here the moment it is published, with no second place to remember to edit.
+ *
+ * Measured 2026-09-19 before this existed: /blog served 50 static words and
+ * zero links to any post. Every article on the site was a page a crawler could
+ * only reach from the sitemap, never by following a link — and "ongoing
+ * curation" is exactly what AdSense says it looks for.
+ */
+const BLOG_INDEX_SEO_CONTENT: SeoPageContent = {
+  path: "/blog",
+  title: "Tax & Finance Blog — Expert Guides for Indian Taxpayers | AiTaxBot",
+  description:
+    "In-depth guides on Indian taxation, ITR filing, tax saving, capital gains, GST, SIP, and the new Income Tax Act 2025. CA-verified articles updated for FY 2026-27 & Tax Year 2026-27.",
+  canonical: "https://www.aitaxbot.co.in/blog",
+  h1: "Tax & Finance Blog — Expert Guides for Indian Taxpayers",
+  intro:
+    "Long-form, Chartered-Accountant-reviewed guides to Indian income tax, written for salaried employees, investors and NRIs. Every article covers the Income Tax Act, 1961 as it applies to returns being filed now, and flags where the Income Tax Act, 2025 changes the position from FY 2026-27 onward. Topics span ITR filing and document checklists, old versus new regime comparisons, HRA and Section 80C deductions, capital gains on shares and mutual funds, GST for small businesses, and reading AIS, Form 26AS and Form 16 before you file.",
+  faqs: [],
+  links: blogPosts
+    .filter((p) => p.status === "published")
+    .map((p) => ({ href: `/blog/${p.slug}`, label: p.metaTitle })),
+};
+
+/**
+ * The /tools hub. Same reason as /blog: it had no entry, so it served the
+ * generic shell and linked to nothing.
+ */
+const TOOLS_INDEX_SEO_CONTENT: SeoPageContent = {
+  path: "/tools",
+  title: "Free Tax Tools — AIS Check, Rent Receipts & Calculators | AiTaxBot",
+  description:
+    "Free Indian tax tools: reconcile your AIS, Form 26AS and Form 16 before filing, generate HRA rent receipts, and use 9 tax and investment calculators.",
+  canonical: "https://www.aitaxbot.co.in/tools",
+  h1: "Free Tax Tools for Indian Taxpayers",
+  intro:
+    "Tools for the parts of filing a return that are mechanical, repetitive and easy to get wrong. The AIS, Form 26AS and Form 16 reconciliation tool reads all three documents together and reports where they disagree. That disagreement is where most notices under Section 143(1) originate: interest a bank reported to the department but the taxpayer never declared, TDS credited in Form 26AS but missing from the return, or a sale of shares captured in the Annual Information Statement and absent from the broker statement. Reading three documents against each other by hand is slow and unreliable; the tool does it in one pass and lists every gap with the amount and the deductor. The rent receipt generator produces receipts in the format employers accept as HRA proof, with the landlord details, the period and the monthly amount laid out as Rule 2A evidence requires. The calculators cover income tax under both the old and new regimes, HRA exemption, provident fund and NPS maturity, SIP and SWP returns, home and vehicle loan EMIs, and short- and long-term capital gains on equity, futures and options, and virtual digital assets. Each one shows the workings rather than only the answer, so the figure can be checked against the section it comes from. All of these are free. Nothing here files a return for you or transmits anything to the Income Tax Department — these are computation and preparation tools, and the filing itself stays with you or your Chartered Accountant.",
+  faqs: [
+    {
+      question: "Are these tools really free?",
+      answer: "Yes. Every calculator and tool on AiTaxBot is free to use with no charge, subscription or usage limit. You do need a free account to see a calculated result, which is how we keep your history available on your dashboard.",
+    },
+    {
+      question: "Do you store the AIS, Form 26AS or Form 16 I upload?",
+      answer: "No. Documents uploaded to the reconciliation tool are processed to produce your report and are not retained afterwards. You can delete your account and everything held against it at any time from your profile page.",
+    },
+    {
+      question: "Can AiTaxBot file my income tax return for me?",
+      answer: "Not currently. These are computation and preparation tools — they work out the figures and flag mismatches before you file, but the return itself is filed by you on the Income Tax Department portal, or by a Chartered Accountant. You can find one through our CA directory.",
+    },
+    {
+      question: "Which financial year do the tools cover?",
+      answer: "The calculators cover FY 2025-26 (AY 2026-27) and FY 2026-27 (AY 2027-28), and let you pick between them where the law differs. The reconciliation tool reads the financial year printed on the documents you upload rather than assuming one.",
+    },
+  ],
+  links: [
+    { href: "/tools/ais-26as-form16", label: "AIS, Form 26AS and Form 16 Reconciliation" },
+    { href: "/tools/rent-receipt", label: "Rent Receipt Generator for HRA" },
+    { href: "/calculators/income-tax", label: "Income Tax Calculator" },
+    { href: "/calculators/hra", label: "HRA Exemption Calculator" },
+    { href: "/calculators/trading-tax", label: "Trading Tax Calculator" },
+    { href: "/calculators/sip", label: "SIP Calculator" },
+    { href: "/calculators/swp", label: "SWP Calculator" },
+    { href: "/calculators/pf", label: "Provident Fund Calculator" },
+    { href: "/calculators/nps", label: "NPS Calculator" },
+    { href: "/calculators/home-loan", label: "Home Loan EMI Calculator" },
+    { href: "/calculators/vehicle-loan", label: "Vehicle Loan EMI Calculator" },
+  ],
+};
+
 export const SEO_CONTENT_BY_PATH: Record<string, SeoPageContent> = Object.fromEntries(
-  [...SEO_CONTENT, ...BLOG_SEO_CONTENT].map((p) => [p.path, p])
+  [
+    ...SEO_CONTENT,
+    BLOG_INDEX_SEO_CONTENT,
+    TOOLS_INDEX_SEO_CONTENT,
+    ...BLOG_SEO_CONTENT,
+  ].map((p) => [p.path, p])
 );
+
+/**
+ * Site navigation, rendered into every crawler-visible page by
+ * server/vite.ts.
+ *
+ * Mirrors the real footer in client/src/components/Footer.tsx, which renders
+ * its links through wouter's <Link> — a client-side component that produces no
+ * <a href> until React mounts. Measured 2026-09-19: the static HTML of every
+ * page on this site contained zero internal links. Each page was an island,
+ * which is the "Navigation Dead-End" failure the AdSense brief in CLAUDE.md
+ * calls an automatic rejection.
+ *
+ * Keep this in step with the footer. It is a deliberate duplicate rather than
+ * an import because Footer.tsx is a React component full of icons and layout,
+ * and the crawler block needs a plain list of hrefs.
+ */
+export const SITE_NAV: SeoLink[] = [
+  { href: "/", label: "Home" },
+  { href: "/calculators", label: "Tax Calculators" },
+  { href: "/calculators/income-tax", label: "Income Tax Calculator" },
+  { href: "/calculators/hra", label: "HRA Calculator" },
+  { href: "/calculators/sip", label: "SIP Calculator" },
+  { href: "/calculators/nps", label: "NPS Calculator" },
+  { href: "/tools", label: "Tax Tools" },
+  { href: "/tools/ais-26as-form16", label: "AIS / 26AS / Form 16 Reconciliation" },
+  { href: "/tools/rent-receipt", label: "Rent Receipt Generator" },
+  { href: "/blog", label: "Tax Blog" },
+  { href: "/nri", label: "NRI Corner" },
+  { href: "/find-ca", label: "Find a Chartered Accountant" },
+  { href: "/about", label: "About AiTaxBot" },
+  { href: "/contact", label: "Contact" },
+  { href: "/privacy-policy", label: "Privacy Policy" },
+  { href: "/terms-of-service", label: "Terms of Service" },
+];
