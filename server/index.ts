@@ -107,6 +107,16 @@ app.use(helmet({
         "https://adservice.google.com",
         "https://www.googleadservices.com",
         "https://www.clarity.ms",
+        // Clarity's loader lives on www.clarity.ms but immediately injects its
+        // real script from scripts.clarity.ms. Listing only the loader host
+        // meant the second-stage script was blocked, so Clarity recorded
+        // nothing at all — verified in the production console 2026-09-19,
+        // "Loading the script https://scripts.clarity.ms/0.8.70/clarity.js
+        // violates the following Content Security Policy directive". The tag
+        // looked installed (window.clarity was a function, the loader 200'd),
+        // which is why this survived: a blocked CDN dependency of a tag that
+        // appears to load is invisible from the dashboard side.
+        "https://scripts.clarity.ms",
         "https://www.google.com",
         "https://www.gstatic.com",
         "https://apis.google.com",
@@ -127,8 +137,26 @@ app.use(helmet({
         "https://www.google-analytics.com",
         "https://analytics.google.com",
         "https://region1.google-analytics.com",
-        "https://www.clarity.ms",
-        "https://b.clarity.ms",
+        // Wildcard rather than the two hosts previously listed: Clarity
+        // beacons to several per-region subdomains (c/d/e/j.clarity.ms) that
+        // rotate, and enumerating them is how this went stale before.
+        "https://*.clarity.ms",
+        // Google Ads conversion measurement. pagead2 was in script-src but not
+        // here, so gtag loaded and then could not report: both
+        // /measurement/conversion and /ccm/collect were refused on every page
+        // load — verified in the production console 2026-09-19. Conversions
+        // imported from GA4 still arrive server-side via the GA4 link, so this
+        // did not zero the account out, but the Ads tag's own signal was lost.
+        "https://pagead2.googlesyndication.com",
+        // reCAPTCHA (the App Check provider) posts to www.google.com/recaptcha.
+        // It was trusted in script-src and frame-src but not here, so those
+        // posts were refused. Observed on a local production build 2026-09-19;
+        // NOT reproduced on the live site, where reCAPTCHA's api.js, anchor
+        // frame and gstatic bundle all load and no App Check error appears —
+        // so this is a latent hole in the same policy rather than a confirmed
+        // live breakage. Allowed because a half-trusted origin is the kind of
+        // gap that only shows up later, under a flow nobody tested.
+        "https://www.google.com",
         "wss://*.firebaseio.com",
       ],
       "frame-src": ["'self'", "https://*.firebaseapp.com", "https://www.google.com"],
