@@ -236,6 +236,7 @@ export default function ResultStep({ state }: ResultStepProps) {
         </div>
         <ResultAuthGate
           toolName="Income Tax Calculator"
+          unlocks="a slab-by-slab breakdown, the old vs new regime comparison, and a downloadable PDF"
           headline={{
             label: `${summary.recommendedRegime === "old" ? "Old" : "New"} Regime Recommended`,
             value: formatINR(recommended.liability.totalTax),

@@ -38,9 +38,25 @@ interface ResultAuthGateProps {
    * number doesn't make sense; the gate then behaves as before.
    */
   headline?: { label: string; value: string; hint?: string };
+  /**
+   * What signing in actually gets you on THIS tool, as a sentence fragment.
+   *
+   * Needed because the default used to name "slab-by-slab breakdown, old vs
+   * new regime comparison, and a downloadable PDF" — true of the Income Tax
+   * Calculator, which was the only caller passing a headline until 2026-09-19,
+   * and false of every other one. An SIP calculator has no regimes to compare,
+   * and only the Income Tax Calculator generates a PDF at all (verified: it is
+   * the sole file importing jspdf). Promising either elsewhere would repeat the
+   * "no login required" problem this gate already caused once.
+   */
+  unlocks?: string;
 }
 
-export default function ResultAuthGate({ toolName, headline }: ResultAuthGateProps) {
+export default function ResultAuthGate({
+  toolName,
+  headline,
+  unlocks = "the full breakdown, step by step",
+}: ResultAuthGateProps) {
   const [modalTab, setModalTab] = useState<"login" | "signup" | null>(null);
 
   // Bento card, dark-ink headline band — this is the single most-seen result
@@ -72,7 +88,7 @@ export default function ResultAuthGate({ toolName, headline }: ResultAuthGatePro
         </h3>
         <p className="text-sm text-ink/65 mb-6 max-w-sm mx-auto">
           {headline
-            ? `Sign in free to see how this was calculated — slab-by-slab breakdown, old vs new regime comparison, and a downloadable PDF. Your inputs stay right here, nothing resets.`
+            ? `Sign in free to see how this was calculated — ${unlocks}. Your inputs stay right here, nothing resets.`
             : `Your ${toolName} result is ready. Sign in or create a free AiTaxBot account to view it — your inputs stay right here, nothing resets.`}
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">

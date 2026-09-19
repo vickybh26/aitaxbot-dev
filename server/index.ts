@@ -157,6 +157,15 @@ app.use(helmet({
         // live breakage. Allowed because a half-trusted origin is the kind of
         // gap that only shows up later, under a flow nobody tested.
         "https://www.google.com",
+        // USD/INR historical rates for the Trading Tax Calculator
+        // (fetchUSDINR in TradingTaxCalculator.tsx). Never allowed here, so
+        // every rate lookup was refused and every US trade computed as zero
+        // tax — the fetch helper caught the error and returned null, so the
+        // tool showed no error, just wrong numbers. Verified 2026-09-19.
+        // Both hosts: .app 301s to .dev, and connect-src is enforced on the
+        // redirect target too, so allowing only one leaves a silent hole.
+        "https://api.frankfurter.dev",
+        "https://api.frankfurter.app",
         "wss://*.firebaseio.com",
       ],
       "frame-src": ["'self'", "https://*.firebaseapp.com", "https://www.google.com"],

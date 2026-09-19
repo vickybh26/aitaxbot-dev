@@ -1460,6 +1460,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
             // signed up never completed a calculation.
             <ResultAuthGate
               toolName="Income Tax Calculator"
+              unlocks="a slab-by-slab breakdown, the old vs new regime comparison, and a downloadable PDF"
               headline={{
                 label: `Your tax under the ${result.recommendedRegime === 'new' ? 'New' : 'Old'} Regime`,
                 value: `₹${(result.recommendedRegime === 'new'
@@ -1831,6 +1832,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
             // signed up never completed a calculation.
             <ResultAuthGate
               toolName="Income Tax Calculator"
+              unlocks="a slab-by-slab breakdown, the old vs new regime comparison, and a downloadable PDF"
               headline={{
                 label: `Your tax under the ${result.recommendedRegime === 'new' ? 'New' : 'Old'} Regime`,
                 value: `₹${(result.recommendedRegime === 'new'

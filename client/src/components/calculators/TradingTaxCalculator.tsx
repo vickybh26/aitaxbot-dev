@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useTrackToolUse } from '@/hooks/useTrackToolUse';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -81,13 +81,36 @@ function monthsBetween(d1: string, d2: string): number {
   return (b.getFullYear() - a.getFullYear()) * 12 + (b.getMonth() - a.getMonth());
 }
 
+/**
+ * Historical USD/INR for a given date.
+ *
+ * Returns null on failure, but LOGS first. It used to swallow the error
+ * silently, and that hid a real outage: the app's CSP did not allow
+ * api.frankfurter.app, so every call was refused, every rate came back null,
+ * and every US trade was valued at zero — with no error anywhere on screen.
+ * A wrong number presented confidently is worse than a visible failure,
+ * especially on a page that tells someone what tax they owe.
+ */
 async function fetchUSDINR(date: string): Promise<number | null> {
   try {
-    const res = await fetch(`https://api.frankfurter.app/${date}?from=USD&to=INR`);
-    if (!res.ok) return null;
+    // api.frankfurter.app now 301s to api.frankfurter.dev/v1. fetch() would
+    // follow that, but CSP connect-src is enforced on the redirect TARGET as
+    // well as the original, so the hop failed with a bare "Failed to fetch"
+    // and no violation event naming the real culprit. Calling the current
+    // host directly avoids depending on a redirect surviving the policy.
+    const res = await fetch(`https://api.frankfurter.dev/v1/${date}?from=USD&to=INR`);
+    if (!res.ok) {
+      console.error(`[TradingTax] USD/INR lookup for ${date} failed: HTTP ${res.status}`);
+      return null;
+    }
     const data = await res.json();
-    return data.rates?.INR ?? null;
-  } catch {
+    const rate = data.rates?.INR ?? null;
+    if (rate === null) {
+      console.error(`[TradingTax] USD/INR lookup for ${date} returned no INR rate`, data);
+    }
+    return rate;
+  } catch (err) {
+    console.error(`[TradingTax] USD/INR lookup for ${date} threw:`, err);
     return null;
   }
 }
@@ -926,7 +949,20 @@ function ForexTab({ trades, setTrades, slabRate }: {
 
 // ─── Summary Tab ──────────────────────────────────────────────────────────────
 
-function SummaryTab({ usStocks, usDividends, indianFO, usFO, forex, slabRate }: {
+/**
+ * The whole tax computation for the summary view, lifted out of SummaryTab so
+ * the sign-in gate can show the headline total without rendering the tab.
+ *
+ * Added 2026-09-19. Every other calculator shows its single headline figure
+ * before the gate and asks for sign-in to see the workings (see the `headline`
+ * prop on ResultAuthGate for why). This one could not, because the total lived
+ * inside the component that the gate replaces — so a signed-out visitor who
+ * entered a full year of trades was shown nothing at all.
+ *
+ * Pure function, no hooks: SummaryTab destructures the whole thing, the gate
+ * takes only grandTotal.
+ */
+function computeTradingTaxSummary({ usStocks, usDividends, indianFO, usFO, forex, slabRate }: {
   usStocks: USTrade[];
   usDividends: USDividend[];
   indianFO: IndianFOTrade[];
@@ -980,6 +1016,23 @@ function SummaryTab({ usStocks, usDividends, indianFO, usFO, forex, slabRate }: 
     { label: "US F&O / Options", income: usFOProfit, tax: usFOTax, color: "bg-emerald-500" },
     { label: "Forex", income: forexProfit, tax: forexTax, color: "bg-rose-500" },
   ].filter(b => b.income > 0 || b.tax > 0);
+
+  return { usStockTax, foTax, usFOTax, grandTotal, hasF_O, hasAnyForeign, itrForm, bars };
+}
+
+
+function SummaryTab({ usStocks, usDividends, indianFO, usFO, forex, slabRate }: {
+  usStocks: USTrade[];
+  usDividends: USDividend[];
+  indianFO: IndianFOTrade[];
+  usFO: USFOTrade[];
+  forex: ForexTrade[];
+  slabRate: number;
+}) {
+  const {
+    usStockTax, foTax, usFOTax, grandTotal, hasAnyForeign, itrForm, bars,
+  } = computeTradingTaxSummary({ usStocks, usDividends, indianFO, usFO, forex, slabRate });
+
 
   if (bars.length === 0) {
     return (
@@ -1097,6 +1150,21 @@ export default function TradingTaxCalculator() {
   const trackTool = useTrackToolUse();
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>("us-stocks");
+  /**
+   * Has the visitor picked a category yet?
+   *
+   * Without this the calculator had no reachable entry point at all. The
+   * QuickStart screen rendered while `!hasAnyData`, and the tab content
+   * rendered only while `hasAnyData || activeTab === "summary"` — but the only
+   * way to add a trade is inside a tab, and all five trade arrays start empty.
+   * So hasAnyData could never become true: clicking a QuickStart card or a top
+   * tab set activeTab and changed nothing on screen. Confirmed on the live site
+   * 2026-09-19 with a real click, not a synthetic one.
+   *
+   * `started` is what QuickStart actually sets. hasAnyData still keeps the
+   * screen dismissed on later renders once trades exist.
+   */
+  const [started, setStarted] = useState(false);
   const [annualIncome, setAnnualIncome] = useState<number>(2500000);
 
   const [usStocks, setUSStocks] = useState<USTrade[]>([]);
@@ -1132,7 +1200,16 @@ export default function TradingTaxCalculator() {
 
   const hasAnyData = usStocks.length + usDividends.length + indianFO.length + usFO.length + forex.length > 0;
 
+  // Headline total for the signed-out gate. Same computation SummaryTab runs,
+  // so the number a visitor is shown before signing in is the number they see
+  // after — there is no second code path to drift.
+  const gatedSummary = useMemo(
+    () => computeTradingTaxSummary({ usStocks, usDividends, indianFO, usFO, forex, slabRate }),
+    [usStocks, usDividends, indianFO, usFO, forex, slabRate],
+  );
+
   const handleQuickStart = (tab: Tab) => {
+    setStarted(true);
     setActiveTab(tab);
   };
 
@@ -1201,7 +1278,7 @@ export default function TradingTaxCalculator() {
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => { setStarted(true); setActiveTab(tab.id); }}
                 className={`flex items-center gap-1.5 px-4 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition-all ${
                   isActive
                     ? `border-b-2 ${tab.color}`
@@ -1225,12 +1302,12 @@ export default function TradingTaxCalculator() {
       {/* ── Tab content ────────────────────────────────────────────────────── */}
       <div className="p-4 md:p-6">
         {/* Quick start if no data and not on summary */}
-        {!hasAnyData && activeTab !== "summary" && (
+        {!hasAnyData && !started && activeTab !== "summary" && (
           <QuickStart onSelect={handleQuickStart} />
         )}
 
         {/* Show tab content when either data exists or user is on summary */}
-        {(hasAnyData || activeTab === "summary") && (
+        {(hasAnyData || started || activeTab === "summary") && (
           <>
             {activeTab === "us-stocks" && <USStocksTab trades={usStocks} setTrades={setUSStocks} slabRate={slabRate} />}
             {activeTab === "us-dividends" && <USDividendsTab dividends={usDividends} setDividends={setUSDividends} slabRate={slabRate} />}
@@ -1240,7 +1317,14 @@ export default function TradingTaxCalculator() {
             {activeTab === "summary" && (
               user
                 ? <SummaryTab usStocks={usStocks} usDividends={usDividends} indianFO={indianFO} usFO={usFO} forex={forex} slabRate={slabRate} />
-                : <ResultAuthGate toolName="Trading Tax Calculator" />
+                : <ResultAuthGate
+                    toolName="Trading Tax Calculator"
+                    headline={gatedSummary.bars.length === 0 ? undefined : {
+                      label: "Total estimated tax — FY 2025-26",
+                      value: fmt(gatedSummary.grandTotal),
+                      hint: "Includes 4% health & education cess · New Regime",
+                    }}
+                  />
             )}
           </>
         )}

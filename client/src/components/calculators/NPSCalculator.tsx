@@ -388,7 +388,14 @@ export default function NPSCalculator() {
 
       {/* Results */}
       {result && !user ? (
-        <ResultAuthGate toolName="NPS Calculator" />
+        <ResultAuthGate
+          toolName="NPS Calculator"
+          headline={{
+            label: "Your NPS corpus at retirement",
+            value: formatCurrency(result.totalCorpus),
+            hint: `About ${formatCurrency(result.monthlyPension)} a month as pension`,
+          }}
+        />
       ) : result && (
         <div className="space-y-6">
 

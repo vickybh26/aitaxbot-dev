@@ -532,7 +532,16 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
               {isCalculating ? (
                 <LoadingState message="Calculating HRA exemption..." />
               ) : result && !user ? (
-                <ResultAuthGate toolName="HRA Calculator" />
+                <ResultAuthGate
+                  toolName="HRA Calculator"
+                  headline={{
+                    label: "Your HRA exemption",
+                    value: `₹${Math.round(result.hraExemption).toLocaleString("en-IN")}`,
+                    hint: result.taxableHRA > 0
+                      ? `₹${Math.round(result.taxableHRA).toLocaleString("en-IN")} of your HRA stays taxable`
+                      : "Your entire HRA is exempt",
+                  }}
+                />
               ) : result ? (
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -630,7 +639,16 @@ export default function HRACalculator({ onClose, onApplyHRA }: HRACalculatorProp
             {/* Breakdown Tab */}
             <TabsContent value="breakdown" className="space-y-6">
               {result && !user ? (
-                <ResultAuthGate toolName="HRA Calculator" />
+                <ResultAuthGate
+                  toolName="HRA Calculator"
+                  headline={{
+                    label: "Your HRA exemption",
+                    value: `₹${Math.round(result.hraExemption).toLocaleString("en-IN")}`,
+                    hint: result.taxableHRA > 0
+                      ? `₹${Math.round(result.taxableHRA).toLocaleString("en-IN")} of your HRA stays taxable`
+                      : "Your entire HRA is exempt",
+                  }}
+                />
               ) : result && (
                 <>
                   <Card>

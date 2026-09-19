@@ -218,7 +218,14 @@ export default function HomeLoanCalculator() {
           {/* Results */}
           <div>
             {result && !user ? (
-              <ResultAuthGate toolName="Home Loan Calculator" />
+              <ResultAuthGate
+                toolName="Home Loan Calculator"
+                headline={{
+                  label: "Your monthly EMI",
+                  value: formatINR(result.emi),
+                  hint: `${formatINR(result.totalInterest)} of interest over the full term`,
+                }}
+              />
             ) : result ? (
               <div className="space-y-4">
 

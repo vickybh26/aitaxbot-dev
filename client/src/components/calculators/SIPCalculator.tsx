@@ -259,7 +259,16 @@ export default function SIPCalculator({ onClose }: SIPCalculatorProps = {}) {
         <Card className="bg-secondary p-6">
           <h3 className="font-semibold text-ink mb-4">Investment Summary</h3>
           {result && !user ? (
-            <ResultAuthGate toolName="SIP Calculator" />
+            <ResultAuthGate
+              toolName="SIP Calculator"
+              headline={{
+                label: "Your maturity value",
+                value: formatCurrency(Math.round(result.maturityValue)),
+                // totalReturns is the rupee gain; wealthGain is a MULTIPLE (rendered
+                // as "1.9x" below), not an amount.
+                hint: `${formatCurrency(Math.round(result.totalInvestment))} invested, ${formatCurrency(Math.round(result.totalReturns))} gained`,
+              }}
+            />
           ) : result && (
             <div className="space-y-4">
               <Card className="bg-card p-4">

@@ -245,7 +245,14 @@ export default function SWPCalculator({ onClose }: SWPCalculatorProps = {}) {
             )}
           </div>
           {result && !user ? (
-            <ResultAuthGate toolName="SWP Calculator" />
+            <ResultAuthGate
+              toolName="SWP Calculator"
+              headline={{
+                label: result.isSelfSustaining ? "Your corpus" : "Your corpus lasts",
+                value: durationText,
+                hint: `Withdrawing ${formatCurrency(Math.round(result.startingMonthlyWithdrawal))} a month`,
+              }}
+            />
           ) : result && (
             <div className="space-y-3">
               <Card className="bg-card p-4">

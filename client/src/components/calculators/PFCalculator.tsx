@@ -543,7 +543,14 @@ export default function PFCalculator() {
 
         <TabsContent value="results" className="space-y-6">
           {result && !user ? (
-            <ResultAuthGate toolName="PF Calculator" />
+            <ResultAuthGate
+              toolName="PF Calculator"
+              headline={{
+                label: "Your PF corpus at retirement",
+                value: formatCurrency(result.totalCorpus),
+                hint: `Includes ${formatCurrency(result.totalInterestEarned)} of interest`,
+              }}
+            />
           ) : result ? (
             <>
               <Card className="border-rule bg-gradient-to-br from-paper to-blue-50">
@@ -693,7 +700,14 @@ export default function PFCalculator() {
 
         <TabsContent value="breakdown" className="space-y-6">
           {result && !user ? (
-            <ResultAuthGate toolName="PF Calculator" />
+            <ResultAuthGate
+              toolName="PF Calculator"
+              headline={{
+                label: "Your PF corpus at retirement",
+                value: formatCurrency(result.totalCorpus),
+                hint: `Includes ${formatCurrency(result.totalInterestEarned)} of interest`,
+              }}
+            />
           ) : result ? (
             <Card>
               <CardHeader>
@@ -751,7 +765,14 @@ export default function PFCalculator() {
 
         <TabsContent value="growth" className="space-y-6">
           {result && !user ? (
-            <ResultAuthGate toolName="PF Calculator" />
+            <ResultAuthGate
+              toolName="PF Calculator"
+              headline={{
+                label: "Your PF corpus at retirement",
+                value: formatCurrency(result.totalCorpus),
+                hint: `Includes ${formatCurrency(result.totalInterestEarned)} of interest`,
+              }}
+            />
           ) : result ? (
             <Card>
               <CardHeader>
