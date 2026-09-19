@@ -27,7 +27,7 @@ Rules that are load-bearing for approval:
 ## Traps
 
 - **The SPA Crawler Trap:** Do not evaluate the site by looking at the React components. AdSense crawlers are notoriously bad at indexing heavy JavaScript payloads on initial passes. You must evaluate the `index.html` payload and server-side injected content.
-- **Navigation Dead-Ends:** AdSense requires a strict, easily crawlable privacy policy, terms of service, and contact page. A missing or non-functional link in the footer is an automatic "Site Navigation" rejection.
+- **Navigation Dead-Ends:** AdSense requires a strict, easily crawlable privacy policy, terms of service, and contact page. A missing or non-functional link in the footer is an automatic "Site Navigation" rejection. **Count the links, do not look at the footer component.** This site's header and footer render through wouter's `<Link>`, which emits no `<a href>` at all until React mounts — measured 2026-09-19, the static HTML of every page contained **zero** internal links while the rendered footer looked complete. `grep -o 'href="/[^"]*"'` on the raw payload is the only check that catches this. Fixed in `d74b670` by injecting a real `<nav>` server-side; if that injection is ever removed, the whole site silently becomes a set of disconnected pages again.
 - **Layout Shifts:** Empty `<div>` containers waiting for AdSense tags to load can cause Cumulative Layout Shift (CLS). Ensure ad slots have reserved minimum heights in the CSS.
 
 ## Required workflow
@@ -36,6 +36,8 @@ Rules that are load-bearing for approval:
 2. Evaluate the text-to-code ratio of the raw payload. 
 3. Check the `<head>` for explicit fiat/Indian tax disambiguation terms.
 4. Verify the presence and accessibility of E-E-A-T trust pages (About, Contact, Privacy).
+5. Count internal `<a href>` links in the raw payload, per the Navigation Dead-Ends trap above. Check `/blog` specifically: it is the index for 36 articles and is the page most likely to list none of them.
+6. Check the response STATUS of an invalid URL, not just a valid one. Every unknown path answered 200 with the homepage title until `74eec10`; an unbounded set of duplicate-titled pages is a spam-policy problem, not just an SEO one.
 
 ## Output format
 
