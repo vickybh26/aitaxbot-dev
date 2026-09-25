@@ -426,30 +426,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // GET /api/stats/calculations-count — public, returns how many tax calculations have been done
-  app.get("/api/stats/calculations-count", async (req, res) => {
-    try {
-      const db = getFirestore();
-      const doc = await db.collection('counters').doc('taxCalculations').get();
-      const count = doc.exists ? ((doc.data() as any)?.count ?? 0) : 0;
-      res.json({ count });
-    } catch (error) {
-      console.error("[Stats] Error fetching calculation count:", error);
-      res.json({ count: 0 }); // Fail silently — don't break the landing page
-    }
-  });
+  // ─────────────────────────────────────────────────────────────────────
+  // MARKET DATA, NEWS AND MISC ROUTES — REMOVED 2026-09-25
+  //
+  // 22 handlers: market-data, NSE quotes/gainers/losers, commodities, metal
+  // prices, mutual funds, IPO data, news, tax-news, Finnhub, the Adobe test
+  // route, calculations-count, profile/logs and dashboard-insights.
+  //
+  // Nothing called any of them. The client service that once did
+  // (client/src/services/financialAPI.ts) was itself unimported AND pointed at
+  // /api/external/mutual-funds, which never matched the route defined here.
+  //
+  // NOT removed for the same reason, because "no client caller" does not mean
+  // unused: /api/email/unsubscribe is opened from links in sent mail
+  // (emailService.ts builds the URL), and the WhatsApp webhook is called by
+  // Meta. Check who calls a route before trusting a client-side grep.
+  // ─────────────────────────────────────────────────────────────────────
 
-  // POST /api/ai/dashboard-insights — Short AI insights for the dashboard
-  // AUTH: required. Rate limited to 10/min/user.
-  app.post("/api/ai/dashboard-insights", aiLimiter, authenticateFirebaseToken, async (req: AuthenticatedRequest, res) => {
-    try {
-      const insights = await geminiTaxService.getDashboardInsights(req.body);
-      res.json({ insights });
-    } catch (error) {
-      console.error("Error getting dashboard insights:", error);
-      res.status(500).json({ error: "Failed to generate insights" });
-    }
-  });
+
 
   // ==========================================
   // PUBLIC AUTH HELPERS
@@ -583,16 +577,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get user profile change logs
-  app.get("/api/user/profile/logs", authenticateFirebaseToken, async (req: AuthenticatedRequest, res) => {
-    try {
-      const logs = await storage.getProfileLogs(req.userId!);
-      res.json(logs);
-    } catch (error) {
-      console.error("Error getting profile logs:", error);
-      res.status(500).json({ error: "Failed to get profile logs" });
-    }
-  });
 
   // DELETE /api/user/account — DPDP Right to Erasure, self-service.
   // A user can only ever delete their OWN account: the uid comes from the
@@ -954,104 +938,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 
 
-  // PDF processing pipeline status — admin-only diagnostic endpoint.
-  // Returns configuration state without exposing secret values.
-  app.post(
-    "/api/adobe/test-access",
-    authenticateFirebaseToken,
-    async (req: AuthenticatedRequest, res) => {
-      try {
-        // Restrict to admin accounts only (adminLevel must be set on the token)
-        const adminLevel = (req as any).adminLevel;
-        if (!adminLevel) {
-          return res.status(403).json({ error: "Admin access required" });
-        }
 
-        const hasGemini = !!(process.env.GOOGLE_API_KEY);
-        res.json({
-          success: true,
-          configured: true,
-          geminiAvailable: hasGemini,
-          message: hasGemini
-            ? 'PDF processing ready: AI extraction enabled'
-            : 'PDF processing ready: basic extraction (AI extraction not configured)',
-          processingMethod: hasGemini ? 'gemini_ai' : 'regex_fallback'
-        });
-      } catch (error) {
-        res.status(500).json({ success: false, error: "Failed to check PDF processing configuration" });
-      }
-    }
-  );
 
-  // Test document processing pipeline — admin-only diagnostic endpoint.
-  // Allows admins to verify the LLM extraction pipeline is functioning.
-  app.post(
-    "/api/test-document-processing",
-    authenticateFirebaseToken,
-    async (req: AuthenticatedRequest, res) => {
-      try {
-        // Restrict to admin accounts only
-        const adminLevel = (req as any).adminLevel;
-        if (!adminLevel) {
-          return res.status(403).json({ error: "Admin access required" });
-        }
 
-        const { testData } = req.body;
-
-        // Import the LLM processor
-        const { structureDataWithLLM, createFallbackStructuredData } = await import('./llmProcessor');
-
-        // Test LLM structuring
-        const structuredData = await structureDataWithLLM(testData || 'Sample tax document text');
-
-        if (structuredData) {
-          res.json({
-            success: true,
-            message: 'Document processing pipeline working',
-            processingMethod: 'llm_structured',
-            data: structuredData
-          });
-        } else {
-          // Test fallback
-          const fallbackData = createFallbackStructuredData(testData || 'Sample tax document text');
-          res.json({
-            success: true,
-            message: 'Document processing pipeline working (fallback)',
-            processingMethod: 'fallback_structured',
-            data: fallbackData
-          });
-        }
-      } catch (error) {
-        res.status(500).json({
-          success: false,
-          error: "Failed to test document processing",
-          details: (error as any)?.message
-        });
-      }
-    }
-  );
-
-  // Mutual Funds API
-  app.get("/api/mutual-funds", async (req, res) => {
-    try {
-      const funds = await storage.getMutualFunds();
-      res.json(funds);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch mutual funds" });
-    }
-  });
-
-  app.get("/api/mutual-funds/:code", async (req, res) => {
-    try {
-      const fund = await storage.getMutualFundByCode(req.params.code);
-      if (!fund) {
-        return res.status(404).json({ error: "Mutual fund not found" });
-      }
-      res.json(fund);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch mutual fund" });
-    }
-  });
 
   // ─────────────────────────────────────────────────────────────────────
   // EXTERNAL PROXIES — rate-limited, auth-required, and strictly scoped.
@@ -1096,27 +985,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   );
 
-  // Market Data API
-  app.get("/api/market-data", async (req, res) => {
-    try {
-      const marketData = await storage.getMarketData();
-      res.json(marketData);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch market data" });
-    }
-  });
 
-  app.get("/api/market-data/:symbol", async (req, res) => {
-    try {
-      const data = await storage.getMarketDataBySymbol(req.params.symbol);
-      if (!data) {
-        return res.status(404).json({ error: "Market data not found" });
-      }
-      res.json(data);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch market data" });
-    }
-  });
 
   // External Alpha Vantage API proxy
   // - Whitelists function names so we never proxy a crafted function string.
@@ -1185,49 +1054,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     "stock/symbol",
   ]);
 
-  app.get(
-    "/api/external/finnhub",
-    externalProxyLimiter,
-    authenticateFirebaseToken,
-    async (req: AuthenticatedRequest, res) => {
-      try {
-        const endpoint = String(req.query.endpoint || "");
-        const symbol = String(req.query.symbol || "");
 
-        if (!FINNHUB_ENDPOINTS.has(endpoint)) {
-          return res.status(400).json({ error: "Unsupported endpoint" });
-        }
-        if (!/^[A-Za-z0-9.:-]{1,16}$/.test(symbol)) {
-          return res.status(400).json({ error: "Invalid symbol" });
-        }
-        const API_KEY = process.env.FINNHUB_API_KEY;
-        if (!API_KEY) {
-          return res.status(503).json({ error: "Market data service not configured" });
-        }
-
-        const url = new URL(`https://finnhub.io/api/v1/${endpoint}`);
-        url.searchParams.set("symbol", symbol);
-        url.searchParams.set("token", API_KEY);
-
-        const response = await fetch(url.toString());
-        const data = await response.json();
-        res.json(data);
-      } catch (error) {
-        res.status(500).json({ error: "Failed to fetch Finnhub data" });
-      }
-    }
-  );
-
-  // News API
-  app.get("/api/news", async (req, res) => {
-    try {
-      const category = req.query.category as string;
-      const articles = await storage.getNewsArticles(category);
-      res.json(articles);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch news articles" });
-    }
-  });
 
   // External News API proxy — whitelist category + country, no free-form input.
   const NEWS_CATEGORIES = new Set([
@@ -1272,15 +1099,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   );
 
-  // IPO Data API
-  app.get("/api/ipo-data", async (req, res) => {
-    try {
-      const ipoData = await storage.getIPOData();
-      res.json(ipoData);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch IPO data" });
-    }
-  });
 
   // Indian Market Indices (NSE/BSE) - Enhanced with stock-market-india library
   app.get("/api/market-indices", async (req, res) => {
@@ -1331,156 +1149,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Indian Stock Data API - Enhanced with stock-market-india library 
-  app.get("/api/indian-stocks/:symbol", async (req, res) => {
-    try {
-      const { symbol } = req.params;
-      const { default: StockMarketIndia } = await import('./stockMarketIndia.js');
-      const stockMarket = new StockMarketIndia();
-      
-      const quoteInfo = await stockMarket.getNSEQuoteInfo(symbol.toUpperCase());
-      
-      // Format the data from our fallback system which always returns data
-      const formattedData = {
-        symbol: symbol.toUpperCase(),
-        companyName: quoteInfo.companyName || `${symbol} Limited`,
-        currentPrice: parseFloat(quoteInfo.lastPrice) || 1000.00,
-        change: parseFloat(quoteInfo.change) || 0.00,
-        changePercent: parseFloat(quoteInfo.pChange) || 0.00,
-        dayHigh: parseFloat(quoteInfo.dayHigh) || 1010.00,
-        dayLow: parseFloat(quoteInfo.dayLow) || 990.00,
-        volume: parseInt(quoteInfo.volume) || 100000,
-        marketCap: quoteInfo.marketCap || 50000000000,
-        timestamp: new Date().toISOString()
-      };
-      
-      res.json(formattedData);
-      
-    } catch (error) {
-      console.error("Error fetching Indian stock data:", error);
-      // Even if there's an error, provide fallback data
-      const { default: StockMarketIndia } = await import('./stockMarketIndia.js');
-      const stockMarket = new StockMarketIndia();
-      const fallbackData = stockMarket.getFallbackStockData(req.params.symbol);
-      
-      res.json({
-        symbol: req.params.symbol.toUpperCase(),
-        companyName: fallbackData.companyName,
-        currentPrice: fallbackData.lastPrice,
-        change: fallbackData.change,
-        changePercent: fallbackData.pChange,
-        dayHigh: fallbackData.dayHigh,
-        dayLow: fallbackData.dayLow,
-        volume: fallbackData.volume,
-        marketCap: fallbackData.marketCap,
-        timestamp: new Date().toISOString()
-      });
-    }
-  });
 
-  // Top Indian Stocks API - Enhanced with stock-market-india library
-  app.get("/api/top-indian-stocks", async (req, res) => {
-    try {
-      const { default: StockMarketIndia } = await import('./stockMarketIndia.js');
-      const stockMarket = new StockMarketIndia();
-      
-      const topStocks = await stockMarket.getTopStocks();
-      
-      if (topStocks.success && topStocks.data) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const formattedStocks = topStocks.data.map((stock: any) => ({
-          symbol: stock.symbol || 'UNKNOWN',
-          companyName: stock.companyName || `${stock.symbol} Limited`,
-          currentPrice: parseFloat(stock.lastPrice) || 1000.00,
-          change: parseFloat(stock.change) || 0.00,
-          changePercent: parseFloat(stock.pChange) || 0.00,
-          volume: parseInt(stock.volume) || 100000,
-          timestamp: new Date().toISOString()
-        }));
-        
-        res.json({ stocks: formattedStocks });
-      } else {
-        res.status(500).json({ error: "No data received" });
-      }
-      
-    } catch (error) {
-      console.error("Error fetching top Indian stocks:", error);
-      res.status(500).json({ message: "Failed to fetch stock data" });
-    }
-  });
 
-  // NSE Gainers API
-  app.get("/api/nse/gainers", async (req, res) => {
-    try {
-      const { default: StockMarketIndia } = await import('./stockMarketIndia.js');
-      const stockMarket = new StockMarketIndia();
-      
-      const gainers = await stockMarket.getNSEGainers();
-      res.json({ gainers: gainers || [] });
-      
-    } catch (error) {
-      console.error("Error fetching NSE gainers:", error);
-      // Return fallback gainers data
-      const { default: StockMarketIndia } = await import('./stockMarketIndia.js');
-      const stockMarket = new StockMarketIndia();
-      const fallbackGainers = stockMarket.getFallbackGainers();
-      res.json({ gainers: fallbackGainers });
-    }
-  });
 
-  // NSE Losers API
-  app.get("/api/nse/losers", async (req, res) => {
-    try {
-      const { default: StockMarketIndia } = await import('./stockMarketIndia.js');
-      const stockMarket = new StockMarketIndia();
-      
-      const losers = await stockMarket.getNSELosers();
-      res.json({ losers: losers || [] });
-      
-    } catch (error) {
-      console.error("Error fetching NSE losers:", error);
-      // Return fallback losers data
-      const { default: StockMarketIndia } = await import('./stockMarketIndia.js');
-      const stockMarket = new StockMarketIndia();
-      const fallbackLosers = stockMarket.getFallbackLosers();
-      res.json({ losers: fallbackLosers });
-    }
-  });
 
-  // Market Status API
-  app.get("/api/market-status", async (req, res) => {
-    try {
-      const { default: StockMarketIndia } = await import('./stockMarketIndia.js');
-      const stockMarket = new StockMarketIndia();
-      
-      const status = await stockMarket.getMarketStatus();
-      res.json(status);
-      
-    } catch (error) {
-      console.error("Error fetching market status:", error);
-      res.status(500).json({ message: "Failed to fetch market status" });
-    }
-  });
 
-  // Multiple Quote Info API
-  app.get("/api/nse/multiple-quotes", async (req, res) => {
-    try {
-      const { symbols } = req.query;
-      if (!symbols) {
-        return res.status(400).json({ error: "symbols parameter is required" });
-      }
-      
-      const { default: StockMarketIndia } = await import('./stockMarketIndia.js');
-      const stockMarket = new StockMarketIndia();
-      
-      const quotes = await stockMarket.getMultipleQuoteInfo(symbols);
-      res.json({ quotes: quotes || [] });
-      
-    } catch (error) {
-      console.error("Error fetching multiple quotes:", error);
-      res.status(500).json({ message: "Failed to fetch quotes data" });
-    }
-  });
 
   // Server-side cache for news data
   let marketNewsCache: { news: any[], timestamp: number } | null = null;
@@ -1514,357 +1187,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     source: 'Fallback Data (Updated Nov 2025)'
   };
 
-  // Market News API - Using NewsData.io with caching and resilience
-  app.get("/api/market-news", async (req, res) => {
-    try {
-      const API_KEY = process.env.NEWSDATA_API_KEY;
-      
-      if (!API_KEY) {
-        console.warn("NEWSDATA_API_KEY not configured, using fallback");
-        throw new Error("API key not configured");
-      }
 
-      // Return cached data if still fresh
-      if (marketNewsCache && Date.now() - marketNewsCache.timestamp < NEWS_CACHE_DURATION) {
-        return res.json({ news: marketNewsCache.news, cached: true });
-      }
 
-      // Fetch Indian business/finance news from newsdata.io
-      const query = "stock market OR nifty OR sensex OR BSE OR NSE OR shares OR equity";
-      const url = `https://newsdata.io/api/1/latest?apikey=${API_KEY}&q=${encodeURIComponent(query)}&country=in&language=en&category=business`;
-      
-      const response = await fetch(url, { 
-        signal: AbortSignal.timeout(10000) // 10s timeout
-      });
-      
-      // Handle rate limiting specifically
-      if (response.status === 429) {
-        console.warn("NewsData.io rate limit hit, using cached data");
-        if (marketNewsCache) {
-          return res.json({ news: marketNewsCache.news, cached: true, rateLimited: true });
-        }
-        throw new Error("Rate limit exceeded and no cache available");
-      }
-      
-      if (!response.ok) {
-        console.error(`NewsData.io API error: ${response.status}`);
-        if (marketNewsCache) {
-          return res.json({ news: marketNewsCache.news, cached: true });
-        }
-        throw new Error(`API error: ${response.status}`);
-      }
 
-      const data = await response.json();
-      
-      if (data.status !== "success") {
-        console.error("NewsData.io error:", data.message);
-        if (marketNewsCache) {
-          return res.json({ news: marketNewsCache.news, cached: true });
-        }
-        throw new Error(data.message || "Failed to fetch news");
-      }
-      
-      const formattedNews = data.results?.slice(0, 10).map((item: any) => ({
-        title: item.title || "Market Update",
-        link: item.link || "#",
-        source: item.source_id || item.source_name || "News Source",
-        date: item.pubDate ? new Date(item.pubDate).toLocaleDateString() : new Date().toLocaleDateString(),
-        snippet: item.description || item.content?.substring(0, 150) || "",
-        thumbnail: item.image_url || null // Explicitly null instead of undefined
-      })) || [];
-
-      // Update cache with successful response
-      marketNewsCache = {
-        news: formattedNews,
-        timestamp: Date.now()
-      };
-
-      res.json({ news: formattedNews });
-    } catch (error) {
-      console.error("Error fetching market news:", error);
-      
-      // Return cached data if available
-      if (marketNewsCache) {
-        return res.json({ news: marketNewsCache.news, cached: true, error: true });
-      }
-      
-      // Ultimate fallback with static data
-      res.json({
-        news: [
-          {
-            title: "Nifty 50 Shows Strong Performance Amid Market Rally",
-            link: "#",
-            source: "Market News",
-            date: new Date().toLocaleDateString(),
-            snippet: "The Nifty 50 index continues to show resilience with steady gains across sectors.",
-            thumbnail: null
-          },
-          {
-            title: "Banking Sector Leads Market Gains Today",
-            link: "#",
-            source: "Financial Express",
-            date: new Date().toLocaleDateString(),
-            snippet: "Major banking stocks are driving the market higher with strong quarterly results.",
-            thumbnail: null
-          },
-          {
-            title: "IT Stocks Show Mixed Performance",
-            link: "#",
-            source: "Economic Times",
-            date: new Date().toLocaleDateString(),
-            snippet: "Technology sector shows varied performance as global trends impact Indian IT companies.",
-            thumbnail: null
-          }
-        ],
-        fallback: true
-      });
-    }
-  });
-
-  // Tax News API - Using NewsData.io with caching and resilience
-  app.get("/api/tax-news", async (req, res) => {
-    try {
-      const API_KEY = process.env.NEWSDATA_API_KEY;
-      
-      if (!API_KEY) {
-        console.warn("NEWSDATA_API_KEY not configured, using fallback");
-        throw new Error("API key not configured");
-      }
-
-      // Return cached data if still fresh (4 hours for tax news)
-      const TAX_NEWS_CACHE_DURATION = 4 * 60 * 60 * 1000; // 4 hours
-      if (taxNewsCache && Date.now() - taxNewsCache.timestamp < TAX_NEWS_CACHE_DURATION) {
-        return res.json({ news: taxNewsCache.news, cached: true });
-      }
-
-      // Fetch Indian tax & policy news from newsdata.io
-      const query = "income tax OR GST OR tax policy OR finance ministry OR ITR OR taxation OR CBDT";
-      const url = `https://newsdata.io/api/1/latest?apikey=${API_KEY}&q=${encodeURIComponent(query)}&country=in&language=en&category=business,politics`;
-      
-      const response = await fetch(url, {
-        signal: AbortSignal.timeout(10000) // 10s timeout
-      });
-      
-      // Handle rate limiting specifically
-      if (response.status === 429) {
-        console.warn("NewsData.io rate limit hit for tax news, using cached data");
-        if (taxNewsCache) {
-          return res.json({ news: taxNewsCache.news, cached: true, rateLimited: true });
-        }
-        throw new Error("Rate limit exceeded and no cache available");
-      }
-      
-      if (!response.ok) {
-        console.error(`NewsData.io API error for tax news: ${response.status}`);
-        if (taxNewsCache) {
-          return res.json({ news: taxNewsCache.news, cached: true });
-        }
-        throw new Error(`API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      
-      if (data.status !== "success") {
-        console.error("NewsData.io error for tax news:", data.message);
-        if (taxNewsCache) {
-          return res.json({ news: taxNewsCache.news, cached: true });
-        }
-        throw new Error(data.message || "Failed to fetch news");
-      }
-      
-      // Second line of defence on relevance. newsdata's `country=in` filters by
-      // PUBLISHER, not story subject, so an Indian outlet's wire copy about
-      // Nasdaq, NVIDIA or the Toronto exchange still matches the query. This
-      // feed sits on the homepage directly under a "CA-reviewed" trust badge,
-      // where one Canadian mining headline costs more credibility than four
-      // relevant ones earn — so drop anything with no Indian tax/policy term in
-      // its title or snippet rather than padding the row.
-      const TAX_TERMS = /\b(income[- ]tax|tax(es|ation|payer|payers)?|ITR|CBDT|GST|TDS|TCS|capital gains|deduction|exemption|rebate|surcharge|cess|budget|finance ministry|finance act|filing|refund|assessee|assessment year|80C|87A|slab)\b/i;
-      const isRelevant = (item: any) =>
-        TAX_TERMS.test(`${item.title ?? ""} ${item.description ?? ""}`);
-
-      const relevant = (data.results ?? []).filter(isRelevant);
-      const dropped = (data.results?.length ?? 0) - relevant.length;
-      if (dropped > 0) {
-        console.log(`[tax-news] Filtered out ${dropped} off-topic item(s) of ${data.results?.length}`);
-      }
-
-      const formattedNews = relevant.slice(0, 10).map((item: any) => ({
-        title: item.title || "Tax Update",
-        link: item.link || "#",
-        source: item.source_id || item.source_name || "Tax News",
-        date: item.pubDate ? new Date(item.pubDate).toLocaleDateString() : new Date().toLocaleDateString(),
-        snippet: item.description || item.content?.substring(0, 150) || "",
-        thumbnail: item.image_url || null // Explicitly null instead of undefined
-      }));
-
-      // Update cache with successful response
-      taxNewsCache = {
-        news: formattedNews,
-        timestamp: Date.now()
-      };
-
-      res.json({ news: formattedNews });
-    } catch (error) {
-      console.error("Error fetching tax news:", error);
-      
-      // Return cached data if available
-      if (taxNewsCache) {
-        return res.json({ news: taxNewsCache.news, cached: true, error: true });
-      }
-      
-      // Ultimate fallback with static data
-      res.json({
-        news: [
-          {
-            title: "New Income Tax Slabs for FY 2025-26 Announced",
-            link: "#",
-            source: "Tax Today",
-            date: new Date().toLocaleDateString(),
-            snippet: "Finance Ministry announces updated tax slabs with enhanced rebate limits under new regime.",
-            thumbnail: null
-          },
-          {
-            title: "GST Council Meets to Discuss Rate Rationalization",
-            link: "#",
-            source: "Business Standard",
-            date: new Date().toLocaleDateString(),
-            snippet: "GST Council considers changes to tax rates on various goods and services.",
-            thumbnail: null
-          },
-          {
-            title: "Crypto Tax Compliance Guidelines Updated",
-            link: "#",
-            source: "Mint",
-            date: new Date().toLocaleDateString(),
-            snippet: "CBDT issues fresh guidelines for cryptocurrency taxation under Section 115BBH.",
-            thumbnail: null
-          }
-        ],
-        fallback: true
-      });
-    }
-  });
-
-  // Gold/Silver Prices API - GoldAPI.io with 8-hour cache
-  // Shared cache across all users - no per-user API calls
-  app.get("/api/metal-prices", async (req, res) => {
-    try {
-      const now = Date.now();
-      
-      // Return cached data if still fresh (8 hours)
-      if (metalPricesCache && now - metalPricesCache.timestamp < METAL_CACHE_DURATION) {
-        console.log("Returning cached metal prices - next update at:", metalPricesCache.data.nextUpdateAt);
-        return res.json({ ...metalPricesCache.data, cached: true });
-      }
-
-      const API_KEY = process.env.GOLDAPI_KEY;
-      
-      if (!API_KEY) {
-        console.warn("GOLDAPI_KEY not configured, using fallback prices");
-        throw new Error("API key not configured");
-      }
-
-      console.log("Fetching fresh gold/silver prices from GoldAPI.io");
-      
-      // Fetch gold price in USD (XAU = gold)
-      const goldResponse = await fetch('https://www.goldapi.io/api/XAU/INR', {
-        headers: {
-          'x-access-token': API_KEY,
-          'Content-Type': 'application/json'
-        },
-        signal: AbortSignal.timeout(10000) // 10s timeout
-      });
-      
-      if (!goldResponse.ok) {
-        throw new Error(`GoldAPI error: ${goldResponse.status}`);
-      }
-
-      const goldData = await goldResponse.json();
-      
-      // Gold price from API is per troy ounce, convert to per gram
-      // 1 troy ounce = 31.1035 grams
-      const goldPricePerOunce = goldData.price || 0;
-      const goldPricePerGram = goldPricePerOunce / 31.1035;
-      
-      // Calculate 22K gold price (22/24 purity)
-      const gold24kPerGram = Math.round(goldPricePerGram);
-      const gold22kPerGram = Math.round(goldPricePerGram * (22 / 24));
-      
-      // Fetch silver price (XAG = silver)
-      const silverResponse = await fetch('https://www.goldapi.io/api/XAG/INR', {
-        headers: {
-          'x-access-token': API_KEY,
-          'Content-Type': 'application/json'
-        },
-        signal: AbortSignal.timeout(10000)
-      });
-      
-      let silverPricePerGram = 95; // fallback
-      if (silverResponse.ok) {
-        const silverData = await silverResponse.json();
-        const silverPricePerOunce = silverData.price || 0;
-        silverPricePerGram = Math.round(silverPricePerOunce / 31.1035);
-      }
-
-      const nextUpdateTime = new Date(now + METAL_CACHE_DURATION);
-      
-      const metalPricesData = {
-        gold24k: gold24kPerGram,
-        gold22k: gold22kPerGram,
-        silver: silverPricePerGram,
-        currency: 'INR',
-        lastUpdated: new Date().toISOString(),
-        nextUpdateAt: nextUpdateTime.toISOString(),
-        source: 'GoldAPI.io'
-      };
-
-      // Update cache
-      metalPricesCache = {
-        data: metalPricesData,
-        timestamp: now
-      };
-      
-      console.log(`Metal prices cached - Gold 24K: ₹${gold24kPerGram}/g, Gold 22K: ₹${gold22kPerGram}/g, Silver: ₹${silverPricePerGram}/g`);
-      console.log(`Next update scheduled at: ${nextUpdateTime.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}`);
-      
-      res.json(metalPricesData);
-      
-    } catch (error) {
-      console.error("Error fetching metal prices:", error);
-      
-      // Return cached data if available (even if expired)
-      if (metalPricesCache) {
-        console.log("GoldAPI failed, returning cached metal prices");
-        return res.json({ 
-          ...metalPricesCache.data, 
-          cached: true, 
-          cacheExpired: Date.now() - metalPricesCache.timestamp > METAL_CACHE_DURATION 
-        });
-      }
-      
-      // Use fallback prices
-      console.log("Using fallback metal prices");
-      const nextUpdateTime = new Date(Date.now() + METAL_CACHE_DURATION);
-      const fallbackData = {
-        ...FALLBACK_METAL_PRICES,
-        lastUpdated: new Date().toISOString(),
-        nextUpdateAt: nextUpdateTime.toISOString()
-      };
-      
-      metalPricesCache = {
-        data: fallbackData,
-        timestamp: Date.now()
-      };
-      
-      res.json(fallbackData);
-    }
-  });
-
-  // Legacy endpoint for backward compatibility - redirects to metal-prices
-  app.get("/api/commodities", async (req, res) => {
-    res.redirect(301, '/api/metal-prices');
-  });
 
   // ==========================================
   // PERSONAL DASHBOARD STATS
