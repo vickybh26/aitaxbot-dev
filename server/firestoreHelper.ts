@@ -197,8 +197,6 @@ export const COLLECTIONS = {
   TAX_RATES: 'taxRates',
   TAX_CALCULATION_HISTORY: 'taxCalculationHistory',
   CRYPTO_TRANSACTIONS: 'cryptoTransactions',
-  TAX_DOCUMENTS: 'taxDocuments',
-  EXTRACTED_TAX_DATA: 'extractedTaxData',
   FIRMS: 'firms',
   CLIENTS: 'clients',
   INVOICES: 'invoices',

@@ -1,8 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertMutualFundSchema, insertMarketDataSchema, insertNewsArticleSchema, insertIPODataSchema, insertTaxDocumentSchema, insertExtractedTaxDataSchema, contactInquirySchema } from "@shared/schema";
-import multer from "multer";
+import { insertMutualFundSchema, insertMarketDataSchema, insertNewsArticleSchema, insertIPODataSchema, contactInquirySchema } from "@shared/schema";
 import path from "path";
 import fs from "fs";
 import crypto from "crypto";
@@ -44,11 +43,6 @@ function ensureWithin(baseDir: string, candidate: string): boolean {
   return resolvedTarget === resolvedBase || resolvedTarget.startsWith(resolvedBase + path.sep);
 }
 
-/** Verify PDF magic bytes (`%PDF-`) — multer's MIME check is client-supplied. */
-function looksLikePdf(buf: Buffer): boolean {
-  return buf.length >= 5 && buf.slice(0, 5).toString("ascii") === "%PDF-";
-}
-
 // ─────────────────────────────────────────────────────────────────────
 // Rate limiters — stricter on expensive / abuse-prone endpoints.
 // (A general /api limiter is applied in server/index.ts.)
@@ -74,29 +68,6 @@ const externalProxyLimiter = rateLimit({
   legacyHeaders: false,
   message: { error: "External API rate limit reached." },
 });
-const uploadLimiter = rateLimit({
-  windowMs: 60_000 * 10,
-  max: 10,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: "Upload rate limit reached." },
-});
-
-// Configure multer — memory storage + MIME check (magic-byte check happens after).
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB limit
-  },
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype === 'application/pdf') {
-      cb(null, true);
-    } else {
-      cb(new Error('Only PDF files are allowed') as any, false);
-    }
-  }
-});
-
 export async function registerRoutes(app: Express): Promise<Server> {
 
   // ─── Request ID middleware ────────────────────────────────────────────────
@@ -952,230 +923,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ─────────────────────────────────────────────────────────────────────
-  // TAX DOCUMENTS — Form 16 / AIS / 26AS uploads
-  // EVERY endpoint requires auth. userId is always derived from the
-  // verified Firebase token (req.userId), never from req.body / req.query.
-  // Reads and deletes re-verify document.userId === req.userId (IDOR guard).
+  // TAX DOCUMENT UPLOAD — REMOVED 2026-09-25
+  //
+  // Five endpoints (/api/tax-documents/upload, /:id/status, the list route,
+  // /api/firebase/cleanup and /cleanup-session) plus processDocumentAsync()
+  // and its server/pdfProcessor.py child process used to live here.
+  //
+  // Nothing in the client called any of them — `grep -rn "tax-documents"
+  // client/` returned nothing — but they were live authenticated routes that
+  // wrote taxpayer PDFs to disk and stored a 1,000-character text excerpt in
+  // Firestore. That directly contradicted the privacy policy's promise that
+  // AIS / 26AS / Form 16 documents are never written to disk or the database.
+  //
+  // The `expiresAt` they recorded was decorative: it was written and never
+  // read, so the files were permanent. /api/firebase/cleanup reported a
+  // `deletedCount` it never computed.
+  //
+  // The reconciliation tool people actually use is unaffected — it lives in
+  // server/taxReconcileRoutes.ts, uses multer.memoryStorage(), and writes
+  // nothing to disk or Firestore. Verified 0 records in taxDocuments and
+  // extractedTaxData before removal, so nothing was orphaned.
+  //
+  // If document persistence is ever wanted, it needs a retention design and a
+  // matching privacy notice FIRST — not an endpoint with a timestamp nobody
+  // acts on.
   // ─────────────────────────────────────────────────────────────────────
 
-  // POST /api/tax-documents/upload — authed, rate-limited, PDF magic-byte check,
-  // sanitised filename on disk (no original user filename persisted on disk).
-  app.post(
-    "/api/tax-documents/upload",
-    uploadLimiter,
-    authenticateFirebaseToken,
-    upload.single("document"),
-    async (req: AuthenticatedRequest, res) => {
-      try {
-        if (!req.file) {
-          return res.status(400).json({ error: "No file uploaded" });
-        }
 
-        // MIME was checked by multer — now verify the actual magic bytes.
-        if (!looksLikePdf(req.file.buffer)) {
-          return res.status(400).json({ error: "Uploaded file is not a valid PDF" });
-        }
 
-        const { documentType } = req.body;
-        if (!documentType || !["form16", "ais", "26as"].includes(documentType)) {
-          return res.status(400).json({ error: "Invalid document type. Must be: form16, ais, or 26as" });
-        }
 
-        const userId = req.userId!;
 
-        const uploadDir = "uploads";
-        if (!fs.existsSync(uploadDir)) {
-          fs.mkdirSync(uploadDir, { recursive: true });
-        }
-
-        const fileId = crypto.randomUUID();
-        // NEVER use req.file.originalname in the on-disk name. We only store
-        // a UUID with a `.pdf` extension, then belt-and-braces check that the
-        // resolved path is inside uploadDir to block any path traversal.
-        const localFileName = safeUploadFilename(fileId, req.file.originalname);
-        const localFilePath = path.join(uploadDir, localFileName);
-        if (!ensureWithin(uploadDir, localFilePath)) {
-          return res.status(400).json({ error: "Invalid upload path" });
-        }
-
-        await fs.promises.writeFile(localFilePath, req.file.buffer);
-        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
-
-        // We keep the original filename in the DB (display-only) — escape it
-        // if ever rendered in HTML. Never use it for filesystem operations.
-        const safeOriginalName = path.basename(req.file.originalname || "document.pdf");
-
-        const taxDocument = await storage.createTaxDocument({
-          userId,
-          documentType,
-          fileName: safeOriginalName,
-          filePath: localFilePath,
-          firebaseFileId: null,
-          downloadUrl: null,
-          fileSize: req.file.size,
-          expiresAt: expiresAt,
-          processingStatus: "pending",
-        });
-
-        // Process PDF in background
-        processDocumentAsync(taxDocument.id, localFilePath, documentType, undefined);
-
-        res.json({
-          success: true,
-          documentId: taxDocument.id,
-          message: "Document uploaded successfully. Processing started.",
-          status: "pending",
-        });
-      } catch (error) {
-        console.error("Upload error:", error);
-        res.status(500).json({ error: "Failed to upload document" });
-      }
-    }
-  );
-
-  // GET /api/tax-documents/:documentId/status — authed + IDOR-guarded.
-  app.get(
-    "/api/tax-documents/:documentId/status",
-    authenticateFirebaseToken,
-    async (req: AuthenticatedRequest, res) => {
-      try {
-        const document = await storage.getTaxDocument(req.params.documentId);
-        if (!document) {
-          return res.status(404).json({ error: "Document not found" });
-        }
-        // Ownership check — DB row must belong to the caller.
-        if (document.userId !== req.userId) {
-          // Return 404 (not 403) to avoid leaking existence of other users' docs.
-          return res.status(404).json({ error: "Document not found" });
-        }
-
-        const extractedData = await storage.getExtractedTaxData(document.id);
-
-        res.json({
-          documentId: document.id,
-          status: document.processingStatus,
-          isProcessed: document.isProcessed,
-          errorMessage: document.errorMessage,
-          extractedData: extractedData || null,
-        });
-      } catch (error) {
-        console.error("Status check error:", error);
-        res.status(500).json({ error: "Failed to check document status" });
-      }
-    }
-  );
-
-  // GET /api/tax-documents — list caller's own documents only.
-  app.get(
-    "/api/tax-documents",
-    authenticateFirebaseToken,
-    async (req: AuthenticatedRequest, res) => {
-      try {
-        const documents = await storage.getTaxDocuments(req.userId!);
-        res.json(documents);
-      } catch (error) {
-        console.error("Fetch documents error:", error);
-        res.status(500).json({ error: "Failed to fetch documents" });
-      }
-    }
-  );
-
-  // POST /api/firebase/cleanup — cleanup the *caller's* expired docs only.
-  app.post(
-    "/api/firebase/cleanup",
-    authenticateFirebaseToken,
-    async (req: AuthenticatedRequest, res) => {
-      try {
-        const userId = req.userId!;
-        let deletedCount = 0;
-        try {
-          console.log("No external storage cleanup needed");
-          console.log(`Cleaned up ${deletedCount} expired Firebase documents for user ${userId}`);
-        } catch (firebaseError) {
-          console.log("Firebase cleanup failed, continuing with local cleanup:", firebaseError);
-        }
-
-        res.json({
-          success: true,
-          deletedCount,
-          message: `Cleaned up ${deletedCount} expired documents`,
-        });
-      } catch (error) {
-        console.error("Cleanup error:", error);
-        res.status(500).json({ error: "Failed to cleanup documents" });
-      }
-    }
-  );
-
-  // POST /api/firebase/cleanup-session — wipes the caller's docs (DB + disk).
-  // Each file path is checked to be inside the uploads/ directory before unlink.
-  app.post(
-    "/api/firebase/cleanup-session",
-    authenticateFirebaseToken,
-    async (req: AuthenticatedRequest, res) => {
-      try {
-        const userId = req.userId!;
-        console.log(`Starting session cleanup for user: ${userId}`);
-
-        let firebaseDeletedCount = 0;
-        let localDeletedCount = 0;
-
-        try {
-          console.log("No external storage cleanup needed");
-          console.log(`Cleaned up ${firebaseDeletedCount} Firebase documents for user session ${userId}`);
-        } catch (firebaseError) {
-          console.log("Firebase session cleanup failed:", firebaseError);
-        }
-
-        const uploadDir = "uploads";
-        let userDocuments: any[] = [];
-        try {
-          userDocuments = await storage.getTaxDocumentsByUserId(userId);
-
-          for (const doc of userDocuments) {
-            // Defensive: ignore docs that somehow aren't owned by the caller.
-            if (doc.userId !== userId) continue;
-
-            if (doc.filePath && !doc.filePath.startsWith("firebase:")) {
-              // Only unlink files that resolve inside uploads/ — blocks any
-              // stored path-traversal from ever touching system paths.
-              if (ensureWithin(uploadDir, doc.filePath) && fs.existsSync(doc.filePath)) {
-                try {
-                  await fs.promises.unlink(doc.filePath);
-                  localDeletedCount++;
-                  console.log(`Deleted local file: ${doc.filePath}`);
-                } catch (fileError) {
-                  console.log(`Failed to delete local file ${doc.filePath}:`, fileError);
-                }
-              } else {
-                console.warn(`Refused to unlink unsafe path: ${doc.filePath}`);
-              }
-            }
-
-            await storage.deleteTaxDocument(doc.id);
-          }
-
-          console.log(`Cleaned up ${userDocuments.length} database records and ${localDeletedCount} local files for user session ${userId}`);
-        } catch (localError) {
-          console.log("Local storage cleanup failed:", localError);
-        }
-
-        const totalDeleted = firebaseDeletedCount + localDeletedCount + userDocuments.length;
-
-        res.json({
-          success: true,
-          deletedCount: totalDeleted,
-          firebaseDeleted: firebaseDeletedCount,
-          localDeleted: localDeletedCount,
-          databaseDeleted: userDocuments.length,
-          message: `Session cleanup completed. Removed ${totalDeleted} total documents`,
-        });
-      } catch (error) {
-        console.error("Session cleanup error:", error);
-        res.status(500).json({ error: "Failed to cleanup session documents" });
-      }
-    }
-  );
 
   // PDF processing pipeline status — admin-only diagnostic endpoint.
   // Returns configuration state without exposing secret values.
@@ -2257,95 +2034,3 @@ export async function registerRoutes(app: Express): Promise<Server> {
   return httpServer;
 }
 
-// Async function to process PDF documents using pdfplumber + Gemini AI
-async function processDocumentAsync(documentId: string, filePath: string, documentType: string, unusedParam?: string) {
-  try {
-    console.log(`Starting PDF document processing for ${documentId} (pdfplumber + Gemini)`);
-    
-    // Update status to processing
-    await storage.updateTaxDocument(documentId, { processingStatus: 'processing' });
-
-    // Check if file exists
-    if (!fs.existsSync(filePath)) {
-      console.error('File not found:', filePath);
-      await storage.updateTaxDocument(documentId, { 
-        processingStatus: 'error',
-        errorMessage: 'Uploaded file not found on server'
-      });
-      return;
-    }
-
-    // Call Python processor (pdfplumber extraction + Gemini structuring).
-    // SECURITY: Pass only the specific env vars the script needs.
-    // Never spread process.env — that would expose Firebase service account,
-    // Adobe credentials, Brevo keys, and all other secrets to the subprocess.
-    const { spawn } = await import('child_process');
-
-    const pythonEnv: Record<string, string> = {
-      // Required for Python itself to locate libraries and temp dirs
-      PATH: process.env.PATH ?? "",
-      HOME: process.env.HOME ?? "",
-      TMPDIR: process.env.TMPDIR ?? "/tmp",
-      // Only secret the script actually reads (for Gemini AI extraction)
-      GOOGLE_API_KEY: process.env.GOOGLE_API_KEY ?? "",
-    };
-
-    const result = await new Promise<any>((resolve, reject) => {
-      const python = spawn('python3', ['server/pdfProcessor.py', filePath, documentType], {
-        env: pythonEnv,
-        timeout: 120000 // 2 minute timeout
-      });
-
-      let stdout = '';
-      let stderr = '';
-
-      python.stdout.on('data', (data: Buffer) => { stdout += data.toString(); });
-      python.stderr.on('data', (data: Buffer) => { stderr += data.toString(); });
-
-      python.on('close', (code: number) => {
-        if (stderr) {
-          console.log(`[pdfProcessor stderr] ${stderr}`);
-        }
-        if (code !== 0 && !stdout) {
-          reject(new Error(`Python process exited with code ${code}: ${stderr}`));
-          return;
-        }
-        try {
-          resolve(JSON.parse(stdout));
-        } catch (e) {
-          reject(new Error(`Failed to parse Python output: ${stdout.substring(0, 200)}`));
-        }
-      });
-
-      python.on('error', (err: Error) => {
-        reject(new Error(`Failed to start Python processor: ${err.message}`));
-      });
-    });
-
-    if (result.success && result.data) {
-      await storage.updateTaxDocument(documentId, {
-        processingStatus: 'completed',
-        isProcessed: true,
-        extractedData: JSON.stringify({
-          unifiedData: result.data,
-          processingMethod: result.processingMethod,
-          extractedText: result.extractedText?.substring(0, 1000)
-        })
-      });
-      console.log(`✅ Document ${documentId} processed via ${result.processingMethod}`);
-    } else {
-      await storage.updateTaxDocument(documentId, {
-        processingStatus: 'error',
-        errorMessage: result.error || 'PDF processing failed'
-      });
-      console.error(`❌ Document ${documentId} processing failed: ${result.error}`);
-    }
-
-  } catch (error) {
-    console.error("Document processing error:", error);
-    await storage.updateTaxDocument(documentId, {
-      processingStatus: 'error',
-      errorMessage: String(error)
-    });
-  }
-}

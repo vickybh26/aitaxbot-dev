@@ -204,55 +204,9 @@ export type InsertIPOData = z.infer<typeof insertIPODataSchema>;
 
 // ─── Tax Document ──────────────────────────────────────────────────────────
 
-export const insertTaxDocumentSchema = z.object({
-  userId: z.string(),
-  documentType: z.string(),
-  fileName: z.string(),
-  filePath: z.string().optional().nullable(),
-  fileSize: z.number().optional().nullable(),
-  mimeType: optStr,
-  assessmentYear: optStr,
-  processingStatus: optStr,
-  firebaseFileId: optStr,
-  downloadUrl: optStr,
-  expiresAt: z.date().optional().nullable(),
-  // Processing result flags (set by async pipeline after initial insert)
-  isProcessed: z.boolean().optional().nullable(),
-  errorMessage: z.string().optional().nullable(),
-  // Extracted data as JSON string (set after successful processing)
-  extractedData: z.string().optional().nullable(),
-});
-
-export type TaxDocument = z.infer<typeof insertTaxDocumentSchema> & {
-  id: string;
-  uploadedAt?: Date | string;
-  updatedAt?: Date | string;
-  // Processing status flags (set by async processing pipeline)
-  isProcessed?: boolean | null;
-  errorMessage?: string | null;
-};
-export type InsertTaxDocument = z.infer<typeof insertTaxDocumentSchema>;
 
 // ─── Extracted Tax Data ────────────────────────────────────────────────────
 
-export const insertExtractedTaxDataSchema = z.object({
-  userId: z.string(),
-  documentId: z.string(),
-  documentType: optStr,
-  assessmentYear: optStr,
-  grossSalary: optNum,
-  netSalary: optNum,
-  tdsDeducted: optNum,
-  deductions: z.record(z.any()).optional().nullable(),
-  rawData: z.record(z.any()).optional().nullable(),
-  confidence: optNum,
-});
-
-export type ExtractedTaxData = z.infer<typeof insertExtractedTaxDataSchema> & {
-  id: string;
-  extractedAt?: Date | string;
-};
-export type InsertExtractedTaxData = z.infer<typeof insertExtractedTaxDataSchema>;
 
 // ─── Tax Calculation History ───────────────────────────────────────────────
 

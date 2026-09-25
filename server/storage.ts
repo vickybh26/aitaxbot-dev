@@ -16,10 +16,6 @@ import type {
   InsertNewsArticle,
   IPOData,
   InsertIPOData,
-  TaxDocument,
-  InsertTaxDocument,
-  ExtractedTaxData,
-  InsertExtractedTaxData,
   TaxCalculationHistory,
   InsertTaxCalculationHistory,
   Firm,
@@ -86,17 +82,8 @@ export interface IStorage {
   createIPOData(ipo: InsertIPOData): Promise<IPOData>;
   
   // Tax Document operations
-  getTaxDocuments(userId: string): Promise<TaxDocument[]>;
-  getTaxDocumentsByUserId(userId: string): Promise<TaxDocument[]>;
-  getTaxDocument(id: string): Promise<TaxDocument | undefined>;
-  createTaxDocument(document: InsertTaxDocument): Promise<TaxDocument>;
-  updateTaxDocument(id: string, data: Partial<InsertTaxDocument>): Promise<TaxDocument | undefined>;
-  deleteTaxDocument(id: string): Promise<boolean>;
   
   // Extracted Tax Data operations
-  getExtractedTaxData(documentId: string): Promise<ExtractedTaxData | undefined>;
-  createExtractedTaxData(data: InsertExtractedTaxData): Promise<ExtractedTaxData>;
-  updateExtractedTaxData(id: string, data: Partial<InsertExtractedTaxData>): Promise<ExtractedTaxData | undefined>;
   
   // Accounting Module Operations
   // Firm operations
@@ -567,138 +554,17 @@ export class FirestoreStorage implements IStorage {
   }
 
   // ==========================================
-  // TAX DOCUMENT OPERATIONS
+  // TAX DOCUMENT OPERATIONS — REMOVED 2026-09-25
+  //
+  // These backed /api/tax-documents/*, deleted from server/routes.ts in the
+  // same change. The endpoints had no client caller but wrote taxpayer PDFs
+  // to disk and a 1,000-character text excerpt to Firestore, contradicting
+  // the privacy policy's never-stored promise. Both collections were empty
+  // (verified before removal), so nothing was orphaned.
+  //
+  // The live reconciliation tool never used these — it holds documents in
+  // memory in server/taxReconcileRoutes.ts and persists nothing.
   // ==========================================
-
-  async getTaxDocuments(userId: string): Promise<TaxDocument[]> {
-    try {
-      const snapshot = await this.db.collection('taxDocuments')
-        .where('userId', '==', userId)
-        .get();
-      
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as unknown as TaxDocument));
-    } catch (error) {
-      console.error('Error getting tax documents:', error);
-      return [];
-    }
-  }
-
-  async getTaxDocumentsByUserId(userId: string): Promise<TaxDocument[]> {
-    return this.getTaxDocuments(userId);
-  }
-
-  async getTaxDocument(id: string): Promise<TaxDocument | undefined> {
-    try {
-      const doc = await this.db.collection('taxDocuments').doc(id).get();
-      if (!doc.exists) return undefined;
-      return { id: doc.id, ...doc.data() } as unknown as TaxDocument;
-    } catch (error) {
-      console.error('Error getting tax document:', error);
-      return undefined;
-    }
-  }
-
-  async createTaxDocument(insertDocument: InsertTaxDocument): Promise<TaxDocument> {
-    try {
-      const id = randomUUID();
-      const document: TaxDocument = {
-        id,
-        userId: insertDocument.userId,
-        documentType: insertDocument.documentType,
-        fileName: insertDocument.fileName,
-        filePath: insertDocument.filePath,
-        firebaseFileId: insertDocument.firebaseFileId || null,
-        downloadUrl: insertDocument.downloadUrl || null,
-        fileSize: insertDocument.fileSize || null,
-        expiresAt: insertDocument.expiresAt || null,
-        uploadedAt: new Date(),
-        isProcessed: false,
-        processingStatus: insertDocument.processingStatus || 'pending',
-        extractedData: null,
-        errorMessage: null,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      } as unknown as TaxDocument;
-      
-      await this.db.collection('taxDocuments').doc(id).set(document);
-      return document;
-    } catch (error) {
-      console.error('Error creating tax document:', error);
-      throw error;
-    }
-  }
-
-  async updateTaxDocument(id: string, updateData: Partial<InsertTaxDocument>): Promise<TaxDocument | undefined> {
-    try {
-      const docRef = this.db.collection('taxDocuments').doc(id);
-      await docRef.update({ ...updateData, updatedAt: new Date() });
-      const doc = await docRef.get();
-      return { id: doc.id, ...doc.data() } as unknown as TaxDocument;
-    } catch (error) {
-      console.error('Error updating tax document:', error);
-      return undefined;
-    }
-  }
-
-  async deleteTaxDocument(id: string): Promise<boolean> {
-    try {
-      await this.db.collection('taxDocuments').doc(id).delete();
-      return true;
-    } catch (error) {
-      console.error('Error deleting tax document:', error);
-      return false;
-    }
-  }
-
-  // ==========================================
-  // EXTRACTED TAX DATA OPERATIONS
-  // ==========================================
-
-  async getExtractedTaxData(documentId: string): Promise<ExtractedTaxData | undefined> {
-    try {
-      const snapshot = await this.db.collection('extractedTaxData')
-        .where('documentId', '==', documentId)
-        .limit(1)
-        .get();
-      
-      if (snapshot.empty) return undefined;
-      const doc = snapshot.docs[0];
-      return { id: doc.id, ...doc.data() } as unknown as ExtractedTaxData;
-    } catch (error) {
-      console.error('Error getting extracted tax data:', error);
-      return undefined;
-    }
-  }
-
-  async createExtractedTaxData(insertData: InsertExtractedTaxData): Promise<ExtractedTaxData> {
-    try {
-      const id = randomUUID();
-      const data: ExtractedTaxData = {
-        id,
-        ...insertData,
-        extractedAt: new Date(),
-        createdAt: new Date()
-      } as unknown as ExtractedTaxData;
-      
-      await this.db.collection('extractedTaxData').doc(id).set(data);
-      return data;
-    } catch (error) {
-      console.error('Error creating extracted tax data:', error);
-      throw error;
-    }
-  }
-
-  async updateExtractedTaxData(id: string, updateData: Partial<InsertExtractedTaxData>): Promise<ExtractedTaxData | undefined> {
-    try {
-      const docRef = this.db.collection('extractedTaxData').doc(id);
-      await docRef.update(updateData);
-      const doc = await docRef.get();
-      return { id: doc.id, ...doc.data() } as unknown as ExtractedTaxData;
-    } catch (error) {
-      console.error('Error updating extracted tax data:', error);
-      return undefined;
-    }
-  }
 
   // ==========================================
   // ACCOUNTING MODULE - FIRM OPERATIONS
