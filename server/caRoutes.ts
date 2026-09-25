@@ -7,7 +7,7 @@
  */
 
 import { Router, type Request, type Response } from "express";
-import { randomUUID } from "crypto";
+import { randomUUID, randomBytes, createHash, timingSafeEqual } from "crypto";
 import { getFirestore, verifyFirebaseToken } from "./firebase";
 import { COLLECTIONS } from "./firestoreHelper";
 import { sendEmail } from "./emailService";
@@ -19,6 +19,54 @@ import {
 } from "@shared/schema";
 
 const router = Router();
+
+
+// ─── CA self-edit access tokens ────────────────────────────────────────────
+//
+// Replaces the previous scheme, which treated `icaiMembershipNumber` + `email`
+// as proof of identity. Both of those are published in the public directory
+// response (see the /list handler below), so anyone who could read the
+// directory could rewrite any CA's profile — and because an update also sets
+// `status: "pending"`, that edit removed the victim from the approved-only
+// listing. Confirmed against production on 2026-09-25: /api/ca/list returned
+// both fields for all approved profiles.
+//
+// The fix is to make the registered email the CHANNEL rather than the
+// credential. Proving you can read mail sent to the address on file is
+// evidence; quoting an address back to us is not.
+//
+// Shape: request-access mails a one-time code, verify exchanges that code for
+// an edit token, and the PUT requires the edit token. Only hashes are stored,
+// so a leak of this collection does not yield a usable code.
+
+const CA_EDIT_TOKENS = "caEditTokens";
+const CODE_TTL_MS = 15 * 60 * 1000;   // time to fetch the code out of an inbox
+const EDIT_TTL_MS = 30 * 60 * 1000;   // time to finish editing once verified
+const MAX_CODE_ATTEMPTS = 5;
+
+function sha256(v: string): string {
+  return createHash("sha256").update(v).digest("hex");
+}
+
+/**
+ * 8 characters from an unambiguous alphabet — no O/0, I/1, so a code read off
+ * a screen and typed into a form does not fail on a character the reader
+ * cannot distinguish. 32^8 is ~1.1e12, and attempts are capped at
+ * MAX_CODE_ATTEMPTS, so guessing is not a practical path.
+ */
+const CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+function generateCode(): string {
+  const bytes = randomBytes(8);
+  let out = "";
+  for (let i = 0; i < 8; i++) out += CODE_ALPHABET[bytes[i] % CODE_ALPHABET.length];
+  return out;
+}
+
+/** Constant-time compare of two hex digests of equal length. */
+function hashesEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  return timingSafeEqual(Buffer.from(a), Buffer.from(b));
+}
 
 // ─── Admin middleware ──────────────────────────────────────────────────────
 // Mirrors the requireAdmin() in adminRoutes.ts. Requires Firebase ID token
@@ -378,12 +426,27 @@ router.get("/pending", requireAdmin, async (req: Request, res: Response) => {
   }
 });
 
-// ─── POST /api/ca/my-profile/verify ───────────────────────────────────────
-// CA self-update: step 1 — verify identity via ICAI no. + registered email.
-// Returns the public profile fields for pre-filling the edit form.
-// No Firebase auth — CAs are not registered as Firebase users.
+// ─── POST /api/ca/my-profile/request-access ───────────────────────────────
+// CA self-update: step 1 — mail a one-time code to the REGISTERED address.
+//
+// Deliberately returns the same response whether or not a profile matched.
+// The previous handler returned 404 for an unknown ICAI number and 404 for a
+// wrong email, which at least confirmed nothing; but any endpoint that reports
+// "found" vs "not found" here turns the directory into a membership oracle.
 
-router.post("/my-profile/verify", async (req: Request, res: Response) => {
+router.post("/my-profile/request-access", async (req: Request, res: Response) => {
+  // Always answers with a requestId, matched or not. An earlier draft returned
+  // one only on a match, which meant the RESPONSE SHAPE leaked exactly what the
+  // generic message was written to hide — caught in testing 2026-09-25. On a
+  // non-match the id is a random UUID with no backing document, so the code
+  // step then fails the same way an expired or wrong code does.
+  const generic = () => ({
+    ok: true,
+    requestId: randomUUID(),
+    message:
+      "If that ICAI membership number matches a profile, we have emailed a one-time code to the address registered on it.",
+  });
+
   try {
     const { icaiMembershipNumber, email } = req.body;
     if (!icaiMembershipNumber || !email) {
@@ -397,31 +460,139 @@ router.post("/my-profile/verify", async (req: Request, res: Response) => {
       .limit(1)
       .get();
 
-    if (snap.empty) {
-      return res.status(404).json({ error: "No CA profile found with this ICAI membership number." });
-    }
+    if (snap.empty) return res.json(generic());
 
     const profile = snap.docs[0].data() as CAProfile;
     if (profile.email.toLowerCase() !== String(email).trim().toLowerCase()) {
-      // Deliberate 404 — don't confirm the ICAI number is valid to a wrong email.
-      return res.status(404).json({ error: "No CA profile found with this ICAI membership number." });
+      return res.json(generic());
     }
 
-    // Return the profile (minus internal admin fields)
+    // Opportunistic sweep: a challenge that is never completed would otherwise
+    // sit in this collection forever. verify/PUT delete on expiry, but only if
+    // someone comes back — an abandoned request never does. Bounded to this
+    // profile's own stale rows, so it stays cheap and needs no scheduler.
+    try {
+      const stale = await db
+        .collection(CA_EDIT_TOKENS)
+        .where("profileId", "==", snap.docs[0].id)
+        .get();
+      const now = Date.now();
+      await Promise.all(
+        stale.docs
+          .filter((d) => now > new Date((d.data() as any).expiresAt).getTime())
+          .map((d) => d.ref.delete()),
+      );
+    } catch (sweepErr) {
+      // A failed sweep must never block a CA from requesting a code.
+      console.error("CA edit token sweep failed:", sweepErr);
+    }
+
+    const code = generateCode();
+    const requestId = randomUUID();
+
+    await db.collection(CA_EDIT_TOKENS).doc(requestId).set({
+      profileId: snap.docs[0].id,
+      codeHash: sha256(code),
+      attempts: 0,
+      verified: false,
+      editTokenHash: null,
+      expiresAt: new Date(Date.now() + CODE_TTL_MS).toISOString(),
+      createdAt: new Date().toISOString(),
+    });
+
+    // Sent to profile.email — the address stored on the record — NOT to the
+    // address supplied in the request. They are equal on this path today, but
+    // using the stored one keeps the guarantee true if the match ever loosens.
+    // Email is the ONLY channel for this code — if it does not send, the CA
+    // is locked out and the generic response gives them no clue why. sendEmail
+    // never throws, so check the result rather than assuming delivery.
+    const mail = await sendEmail({
+      to: [{ email: profile.email, name: profile.fullName }],
+      subject: `Your AiTaxBot profile edit code: ${code}`,
+      htmlContent: `
+        <p>Hello ${profile.fullName},</p>
+        <p>Use this code to edit your AiTaxBot CA directory profile:</p>
+        <p style="font-size:24px;font-weight:700;letter-spacing:3px;font-family:monospace">${code}</p>
+        <p>It expires in 15 minutes and can be used once.</p>
+        <p style="color:#64748b;font-size:13px">If you did not ask to edit your profile, ignore this email — nothing has changed, and whoever requested it cannot proceed without this code.</p>
+      `,
+    });
+
+    if (!mail.sent) {
+      console.error(
+        `[CA] Edit code for profile ${snap.docs[0].id} could not be emailed (${mail.reason ?? "unknown"}). ` +
+        `The CA cannot complete verification until mail delivery works.`
+      );
+    }
+
+    return res.json({ ...generic(), requestId });
+  } catch (err) {
+    console.error("CA edit access request error:", err);
+    return res.status(500).json({ error: "Could not start verification. Please try again." });
+  }
+});
+
+// ─── POST /api/ca/my-profile/verify ───────────────────────────────────────
+// CA self-update: step 2 — exchange the emailed code for an edit token.
+// The code is consumed here whether or not the CA goes on to save, so a code
+// that has been used to read a profile cannot be replayed later.
+
+router.post("/my-profile/verify", async (req: Request, res: Response) => {
+  try {
+    const { requestId, code } = req.body;
+    if (!requestId || !code) {
+      return res.status(400).json({ error: "Verification code is required." });
+    }
+
+    const db = getFirestore();
+    const ref = db.collection(CA_EDIT_TOKENS).doc(String(requestId));
+    const doc = await ref.get();
+    if (!doc.exists) return res.status(400).json({ error: "This code is no longer valid. Request a new one." });
+
+    const rec = doc.data() as any;
+    if (rec.verified) return res.status(400).json({ error: "This code has already been used. Request a new one." });
+    if (Date.now() > new Date(rec.expiresAt).getTime()) {
+      await ref.delete();
+      return res.status(400).json({ error: "This code has expired. Request a new one." });
+    }
+    if ((rec.attempts ?? 0) >= MAX_CODE_ATTEMPTS) {
+      await ref.delete();
+      return res.status(429).json({ error: "Too many incorrect attempts. Request a new code." });
+    }
+
+    if (!hashesEqual(sha256(String(code).trim().toUpperCase()), rec.codeHash)) {
+      await ref.update({ attempts: (rec.attempts ?? 0) + 1 });
+      return res.status(400).json({ error: "Incorrect code." });
+    }
+
+    const profileDoc = await db.collection(COLLECTIONS.CA_PROFILES).doc(rec.profileId).get();
+    if (!profileDoc.exists) return res.status(404).json({ error: "Profile not found." });
+    const profile = profileDoc.data() as CAProfile;
+
+    const editToken = randomBytes(32).toString("hex");
+    await ref.update({
+      verified: true,
+      editTokenHash: sha256(editToken),
+      expiresAt: new Date(Date.now() + EDIT_TTL_MS).toISOString(),
+    });
+
     return res.json({
-      id: profile.id,
-      fullName: profile.fullName,
-      firmName: profile.firmName,
-      icaiMembershipNumber: profile.icaiMembershipNumber,
-      city: profile.city,
-      state: profile.state,
-      email: profile.email,
-      whatsappNumber: profile.whatsappNumber,
-      practiceAreas: profile.practiceAreas,
-      languages: profile.languages,
-      yearsOfPractice: profile.yearsOfPractice,
-      bio: profile.bio,
-      status: profile.status,
+      editToken,
+      profile: {
+        id: profileDoc.id,
+        fullName: profile.fullName,
+        firmName: profile.firmName,
+        icaiMembershipNumber: profile.icaiMembershipNumber,
+        city: profile.city,
+        state: profile.state,
+        email: profile.email,
+        whatsappNumber: profile.whatsappNumber,
+        practiceAreas: profile.practiceAreas,
+        languages: profile.languages,
+        yearsOfPractice: profile.yearsOfPractice,
+        bio: profile.bio,
+        status: profile.status,
+      },
     });
   } catch (err) {
     console.error("CA verify error:", err);
@@ -430,47 +601,71 @@ router.post("/my-profile/verify", async (req: Request, res: Response) => {
 });
 
 // ─── PUT /api/ca/my-profile ───────────────────────────────────────────────
-// CA self-update: step 2 — submit updated profile.
-// Identity re-verified via icaiMembershipNumber + email in body.
-// Updates allowed fields; sets status back to "pending" for admin review.
+// CA self-update: step 3 — apply the edit, authorised by the edit token only.
 
 router.put("/my-profile", async (req: Request, res: Response) => {
   try {
-    const { icaiMembershipNumber, email, ...updates } = req.body;
-    if (!icaiMembershipNumber || !email) {
-      return res.status(400).json({ error: "ICAI membership number and email are required." });
+    const { editToken, updates } = req.body;
+    if (!editToken) {
+      return res.status(401).json({ error: "Not verified. Request a new code and try again." });
     }
 
     const db = getFirestore();
     const snap = await db
-      .collection(COLLECTIONS.CA_PROFILES)
-      .where("icaiMembershipNumber", "==", String(icaiMembershipNumber).trim())
+      .collection(CA_EDIT_TOKENS)
+      .where("editTokenHash", "==", sha256(String(editToken)))
       .limit(1)
       .get();
 
-    if (snap.empty) {
-      return res.status(404).json({ error: "Profile not found." });
+    if (snap.empty) return res.status(401).json({ error: "Not verified. Request a new code and try again." });
+
+    const tokenRef = snap.docs[0].ref;
+    const rec = snap.docs[0].data() as any;
+    if (!rec.verified || Date.now() > new Date(rec.expiresAt).getTime()) {
+      await tokenRef.delete();
+      return res.status(401).json({ error: "Your editing session expired. Request a new code." });
     }
 
-    const existing = snap.docs[0].data() as CAProfile;
-    if (existing.email.toLowerCase() !== String(email).trim().toLowerCase()) {
-      return res.status(404).json({ error: "Profile not found." });
-    }
+    const profileRef = db.collection(COLLECTIONS.CA_PROFILES).doc(rec.profileId);
+    const profileDoc = await profileRef.get();
+    if (!profileDoc.exists) return res.status(404).json({ error: "Profile not found." });
+    const existing = profileDoc.data() as CAProfile;
 
-    // Whitelist of fields a CA may update themselves
+    // Whitelist of fields a CA may update themselves. Everything else —
+    // email, ICAI number, status, approval timestamps — is deliberately not
+    // settable here; changing the address on file is an ownership change and
+    // needs a stronger path than "you can read the current address".
     const ALLOWED = [
       "fullName", "firmName", "city", "state", "whatsappNumber",
       "practiceAreas", "languages", "yearsOfPractice", "bio",
     ] as const;
 
+    // `updates` is read as a nested object because that is what the client
+    // sends. The previous handler did `const { icai, email, ...updates } =
+    // req.body`, which collected `{ updates: {...} }` — so `"fullName" in
+    // updates` was always false and NOT ONE FIELD was ever written. The only
+    // surviving effect was `status: "pending"`, i.e. a CA who edited their
+    // profile lost their public listing and got none of their changes.
+    // Demonstrated 2026-09-25 before this rewrite.
+    const incoming = (updates && typeof updates === "object") ? updates as Record<string, any> : {};
+
     const patch: Record<string, any> = { status: "pending", updatedAt: new Date().toISOString() };
     for (const field of ALLOWED) {
-      if (field in updates && updates[field] !== undefined) {
-        patch[field] = updates[field];
+      if (field in incoming && incoming[field] !== undefined) {
+        patch[field] = incoming[field];
       }
     }
 
-    await snap.docs[0].ref.update(patch);
+    // Nothing to change other than the status reset? Then don't reset it —
+    // silently delisting a profile for an empty submission is the bug above
+    // in a different costume.
+    const changedFields = Object.keys(patch).filter((k) => k !== "status" && k !== "updatedAt");
+    if (changedFields.length === 0) {
+      return res.status(400).json({ error: "No changes submitted." });
+    }
+
+    await profileRef.update(patch);
+    await tokenRef.delete(); // single use — the edit is done
 
     // Notify admin
     try {
@@ -478,39 +673,39 @@ router.put("/my-profile", async (req: Request, res: Response) => {
         to: [{ email: "vickybh26@gmail.com", name: "AiTaxBot Admin" }],
         subject: `CA Profile Updated — ${existing.fullName} (${existing.icaiMembershipNumber})`,
         htmlContent: `
-          <h2>CA Profile Updated — Pending Re-Approval</h2>
-          <p><strong>${existing.fullName}</strong> (ICAI: ${existing.icaiMembershipNumber}) has updated their profile and it is now pending review.</p>
-          <p>
-            <a href="https://aitaxbot.co.in/admin/cas" style="background:#2563eb;color:white;padding:10px 20px;border-radius:6px;text-decoration:none">
-              Review in Admin Panel
-            </a>
-          </p>
+          <p>A CA updated their directory profile and it is back in the pending queue for review.</p>
+          <p><strong>${existing.fullName}</strong> — ICAI ${existing.icaiMembershipNumber}</p>
+          <p>Changed: ${changedFields.join(", ")}</p>
+          <p><a href="https://www.aitaxbot.co.in/admin/cas">Review in admin</a></p>
         `,
       });
-    } catch (e) {
-      console.error("CA update admin notification failed:", e);
+    } catch (mailErr) {
+      // A failed notification must not fail the CA's save.
+      console.error("CA update admin notification failed:", mailErr);
     }
 
-    // Confirm to CA
+    // Confirm to the CA. This doubles as a security signal: if a profile is
+    // changed, the address on file hears about it even when the CA is not the
+    // one who changed it.
     try {
       await sendEmail({
         to: [{ email: existing.email, name: existing.fullName }],
         subject: "Your AiTaxBot CA profile update is under review",
         htmlContent: `
           <h2>Profile update received, ${existing.fullName}!</h2>
-          <p>Your updated profile has been submitted and is now under review. We typically complete re-approvals within 1–2 business days.</p>
-          <p style="color:#888;font-size:12px">If you have questions, contact support@aitaxbot.co.in</p>
+          <p>Your updated profile has been submitted and is now under review. We typically complete re-approvals within 1\u20132 business days.</p>
+          <p>Changed: ${changedFields.join(", ")}</p>
+          <p style="color:#888;font-size:12px">If you did not make this change, reply to this email straight away.</p>
         `,
       });
     } catch (e) {
       console.error("CA update confirmation email failed:", e);
     }
 
-    return res.json({ success: true });
+    return res.json({ ok: true, changed: changedFields, status: "pending" });
   } catch (err) {
-    console.error("CA update error:", err);
+    console.error("CA profile update error:", err);
     return res.status(500).json({ error: "Update failed. Please try again." });
   }
 });
-
 export default router;

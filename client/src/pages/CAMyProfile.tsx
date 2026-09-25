@@ -83,13 +83,53 @@ export default function CAMyProfile() {
   });
   const [saving, setSaving] = useState(false);
 
-  // Step tracking
-  const [step, setStep] = useState<1 | 2 | 3>(1);
+  // Identity is now proved by reading a code we email to the address on the
+  // profile — not by quoting that address back to us. `requestId` is the
+  // non-secret handle for a pending challenge; `editToken` is what actually
+  // authorises the save.
+  const [requestId, setRequestId] = useState<string | null>(null);
+  const [code, setCode] = useState("");
+  const [editToken, setEditToken] = useState<string | null>(null);
+  const [sending, setSending] = useState(false);
 
-  // ---------- Step 1: verify ----------
-  const handleVerify = async () => {
+  // Step tracking
+  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
+
+  // ---------- Step 1: request a one-time code ----------
+  const handleRequestCode = async () => {
     if (!icai.trim() || !email.trim()) {
       toast({ title: "Required", description: "Enter both ICAI number and registered email.", variant: "destructive" });
+      return;
+    }
+    setSending(true);
+    try {
+      const res = await fetch("/api/ca/my-profile/request-access", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ icaiMembershipNumber: icai.trim(), email: email.trim().toLowerCase() }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast({ title: "Could not send code", description: data.error || "Please try again.", variant: "destructive" });
+        return;
+      }
+      // The server answers identically whether or not a profile matched, so
+      // this screen must not claim one exists. `requestId` is simply absent on
+      // a non-match; advance either way so the UI leaks nothing the API didn't.
+      setRequestId(data.requestId ?? null);
+      setStep(2);
+      toast({ title: "Check your email", description: data.message });
+    } catch {
+      toast({ title: "Error", description: "Something went wrong. Please try again.", variant: "destructive" });
+    } finally {
+      setSending(false);
+    }
+  };
+
+  // ---------- Step 2: exchange the code for an edit token ----------
+  const handleVerify = async () => {
+    if (!code.trim()) {
+      toast({ title: "Required", description: "Enter the code from your email.", variant: "destructive" });
       return;
     }
     setVerifying(true);
@@ -97,27 +137,28 @@ export default function CAMyProfile() {
       const res = await fetch("/api/ca/my-profile/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ icaiMembershipNumber: icai.trim(), email: email.trim().toLowerCase() }),
+        body: JSON.stringify({ requestId, code: code.trim().toUpperCase() }),
       });
       const data = await res.json();
       if (!res.ok) {
-        toast({ title: "Verification failed", description: data.error || "No matching profile found.", variant: "destructive" });
+        toast({ title: "Verification failed", description: data.error || "Incorrect code.", variant: "destructive" });
         return;
       }
-      // Pre-fill form with current profile data
-      setProfileId(data.id);
+      const pr = data.profile;
+      setEditToken(data.editToken);
+      setProfileId(pr.id);
       setForm({
-        fullName: data.fullName || "",
-        firmName: data.firmName || "",
-        city: data.city || "",
-        state: data.state || "",
-        whatsappNumber: data.whatsappNumber || "",
-        practiceAreas: data.practiceAreas || [],
-        languages: data.languages || [],
-        yearsOfPractice: String(data.yearsOfPractice || ""),
-        bio: data.bio || "",
+        fullName: pr.fullName || "",
+        firmName: pr.firmName || "",
+        city: pr.city || "",
+        state: pr.state || "",
+        whatsappNumber: pr.whatsappNumber || "",
+        practiceAreas: pr.practiceAreas || [],
+        languages: pr.languages || [],
+        yearsOfPractice: String(pr.yearsOfPractice || ""),
+        bio: pr.bio || "",
       });
-      setStep(2);
+      setStep(3);
     } catch {
       toast({ title: "Error", description: "Something went wrong. Please try again.", variant: "destructive" });
     } finally {
@@ -136,18 +177,14 @@ export default function CAMyProfile() {
       const res = await fetch("/api/ca/my-profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          icaiMembershipNumber: icai.trim(),
-          email: email.trim().toLowerCase(),
-          updates: form,
-        }),
+        body: JSON.stringify({ editToken, updates: form }),
       });
       const data = await res.json();
       if (!res.ok) {
         toast({ title: "Update failed", description: data.error || "Could not save changes.", variant: "destructive" });
         return;
       }
-      setStep(3);
+      setStep(4);
     } catch {
       toast({ title: "Error", description: "Something went wrong. Please try again.", variant: "destructive" });
     } finally {
@@ -188,13 +225,13 @@ export default function CAMyProfile() {
 
           {/* Step indicator */}
           <div className="flex items-center justify-center gap-3 mb-8">
-            {[1, 2, 3].map((s) => (
+            {[1, 2, 3, 4].map((s) => (
               <div key={s} className="flex items-center gap-3">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold
                   ${step === s ? "bg-ink text-white" : step > s ? "bg-green-500 text-white" : "bg-secondary text-ink/65"}`}>
                   {step > s ? "✓" : s}
                 </div>
-                {s < 3 && <div className={`w-12 h-0.5 ${step > s ? "bg-green-500" : "bg-secondary"}`} />}
+                {s < 4 && <div className={`w-12 h-0.5 ${step > s ? "bg-green-500" : "bg-secondary"}`} />}
               </div>
             ))}
           </div>
@@ -208,7 +245,7 @@ export default function CAMyProfile() {
                   Verify Your Identity
                 </CardTitle>
                 <CardDescription>
-                  Enter the ICAI membership number and email address you used when registering.
+                  Enter the ICAI membership number and email address you registered with. We will email a one-time code to that address.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -233,8 +270,8 @@ export default function CAMyProfile() {
                     className="mt-1"
                   />
                 </div>
-                <Button onClick={handleVerify} disabled={verifying} className="w-full">
-                  {verifying ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Verifying…</> : "Verify & Continue"}
+                <Button onClick={handleRequestCode} disabled={sending} className="w-full">
+                  {sending ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Sending code…</> : "Email me a code"}
                 </Button>
                 <p className="text-xs text-ink/65 text-center">
                   Can't access your registered email?{" "}
@@ -244,8 +281,50 @@ export default function CAMyProfile() {
             </Card>
           )}
 
-          {/* ── STEP 2: Edit form ── */}
+          {/* ── STEP 2: Enter the emailed code ── */}
           {step === 2 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ShieldCheck className="w-5 h-5 text-credit" />
+                  Enter your code
+                </CardTitle>
+                <CardDescription>
+                  If that membership number matches a profile, we have emailed an 8-character code to the address registered on it. It expires in 15 minutes.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label htmlFor="code">One-time code *</Label>
+                  <Input
+                    id="code"
+                    placeholder="XXXXXXXX"
+                    value={code}
+                    onChange={(e) => setCode(e.target.value.toUpperCase())}
+                    className="mt-1 font-mono tracking-[0.3em] text-center text-lg"
+                    maxLength={8}
+                    autoComplete="one-time-code"
+                  />
+                </div>
+                <Button onClick={handleVerify} disabled={verifying} className="w-full">
+                  {verifying ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Checking…</> : "Verify code"}
+                </Button>
+                <div className="flex gap-3">
+                  <Button variant="outline" onClick={() => setStep(1)} className="flex-1">Back</Button>
+                  <Button variant="ghost" onClick={handleRequestCode} disabled={sending} className="flex-1">
+                    {sending ? "Sending…" : "Resend code"}
+                  </Button>
+                </div>
+                <p className="text-xs text-ink/65 text-center">
+                  Can't access your registered email?{" "}
+                  <Link href="/contact" className="text-credit hover:underline">Contact support</Link>.
+                </p>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* ── STEP 3: Edit form ── */}
+          {step === 3 && (
             <Card>
               <CardHeader>
                 <CardTitle>Update Your Profile</CardTitle>
@@ -341,7 +420,7 @@ export default function CAMyProfile() {
                 </div>
 
                 <div className="flex gap-3 pt-2">
-                  <Button variant="outline" onClick={() => setStep(1)} className="flex-1">
+                  <Button variant="outline" onClick={() => setStep(2)} className="flex-1">
                     Back
                   </Button>
                   <Button onClick={handleSave} disabled={saving} className="flex-1">
@@ -352,8 +431,8 @@ export default function CAMyProfile() {
             </Card>
           )}
 
-          {/* ── STEP 3: Success ── */}
-          {step === 3 && (
+          {/* ── STEP 4: Success ── */}
+          {step === 4 && (
             <Card>
               <CardContent className="py-12 text-center">
                 <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-4" />
@@ -362,7 +441,7 @@ export default function CAMyProfile() {
                   Your changes have been submitted for admin review. You'll receive a confirmation email once approved — usually within 1–2 business days.
                 </p>
                 <div className="flex gap-3 justify-center">
-                  <Button variant="outline" onClick={() => { setStep(1); setIcai(""); setEmail(""); }}>
+                  <Button variant="outline" onClick={() => { setStep(1); setIcai(""); setEmail(""); setCode(""); setRequestId(null); setEditToken(null); }}>
                     Update Another Profile
                   </Button>
                   <Button asChild>
