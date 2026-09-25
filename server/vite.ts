@@ -6,7 +6,7 @@ import { type Server } from "http";
 import viteConfig from "../vite.config";
 import { nanoid } from "nanoid";
 import { SEO_CONTENT_BY_PATH, SITE_NAV, type SeoPageContent } from "@shared/seoContent";
-import { isKnownRoute } from "@shared/routes";
+import { isKnownRoute, isNoIndexRoute } from "@shared/routes";
 
 const viteLogger = createLogger();
 
@@ -124,6 +124,15 @@ export function injectSeoContent(html: string, pathname: string): string {
     })),
   };
 
+  // A long page's body, as real headings and paragraphs rather than one <p>.
+  // Blog posts populate this; without it a crawler received only each article's
+  // opening paragraph (11% of the library's words, measured 2026-09-25).
+  const sectionsHtml = (page.sections ?? [])
+    .map((sec) =>
+      (sec.heading ? `<h2>${escapeHtml(sec.heading)}</h2>` : "") +
+      `<p>${escapeHtml(sec.body)}</p>`)
+    .join("");
+
   // Hub pages (/blog, /tools) carry their own link list; every other page
   // renders just the site nav below.
   const pageLinksHtml = page.links?.length
@@ -145,6 +154,7 @@ export function injectSeoContent(html: string, pathname: string): string {
     <div id="seo-static-content" style="max-width:960px;margin:0 auto;padding:24px 16px;font-family:system-ui,sans-serif;line-height:1.6;">
       <h1>${escapeHtml(page.h1)}</h1>
       <p>${escapeHtml(page.intro)}</p>
+      ${sectionsHtml}
       ${page.faqs.length > 0 ? `<h2>Frequently Asked Questions</h2>\n      ${faqItemsHtml}` : ""}
       ${pageLinksHtml}
       ${navHtml}
@@ -234,6 +244,7 @@ export async function setupVite(app: Express, server: Server) {
       // a link checker or a monitoring probe is told.
       const known = isKnownRoute(pathname);
       if (!known) page = markNotFound(page);
+      else if (isNoIndexRoute(pathname)) page = markNoIndex(page);
       res.status(known ? 200 : 404).set({ "Content-Type": "text/html" }).end(page);
     } catch (e) {
       vite.ssrFixStacktrace(e as Error);
@@ -266,10 +277,43 @@ function injectNonce(html: string, nonce: string): string {
  * indexed; the title stops it looking like the homepage while it is still in
  * the index.
  */
+/**
+ * Set the robots directive, replacing the one client/index.html already ships.
+ *
+ * The template carries `<meta name="robots" content="index, follow">`. An
+ * earlier version of this file appended a second tag instead of replacing it,
+ * so a noindex page served two contradictory directives. Google resolves that
+ * by taking the most restrictive, so it happened to work — but "happens to
+ * work because the crawler is forgiving" is how the rest of this file's bugs
+ * survived, so it is replaced properly.
+ */
+function setRobots(html: string, content: string): string {
+  const tag = `<meta name="robots" content="${content}" />`;
+  if (/<meta\s+name="robots"[^>]*>/i.test(html)) {
+    return html.replace(/<meta\s+name="robots"[^>]*>/i, tag);
+  }
+  return html.replace(/<\/head>/i, `  ${tag}
+  </head>`);
+}
+
+/**
+ * Add a robots noindex without touching the title.
+ *
+ * For a page that renders fine but should not be in search: login-gated
+ * screens, and anything declared in NOINDEX_ROUTES. Keeping the declaration in
+ * shared/routes.ts and acting on it HERE is what stops it being a comment
+ * nobody enforces — /accounting sat in the sitemap for months while
+ * redirecting every visitor to /login.
+ */
+function markNoIndex(html: string): string {
+  return setRobots(html, "noindex, follow");
+}
+
 function markNotFound(html: string): string {
-  return html
-    .replace(/<title>[\s\S]*?<\/title>/i, "<title>Page not found — AiTaxBot</title>")
-    .replace(/<\/head>/i, '  <meta name="robots" content="noindex, nofollow" />\n  </head>');
+  return setRobots(
+    html.replace(/<title>[\s\S]*?<\/title>/i, "<title>Page not found — AiTaxBot</title>"),
+    "noindex, nofollow",
+  );
 }
 
 export function serveStatic(app: Express) {
@@ -312,6 +356,7 @@ export function serveStatic(app: Express) {
     // says so. This is the branch the ad crawler actually reads.
     const known = isKnownRoute(pathname);
     if (!known) html = markNotFound(html);
+    else if (isNoIndexRoute(pathname)) html = markNoIndex(html);
 
     const nonce = res.locals.cspNonce as string | undefined;
     if (nonce) {

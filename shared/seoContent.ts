@@ -41,6 +41,11 @@ export interface SeoLink {
   label: string;
 }
 
+export interface SeoSection {
+  heading?: string;
+  body: string;
+}
+
 export interface SeoPageContent {
   path: string;
   title: string;
@@ -57,6 +62,20 @@ export interface SeoPageContent {
    * them — the entire content library was unreachable by following links.
    */
   links?: SeoLink[];
+  /**
+   * The body of a long page, as headed sections.
+   *
+   * `intro` renders as a single <p>, which is fine for a calculator page whose
+   * crawler copy is one paragraph. It is not fine for a 2,400-word article: the
+   * blog generator below used to ship ONLY the "intro" section, so across the
+   * 36 posts a crawler received 4,643 of 42,455 written words — 11%. The bodies
+   * existed and rendered perfectly in a browser; they simply never reached
+   * anything that does not run JavaScript. Measured 2026-09-25.
+   *
+   * Rendered by server/vite.ts as <h2> + <p> pairs, so the article keeps its
+   * structure rather than arriving as one wall of text.
+   */
+  sections?: SeoSection[];
 }
 
 export const SEO_CONTENT: SeoPageContent[] = [
@@ -462,6 +481,18 @@ function blogPostToSeoContent(post: BlogPost): SeoPageContent {
     .map((s: { content_md: string }) => stripMarkdown(s.content_md).replace(/\n+/g, " "))
     .join(" ");
 
+  // Everything that is actually the article: the headed body sections and the
+  // closing paragraph. Excludes "cta" (a call to action is not content) and
+  // "faq" (handled separately below, so it can also feed the FAQPage JSON-LD).
+  const sections: SeoSection[] = post.bodySections
+    .filter((s: { type: string; content_md?: string }) =>
+      ["h2", "h3", "outro"].includes(s.type) && typeof s.content_md === "string")
+    .map((s: { heading?: string; content_md: string }) => ({
+      heading: s.heading,
+      body: stripMarkdown(s.content_md).replace(/\n+/g, " "),
+    }))
+    .filter((s: SeoSection) => s.body.length > 0);
+
   const faqs: SeoFaq[] = post.bodySections
     .filter((s: { type: string; items?: unknown }) => s.type === "faq" && Array.isArray(s.items))
     .flatMap((s: { items: { q: string; a: string }[] }) =>
@@ -478,6 +509,7 @@ function blogPostToSeoContent(post: BlogPost): SeoPageContent {
     canonical: `https://www.aitaxbot.co.in/blog/${post.slug}`,
     h1: post.metaTitle, // matches client/src/pages/BlogPost.tsx, which renders post.metaTitle as both <title> and <h1>
     intro,
+    sections,
     faqs,
   };
 }
@@ -485,6 +517,77 @@ function blogPostToSeoContent(post: BlogPost): SeoPageContent {
 export const BLOG_SEO_CONTENT: SeoPageContent[] = blogPosts
   .filter((p) => p.status === "published")
   .map(blogPostToSeoContent);
+
+/**
+ * /find-ca and /ca/register had no entry until 2026-09-25, so both served the
+ * generic shell and the homepage's <title> while rendering 1,390 and 422 words
+ * respectively in a browser. Titles below are copied verbatim from each page's
+ * own <Helmet>, and the copy stays inside what the ICAI Code of Ethics permits
+ * a directory to say: factual listing only, no recommendation, no ranking, no
+ * advertising of professional services. Those constraints are stated on the
+ * pages themselves and must not be softened here to read as marketing.
+ */
+const FIND_CA_SEO_CONTENT: SeoPageContent = {
+  path: "/find-ca",
+  title: "Find a CA Near You — AiTaxBot | Free CA Introduction Service",
+  description:
+    "Search a factual directory of Chartered Accountants in India by city and area of practice, and send an enquiry directly. No referral fee, no ranking, no endorsement.",
+  canonical: "https://www.aitaxbot.co.in/find-ca",
+  h1: "Find a Chartered Accountant",
+  intro:
+    "A factual directory of Chartered Accountants in practice in India, searchable by city and by the kind of work they take on — ITR filing, tax planning, salary and capital gains, GST, business and audit support. Every listing shows the member's name, firm, city, ICAI membership number, languages and years in practice, so a taxpayer can verify the member independently on the ICAI register before contacting anyone. " +
+    "This is an introduction service and nothing more. AiTaxBot does not rank, rate, recommend or endorse any member, takes no fee or commission for an introduction, and has no arrangement under which any listing is promoted above another. Enquiries go to the member directly; what follows is between the taxpayer and that Chartered Accountant. " +
+    "These limits are not editorial preference. The Chartered Accountants Act, 1949 and the ICAI Code of Ethics restrict how a member in practice may be listed or approached — Clause 5 of Part I of the First Schedule prohibits paying for professional business, Clause 6 permits only a response to an enquiry the taxpayer initiated, and Item K prohibits roving circulars and cold outreach. The directory is built to stay inside them.",
+  faqs: [
+    {
+      question: "Does AiTaxBot charge for an introduction?",
+      answer: "No. There is no fee, commission or referral payment in either direction. Paying for professional business is prohibited under Clause 5 of Part I of the First Schedule to the Chartered Accountants Act, 1949.",
+    },
+    {
+      question: "Are these CAs recommended or ranked?",
+      answer: "No. Listings are factual and are not ordered by any measure of quality. AiTaxBot does not rate, review, rank or endorse any member — doing so would breach the ICAI Code of Ethics. Verify any member's standing yourself on the ICAI register using the membership number shown.",
+    },
+    {
+      question: "How do I know a listed CA is genuine?",
+      answer: "Every listing carries an ICAI membership number, which you can check against the ICAI's own member search. Listings are also reviewed before they appear, but the ICAI register is the authority, not us.",
+    },
+    {
+      question: "What happens after I send an enquiry?",
+      answer: "Your enquiry goes to that Chartered Accountant directly. AiTaxBot is not a party to the engagement, sets no fees, and receives nothing from it.",
+    },
+  ],
+};
+
+const CA_REGISTER_SEO_CONTENT: SeoPageContent = {
+  path: "/ca/register",
+  title: "Register as a CA — AiTaxBot | List Your Practice for Free",
+  description:
+    "Chartered Accountants in practice can list their firm on the AiTaxBot directory free of charge. Factual listing only — no ranking, no advertising, no fee.",
+  canonical: "https://www.aitaxbot.co.in/ca/register",
+  h1: "Register as a Chartered Accountant",
+  intro:
+    "Chartered Accountants in practice in India can add their firm to the AiTaxBot directory free of charge. A listing carries your name, firm, city and state, ICAI membership number, areas of practice, languages and years in practice — the factual particulars a taxpayer needs to identify and verify you, and nothing beyond them. " +
+    "Registrations are reviewed before they appear, and the membership number is checked against the ICAI register. A listing is not advertising: there is no ranking, no rating, no featured placement and no way to pay for position, because the ICAI Code of Ethics does not permit any of them. Taxpayers reach you only by sending an enquiry they initiated. " +
+    "You can edit your own listing later from the CA profile page. Editing is verified by a one-time code sent to the email address on your registration, so only someone with access to that mailbox can change what the directory says about you.",
+  faqs: [
+    {
+      question: "Is listing free?",
+      answer: "Yes, and it stays free. There is no listing fee, no subscription and no commission on any work that follows.",
+    },
+    {
+      question: "Can I pay to appear higher in results?",
+      answer: "No. There is no paid placement of any kind. Ranking members by anything other than the taxpayer's own search terms would amount to recommendation, which the ICAI Code of Ethics prohibits.",
+    },
+    {
+      question: "Who can register?",
+      answer: "Any Chartered Accountant holding a valid ICAI membership and in practice in India. The membership number is verified against the ICAI register before a listing is published.",
+    },
+    {
+      question: "How do I change my listing later?",
+      answer: "From the CA profile page. You enter your ICAI membership number and registered email, we send a one-time code to that email address, and the code lets you edit. Changes go back to review before they appear.",
+    },
+  ],
+};
 
 /**
  * The /blog index. Title/description/canonical are copied verbatim from the
@@ -561,6 +664,8 @@ const TOOLS_INDEX_SEO_CONTENT: SeoPageContent = {
 export const SEO_CONTENT_BY_PATH: Record<string, SeoPageContent> = Object.fromEntries(
   [
     ...SEO_CONTENT,
+    FIND_CA_SEO_CONTENT,
+    CA_REGISTER_SEO_CONTENT,
     BLOG_INDEX_SEO_CONTENT,
     TOOLS_INDEX_SEO_CONTENT,
     ...BLOG_SEO_CONTENT,

@@ -5,13 +5,15 @@
   "license": "MIT",
   "scripts": {
     "dev": "node --env-file=.env node_modules/tsx/dist/cli.mjs server/index.ts",
-    "build": "vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
+    "build": "npm run sitemap && vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
     "start": "NODE_ENV=production node dist/index.js",
     "check": "tsc",
     "typecheck": "tsc --noEmit",
     "test:parsers": "node scripts/test-reconcile-parsers.mjs",
     "test:calc": "node node_modules/tsx/dist/cli.mjs scripts/test-tax-calculations.ts",
-    "test:routes": "node node_modules/tsx/dist/cli.mjs scripts/test-routes.ts"
+    "test:routes": "node node_modules/tsx/dist/cli.mjs scripts/test-routes.ts",
+    "test:seo": "node node_modules/tsx/dist/cli.mjs scripts/test-seo-parity.ts",
+    "sitemap": "node node_modules/tsx/dist/cli.mjs scripts/generate-sitemap.ts"
   },
   "dependencies": {
     "@adobe/pdfservices-node-sdk": "^4.1.0",

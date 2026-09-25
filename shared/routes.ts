@@ -80,3 +80,55 @@ export function isKnownRoute(pathname: string): boolean {
   }
   return false;
 }
+
+/**
+ * Routes that must never be indexed, and why.
+ *
+ * A route belongs to exactly one of three categories, and "nobody has written
+ * the copy yet" is not one of them. That omission is what produced /find-ca,
+ * /ca/register and /accounting serving 50 words under the homepage's title
+ * while rendering fine in a browser — invisible for months because looking at
+ * the site runs the JavaScript that hides the problem.
+ *
+ *   1. PRIVATE  — behind a login. Nothing public to say.
+ *   2. NOINDEX  — public but deliberately not for search.
+ *   3. everything else — MUST have an entry in shared/seoContent.ts.
+ *
+ * scripts/test-seo-parity.ts enforces that, and server/vite.ts emits a robots
+ * noindex for the first two, so the declaration has teeth rather than being a
+ * comment nobody reads.
+ */
+export const PRIVATE_ROUTES: readonly string[] = [
+  "/login",
+  "/signup",
+  "/dashboard",
+  "/profile",
+  "/ca/my-profile",
+  "/admin",
+  "/admin/analytics",
+  "/admin/users",
+  "/admin/cas",
+  "/admin/digest",
+  "/admin/ai-review",
+  // Redirects straight to /login with a returnUrl — it was in the sitemap,
+  // so Google was being asked to index a page that bounces every visitor.
+  "/accounting",
+];
+
+export const NOINDEX_ROUTES: readonly string[] = [
+  // Unfinished. Its own <h1> says "(Preview)". Not linked from anywhere and
+  // not in the sitemap, but publicly reachable, so it is marked explicitly
+  // rather than left to chance.
+  "/calculators/income-tax-wizard",
+];
+
+/** Should this path carry a robots noindex? */
+export function isNoIndexRoute(pathname: string): boolean {
+  const p = pathname.replace(/\/+$/, "") || "/";
+  return PRIVATE_ROUTES.includes(p) || NOINDEX_ROUTES.includes(p);
+}
+
+/** The routes that belong in the sitemap: public, indexable, and rendered. */
+export function indexableRoutes(): string[] {
+  return STATIC_ROUTES.filter((r) => !isNoIndexRoute(r));
+}
