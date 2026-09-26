@@ -140,9 +140,6 @@ function RegimeComparisonCard() {
     <div className="bento p-6 sm:p-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="font-display text-xl font-bold sm:text-2xl">Income Tax Calculator</h2>
-        <span className="rounded-full bg-secondary px-4 py-1.5 text-xs font-semibold text-ink/70">
-          FY 2026-27 · AY 2027-28
-        </span>
       </div>
       {/* A flat 4-item grid, not two independently-stacked columns — with
           two nested columns the "Old regime tax" and "New regime tax" boxes
@@ -234,11 +231,7 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
       <div className="mx-auto grid max-w-[1180px] grid-cols-12 gap-5 px-5 py-10 sm:gap-6 lg:py-14">
         {/* Hero */}
         <div className="col-span-12 mb-2">
-          <span className="inline-flex items-center gap-2 rounded-full bg-secondary px-4 py-1.5 text-xs font-semibold text-ink/70">
-            <span className="h-1.5 w-1.5 rounded-full bg-credit" aria-hidden="true" />
-            For individual taxpayers · AY 2027-28
-          </span>
-          <h1 className="mt-5 max-w-3xl font-display text-[clamp(2.2rem,5vw,3.75rem)] font-extrabold leading-[1.08] tracking-tight">
+          <h1 className="max-w-3xl font-display text-[clamp(2.2rem,5vw,3.75rem)] font-extrabold leading-[1.08] tracking-tight">
             Maximise your savings, <span className="text-credit">minus the complexity.</span>
           </h1>
           <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-ink/70">

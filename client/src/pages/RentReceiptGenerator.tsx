@@ -228,7 +228,6 @@ export default function RentReceiptGenerator() {
             { label: "Tools", href: "/tools" },
             { label: "Rent Receipt Generator" },
           ]}
-          badge="HRA · FY 2026-27"
           maxWidth="max-w-4xl"
         />
 

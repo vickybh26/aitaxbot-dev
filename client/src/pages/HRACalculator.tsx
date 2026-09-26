@@ -89,7 +89,6 @@ export default function HRACalculatorPage() {
             { label: "Calculators", href: "/calculators" },
             { label: "HRA Calculator" }
           ]}
-          badge="FY 2026-27 ✓"
         />
 
         {/* Calculator */}

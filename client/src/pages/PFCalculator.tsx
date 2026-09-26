@@ -93,7 +93,6 @@ export default function PFCalculatorPage() {
             { label: "Calculators", href: "/calculators" },
             { label: "PF Calculator" }
           ]}
-          badge="FY 2026-27 ✓"
         />
 
         {/* Calculator */}

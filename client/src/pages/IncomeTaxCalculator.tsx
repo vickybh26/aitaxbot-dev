@@ -103,7 +103,6 @@ export default function IncomeTaxCalculatorPage() {
             { label: "Calculators", href: "/calculators" },
             { label: "Income Tax Calculator" }
           ]}
-          badge="FY 2026-27 ✓"
         />
 
         {/* Calculator — step-by-step wizard, cutover 2026-08-30 (was the flat

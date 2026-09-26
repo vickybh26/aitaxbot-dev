@@ -97,7 +97,6 @@ export default function TradingTaxCalculatorPage() {
           ]}
           title="US Stock & F&O Trading Tax Calculator"
           subtitle="Calculate capital gains tax on US stocks, F&O income, dividends & forex trading for Indian residents. Auto-fetches historical USD/INR rates."
-          badge="FY 2025-26 · AY 2026-27"
           maxWidth="max-w-5xl"
         />
 

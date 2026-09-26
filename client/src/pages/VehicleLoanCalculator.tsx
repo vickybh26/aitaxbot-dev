@@ -93,7 +93,6 @@ export default function VehicleLoanCalculatorPage() {
             { label: "Calculators", href: "/calculators" },
             { label: "Vehicle Loan Calculator" }
           ]}
-          badge="FY 2026-27 ✓"
         />
 
         <section className="py-12 px-6">

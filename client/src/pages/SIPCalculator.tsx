@@ -89,7 +89,6 @@ export default function SIPCalculatorPage() {
             { label: "Calculators", href: "/calculators" },
             { label: "SIP Calculator" }
           ]}
-          badge="FY 2026-27 ✓"
         />
 
         {/* Calculator */}

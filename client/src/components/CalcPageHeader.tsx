@@ -6,7 +6,6 @@ interface CalcPageHeaderProps {
   title: string;
   subtitle: string;
   breadcrumbs: { label: string; href?: string }[];
-  badge?: string;
   maxWidth?: string;
 }
 
@@ -17,20 +16,19 @@ const trustChips = [
 ];
 
 /**
- * Shared header on every calculator/tool page (11 call sites as of
- * 2026-09-04 — see `grep -rl CalcPageHeader client/src/pages`). Re-skinned to
- * the ink/paper/credit/rule tokens the homepage now uses everywhere
- * (2026-09-05) — same eyebrow-pill-with-dot shape as the homepage's "For
- * individual taxpayers" badge, same font-display headline. Content and prop
- * interface are unchanged — same breadcrumbs, same title/subtitle/badge
- * values passed by every caller, same trust chips — this is a re-skin, not
- * a rewrite, so none of the 11 call sites needed to change.
+ * Shared header on every calculator/tool page.
+ *
+ * The eyebrow pill this used to render above the title ("FY 2026-27 · AY
+ * 2027-28" / "For individual taxpayers · AY 2027-28" on the homepage) was
+ * removed 2026-09-26 — it repeated the same generic audience/year label on
+ * every page and added nothing a visitor needed. The trust chips below the
+ * subtitle (CA-Reviewed / IT Act 2025 Ready / FY 2026-27 Updated) carry the
+ * FY information that matters, and are specific claims rather than filler.
  */
 export default function CalcPageHeader({
   title,
   subtitle,
   breadcrumbs,
-  badge = "FY 2026-27 · AY 2027-28",
   maxWidth = "max-w-6xl"
 }: CalcPageHeaderProps) {
   return (
@@ -57,13 +55,9 @@ export default function CalcPageHeader({
       <div className={cn(maxWidth, "mx-auto px-6 pt-6 pb-9")}>
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
 
-          {/* Left: eyebrow + title + subtitle + trust chips */}
+          {/* Left: title + subtitle + trust chips */}
           <div className="flex-1">
-            <span className="inline-flex items-center gap-2 rounded-full bg-secondary px-4 py-1.5 text-xs font-semibold text-ink/70">
-              <span className="h-1.5 w-1.5 rounded-full bg-credit" aria-hidden />
-              {badge}
-            </span>
-            <h1 className="font-display mt-4 text-2xl md:text-3xl font-extrabold text-ink mb-2 leading-tight tracking-tight">
+            <h1 className="font-display text-2xl md:text-3xl font-extrabold text-ink mb-2 leading-tight tracking-tight">
               {title}
             </h1>
             <p className="text-sm text-ink/65 max-w-2xl leading-relaxed">

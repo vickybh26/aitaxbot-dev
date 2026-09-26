@@ -89,7 +89,6 @@ export default function NPSCalculatorPage() {
             { label: "Calculators", href: "/calculators" },
             { label: "NPS Calculator" }
           ]}
-          badge="FY 2026-27 ✓"
         />
 
         {/* Calculator */}

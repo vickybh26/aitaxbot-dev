@@ -89,7 +89,6 @@ export default function SWPCalculatorPage() {
             { label: "Calculators", href: "/calculators" },
             { label: "SWP Calculator" }
           ]}
-          badge="FY 2026-27 ✓"
         />
 
         {/* Calculator */}
