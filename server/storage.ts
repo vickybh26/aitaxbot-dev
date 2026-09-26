@@ -172,11 +172,18 @@ export class FirestoreStorage implements IStorage {
       // User already exists — only update fields managed by the auth provider.
       // NEVER overwrite user-edited fields (firstName, lastName, mobile, gender,
       // occupation, city, state, isProfileComplete) so profile edits are preserved.
-      const authUpdate: Partial<User> & { updatedAt: Date } = {
+      // ISO string, not a raw Date -- a bare `new Date()` gets written as a
+      // Firestore Timestamp, which serialises to `{_seconds, _nanoseconds}`
+      // over JSON instead of a string. The client then does `new Date(...)`
+      // on that object and silently gets "Invalid Date" -- exactly what the
+      // profile page's "Member since" field showed for every account created
+      // before this fix (2026-09-26). AdminUsers.tsx already works around the
+      // symptom on the admin side; this is the actual cause.
+      const authUpdate: Partial<User> & { updatedAt: string } = {
         email: userData.email || (existingDoc.data()! as any).email,
         profileImageUrl: userData.profileImageUrl || (existingDoc.data()! as any).profileImageUrl,
         authProvider: (userData as any).authProvider || (existingDoc.data()! as any).authProvider || 'google',
-        updatedAt: new Date(),
+        updatedAt: new Date().toISOString(),
       };
       await docRef.update(authUpdate);
       return { user: { id: userId, ...existingDoc.data(), ...authUpdate } as unknown as User, isNewUser: false };
@@ -196,8 +203,10 @@ export class FirestoreStorage implements IStorage {
       state: (userData as any).state || null,
       authProvider: (userData as any).authProvider || 'google',
       isProfileComplete: false,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      // ISO strings -- see the comment on authUpdate above for why a raw
+      // Date breaks client-side parsing of this field.
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
     await docRef.set(user);
     return { user, isNewUser: true };

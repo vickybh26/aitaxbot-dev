@@ -14,6 +14,7 @@ import {
   FileText,
   Gauge,
   PiggyBank,
+  User,
 } from "lucide-react";
 
 const sections = [
@@ -22,6 +23,8 @@ const sections = [
   { id: "deductions", label: "Deductions", icon: PiggyBank },
   { id: "documents", label: "Documents", icon: FileText },
   { id: "saved", label: "Saved", icon: Bookmark },
+  // Was its own /profile page until 2026-09-26 -- see ProfileSection.tsx.
+  { id: "profile", label: "Profile", icon: User },
 ] as const;
 
 export default function Rail({

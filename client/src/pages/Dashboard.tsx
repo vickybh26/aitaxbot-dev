@@ -40,6 +40,7 @@ import NextUp from "@/components/dashboard/NextUp";
 import LeftToClaim from "@/components/dashboard/LeftToClaim";
 import DocsAndAis from "@/components/dashboard/DocsAndAis";
 import SavedResults from "@/components/dashboard/SavedResults";
+import ProfileSection from "@/components/dashboard/ProfileSection";
 import {
   AlertCircle,
   Building2,
@@ -129,11 +130,6 @@ function currentFinancialYear(now = new Date()): string {
   return `${start}-${String((start + 1) % 100).padStart(2, "0")}`;
 }
 
-function currentAssessmentYear(now = new Date()): string {
-  const start = (now.getMonth() >= 3 ? now.getFullYear() : now.getFullYear() - 1) + 1;
-  return `${start}-${String((start + 1) % 100).padStart(2, "0")}`;
-}
-
 export default function Dashboard() {
   const { user, userProfile, isProfileComplete, getIdToken } = useAuth();
   const { toast } = useToast();
@@ -149,6 +145,20 @@ export default function Dashboard() {
 
   useEffect(() => {
     trackPageView("/dashboard", "User Dashboard - AiTaxBot");
+  }, []);
+
+  // Deep-links into a section (e.g. the account menu's "My Profile" link,
+  // now /dashboard#profile since the two pages were merged 2026-09-26).
+  // Wouter's setLocation and a plain <Link> both update the URL via
+  // history.pushState, which -- unlike an ordinary page load -- does NOT
+  // trigger the browser's native scroll-to-hash behaviour, so it's done by
+  // hand once the target section has mounted.
+  useEffect(() => {
+    if (!window.location.hash) return;
+    const id = window.location.hash.slice(1);
+    requestAnimationFrame(() => {
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   }, []);
 
   const { data: stats } = useQuery<DashboardStats>({
@@ -350,17 +360,10 @@ export default function Dashboard() {
 
       <div className="bg-paper">
         <div className="mx-auto max-w-[1180px] px-5 py-8 lg:py-12">
-          {/* ── Header ──
-              The year chip is a statement of the FY in progress, not a picker:
-              we hold one saved result per tool, not a set per assessment year,
-              so a dropdown here would offer years with nothing behind them. */}
+          {/* ── Header ── */}
           <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 sm:flex sm:flex-wrap sm:justify-between">
             <div className="min-w-0">
-              <span className="inline-flex items-center gap-2 rounded-full bg-secondary px-4 py-1.5 text-xs font-semibold text-ink/70">
-                <span className="h-1.5 w-1.5 rounded-full bg-credit" aria-hidden />
-                FY {currentFinancialYear()} · AY {currentAssessmentYear()}
-              </span>
-              <h1 className="mt-4 truncate font-display text-[clamp(1.7rem,3.6vw,2.4rem)] font-extrabold tracking-tight text-ink">
+              <h1 className="truncate font-display text-[clamp(1.7rem,3.6vw,2.4rem)] font-extrabold tracking-tight text-ink">
                 Good to see you, {firstName}.
               </h1>
             </div>
@@ -617,6 +620,12 @@ export default function Dashboard() {
                   ))}
                 </div>
               </section>
+
+              {/* Profile & account — merged from the standalone /profile page
+                  2026-09-26 (see ProfileSection.tsx for why). Last on the
+                  page: everything above is why someone visits; this is
+                  account administration, visited far less often. */}
+              <ProfileSection />
             </div>
           </div>
         </div>

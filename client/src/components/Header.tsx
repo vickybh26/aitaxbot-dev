@@ -229,7 +229,7 @@ export default function Header({ showModal }: HeaderProps = {}) {
                         Dashboard
                       </Link>
                     )}
-                    <Link href="/profile" onClick={() => setUserOpen(false)} className={dropItem} data-testid="link-header-profile">
+                    <Link href="/dashboard#profile" onClick={() => setUserOpen(false)} className={dropItem} data-testid="link-header-profile">
                       <User className="w-4 h-4 text-ink/50" />
                       {t("nav.profile")}
                     </Link>
@@ -311,7 +311,7 @@ export default function Header({ showModal }: HeaderProps = {}) {
             <div className="pt-3 border-t border-rule space-y-2">
               {isAuthenticated ? (
                 <>
-                  <Link href="/profile" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 py-2 text-sm text-ink/75">
+                  <Link href="/dashboard#profile" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 py-2 text-sm text-ink/75">
                     <User className="w-4 h-4" />{t("nav.profile")}
                   </Link>
                   {adminLevel !== null && (
