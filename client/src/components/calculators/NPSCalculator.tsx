@@ -405,16 +405,16 @@ export default function NPSCalculator() {
               <p className="text-xs text-blue-100 mb-1">Total Corpus at {retirementAge}</p>
               <p className="text-xl font-bold">{formatCurrency(result.totalCorpus)}</p>
             </Card>
-            <Card className="p-4 bg-gradient-to-br from-green-500 to-green-600 text-white">
-              <p className="text-xs text-green-100 mb-1">Lump Sum (60%, Tax-Free)</p>
+            <Card className="p-4 bg-gradient-to-br from-green-700 to-green-800 text-white">
+              <p className="text-xs text-white/90 mb-1">Lump Sum (60%, Tax-Free)</p>
               <p className="text-xl font-bold">{formatCurrency(result.lumpSum)}</p>
             </Card>
             <Card className="p-4 bg-gradient-to-br from-ink to-credit text-white">
               <p className="text-xs text-paper/80 mb-1">Monthly Pension (Est.)</p>
               <p className="text-xl font-bold">{formatCurrency(result.monthlyPension)}</p>
             </Card>
-            <Card className="p-4 bg-gradient-to-br from-orange-500 to-orange-600 text-white">
-              <p className="text-xs text-orange-100 mb-1">Annual Tax Saving</p>
+            <Card className="p-4 bg-gradient-to-br from-orange-700 to-orange-800 text-white">
+              <p className="text-xs text-white/90 mb-1">Annual Tax Saving</p>
               <p className="text-xl font-bold">{formatCurrency(result.totalTaxSaving)}</p>
             </Card>
           </div>

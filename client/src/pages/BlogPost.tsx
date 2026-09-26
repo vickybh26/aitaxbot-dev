@@ -117,7 +117,20 @@ export default function BlogPost() {
   };
 
   // Block-level markdown renderer: tables, lists, headings, paragraphs
-  const renderMarkdown = (content: string) => {
+  /**
+   * `dark` is set true only for the CTA section, which sits on a solid ink
+   * background (see the 'cta' branch below) instead of the paper/card
+   * backgrounds every other section renders on. Every text colour in this
+   * function used to be hardcoded to text-ink / text-ink/80, which is
+   * correct on a light background and unreadable on a dark one -- computed
+   * 2026-09-26: text-ink/80 over the CTA's ink end measured 1.00:1 (WCAG
+   * requires 4.5:1), i.e. genuinely invisible, not just low-contrast. The
+   * outer wrapper's text-white did nothing, because a child element's own
+   * `color` always wins over an inherited one.
+   */
+  const renderMarkdown = (content: string, dark = false) => {
+    const headingColor = dark ? "text-white" : "text-ink";
+    const bodyColor = dark ? "text-white/90" : "text-ink/80";
     const lines = content.split('\n');
     const nodes: React.ReactNode[] = [];
     let i = 0;
@@ -131,7 +144,7 @@ export default function BlogPost() {
       // Sub-sub heading: ### Foo
       if (trimmed.startsWith('### ')) {
         nodes.push(
-          <h4 key={i} className="text-xl font-bold text-ink mt-8 mb-3">
+          <h4 key={i} className={`text-xl font-bold ${headingColor} mt-8 mb-3`}>
             {renderInline(trimmed.slice(4))}
           </h4>
         );
@@ -141,7 +154,7 @@ export default function BlogPost() {
       // Sub heading: ## Foo
       if (trimmed.startsWith('## ')) {
         nodes.push(
-          <h3 key={i} className="text-2xl font-bold text-ink mt-8 mb-3">
+          <h3 key={i} className={`text-2xl font-bold ${headingColor} mt-8 mb-3`}>
             {renderInline(trimmed.slice(3))}
           </h3>
         );
@@ -174,7 +187,7 @@ export default function BlogPost() {
           else break;
         }
         nodes.push(
-          <ul key={`ul-${i}`} className="list-disc pl-6 space-y-1 mb-4 text-ink/80">
+          <ul key={`ul-${i}`} className={`list-disc pl-6 space-y-1 mb-4 ${bodyColor}`}>
             {items.map((item, idx) => <li key={idx}>{renderInline(item)}</li>)}
           </ul>
         );
@@ -189,7 +202,7 @@ export default function BlogPost() {
           i++;
         }
         nodes.push(
-          <ol key={`ol-${i}`} className="list-decimal pl-6 space-y-1 mb-4 text-ink/80">
+          <ol key={`ol-${i}`} className={`list-decimal pl-6 space-y-1 mb-4 ${bodyColor}`}>
             {items.map((item, idx) => <li key={idx}>{renderInline(item)}</li>)}
           </ol>
         );
@@ -207,7 +220,7 @@ export default function BlogPost() {
         nodes.push(
           <ul key={`chk-${i}`} className="space-y-2 mb-4">
             {items.map((item, idx) => (
-              <li key={idx} className="flex items-start gap-2 text-ink/80">
+              <li key={idx} className={`flex items-start gap-2 ${bodyColor}`}>
                 {renderInline(item)}
               </li>
             ))}
@@ -218,7 +231,7 @@ export default function BlogPost() {
 
       // Regular paragraph
       nodes.push(
-        <p key={i} className="mb-3 leading-relaxed text-ink/80">
+        <p key={i} className={`mb-3 leading-relaxed ${bodyColor}`}>
           {renderInline(trimmed)}
         </p>
       );
@@ -399,9 +412,16 @@ export default function BlogPost() {
 
               if (section.type === 'cta') {
                 sectionContent = (
-                  <Card key={index} className="p-8 mb-8 bg-gradient-to-r from-ink to-green-600 text-white" data-testid="cta-section">
+                  // from-ink to-credit (was to-green-600, the site's only
+                  // remaining raw Tailwind colour): computed 2026-09-26,
+                  // white text now measures 14.48:1 at the ink end and
+                  // 5.44:1 at the credit end -- both clear AA's 4.5:1
+                  // across the whole gradient, versus the old green-600 end
+                  // topping out at 3.30:1 for white and 3.34:1 for the
+                  // ink/80 text that was actually rendered there.
+                  <Card key={index} className="p-8 mb-8 bg-gradient-to-r from-ink to-credit text-white" data-testid="cta-section">
                     <div className="mb-6 text-white">
-                      {section.content_md && renderMarkdown(section.content_md)}
+                      {section.content_md && renderMarkdown(section.content_md, true)}
                     </div>
                     {section.internal_links && section.internal_links.length > 0 && (
                       <div className="flex flex-wrap gap-3">
