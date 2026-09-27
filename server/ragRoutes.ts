@@ -11,6 +11,7 @@
 
 import { Router, Request, Response } from "express";
 import { runRAGQuery, checkRAGHealth } from "./ragService";
+import { evaluateAnswerPair } from "./aiAnswerEvaluator";
 import { verifyFirebaseToken, getFirestore } from "./firebase";
 
 const router = Router();
@@ -68,7 +69,9 @@ router.post("/query", async (req: Request, res: Response) => {
     const result = await runRAGQuery({
       question: question.trim(),
       sessionId: sessionId || undefined,
-      source: source || "api",
+      // Public callers cannot mark their own record as an admin-only test
+      // eligible for a second Gemini evaluation call.
+      source: source === "admin-eval" ? "api" : source || "api",
       financialYear: typeof financialYear === "string" ? financialYear.trim() : undefined,
     });
     // Per-step timeouts: embed 10s + search 8s + generate 25s (in ragService.ts)
@@ -141,6 +144,28 @@ async function requireAdminL1(req: Request, res: Response, next: any): Promise<a
     return (res as any).apiError(500, "AUTH_CHECK_FAILED", "Auth check failed.");
   }
 }
+
+// ─── POST /api/ai/admin/test-query ───────────────────────────────────────────
+// Admin-only test questions are explicitly marked by this server route, not a
+// client-controlled `source` value on the public query endpoint.
+router.post("/admin/test-query", requireAdminL1, async (req: Request, res: Response) => {
+  const r = res as any;
+  try {
+    const question = typeof req.body?.question === "string" ? req.body.question.trim() : "";
+    if (question.length < 5) return r.apiError(400, "QUESTION_TOO_SHORT", "Please provide a question (minimum 5 characters).");
+    if (question.length > 1000) return r.apiError(400, "QUESTION_TOO_LONG", "Question too long (maximum 1000 characters).");
+
+    const result = await runRAGQuery({ question, source: "admin-eval" });
+    return res.json(result);
+  } catch (err: any) {
+    const message = String(err?.message || "");
+    console.error("[RAG] Admin test query failed:", message.slice(0, 500));
+    if (message.includes("timed out")) {
+      return r.apiError(504, "AI_TIMEOUT", "The AI is taking too long to respond. Please try again later.");
+    }
+    return r.apiError(502, "AI_UNAVAILABLE", "The AI service is temporarily unavailable.");
+  }
+});
 
 // ─── GET /api/ai/admin/queries ───────────────────────────────────────────────
 // Returns recent anonymous queries — useful for identifying gaps in the knowledge base
@@ -227,6 +252,67 @@ router.post("/admin/queries/:id/grade", requireAdminL1, async (req: Request, res
   }
 });
 
+// ─── POST /api/ai/admin/queries/:id/auto-grade ───────────────────────────────
+// On-demand AI recommendation only. It never overwrites the human grade.
+// Restrict to admin-authored test questions or the PII-minimized production
+// shadow summaries; arbitrary public query text is not sent to a second call.
+router.post("/admin/queries/:id/auto-grade", requireAdminL1, async (req: Request, res: Response) => {
+  const r = res as any;
+  try {
+    const docRef = getFirestore().collection("ai_queries").doc(req.params.id);
+    const doc = await docRef.get();
+    if (!doc.exists) return r.apiError(404, "QUERY_NOT_FOUND", "No query found with that ID.");
+
+    const data = doc.data() as any;
+    const isAllowedSource = data.source === "admin-eval" || data.comparison_type === "production_vs_rag";
+    if (!isAllowedSource || data.graph_available !== true) {
+      return r.apiError(400, "QUERY_NOT_EVALUABLE", "Only admin test questions and PII-minimized production shadow comparisons can be evaluated.");
+    }
+
+    const question = typeof data.question === "string" ? data.question.trim() : "";
+    const answerA = typeof data.gemini_answer === "string" ? data.gemini_answer.trim() : "";
+    const answerB = typeof data.graph_answer === "string" ? data.graph_answer.trim() : "";
+    if (!question || !answerA || !answerB) {
+      return r.apiError(400, "ANSWERS_REQUIRED", "A question and both answers are required.");
+    }
+    if (question.length > 2_000 || answerA.length > 12_000 || answerB.length > 12_000) {
+      return r.apiError(413, "COMPARISON_TOO_LARGE", "This comparison is too long for the evaluator.");
+    }
+
+    // Avoid repeated evaluator calls for the same row (cost and data minimization).
+    const previousEvaluation = data.auto_review?.evaluated_at;
+    if (previousEvaluation && Date.now() - new Date(previousEvaluation).getTime() < 60_000) {
+      return r.apiError(429, "EVALUATION_COOLDOWN", "This comparison was evaluated recently. Try again after one minute.");
+    }
+
+    const evaluation = await evaluateAnswerPair({
+      question,
+      answerA,
+      answerB,
+      answerALabel: data.comparison_type === "production_vs_rag" ? "Production analysis shown to user" : "Gemini baseline",
+      answerBLabel: data.comparison_type === "production_vs_rag" ? "RAG candidate" : "Graph/RAG candidate",
+    });
+    const autoReview = {
+      ...evaluation,
+      evaluated_at: new Date().toISOString(),
+      evaluated_by: (req as any).adminUid || null,
+      model: "gemini-3.5-flash",
+    };
+    await docRef.update({ auto_review: autoReview });
+    return res.json({ auto_review: autoReview });
+  } catch (err: any) {
+    const message = String(err?.message || "");
+    if (message.includes("disabled") || message.includes("not configured")) {
+      return r.apiError(503, "EVALUATOR_DISABLED", message);
+    }
+    console.error("[RAG] Auto-grade failed:", message.slice(0, 500));
+    if (err?.name === "AbortError") {
+      return r.apiError(504, "EVALUATOR_TIMEOUT", "The answer evaluator timed out. Please try again later.");
+    }
+    return r.apiError(502, "EVALUATOR_FAILED", "The answer evaluator failed. The stored answers and human grade were not changed.");
+  }
+});
+
 // ─── GET /api/ai/admin/eval-stats ────────────────────────────────────────────
 // Quick aggregate view of how the graph path is doing against Gemini —
 // counts by match_status among graded, graph-available comparisons.
@@ -239,12 +325,27 @@ router.get("/admin/eval-stats", requireAdminL1, async (_req: Request, res: Respo
       .limit(2000)
       .get();
 
-    const stats = { total: 0, pending: 0, match: 0, partial: 0, mismatch: 0 };
+    const stats = {
+      total: 0, pending: 0, match: 0, partial: 0, mismatch: 0,
+      autoReviewed: 0, autoComparedCount: 0, autoAgreementCount: 0, autoAgreementRate: 0,
+      evaluatorEnabled: process.env.AI_ANSWER_EVALUATOR_ENABLED === "true",
+    };
     snapshot.docs.forEach(doc => {
-      const status = ((doc.data() as any).match_status as string) || "pending";
+      const row = doc.data() as any;
+      const status = (row.match_status as string) || "pending";
       stats.total++;
       if (status in stats) (stats as any)[status]++;
+      if (row.auto_review?.match_status && row.auto_review.match_status !== "pending") {
+        stats.autoReviewed++;
+        if (status !== "pending") {
+          stats.autoComparedCount++;
+          if (row.auto_review.match_status === status) stats.autoAgreementCount++;
+        }
+      }
     });
+    stats.autoAgreementRate = stats.autoComparedCount > 0
+      ? Math.round((stats.autoAgreementCount / stats.autoComparedCount) * 100)
+      : 0;
 
     return res.json(stats);
   } catch (err) {

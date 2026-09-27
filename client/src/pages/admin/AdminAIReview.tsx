@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import AdminLayout from "@/components/AdminLayout";
-import { Scale, CheckCircle2, AlertTriangle, XCircle, Loader2, Send } from "lucide-react";
+import { Scale, CheckCircle2, AlertTriangle, XCircle, Loader2, Send, Sparkles } from "lucide-react";
 
 interface AIQuery {
   id: string;
@@ -20,6 +20,16 @@ interface AIQuery {
   // gemini_answer = the ad-hoc production analysis the user saw,
   // graph_answer = the RAG pipeline's shadow answer (candidate replacement).
   comparison_type?: "production_vs_rag";
+  auto_review?: {
+    match_status: "match" | "partial" | "mismatch";
+    confidence: "low" | "medium" | "high";
+    scores: { equivalence: number; completeness: number; context_fit: number; safety: number };
+    rationale: string;
+    material_differences: string[];
+    tax_correctness_verified: false;
+    human_review_required: true;
+    evaluated_at: string;
+  };
 }
 
 type FilterStatus = "all" | "pending" | "match" | "partial" | "mismatch";
@@ -41,7 +51,11 @@ function useEvalStats() {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error("Failed to load eval stats");
-      return res.json() as Promise<{ total: number; pending: number; match: number; partial: number; mismatch: number }>;
+      return res.json() as Promise<{
+        total: number; pending: number; match: number; partial: number; mismatch: number;
+        autoReviewed: number; autoComparedCount: number; autoAgreementCount: number;
+        autoAgreementRate: number; evaluatorEnabled: boolean;
+      }>;
     },
     staleTime: 30_000,
   });
@@ -88,18 +102,41 @@ function useGradeMutation() {
   });
 }
 
+function useAutoGradeMutation() {
+  const { getIdToken } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const token = await getIdToken();
+      const res = await fetch(`/api/ai/admin/queries/${id}/auto-grade`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body?.error?.message || body?.error || "Automatic rating failed");
+      return body;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/ai/admin/queries", "graph_available"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/ai/admin/eval-stats"] });
+    },
+  });
+}
+
 // The public site has no AI chat page yet, so /api/ai/query never gets called
 // organically — which left this review page permanently empty ("comparison not
 // working"). This box lets an admin fire test questions directly: each one runs
 // the full Gemini + graph shadow pipeline and logs a fresh comparison below.
 function TestQuestionBox() {
   const queryClient = useQueryClient();
+  const { getIdToken } = useAuth();
   const [question, setQuestion] = useState("");
   const ask = useMutation({
     mutationFn: async (q: string) => {
-      const res = await fetch("/api/ai/query", {
+      const token = await getIdToken();
+      const res = await fetch("/api/ai/admin/test-query", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ question: q, source: "admin-eval" }),
       });
       if (!res.ok) {
@@ -186,9 +223,10 @@ function AnswerCard({ title, text, accent }: { title: string; text: string | nul
   );
 }
 
-function QueryRow({ item }: { item: AIQuery }) {
+function QueryRow({ item, evaluatorEnabled }: { item: AIQuery; evaluatorEnabled: boolean }) {
   const [notes, setNotes] = useState(item.notes || "");
   const grade = useGradeMutation();
+  const autoGrade = useAutoGradeMutation();
   const status = item.match_status || "pending";
   const statusStyle = STATUS_STYLES[status] || STATUS_STYLES.pending;
 
@@ -220,6 +258,61 @@ function QueryRow({ item }: { item: AIQuery }) {
           </>
         )}
       </div>
+
+      <section className="mb-3 rounded-xl border border-rule bg-secondary/60 p-3" aria-label="Automatic rating suggestion">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold text-ink">AI rating suggestion</p>
+            <p className="mt-0.5 text-xs leading-5 text-ink/65">
+              Rubric-based comparison only—not a tax-law fact check. The suggestion never replaces your rating.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              if (window.confirm("Send this question and answer pair to Gemini for an on-demand rating? Do not evaluate taxpayer-identifying details.")) {
+                autoGrade.mutate(item.id);
+              }
+            }}
+            disabled={!evaluatorEnabled || autoGrade.isPending || (item.source !== "admin-eval" && item.comparison_type !== "production_vs_rag")}
+            className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-lg border border-rule bg-card px-3 py-2 text-xs font-semibold text-ink hover:bg-paper disabled:cursor-not-allowed disabled:opacity-50"
+            title={!evaluatorEnabled ? "Enable AI_ANSWER_EVALUATOR_ENABLED after confirming paid Gemini API service terms" : undefined}
+            data-testid={`auto-grade-${item.id}`}
+          >
+            {autoGrade.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+            {autoGrade.isPending ? "Rating…" : item.auto_review ? "Rate again" : "Rate with AI"}
+          </button>
+        </div>
+
+        {!evaluatorEnabled && (
+          <p className="mt-2 text-xs text-ink/65">Disabled until the operator confirms a billing-enabled Gemini API project and enables the evaluator.</p>
+        )}
+        {autoGrade.isError && <p role="alert" className="mt-2 text-xs text-debit">{(autoGrade.error as Error).message}</p>}
+        {item.auto_review && (
+          <div className="mt-3 border-t border-rule pt-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded-full bg-ink/10 px-2.5 py-1 text-xs font-semibold capitalize text-ink">
+                Suggested: {item.auto_review.match_status}
+              </span>
+              <span className="text-xs text-ink/65">{item.auto_review.confidence} confidence</span>
+              <span className="text-xs text-ink/65">· reviewed {new Date(item.auto_review.evaluated_at).toLocaleString("en-IN")}</span>
+            </div>
+            <p className="mt-2 text-sm leading-5 text-ink/80">{item.auto_review.rationale}</p>
+            <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink/65">
+              <span>Answer alignment {item.auto_review.scores.equivalence}/5</span>
+              <span>Completeness {item.auto_review.scores.completeness}/5</span>
+              <span>Year/jurisdiction fit {item.auto_review.scores.context_fit}/5</span>
+              <span>Safety {item.auto_review.scores.safety}/5</span>
+            </div>
+            {item.auto_review.material_differences.length > 0 && (
+              <ul className="mt-2 list-disc space-y-1 pl-5 text-xs leading-5 text-ink/70">
+                {item.auto_review.material_differences.map((difference, index) => <li key={index}>{difference}</li>)}
+              </ul>
+            )}
+            <p className="mt-2 text-xs font-medium text-notice">Not independently verified against tax law or source documents. Human review required.</p>
+          </div>
+        )}
+      </section>
 
       <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
         <input
@@ -298,7 +391,15 @@ export default function AdminAIReview() {
           <StatChip label="Match" value={stats.match} tone="text-emerald-600" />
           <StatChip label="Partial" value={stats.partial} tone="text-amber-600" />
           <StatChip label="Mismatch" value={stats.mismatch} tone="text-red-600" />
+          <StatChip label="AI suggestions" value={stats.autoReviewed} tone="text-ink/65" />
+          <StatChip label="AI / human agreement" value={stats.autoAgreementRate} tone="text-ink/65" />
         </div>
+      )}
+
+      {stats && stats.autoComparedCount > 0 && (
+        <p className="-mt-4 mb-5 text-xs text-ink/65">
+          Agreement is {stats.autoAgreementCount} of {stats.autoComparedCount} comparisons with a human grade. It is a calibration signal, not a measure of tax correctness.
+        </p>
       )}
 
       <div className="flex gap-2 mb-4">
@@ -335,7 +436,7 @@ export default function AdminAIReview() {
 
       <div className="space-y-4">
         {filtered.map((item) => (
-          <QueryRow key={item.id} item={item} />
+          <QueryRow key={item.id} item={item} evaluatorEnabled={stats?.evaluatorEnabled ?? false} />
         ))}
       </div>
     </AdminLayout>
