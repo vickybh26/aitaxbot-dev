@@ -60,6 +60,11 @@ import {
   type TaxRegime,
   type AgeGroup,
 } from "../shared/taxLiability";
+import {
+  computeSection80D,
+  computeSection80G,
+  computeHousePropertyNet,
+} from "../shared/deductions";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
@@ -278,6 +283,107 @@ console.log("\nResidency and agricultural income (audit findings 1 & 2)\n" + "�
   const belowExemption = computeTaxLiability(300000, "new", "2026-27", "below60", {}, 100000);
   const belowExemptionBaseline = computeTaxLiability(300000, "new", "2026-27", "below60", {}, 0);
   check("non-agri income ≤ basic exemption limit: no integration", belowExemption.incomeTax, belowExemptionBaseline.incomeTax);
+}
+
+// ─── Capital gains sub-classification (tax-logic audit finding 7) ─────────
+// Property/unlisted-share LTCG (s.112, 12.5% flat) and VDA/crypto gains
+// (s.115BBH, 30% flat) were previously pooled into the slab-taxed
+// "capital gains" bucket. VDA additionally bears the FULL slab-based
+// surcharge rate — the 15% surcharge cap proviso does not name s.115BBH,
+// unlike s.111A/112/112A.
+console.log("\nCapital gains sub-classification (audit finding 7)\n" + "─".repeat(60));
+{
+  const otherLTCG = 10000000;
+  const vdaIncome = 10000000;
+  const slabIncome = 90000000; // far from any marginal-relief cliff
+  const r = computeTaxLiability(slabIncome, "old", "2026-27", "below60", { otherLTCG, vdaIncome });
+
+  const expectedSlabTax = 12500 + 100000 + (slabIncome - 1000000) * 0.30;
+  const expectedOtherLTCGTax = otherLTCG * 0.125;
+  const expectedVdaTax = vdaIncome * 0.30;
+  check("s.112 otherLTCG taxed at 12.5% flat", r.specialRateTax, expectedOtherLTCGTax + expectedVdaTax);
+  check("band rate is 37% (old, total > ₹5Cr)", r.surchargeRate, 37, 0);
+
+  const expectedSlabPortion = expectedSlabTax + expectedVdaTax; // VDA bears the full band rate
+  const expectedSurcharge = expectedSlabPortion * 0.37 + expectedOtherLTCGTax * 0.15;
+  check("VDA tax excluded from the 15% surcharge cap", r.surcharge, expectedSurcharge, 1);
+
+  // Below the surcharge threshold, the distinction is inert either way.
+  const under = computeTaxLiability(2000000, "new", "2026-27", "below60", { otherLTCG: 500000, vdaIncome: 500000 });
+  check("no surcharge below ₹50L regardless of bucket", under.surcharge, 0);
+}
+
+// ─── Chapter VI-A deduction helpers (tax-logic audit findings 4, 5, 6) ────
+console.log("\nDeduction helpers (audit findings 4, 5, 6)\n" + "─".repeat(60));
+{
+  // Finding 4 — Section 80D: self/family and parents are SEPARATE caps, not
+  // one combined cap keyed off the assessee's own age.
+  check(
+    "80D: under-60 assessee, senior-citizen parents claiming both caps in full",
+    computeSection80D(25000, false, 50000, true),
+    75000
+  );
+  check(
+    "80D: caps apply independently, excess in either bucket is lost (not shared)",
+    computeSection80D(40000, false, 60000, false),
+    25000 + 25000
+  );
+  check(
+    "80D: both senior — the ₹1,00,000 ceiling",
+    computeSection80D(60000, true, 60000, true),
+    100000
+  );
+
+  // Finding 5 — Section 80G: rate and qualifying-limit applicability depend
+  // on donee category; a cash donation over ₹2,000 is disallowed IN FULL.
+  check(
+    "80G: 100%-no-limit category ignores the 10% cap entirely",
+    computeSection80G(500000, "100-no-limit", false, 2000000),
+    500000
+  );
+  check(
+    "80G: 50%-with-limit category — most common receipt",
+    computeSection80G(2000000, "50-limit", false, 1000000),
+    100000 * 0.5 // qualifying = min(20L, 10% of 10L=1L) = 1L, then 50%
+  );
+  check(
+    "80G: cash donation over ₹2,000 gets NOTHING, not even the first ₹2,000",
+    computeSection80G(5000, "50-limit", true, 1000000),
+    0
+  );
+  check(
+    "80G: cash donation AT the ₹2,000 line is still fully allowed",
+    computeSection80G(2000, "50-limit", true, 1000000),
+    1000
+  );
+
+  // Finding 6 — Section 24(b): self-occupied caps the interest itself;
+  // let-out caps only the LOSS available to set off against other heads.
+  check(
+    "24(b): self-occupied, old regime — interest capped at ₹2L",
+    computeHousePropertyNet(0, 250000, "selfOccupied", "old"),
+    -200000
+  );
+  check(
+    "24(b): self-occupied, New Regime — no interest deduction at all",
+    computeHousePropertyNet(300000, 250000, "selfOccupied", "new"),
+    300000
+  );
+  check(
+    "24(b): let-out — full interest allowed against rental income, no cap on the interest itself",
+    computeHousePropertyNet(300000, 400000, "letOut", "old"),
+    -100000
+  );
+  check(
+    "24(b): let-out — resulting loss set-off against other heads capped at ₹2L",
+    computeHousePropertyNet(300000, 800000, "letOut", "old"),
+    -200000
+  );
+  check(
+    "24(b): let-out applies identically under the New Regime (not a disallowed deduction)",
+    computeHousePropertyNet(300000, 800000, "letOut", "new"),
+    -200000
+  );
 }
 
 // ─── 15% surcharge cap on special-rate income (re-verify finding A) ────────

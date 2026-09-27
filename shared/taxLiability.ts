@@ -59,10 +59,29 @@ export interface TaxLiabilityResult {
   breakdown: SlabBreakdownRow[];
 }
 
-/** Listed-equity gains, charged at their own rates rather than at slab rates. */
+/** Income charged at its own statutory rate rather than pooled into the slab ladder. */
 export interface SpecialRateIncome {
   ltcgEquity?: number;
   stcgEquity?: number;
+  /**
+   * Long-term gains on assets OTHER than listed equity/equity-oriented funds
+   * — property, unlisted shares — under s.112: 12.5% flat, post-Budget-2024.
+   * The ₹1,25,000 annual allowance is an s.112A feature and does NOT apply
+   * here. Indexation is not modelled: for property acquired before 23 July
+   * 2024, the taxpayer may instead choose 20% WITH indexation if that is
+   * lower, which needs the indexed cost of acquisition — an input this
+   * calculator does not collect. This flat 12.5% is therefore a ceiling, not
+   * always the statutory-optimal figure.
+   */
+  otherLTCG?: number;
+  /**
+   * Virtual digital asset (crypto) gains under s.115BBH: flat 30%, no
+   * exemption threshold, and — unlike every other bucket here — losses on
+   * VDAs cannot be set off against ANY other income, including other VDAs.
+   * This engine only computes forward tax on a positive figure; it does not
+   * model set-off at all, so that restriction has no separate code path.
+   */
+  vdaIncome?: number;
 }
 
 // ─── Slab tables (must stay in sync with TaxCalculator.tsx) ─────────────────
@@ -255,25 +274,53 @@ export function computeSurcharge(
 export const LTCG_EQUITY_EXEMPTION = 125000; // s.112A annual allowance
 export const LTCG_EQUITY_RATE = 12.5;
 export const STCG_EQUITY_RATE = 20; // s.111A
+export const OTHER_LTCG_RATE = 12.5; // s.112 — property / unlisted shares, no indexation modelled
+export const VDA_RATE = 30; // s.115BBH
 
 export interface SpecialRateResult {
   ltcgTaxable: number;
   ltcgTax: number;
   stcgTax: number;
+  otherLTCGTax: number;
+  vdaTax: number;
   total: number;
+  /**
+   * ltcgTax + stcgTax + otherLTCGTax — the portion eligible for the 15%
+   * surcharge cap (s.111A / s.112 / s.112A). VDA tax is deliberately
+   * excluded: the surcharge-cap proviso does not name s.115BBH, so VDA
+   * income bears the ordinary slab-based surcharge rate like any other
+   * income, not the 15% ceiling.
+   */
+  surchargeCappedPortion: number;
 }
 
 /**
- * Tax on listed-equity gains. The ₹1,25,000 exemption applies to LTCG only and
- * is an annual allowance, not a per-transaction one.
+ * Tax on gains charged outside the slab ladder. The ₹1,25,000 exemption
+ * applies to listed-equity LTCG only (s.112A) and is an annual allowance, not
+ * a per-transaction one — it does NOT extend to otherLTCG (s.112).
  */
-export function computeSpecialRateTax(ltcgEquity: number, stcgEquity: number): SpecialRateResult {
+export function computeSpecialRateTax(
+  ltcgEquity: number,
+  stcgEquity: number,
+  otherLTCG: number = 0,
+  vdaIncome: number = 0
+): SpecialRateResult {
   const ltcg = Math.max(0, ltcgEquity);
   const stcg = Math.max(0, stcgEquity);
   const ltcgTaxable = Math.max(0, ltcg - LTCG_EQUITY_EXEMPTION);
   const ltcgTax = (ltcgTaxable * LTCG_EQUITY_RATE) / 100;
   const stcgTax = (stcg * STCG_EQUITY_RATE) / 100;
-  return { ltcgTaxable, ltcgTax, stcgTax, total: ltcgTax + stcgTax };
+  const otherLTCGTax = (Math.max(0, otherLTCG) * OTHER_LTCG_RATE) / 100;
+  const vdaTax = (Math.max(0, vdaIncome) * VDA_RATE) / 100;
+  return {
+    ltcgTaxable,
+    ltcgTax,
+    stcgTax,
+    otherLTCGTax,
+    vdaTax,
+    total: ltcgTax + stcgTax + otherLTCGTax + vdaTax,
+    surchargeCappedPortion: ltcgTax + stcgTax + otherLTCGTax,
+  };
 }
 
 export function calculateTaxForSlab(income: number, slabs: TaxSlabDef[]): { totalTax: number; breakdown: SlabBreakdownRow[] } {
@@ -358,7 +405,10 @@ export function computeTaxLiability(
   // income and earns no rebate at all. Testing the ₹10,25,000 alone grants a
   // full rebate and understates the liability by ₹44,200.
   const grossSpecialIncome =
-    Math.max(0, special.ltcgEquity ?? 0) + Math.max(0, special.stcgEquity ?? 0);
+    Math.max(0, special.ltcgEquity ?? 0) +
+    Math.max(0, special.stcgEquity ?? 0) +
+    Math.max(0, special.otherLTCG ?? 0) +
+    Math.max(0, special.vdaIncome ?? 0);
   const totalIncomeAll = income + grossSpecialIncome;
 
   let rebateLimit = 0;
@@ -452,7 +502,12 @@ export function computeTaxLiability(
   // the rebate block: the s.87A / s.156 rebate is not available against tax on
   // these gains. Pooling them into slab income previously let the rebate wipe
   // out LTCG tax entirely and report "zero tax".
-  const sr = computeSpecialRateTax(special.ltcgEquity ?? 0, special.stcgEquity ?? 0);
+  const sr = computeSpecialRateTax(
+    special.ltcgEquity ?? 0,
+    special.stcgEquity ?? 0,
+    special.otherLTCG ?? 0,
+    special.vdaIncome ?? 0
+  );
 
   // ── Surcharge ───────────────────────────────────────────────────────────
   // Assessed on total income including the special-rate gains, and levied on
@@ -473,7 +528,7 @@ export function computeTaxLiability(
     taxBeforeSurcharge,
     regime,
     taxAtThreshold,
-    sr.total // capped at 15% inside computeSurcharge
+    sr.surchargeCappedPortion // capped at 15% inside computeSurcharge — excludes VDA tax
   );
 
   // Cess is levied on tax plus surcharge, so it must be recomputed here rather

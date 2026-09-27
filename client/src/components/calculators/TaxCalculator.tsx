@@ -23,6 +23,13 @@ import { useToast } from '@/hooks/use-toast';
 import { useTrackToolUse } from '@/hooks/useTrackToolUse';
 import { recommendITRForm, type ITRFormResult } from '@shared/itrFormSelector';
 import { computeTaxLiability, type AgeGroup } from '@shared/taxLiability';
+import {
+  computeSection80D,
+  computeSection80G,
+  computeHousePropertyNet,
+  type Section80GCategory,
+  type PropertyType,
+} from '@shared/deductions';
 import ResultAuthGate from '@/components/ResultAuthGate';
 
 interface AiTip {
@@ -113,17 +120,24 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
     salaryIncome: '',
     basicSalary: '',
     housePropertyIncome: '',
+    propertyType: 'selfOccupied' as PropertyType,
     businessIncome: '',
     capitalGainsIncome: '',
     ltcgEquity: '',
     stcgEquity: '',
+    otherLTCG: '',
+    vdaIncome: '',
     otherIncome: '',
     section80C: '',
     section80D: '',
+    section80DParents: '',
+    section80DParentsAreSenior: false,
     section80E: '',
     section80TTA: '',
     section80CCD1B: '',
     section80G: '',
+    section80GCategory: '50-limit' as Section80GCategory,
+    section80GPaidInCash: false,
     homeLoanInterest: '',
     lta: '',
     hraReceived: '',
@@ -133,12 +147,17 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
     ageGroup: 'below60' as 'below60' | '60to80' | 'above80',
     financialYear: '2026-27' as '2024-25' | '2025-26' | '2026-27',
     // ── ITR form recommendation inputs (classification only — don't affect tax) ──
+    // isNonResident and agriculturalIncome used to live in this group. They
+    // don't anymore: a mislabelled "classification only" comment on a field
+    // that genuinely does change the tax computation is how those two bugs
+    // survived unnoticed for months — see the audit fix in computeTaxLiability.
     hasMultipleHouseProperties: false,
     hasCryptoIncome: false,
     isPresumptiveScheme: false,
     isDirector: false,
-    isNonResident: false,
     hasForeignAssets: false,
+    // ── Affects tax AND the ITR form recommendation — see computeTaxLiability ──
+    isNonResident: false,
     agriculturalIncome: ''
   });
 
@@ -238,13 +257,36 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
     // could report "zero tax" on a return that in fact had a liability.
     const ltcgEquityIncome = parseFloat(formData.ltcgEquity) || 0;
     const stcgEquityIncome = parseFloat(formData.stcgEquity) || 0;
+    // Long-term gains on property/unlisted shares (s.112, 12.5% flat, no
+    // indexation modelled) and VDA/crypto gains (s.115BBH, 30% flat, no
+    // set-off) — previously pooled into `capitalGainsIncome` and taxed at
+    // slab rates. `hasCryptoIncome` used to be a checkbox with nowhere for an
+    // amount to go, so VDA gains could not have reached the engine at all.
+    const otherLTCGIncome = parseFloat(formData.otherLTCG) || 0;
+    const vdaIncomeAmount = parseFloat(formData.vdaIncome) || 0;
 
-    // `capitalGainsIncome` remains the slab-taxed bucket — debt-fund gains,
-    // unlisted shares, short-term gains outside s.111A — which genuinely are
-    // charged at the ordinary rates.
+    // s.24(b) interest against a LET-OUT property has no statutory cap and
+    // applies under both regimes (it's part of computing that head's own
+    // income, not a deduction s.115BAC/s.202 disallow); a SELF-OCCUPIED
+    // property caps the interest at ₹2,00,000 and loses it entirely under the
+    // New Regime. Previously a single unconditional ₹2L cap regardless of
+    // either distinction — see shared/deductions.ts.
+    const housePropertyIncomeRaw = parseFloat(formData.housePropertyIncome) || 0;
+    const homeLoanInterestRaw = parseFloat(formData.homeLoanInterest) || 0;
+    const housePropertyNet = computeHousePropertyNet(
+      housePropertyIncomeRaw,
+      homeLoanInterestRaw,
+      formData.propertyType,
+      regime
+    );
+
+    // `capitalGainsIncome` remains the slab-taxed bucket — debt-fund gains
+    // (genuinely slab-taxed at any holding period since Finance Act 2023),
+    // unlisted shares held ≤24 months, and other short-term gains outside
+    // s.111A — which are correctly charged at the ordinary rates.
     const slabTaxedIncome = [
       parseFloat(formData.salaryIncome) || 0,
-      parseFloat(formData.housePropertyIncome) || 0,
+      housePropertyNet,
       parseFloat(formData.businessIncome) || 0,
       parseFloat(formData.capitalGainsIncome) || 0,
       parseFloat(formData.otherIncome) || 0
@@ -252,7 +294,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
 
     // Gross total income for display and effective-rate purposes includes the
     // special-rate gains, even though they bypass the slab computation.
-    const totalIncome = slabTaxedIncome + ltcgEquityIncome + stcgEquityIncome;
+    const totalIncome = slabTaxedIncome + ltcgEquityIncome + stcgEquityIncome + otherLTCGIncome + vdaIncomeAmount;
 
     // Standard deduction — allowed ONLY against income under the head
     // "Salaries" (s.16(ia) of ITA 1961 / the equivalent under ITA 2025).
@@ -305,13 +347,17 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
     const isSenior = formData.ageGroup === '60to80' || formData.ageGroup === 'above80';
 
     const section80C = Math.min(parseFloat(formData.section80C) || 0, 150000);
-    // 80D: ₹25,000 self/family (₹50,000 if senior) + ₹25,000 parents (₹50,000 if
-    // the parents are senior). ₹1,00,000 is the absolute statutory ceiling and is
-    // only reachable when both the assessee and the parents are 60+. Without a
-    // separate "parents' age" input we take the assessee's age as the proxy,
-    // which is the conservative reading. Previously uncapped entirely.
-    const section80DCap = isSenior ? 100000 : 50000;
-    const section80D = Math.min(parseFloat(formData.section80D) || 0, section80DCap);
+    // 80D: ₹25,000 self/family (₹50,000 if the assessee is senior) PLUS a
+    // SEPARATE ₹25,000 for parents (₹50,000 if the parents are senior) — two
+    // independent caps, not one combined cap keyed off the assessee's own
+    // age. Previously used the assessee's age as a proxy for both, which
+    // under-served a under-60 taxpayer with senior-citizen parents.
+    const section80D = computeSection80D(
+      parseFloat(formData.section80D) || 0,
+      isSenior,
+      parseFloat(formData.section80DParents) || 0,
+      formData.section80DParentsAreSenior
+    );
     const section80E = parseFloat(formData.section80E) || 0;  // No upper cap — correct, 80E is uncapped
     // 80TTA is ₹10,000 on savings interest for under-60s. A senior citizen
     // claims 80TTB instead at ₹50,000, which covers ALL deposit interest.
@@ -319,15 +365,29 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
     const savingsInterestCap = isSenior ? 50000 : 10000; // 80TTB : 80TTA
     const section80TTA = Math.min(parseFloat(formData.section80TTA) || 0, savingsInterestCap);
     const section80CCD1B = Math.min(parseFloat(formData.section80CCD1B) || 0, 50000); // NPS extra cap ₹50k
-    // 80G: most donees carry a qualifying limit of 10% of adjusted gross total
-    // income, and many attract a 50% deduction rate rather than 100%. Modelling
-    // the full donee taxonomy needs an input this form does not have, so we
-    // apply the qualifying limit only — the part that is universal — and leave
-    // the 50%/100% split to the user's own figure. Previously uncapped, which
-    // let a donation of any size be deducted in full.
-    const adjustedGTI = Math.max(0, totalIncome - standardDeduction);
-    const section80G = Math.min(parseFloat(formData.section80G) || 0, adjustedGTI * 0.10);
-    const homeLoanInterest = Math.min(parseFloat(formData.homeLoanInterest) || 0, 200000); // Sec 24(b) cap ₹2L
+    // "Adjusted Total Income" for the 80G 10% qualifying limit excludes ALL
+    // capital gains taxed at special rates and every other Chapter VI-A
+    // deduction (80G is computed last, against what's left) — it is NOT
+    // Gross Total Income itself. Previously included the special-rate gains
+    // in the base, which inflated the 10% limit for anyone with LTCG/STCG.
+    const chapterVIAExcept80G = section80C + section80D + section80E + section80TTA + section80CCD1B;
+    const specialRateGainsExcludedFromAGTI = ltcgEquityIncome + stcgEquityIncome + otherLTCGIncome + vdaIncomeAmount;
+    const adjustedGTI = Math.max(
+      0,
+      totalIncome - standardDeduction - specialRateGainsExcludedFromAGTI - chapterVIAExcept80G
+    );
+    // 80G: the deduction rate (100%/50%) and whether the 10%-of-AGTI
+    // qualifying limit even applies depend on the donee's category — see
+    // shared/deductions.ts. A donation over ₹2,000 paid in cash is
+    // disallowed IN FULL under s.80G(5D), not merely capped at ₹2,000.
+    // Previously: a flat 10%-of-adjusted-GTI cap regardless of donee category,
+    // no rate distinction, and no cash-payment check at all.
+    const section80G = computeSection80G(
+      parseFloat(formData.section80G) || 0,
+      formData.section80GCategory,
+      formData.section80GPaidInCash,
+      adjustedGTI
+    );
     const lta = parseFloat(formData.lta) || 0;  // LTA exemption under old regime
     // "Other deductions" is a free-text catch-all. Left uncapped it allowed any
     // user to drive taxable income to zero. Bounded to the remaining Chapter
@@ -341,8 +401,12 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
     );
 
     if (regime === 'old') {
+      // Home loan interest no longer appears here — it is now folded into
+      // housePropertyNet above, which is where s.24(b) actually sits in the
+      // statute (part of computing income under the house-property head, not
+      // a Chapter VI-A deduction taken after Gross Total Income is formed).
       totalDeductions = section80C + section80D + section80E + section80TTA +
-        section80CCD1B + section80G + homeLoanInterest + lta +
+        section80CCD1B + section80G + lta +
         hraExemption + otherDeductions + standardDeduction;
     } else {
       // New regime: only standard deduction (₹75,000) applies
@@ -397,7 +461,12 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
       regime,
       formData.financialYear,
       formData.ageGroup as AgeGroup,
-      { ltcgEquity: ltcgEquityIncome, stcgEquity: stcgEquityIncome },
+      {
+        ltcgEquity: ltcgEquityIncome,
+        stcgEquity: stcgEquityIncome,
+        otherLTCG: otherLTCGIncome,
+        vdaIncome: vdaIncomeAmount,
+      },
       parseFloat(formData.agriculturalIncome) || 0,
       !formData.isNonResident
     );
@@ -576,17 +645,24 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
       salaryIncome: '',
       basicSalary: '',
       housePropertyIncome: '',
+      propertyType: 'selfOccupied',
       businessIncome: '',
       capitalGainsIncome: '',
       ltcgEquity: '',
       stcgEquity: '',
+      otherLTCG: '',
+      vdaIncome: '',
       otherIncome: '',
       section80C: '',
       section80D: '',
+      section80DParents: '',
+      section80DParentsAreSenior: false,
       section80E: '',
       section80TTA: '',
       section80CCD1B: '',
       section80G: '',
+      section80GCategory: '50-limit',
+      section80GPaidInCash: false,
       homeLoanInterest: '',
       lta: '',
       hraReceived: '',
@@ -691,19 +767,31 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
       const salaryIncome   = parseFloat(formData.salaryIncome)        || 0;
       const hraReceived    = parseFloat(formData.hraReceived)         || 0;
       const rentPaid       = parseFloat(formData.rentPaid)            || 0;
-      const rentalIncome   = parseFloat(formData.housePropertyIncome) || 0;
+      const rentalIncomeRaw = parseFloat(formData.housePropertyIncome) || 0;
+      const homeLoanInterestRaw = parseFloat(formData.homeLoanInterest) || 0;
       const capitalGains   = parseFloat(formData.capitalGainsIncome)  || 0;
       const businessInc    = parseFloat(formData.businessIncome)      || 0;
       const otherInc       = parseFloat(formData.otherIncome)         || 0;
+      const isSeniorForPDF = formData.ageGroup === '60to80' || formData.ageGroup === 'above80';
+
+      // s.24(b) interest folded into the house-property figure itself, per
+      // property type and regime — same helper calculateSingleRegime uses, so
+      // this can no longer drift from the on-screen figure the way sec80D and
+      // sec80G below already had (see the note on hraExemption).
+      const rentalIncomeOld = computeHousePropertyNet(rentalIncomeRaw, homeLoanInterestRaw, formData.propertyType, 'old');
+      const rentalIncomeNew = computeHousePropertyNet(rentalIncomeRaw, homeLoanInterestRaw, formData.propertyType, 'new');
 
       // Deductions (capped exactly as in calculateSingleRegime)
       const sec80C         = Math.min(parseFloat(formData.section80C)      || 0, 150000);
-      const sec80D         = parseFloat(formData.section80D)               || 0;
+      const sec80D         = computeSection80D(
+        parseFloat(formData.section80D) || 0,
+        isSeniorForPDF,
+        parseFloat(formData.section80DParents) || 0,
+        formData.section80DParentsAreSenior
+      );
       const sec80E         = parseFloat(formData.section80E)               || 0;
-      const sec80TTA       = Math.min(parseFloat(formData.section80TTA)    || 0, 10000);
+      const sec80TTA       = Math.min(parseFloat(formData.section80TTA)    || 0, isSeniorForPDF ? 50000 : 10000);
       const sec80CCD1B     = Math.min(parseFloat(formData.section80CCD1B)  || 0, 50000);
-      const sec80G         = parseFloat(formData.section80G)               || 0;
-      const homeLoanInt    = Math.min(parseFloat(formData.homeLoanInterest) || 0, 200000);
       const lta            = parseFloat(formData.lta)                      || 0;
 
       // HRA exemption — read from the engine, never recomputed here.
@@ -717,13 +805,27 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
       // did not add up, on a document a taxpayer may hand to their CA.
       const hraExemption = result.oldRegime.hraExemption;
 
-      const totalChapterVIA = sec80C + sec80D + sec80E + sec80TTA + sec80CCD1B + sec80G + homeLoanInt;
-
       // ── Build OLD regime RegimePDFData ─────────────────────────────────────
       const oldSD       = result.oldRegime.standardDeduction;   // ₹50,000
       const oldNetSal   = salaryIncome - hraExemption - lta - oldSD;
-      const oldOtherInc = rentalIncome + capitalGains + businessInc + otherInc;
+      const oldOtherInc = rentalIncomeOld + capitalGains + businessInc + otherInc;
       const oldGTI      = Math.max(0, oldNetSal) + oldOtherInc;
+
+      // sec80G depends on Adjusted Total Income, which itself depends on
+      // oldGTI — so it's computed here rather than alongside the other
+      // deductions above. `oldGTI` already excludes the special-rate gains
+      // (ltcgEquity/stcgEquity/otherLTCG/vdaIncome aren't summed into it),
+      // which matches the statutory AGTI exclusion; it still needs the other
+      // Chapter VI-A deductions subtracted out.
+      const chapterVIAExcept80GForPDF = sec80C + sec80D + sec80E + sec80TTA + sec80CCD1B;
+      const adjustedGTIForPDF = Math.max(0, oldGTI - chapterVIAExcept80GForPDF);
+      const sec80G = computeSection80G(
+        parseFloat(formData.section80G) || 0,
+        formData.section80GCategory,
+        formData.section80GPaidInCash,
+        adjustedGTIForPDF
+      );
+      const totalChapterVIA = sec80C + sec80D + sec80E + sec80TTA + sec80CCD1B + sec80G;
       const oldTaxAfterRebate = Math.max(0, result.oldRegime.incomeTax - result.oldRegime.rebate87A);
 
       const oldRegimeData = {
@@ -734,7 +836,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
         ltaExemption:     lta          || undefined,
         standardDeduction: oldSD,
         netSalary:        Math.max(0, oldNetSal),
-        rentalIncome:     rentalIncome  || undefined,
+        rentalIncome:     rentalIncomeRaw || undefined,
         capitalGainsLTCG: capitalGains  || undefined,
         otherIncome:      (businessInc + otherInc) || undefined,
         grossTotalIncome: oldGTI,
@@ -744,7 +846,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
         sec80TTA:         sec80TTA      || undefined,
         sec80CCD1B:       sec80CCD1B    || undefined,
         sec80G:           sec80G        || undefined,
-        homeLoanInterest: homeLoanInt   || undefined,
+        homeLoanInterest: homeLoanInterestRaw || undefined,
         totalChapterVIA,
         taxableIncome:    result.oldRegime.taxableIncome,
         incomeTax:        result.oldRegime.incomeTax,
@@ -757,9 +859,14 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
       };
 
       // ── Build NEW regime RegimePDFData ─────────────────────────────────────
+      // Self-occupied home loan interest is disallowed under the New Regime,
+      // but let-out interest is not — computeHousePropertyNet applies that
+      // distinction, hence a separate rentalIncomeNew rather than reusing
+      // the old-regime figure.
+      const homeLoanInterestDisplayNew = formData.propertyType === 'letOut' ? homeLoanInterestRaw : 0;
       const newSD       = result.newRegime.standardDeduction;   // ₹75,000
       const newNetSal   = salaryIncome - newSD;
-      const newOtherInc = rentalIncome + capitalGains + businessInc + otherInc;
+      const newOtherInc = rentalIncomeNew + capitalGains + businessInc + otherInc;
       const newGTI      = Math.max(0, newNetSal) + newOtherInc;
       const newTaxAfterRebate = Math.max(0, result.newRegime.incomeTax - result.newRegime.rebate87A);
 
@@ -767,7 +874,8 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
         grossSalary:      salaryIncome,
         standardDeduction: newSD,
         netSalary:        Math.max(0, newNetSal),
-        rentalIncome:     rentalIncome  || undefined,
+        rentalIncome:     rentalIncomeRaw || undefined,
+        homeLoanInterest: homeLoanInterestDisplayNew || undefined,
         capitalGainsLTCG: capitalGains  || undefined,
         otherIncome:      (businessInc + otherInc) || undefined,
         grossTotalIncome: newGTI,
@@ -1032,6 +1140,26 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                   </div>
 
                   <div>
+                    <Label htmlFor="property-type">Property Type</Label>
+                    <Select
+                      value={formData.propertyType}
+                      onValueChange={(value) => updateFormData('propertyType', value as PropertyType)}
+                    >
+                      <SelectTrigger id="property-type" data-testid="select-property-type">
+                        <SelectValue placeholder="Select property type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="selfOccupied">Self-occupied</SelectItem>
+                        <SelectItem value="letOut">Let out (rented)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-ink/65 mt-1">
+                      Self-occupied: home loan interest capped at ₹2,00,000/year, unavailable under the New Regime.
+                      Let out: no cap on the interest itself, but only ₹2,00,000 of any resulting loss can offset your other income this year.
+                    </p>
+                  </div>
+
+                  <div>
                     <Label htmlFor="business-income">Business/Professional Income</Label>
                     <Input
                       id="business-income"
@@ -1045,7 +1173,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                   </div>
 
                   <div>
-                    <Label htmlFor="capital-gains-income">Capital Gains Income</Label>
+                    <Label htmlFor="capital-gains-income">Capital Gains Income — Short-Term / Debt Funds</Label>
                     <Input
                       id="capital-gains-income"
                       type="number"
@@ -1056,9 +1184,61 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                       data-testid="input-capital-gains-income"
                     />
                     <p className="text-xs text-ink/65 mt-1">
-                      Debt funds, unlisted shares, property — gains taxed at your slab rate.
-                      Listed shares and equity mutual funds go in the two fields below.
+                      Debt mutual funds (any holding period, since Finance Act 2023) and short-term
+                      (≤24 months) gains on property or unlisted shares — taxed at your slab rate.
+                      Long-term property/unlisted-share gains go in the field below; listed equity in the two above.
                     </p>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="other-ltcg">
+                      Long-Term Capital Gains — Property / Unlisted Shares
+                    </Label>
+                    <Input
+                      id="other-ltcg"
+                      type="number"
+                      inputMode="numeric"
+                      placeholder="e.g., 500000"
+                      value={formData.otherLTCG}
+                      onChange={(e) => updateFormData('otherLTCG', e.target.value)}
+                      data-testid="input-other-ltcg"
+                    />
+                    <p className="text-xs text-ink/65 mt-1">
+                      Held over 24 months. Section 112 — flat 12.5%, no exemption threshold. Assumes
+                      no indexation; if you bought before 23 July 2024 you may do better claiming
+                      20% with indexation instead — a CA can check which is lower for you.
+                    </p>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="crypto-income"
+                        checked={formData.hasCryptoIncome}
+                        onChange={(e) => updateFormData('hasCryptoIncome', e.target.checked)}
+                        data-testid="checkbox-crypto-income"
+                      />
+                      <Label htmlFor="crypto-income" className="font-normal">Crypto / Virtual Digital Asset income (Sec 115BBH)</Label>
+                    </div>
+                    {formData.hasCryptoIncome && (
+                      <div className="mt-2">
+                        <Label htmlFor="vda-income">VDA Gains</Label>
+                        <Input
+                          id="vda-income"
+                          type="number"
+                          inputMode="numeric"
+                          placeholder="e.g., 200000"
+                          value={formData.vdaIncome}
+                          onChange={(e) => updateFormData('vdaIncome', e.target.value)}
+                          data-testid="input-vda-income"
+                        />
+                        <p className="text-xs text-ink/65 mt-1">
+                          Flat 30%, no ₹1,25,000 exemption, no deduction against it, and losses
+                          cannot be set off against any other income — not even other VDA gains.
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   {/* Listed-equity gains are charged at their own statutory rates and
@@ -1133,16 +1313,6 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                         />
                         <Label htmlFor="multiple-house-properties" className="font-normal">More than one house property</Label>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <input
-                          type="checkbox"
-                          id="crypto-income"
-                          checked={formData.hasCryptoIncome}
-                          onChange={(e) => updateFormData('hasCryptoIncome', e.target.checked)}
-                          data-testid="checkbox-crypto-income"
-                        />
-                        <Label htmlFor="crypto-income" className="font-normal">Crypto / Virtual Digital Asset income (Sec 115BBH)</Label>
-                      </div>
                       {parseFloat(formData.businessIncome) > 0 && (
                         <div className="flex items-center space-x-2">
                           <input
@@ -1168,22 +1338,32 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                       <div className="flex items-center space-x-2">
                         <input
                           type="checkbox"
-                          id="is-non-resident"
-                          checked={formData.isNonResident}
-                          onChange={(e) => updateFormData('isNonResident', e.target.checked)}
-                          data-testid="checkbox-is-non-resident"
-                        />
-                        <Label htmlFor="is-non-resident" className="font-normal">Non-resident / RNOR (not ordinarily resident)</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <input
-                          type="checkbox"
                           id="foreign-assets"
                           checked={formData.hasForeignAssets}
                           onChange={(e) => updateFormData('hasForeignAssets', e.target.checked)}
                           data-testid="checkbox-foreign-assets"
                         />
                         <Label htmlFor="foreign-assets" className="font-normal">Foreign income or foreign assets</Label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label className="mb-2 block text-sm text-muted-foreground">
+                      These two affect your tax as well as your ITR form
+                    </Label>
+                    <div className="space-y-2.5">
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id="is-non-resident"
+                          checked={formData.isNonResident}
+                          onChange={(e) => updateFormData('isNonResident', e.target.checked)}
+                          data-testid="checkbox-is-non-resident"
+                        />
+                        <Label htmlFor="is-non-resident" className="font-normal">
+                          Non-resident / RNOR (not ordinarily resident) — no Section 87A/156 rebate applies
+                        </Label>
                       </div>
                     </div>
                   </div>
@@ -1199,6 +1379,10 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                       onChange={(e) => updateFormData('agriculturalIncome', e.target.value)}
                       data-testid="input-agricultural-income"
                     />
+                    <p className="text-xs text-ink/65 mt-1">
+                      Exempt itself, but above ₹5,000 it can push your non-agricultural income into
+                      higher tax slabs (partial integration) once that income exceeds your basic exemption limit.
+                    </p>
                   </div>
                 </div>
               </Card>
@@ -1227,7 +1411,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                   </div>
 
                   <div>
-                    <Label htmlFor="section-80d">Section 80D (Health Insurance)</Label>
+                    <Label htmlFor="section-80d">Section 80D — Health Insurance (Self & Family)</Label>
                     <Input
                       id="section-80d"
                       type="number"
@@ -1237,6 +1421,35 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                       onChange={(e) => updateFormData('section80D', e.target.value)}
                       data-testid="input-section-80d"
                     />
+                    <p className="text-xs text-ink/65 mt-1">
+                      Max ₹25,000, or ₹50,000 if you are a senior citizen.
+                    </p>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="section-80d-parents">Section 80D — Health Insurance (Parents)</Label>
+                    <Input
+                      id="section-80d-parents"
+                      type="number"
+                      inputMode="numeric"
+                      placeholder="e.g., 25000"
+                      value={formData.section80DParents}
+                      onChange={(e) => updateFormData('section80DParents', e.target.value)}
+                      data-testid="input-section-80d-parents"
+                    />
+                    <div className="flex items-center space-x-2 mt-2">
+                      <input
+                        type="checkbox"
+                        id="parents-senior"
+                        checked={formData.section80DParentsAreSenior}
+                        onChange={(e) => updateFormData('section80DParentsAreSenior', e.target.checked)}
+                        data-testid="checkbox-parents-senior"
+                      />
+                      <Label htmlFor="parents-senior" className="font-normal">Parents are senior citizens (60+)</Label>
+                    </div>
+                    <p className="text-xs text-ink/65 mt-1">
+                      A separate ₹25,000 cap (₹50,000 if your parents are senior citizens) — on top of, not shared with, the self &amp; family cap above.
+                    </p>
                   </div>
 
                   <div>
@@ -1292,16 +1505,52 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
                   </div>
 
                   <div>
-                    <Label htmlFor="home-loan-interest">Section 24(b) – Home Loan Interest (max ₹2,00,000)</Label>
+                    <Label htmlFor="section-80g-category">Donee Category (check your receipt)</Label>
+                    <Select
+                      value={formData.section80GCategory}
+                      onValueChange={(value) => updateFormData('section80GCategory', value as Section80GCategory)}
+                    >
+                      <SelectTrigger id="section-80g-category" data-testid="select-section-80g-category">
+                        <SelectValue placeholder="Select donee category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="100-no-limit">100% deduction, no limit (PM CARES, National Defence Fund, PM National Relief Fund)</SelectItem>
+                        <SelectItem value="50-no-limit">50% deduction, no limit (e.g. PM's Drought Relief Fund)</SelectItem>
+                        <SelectItem value="100-limit">100% deduction, up to 10% of adjusted income (govt./local authority funds for specified purposes)</SelectItem>
+                        <SelectItem value="50-limit">50% deduction, up to 10% of adjusted income (most registered charitable trusts/NGOs)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <div className="flex items-center space-x-2 mt-2">
+                      <input
+                        type="checkbox"
+                        id="section-80g-cash"
+                        checked={formData.section80GPaidInCash}
+                        onChange={(e) => updateFormData('section80GPaidInCash', e.target.checked)}
+                        data-testid="checkbox-section-80g-cash"
+                      />
+                      <Label htmlFor="section-80g-cash" className="font-normal">Paid in cash</Label>
+                    </div>
+                    <p className="text-xs text-ink/65 mt-1">
+                      A cash donation over ₹2,000 gets NO deduction at all under Section 80G(5D) — not even the first ₹2,000.
+                    </p>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="home-loan-interest">Section 24(b) – Home Loan Interest</Label>
                     <Input
                       id="home-loan-interest"
                       type="number"
                       inputMode="numeric"
-                      placeholder="Max ₹2,00,000"
+                      placeholder={formData.propertyType === 'letOut' ? 'No statutory cap' : 'Max ₹2,00,000'}
                       value={formData.homeLoanInterest}
                       onChange={(e) => updateFormData('homeLoanInterest', e.target.value)}
                       data-testid="input-home-loan-interest"
                     />
+                    <p className="text-xs text-ink/65 mt-1">
+                      {formData.propertyType === 'letOut'
+                        ? 'Let out: no cap on the interest itself against rental income; only ₹2,00,000 of any resulting loss can offset your other income this year.'
+                        : 'Self-occupied: capped at ₹2,00,000/year, and unavailable under the New Regime.'}
+                    </p>
                   </div>
 
                   <div>
