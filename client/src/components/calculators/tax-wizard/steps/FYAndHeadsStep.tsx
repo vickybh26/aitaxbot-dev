@@ -1,15 +1,19 @@
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Choice, Field, ToggleCard } from "@/components/calc/Field";
+import { Choice, Field, StringMoneyInput, ToggleCard } from "@/components/calc/Field";
 import type { AgeGroup } from "@shared/taxLiability";
 import { INCOME_HEAD_LABELS, type IncomeHeadKey, type WizardState } from "../types";
 
 interface FYAndHeadsStepProps {
   financialYear: string;
   ageGroup: AgeGroup;
+  isNonResident: boolean;
+  agriculturalIncome: string;
   incomeHeads: WizardState["incomeHeads"];
   onFinancialYearChange: (fy: string) => void;
   onAgeGroupChange: (ageGroup: AgeGroup) => void;
+  onIsNonResidentChange: (value: boolean) => void;
+  onAgriculturalIncomeChange: (value: string) => void;
   onIncomeHeadsChange: (next: WizardState["incomeHeads"]) => void;
 }
 
@@ -34,9 +38,13 @@ const HEAD_ORDER: IncomeHeadKey[] = [
 export default function FYAndHeadsStep({
   financialYear,
   ageGroup,
+  isNonResident,
+  agriculturalIncome,
   incomeHeads,
   onFinancialYearChange,
   onAgeGroupChange,
+  onIsNonResidentChange,
+  onAgriculturalIncomeChange,
   onIncomeHeadsChange,
 }: FYAndHeadsStepProps) {
   function toggleHead(key: IncomeHeadKey) {
@@ -75,6 +83,24 @@ export default function FYAndHeadsStep({
         hint="Affects your tax-free income threshold under the Old Regime, and deduction limits like 80D and 80TTB."
       >
         <Choice<AgeGroup> value={ageGroup} onChange={onAgeGroupChange} options={AGE_GROUP_OPTIONS} />
+      </Field>
+
+      <ToggleCard
+        checked={isNonResident}
+        onClick={() => onIsNonResidentChange(!isNonResident)}
+        title="Non-resident / RNOR (not ordinarily resident)"
+        hint="No Section 87A/156 rebate applies — you're taxed on the full slab amount however low your income is."
+      />
+
+      <Field
+        label="Agricultural Income (if any)"
+        hint="Exempt itself, but above ₹5,000 it can push your non-agricultural income into higher tax slabs (partial integration) once that income exceeds your basic exemption limit."
+      >
+        <StringMoneyInput
+          id="wizard-agricultural-income"
+          value={agriculturalIncome}
+          onChange={onAgriculturalIncomeChange}
+        />
       </Field>
 
       <div>

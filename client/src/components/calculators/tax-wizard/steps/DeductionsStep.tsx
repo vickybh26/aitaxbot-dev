@@ -1,14 +1,12 @@
-import { Field, StringMoneyInput } from "@/components/calc/Field";
+import { Field, StringMoneyInput, ToggleCard } from "@/components/calc/Field";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { AgeGroup } from "@shared/taxLiability";
+import type { Section80GCategory } from "@shared/deductions";
 import {
   computeDeductions,
   toAmount,
   SECTION_80C_CAP,
   SECTION_80CCD1B_CAP,
-  SECTION_80D_CAP_BELOW60,
-  SECTION_80D_CAP_SENIOR,
-  SECTION_80TTA_CAP,
-  SECTION_80TTB_CAP,
   type DeductionsDetails,
   type OtherSourcesDetails,
 } from "../types";
@@ -28,15 +26,24 @@ export function isDeductionsStepValid(): boolean {
   return true;
 }
 
+type MoneyFieldKey = "section80C" | "section80D" | "section80DParents" | "section80E" | "section80CCD1B" | "section80G";
+
 interface FieldDef {
-  key: keyof DeductionsDetails;
+  key: MoneyFieldKey;
   label: string;
   hint: string;
 }
 
+const SECTION_80G_CATEGORY_OPTIONS: { value: Section80GCategory; label: string }[] = [
+  { value: "100-no-limit", label: "100% deduction, no limit (PM CARES, National Defence Fund, PM National Relief Fund)" },
+  { value: "50-no-limit", label: "50% deduction, no limit (e.g. PM's Drought Relief Fund)" },
+  { value: "100-limit", label: "100% deduction, up to 10% of adjusted income (govt./local authority funds for specified purposes)" },
+  { value: "50-limit", label: "50% deduction, up to 10% of adjusted income (most registered charitable trusts/NGOs)" },
+];
+
 export default function DeductionsStep({ value, otherSources, ageGroup, onChange }: DeductionsStepProps) {
   const result = computeDeductions(value, otherSources, ageGroup);
-  const section80DCap = ageGroup === "below60" ? SECTION_80D_CAP_BELOW60 : SECTION_80D_CAP_SENIOR;
+  const isSenior = ageGroup === "60to80" || ageGroup === "above80";
 
   const FIELDS: FieldDef[] = [
     {
@@ -46,8 +53,13 @@ export default function DeductionsStep({ value, otherSources, ageGroup, onChange
     },
     {
       key: "section80D",
-      label: "Section 80D (Health Insurance Premium)",
-      hint: `Capped at ₹${section80DCap.toLocaleString("en-IN")}/year for your age group.`,
+      label: "Section 80D (Health Insurance — Self & Family)",
+      hint: `Capped at ₹${isSenior ? "50,000" : "25,000"}/year for your age group.`,
+    },
+    {
+      key: "section80DParents",
+      label: "Section 80D (Health Insurance — Parents)",
+      hint: "A separate cap from the one above — not shared with it.",
     },
     {
       key: "section80E",
@@ -62,11 +74,11 @@ export default function DeductionsStep({ value, otherSources, ageGroup, onChange
     {
       key: "section80G",
       label: "Section 80G (Donations)",
-      hint: "Some donations qualify for only 50% deduction — talk to your CA if you're unsure which applies. Also capped at 10% of your adjusted income overall; we'll apply that on the result page.",
+      hint: "The rate (100%/50%) and whether the 10%-of-adjusted-income limit applies both depend on the donee category — set that below.",
     },
   ];
 
-  function update(key: keyof DeductionsDetails, raw: string) {
+  function update(key: MoneyFieldKey, raw: string) {
     onChange({ ...value, [key]: raw.replace(/[^\d.]/g, "") });
   }
 
@@ -92,9 +104,48 @@ export default function DeductionsStep({ value, otherSources, ageGroup, onChange
       )}
 
       {FIELDS.map(({ key, label, hint }) => (
-        <Field key={key} label={label} hint={hint}>
-          <StringMoneyInput id={`ded-${key}`} value={value[key]} onChange={(v) => update(key, v)} />
-        </Field>
+        <div key={key}>
+          <Field label={label} hint={hint}>
+            <StringMoneyInput id={`ded-${key}`} value={value[key]} onChange={(v) => update(key, v)} />
+          </Field>
+
+          {key === "section80DParents" && (
+            <div className="mt-2">
+              <ToggleCard
+                checked={value.section80DParentsAreSenior}
+                onClick={() => onChange({ ...value, section80DParentsAreSenior: !value.section80DParentsAreSenior })}
+                title="Parents are senior citizens (60+)"
+                hint="Raises their cap to ₹50,000/year."
+              />
+            </div>
+          )}
+
+          {key === "section80G" && toAmount(value.section80G) > 0 && (
+            <div className="mt-3 space-y-3">
+              <Field label="Donee Category (check your receipt)">
+                <Select
+                  value={value.section80GCategory}
+                  onValueChange={(v) => onChange({ ...value, section80GCategory: v as Section80GCategory })}
+                >
+                  <SelectTrigger id="ded-80g-category" className="rounded-2xl border-rule bg-paper text-[15px] font-semibold">
+                    <SelectValue placeholder="Select donee category" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-2xl border-rule">
+                    {SECTION_80G_CATEGORY_OPTIONS.map((o) => (
+                      <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Field>
+              <ToggleCard
+                checked={value.section80GPaidInCash}
+                onClick={() => onChange({ ...value, section80GPaidInCash: !value.section80GPaidInCash })}
+                title="Paid in cash"
+                hint="A cash donation over ₹2,000 gets NO deduction at all under Section 80G(5D) — not even the first ₹2,000."
+              />
+            </div>
+          )}
+        </div>
       ))}
 
       <div className="rounded-2xl border border-rule bg-paper p-4 flex items-center justify-between">

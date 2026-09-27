@@ -13,10 +13,8 @@ import ResultStep from "./steps/ResultStep";
 import { createEmptyWizardState, type WizardState } from "./types";
 
 /**
- * Multi-PR wizard rebuild — see types.ts for the full plan. Every income
- * head plus Deductions plus the Result screen are now built: this is the
- * LAST increment before a separate cutover PR swaps the live
- * /calculators/income-tax route over to this component.
+ * Multi-PR wizard rebuild — see types.ts for the full plan. This has been
+ * the live /calculators/income-tax route since the 2026-08-30 cutover.
  *
  * The step LIST is dynamic, not a fixed array: getActiveSteps() below
  * recomputes it from state.incomeHeads on every render, so toggling a head
@@ -139,9 +137,13 @@ export default function TaxWizard() {
         <FYAndHeadsStep
           financialYear={state.financialYear}
           ageGroup={state.ageGroup}
+          isNonResident={state.isNonResident}
+          agriculturalIncome={state.agriculturalIncome}
           incomeHeads={state.incomeHeads}
           onFinancialYearChange={(financialYear) => setState((s) => ({ ...s, financialYear }))}
           onAgeGroupChange={(ageGroup) => setState((s) => ({ ...s, ageGroup }))}
+          onIsNonResidentChange={(isNonResident) => setState((s) => ({ ...s, isNonResident }))}
+          onAgriculturalIncomeChange={(agriculturalIncome) => setState((s) => ({ ...s, agriculturalIncome }))}
           onIncomeHeadsChange={(incomeHeads) => setState((s) => ({ ...s, incomeHeads }))}
         />
       )}

@@ -1,18 +1,16 @@
 /**
  * AiTaxBot Income Tax Wizard — shared state shape.
  *
- * This is the FIRST increment of a multi-PR rebuild that replaces the old
- * single-page "throw every field at the user" calculator (TaxCalculator.tsx)
- * with a step-by-step flow: basic details -> FY/AY + which income heads
- * apply -> one focused step per selected head -> deductions -> result.
- *
- * Deliberately NOT wired into the live /calculators/income-tax route yet.
- * TaxCalculator.tsx keeps serving real traffic unchanged until every income
- * head this wizard needs (Salary, House Property, Business 44AD/ADA/AE,
- * Capital Gains equity/MF, Other Sources) has its own step and the combined
- * output is verified to match computeTaxLiability() in shared/taxLiability.ts
- * exactly. Only then does a final cutover PR swap the route. See
- * client/src/pages/IncomeTaxCalculatorWizard.tsx for the preview route.
+ * Replaced the old single-page "throw every field at the user" calculator
+ * (TaxCalculator.tsx) as the live /calculators/income-tax route in the
+ * 2026-08-30 cutover (see IncomeTaxCalculator.tsx) — a step-by-step flow:
+ * basic details -> FY/AY + which income heads apply -> one focused step per
+ * selected head -> deductions -> result. TaxCalculator.tsx is no longer
+ * routed to from any live page (it still exists as the homepage's quick-
+ * calculate modal, Landing.tsx). This file's header used to say the cutover
+ * hadn't happened yet — left uncorrected after it shipped, which is exactly
+ * the kind of stale comment that sends the next reader looking in the wrong
+ * file for a live bug.
  */
 
 import {
@@ -22,6 +20,7 @@ import {
   type TaxRegime,
   type TaxLiabilityResult,
 } from "@shared/taxLiability";
+import { computeSection80D, computeSection80G, type Section80GCategory } from "@shared/deductions";
 
 export type IncomeHeadKey =
   | "salary"
@@ -188,21 +187,22 @@ export interface OtherSourcesDetails {
  */
 export interface DeductionsDetails {
   section80C: string; // PPF, ELSS, life insurance, etc. — capped Rs.1,50,000
-  section80D: string; // Health insurance premium — capped Rs.25,000/Rs.50,000 by age (simplified, see below)
+  section80D: string; // Health insurance premium — self & family
+  // A SEPARATE Rs.25,000 cap (Rs.50,000 if parents are senior citizens) — not
+  // shared with section80D above. Previously modelled as one combined cap
+  // keyed off the assessee's own age, which under-served an under-60
+  // taxpayer with senior-citizen parents. See computeSection80D.
+  section80DParents: string;
+  section80DParentsAreSenior: boolean;
   section80E: string; // Student loan interest — uncapped
   section80CCD1B: string; // Additional NPS (own contribution) — capped Rs.50,000
-  section80G: string; // Donations — real rule varies 50%/100% by donee (out of scope); the 10%-of-adjusted-GTI qualifying limit IS applied, but only in the Result step's aggregate computation, since it needs the full income picture this step alone doesn't have — see computeWizardTaxSummary
+  section80G: string; // Donations — rate (100%/50%) and whether the 10%-of-adjusted-GTI limit even applies depend on donee category; applied in the Result step's aggregate computation via computeSection80G, since it needs the full income picture this step alone doesn't have
+  section80GCategory: Section80GCategory;
+  section80GPaidInCash: boolean; // s.80G(5D): a cash donation over Rs.2,000 is disallowed IN FULL
 }
 
 export const SECTION_80C_CAP = 150000;
 export const SECTION_80CCD1B_CAP = 50000;
-// ₹50,000 self+family (₹1,00,000 if senior) — matches TaxCalculator.tsx's
-// existing section80DCap logic exactly (that comment explains the full
-// self+parents breakdown this aggregate figure approximates; using a
-// different pair of numbers here would silently disagree with the live
-// calculator on the exact same input).
-export const SECTION_80D_CAP_BELOW60 = 50000;
-export const SECTION_80D_CAP_SENIOR = 100000;
 export const SECTION_80TTA_CAP = 10000;
 export const SECTION_80TTB_CAP = 50000; // senior citizens only
 
@@ -210,6 +210,15 @@ export interface WizardState {
   basicDetails: BasicDetails;
   financialYear: string; // matches TaxCalculator.tsx's existing values: "2024-25" | "2025-26" | "2026-27"
   ageGroup: AgeGroup;
+  // Gates the Section 87A/156 rebate entirely — a non-resident gets NO
+  // rebate however low their income, and no cliff marginal relief either.
+  // Previously not collected anywhere in this wizard, so computeTaxLiability
+  // was always called as if every taxpayer were resident.
+  isNonResident: boolean;
+  // Exempt itself (s.10(1)), but above Rs.5,000 it can push non-agricultural
+  // income into higher slabs via partial integration once that income
+  // exceeds the basic exemption limit. Previously not collected at all.
+  agriculturalIncome: string;
   incomeHeads: Record<IncomeHeadKey, boolean>;
   salary: SalaryDetails;
   houseProperty: HousePropertyDetails;
@@ -249,6 +258,8 @@ export function createEmptyWizardState(): WizardState {
     basicDetails: { name: "", mobile: "", email: "" },
     financialYear: "2026-27",
     ageGroup: "below60",
+    isNonResident: false,
+    agriculturalIncome: "",
     incomeHeads: {
       salary: false,
       houseProperty: false,
@@ -296,9 +307,13 @@ export function createEmptyWizardState(): WizardState {
     deductions: {
       section80C: "",
       section80D: "",
+      section80DParents: "",
+      section80DParentsAreSenior: false,
       section80E: "",
       section80CCD1B: "",
       section80G: "",
+      section80GCategory: "50-limit",
+      section80GPaidInCash: false,
     },
   };
 }
@@ -347,10 +362,15 @@ export function computeHRAExemption(salary: SalaryDetails): number {
 export interface HousePropertyComputation {
   letOutNetAnnualValue: number;
   letOutStandardDeduction: number; // 30% of NAV, Section 24(a)
+  letOutInterest: number; // uncapped, as claimed
   letOutIncome: number; // can be negative (loss)
   selfOccupiedInterestCapped: number; // always <= SELF_OCCUPIED_INTEREST_CAP
   selfOccupiedIncome: number; // always <= 0 (a deduction/loss, never positive)
   totalIncome: number; // letOutIncome + selfOccupiedIncome — can be negative
+  /** Interest actually claimed across both — for PDF/AI-advice display, which
+   *  previously read only selfOccupiedHomeLoanInterest and silently omitted
+   *  let-out interest entirely. */
+  totalInterestClaimed: number;
 }
 
 /**
@@ -383,11 +403,31 @@ export function computeHousePropertyIncome(hp: HousePropertyDetails): HousePrope
   return {
     letOutNetAnnualValue,
     letOutStandardDeduction,
+    letOutInterest,
     letOutIncome,
     selfOccupiedInterestCapped,
     selfOccupiedIncome,
     totalIncome: letOutIncome + selfOccupiedIncome,
+    totalInterestClaimed: letOutInterest + selfOccupiedInterestCapped,
   };
+}
+
+/**
+ * s.71(3A): however large a house-property loss is, only Rs.2,00,000 of it
+ * can be set off against OTHER heads of income in the same year — the
+ * excess is carried forward, which a single-year calculator cannot model.
+ * This is separate from (and in addition to) the self-occupied interest cap
+ * above: a let-out property's interest itself has no statutory cap, but a
+ * large resulting loss still can't fully offset salary/business/other income
+ * this year. Previously not applied at all — an uncapped let-out loss could
+ * offset an unlimited amount of other income.
+ */
+export const HOUSE_PROPERTY_LOSS_SETOFF_CAP = 200000;
+
+export function capHousePropertyLossForSetOff(housePropertyIncome: number): number {
+  return housePropertyIncome < 0
+    ? Math.max(housePropertyIncome, -HOUSE_PROPERTY_LOSS_SETOFF_CAP)
+    : housePropertyIncome;
 }
 
 // 44AE flat rates, straight from Schedule BP of a real filed ITR-3
@@ -523,8 +563,13 @@ export function computeDeductions(
   ageGroup: AgeGroup
 ): DeductionsComputation {
   const section80C = Math.min(toAmount(deductions.section80C), SECTION_80C_CAP);
-  const section80DCap = ageGroup === "below60" ? SECTION_80D_CAP_BELOW60 : SECTION_80D_CAP_SENIOR;
-  const section80D = Math.min(toAmount(deductions.section80D), section80DCap);
+  const isSenior = ageGroup === "60to80" || ageGroup === "above80";
+  const section80D = computeSection80D(
+    toAmount(deductions.section80D),
+    isSenior,
+    toAmount(deductions.section80DParents),
+    deductions.section80DParentsAreSenior
+  );
   const section80E = toAmount(deductions.section80E);
   const section80CCD1B = Math.min(toAmount(deductions.section80CCD1B), SECTION_80CCD1B_CAP);
   const section80G = toAmount(deductions.section80G);
@@ -586,6 +631,10 @@ export interface RegimeSummary {
   // doc comment for why that duplication specifically is a risk here.
   grossSalary: number;
   housePropertyIncome: number; // can be negative (loss); old regime includes self-occupied interest relief, new regime doesn't
+  // Self-occupied (capped) + let-out (uncapped) interest actually claimed —
+  // for PDF/AI-advice display, which previously re-derived only the
+  // self-occupied figure and silently omitted let-out interest entirely.
+  homeLoanInterestClaimed: number;
   businessIncome: number;
   debtFundGains: number;
   otherSourcesIncome: number;
@@ -608,12 +657,22 @@ export function computeRegimeSummary(state: WizardState, regime: TaxRegime): Reg
 
   const hpComputation = computeHousePropertyIncome(state.houseProperty);
   const housePropertyIncome = regime === "old" ? hpComputation.totalIncome : hpComputation.letOutIncome;
+  // Self-occupied interest is disallowed under the New Regime; let-out
+  // interest is not (it's part of computing that head's own income, which
+  // s.115BAC/s.202 doesn't touch).
+  const homeLoanInterestClaimedForRegime =
+    regime === "old" ? hpComputation.totalInterestClaimed : hpComputation.letOutInterest;
+  // s.71(3A) — only Rs.2,00,000 of a house-property LOSS can be set off
+  // against other heads this year, regardless of regime. Applied at the
+  // point of aggregation so `housePropertyIncome` above still exposes the
+  // real, uncapped figure for PDF/AI-advice display.
+  const housePropertyIncomeForSlab = capHousePropertyLossForSetOff(housePropertyIncome);
 
   const businessIncome = computeBusinessIncome(state.business).presumptiveIncome;
   const debtFundGains = toAmount(state.capitalGains.debtFundGains);
   const otherSourcesIncome = computeOtherSourcesIncome(state.otherSources);
 
-  const slabIncome = grossSalary + housePropertyIncome + businessIncome + debtFundGains + otherSourcesIncome;
+  const slabIncome = grossSalary + housePropertyIncomeForSlab + businessIncome + debtFundGains + otherSourcesIncome;
 
   const ltcgEquity = toAmount(state.capitalGains.ltcgEquity);
   const stcgEquity = toAmount(state.capitalGains.stcgEquity);
@@ -631,11 +690,18 @@ export function computeRegimeSummary(state: WizardState, regime: TaxRegime): Reg
   };
   if (regime === "old") {
     const ded = computeDeductions(state.deductions, state.otherSources, state.ageGroup);
-    // 10%-of-adjusted-GTI qualifying limit on 80G — same formula as
-    // TaxCalculator.tsx's adjustedGTI, computed here (not in DeductionsStep)
-    // because it needs this full cross-head income picture.
-    const adjustedGTI = Math.max(0, grossTotalIncome - standardDeduction);
-    const section80GCapped = Math.min(ded.section80G, adjustedGTI * 0.1);
+    // Adjusted Total Income for the 80G qualifying limit excludes special-
+    // rate capital gains and every other Chapter VI-A deduction — same
+    // formula as TaxCalculator.tsx's adjustedGTI, computed here (not in
+    // DeductionsStep) because it needs this full cross-head income picture.
+    const chapterVIAExcept80G = ded.section80C + ded.section80D + ded.section80E + ded.section80CCD1B + ded.section80TTAorTTB;
+    const adjustedGTI = Math.max(0, grossTotalIncome - standardDeduction - ltcgEquity - stcgEquity - chapterVIAExcept80G);
+    const section80GCapped = computeSection80G(
+      ded.section80G,
+      state.deductions.section80GCategory,
+      state.deductions.section80GPaidInCash,
+      adjustedGTI
+    );
     chapterVIADeductions =
       ded.section80C + ded.section80D + ded.section80E + ded.section80CCD1B + section80GCapped + ded.section80TTAorTTB;
     // section80G here is the CAPPED figure actually applied — deliberately
@@ -647,10 +713,15 @@ export function computeRegimeSummary(state: WizardState, regime: TaxRegime): Reg
   const totalDeductions = standardDeduction + professionalTaxDeduction + hraExemption + ltaExemption + chapterVIADeductions;
   const taxableIncome = Math.max(0, slabIncome - totalDeductions);
 
-  const liability = computeTaxLiability(taxableIncome, regime, state.financialYear, state.ageGroup, {
-    ltcgEquity,
-    stcgEquity,
-  });
+  const liability = computeTaxLiability(
+    taxableIncome,
+    regime,
+    state.financialYear,
+    state.ageGroup,
+    { ltcgEquity, stcgEquity },
+    toAmount(state.agriculturalIncome),
+    !state.isNonResident
+  );
 
   const takeHome = grossTotalIncome - liability.totalTax;
   const effectiveRate = grossTotalIncome > 0 ? (liability.totalTax / grossTotalIncome) * 100 : 0;
@@ -671,6 +742,7 @@ export function computeRegimeSummary(state: WizardState, regime: TaxRegime): Reg
     effectiveRate,
     grossSalary,
     housePropertyIncome,
+    homeLoanInterestClaimed: homeLoanInterestClaimedForRegime,
     businessIncome,
     debtFundGains,
     otherSourcesIncome,

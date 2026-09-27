@@ -68,9 +68,10 @@ function regimePDFData(state: WizardState, summary: RegimeSummary) {
     sec80TTA: isOld ? summary.deductionsBreakdown.section80TTAorTTB || undefined : undefined,
     sec80CCD1B: isOld ? summary.deductionsBreakdown.section80CCD1B || undefined : undefined,
     sec80G: isOld ? summary.deductionsBreakdown.section80G || undefined : undefined,
-    homeLoanInterest: isOld
-      ? Math.min(toAmount(state.houseProperty.selfOccupiedHomeLoanInterest), 200000) || undefined
-      : undefined,
+    // Reads the engine's own figure (self-occupied capped + let-out
+    // uncapped) rather than re-deriving self-occupied-only here, which
+    // previously made let-out interest vanish from the PDF entirely.
+    homeLoanInterest: summary.homeLoanInterestClaimed || undefined,
     totalChapterVIA: summary.chapterVIADeductions,
     taxableIncome: summary.taxableIncome,
     incomeTax: summary.liability.incomeTax,
@@ -93,7 +94,7 @@ export function buildTaxComputationData(state: WizardState, wizardSummary: Wizar
       name: displayName || state.basicDetails.name || "Taxpayer",
       status: "Individual",
       ageGroup: state.ageGroup,
-      residencyStatus: "Resident",
+      residencyStatus: state.isNonResident ? "Non-Resident" : "Resident",
     },
     assessmentYear,
     financialYear: state.financialYear,
@@ -121,6 +122,8 @@ export function buildTaxAdviceInput(state: WizardState, wizardSummary: WizardTax
 
   return {
     ageGroup: state.ageGroup,
+    isNonResident: state.isNonResident,
+    agriculturalIncome: toAmount(state.agriculturalIncome),
     salaryIncome: old.grossSalary,
     housePropertyIncome: old.housePropertyIncome,
     businessIncome: old.businessIncome,
@@ -133,7 +136,7 @@ export function buildTaxAdviceInput(state: WizardState, wizardSummary: WizardTax
     section80TTA: old.deductionsBreakdown.section80TTAorTTB,
     section80CCD1B: old.deductionsBreakdown.section80CCD1B,
     section80G: old.deductionsBreakdown.section80G,
-    homeLoanInterest: Math.min(toAmount(state.houseProperty.selfOccupiedHomeLoanInterest), 200000),
+    homeLoanInterest: old.homeLoanInterestClaimed,
     lta: toAmount(state.salary.lta),
     hraReceived: toAmount(state.salary.hraReceived),
     rentPaid: toAmount(state.salary.rentPaid),
