@@ -13,6 +13,11 @@ import { getGeminiModel } from "@/lib/firebase";
 export interface TaxAdviceInput {
   occupation?: string;
   ageGroup?: string;
+  // Residency and agricultural income change which rules apply — see
+  // buildPrompt's GROUND TRUTH block. Previously missing here, so the AI had
+  // no way to know a user was ineligible for the s.87A/s.156 rebate.
+  isNonResident?: boolean;
+  agriculturalIncome?: number;
   salaryIncome: number;
   housePropertyIncome: number;
   businessIncome: number;
@@ -62,6 +67,16 @@ function buildFallbackTips(input: TaxAdviceInput): TaxAdviceResult {
 
   const income = input.totalIncome;
   const slab = income > 1_500_000 ? 0.3 : income > 1_000_000 ? 0.2 : 0.05;
+
+  // Non-residents get no s.87A/s.156 rebate at all — surface this before any
+  // deduction tip below, since those all implicitly assume a rebate might apply.
+  if (input.isNonResident) {
+    tips.push({
+      title: "No Section 87A/156 rebate as a non-resident",
+      detail: "As a non-resident, you are not eligible for the Section 87A/156 rebate that gives residents nil tax below a threshold — you pay tax on your full slab-computed income regardless of how low it is.",
+      priority: "high",
+    });
+  }
 
   // 80C gap
   const gap80C = 150_000 - Math.min(input.section80C, 150_000);
@@ -151,9 +166,15 @@ function buildPrompt(input: TaxAdviceInput): string {
 
   return `You are an expert Indian Chartered Accountant providing personalised income tax advice for FY ${input.financialYear}.
 
+GROUND TRUTH — CURRENT LAW (treat as authoritative):
+- RESIDENCY: The Section 87A / Section 156 rebate (nil tax up to a threshold) is available ONLY to RESIDENT INDIVIDUALS. If USER PROFILE below says the user is a NON-RESIDENT, they get NO rebate at all, however low their total income — they pay full tax on the entire slab-computed amount plus cess. Do NOT tell a non-resident their tax is nil or reduced by a rebate.
+- AGRICULTURAL INCOME: Exempt under Section 10(1), but if net agricultural income exceeds ₹5,000 AND non-agricultural income exceeds the basic exemption limit, the "partial integration" rate-schedule mechanism pushes non-agricultural income into higher slabs even though the agricultural income itself is never taxed. Mention this if AGRICULTURAL INCOME below is non-zero and material.
+
 USER PROFILE:
 - Occupation: ${occupationLabel[input.occupation || ""] || "Not specified"}
 - Age Group: ${input.ageGroup || "below60"}
+- Residency: ${input.isNonResident ? "NON-RESIDENT (no s.87A/156 rebate available)" : "Resident Individual"}
+- Agricultural Income: ₹${(input.agriculturalIncome || 0).toLocaleString("en-IN")}
 
 INCOME BREAKDOWN (₹):
 - Salary: ${input.salaryIncome.toLocaleString("en-IN")}

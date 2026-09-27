@@ -241,6 +241,45 @@ console.log("\nCapital gains — s.112A / s.111A charged separately\n" + "─".r
   check("F3 · total ₹16,250, not zero", f3.totalTax, 16250);
 }
 
+// ─── Residency and agricultural income (tax-logic audit, 2026-09-27) ───────
+// Finding 1: the s.87A/s.156 rebate was ungated on residency — a non-resident
+// with total income under the rebate threshold was shown ₹0 tax, which is not
+// available to non-residents under either Act, however low their income.
+// Finding 2: net agricultural income above ₹5,000, combined with
+// non-agricultural income above the basic exemption limit, was never fed into
+// the engine at all — the "partial integration" rate-schedule mechanism that
+// raises the effective rate on non-agricultural income was silently skipped.
+console.log("\nResidency and agricultural income (audit findings 1 & 2)\n" + "─".repeat(60));
+{
+  // Finding 1 — old regime, FY 2026-27, taxable ₹4,90,000 (under the ₹5L
+  // rebate threshold). Slab tax: (250000@0%) + (240000@5%) = ₹12,000.
+  const resident = computeTaxLiability(490000, "old", "2026-27", "below60", {}, 0, true);
+  check("resident under ₹5L: full rebate, tax nil", resident.totalTax, 0);
+
+  const nonResident = computeTaxLiability(490000, "old", "2026-27", "below60", {}, 0, false);
+  check("non-resident under ₹5L: NO rebate, pays ₹12,000 + 4% cess", nonResident.rebate, 0);
+  check("non-resident under ₹5L: total tax ₹12,480", nonResident.totalTax, 12480);
+
+  // Finding 2 — new regime, FY 2026-27, non-agri taxable ₹15,00,000 (above the
+  // ₹4,00,000 basic exemption limit) + net agricultural income ₹2,00,000
+  // (above the ₹5,000 floor) → partial integration applies.
+  // tax(17,00,000) − tax(6,00,000) = 1,40,000 − 10,000 = ₹1,30,000, vs the
+  // ₹1,05,000 plain slab tax on ₹15,00,000 alone — a ₹25,000 increase, even
+  // though the ₹2,00,000 of agricultural income itself is never taxed.
+  const withAgri = computeTaxLiability(1500000, "new", "2026-27", "below60", {}, 200000);
+  const baseline = computeTaxLiability(1500000, "new", "2026-27", "below60", {}, 0);
+  check("agri partial integration: incomeTax rises by ₹25,000", withAgri.incomeTax - baseline.incomeTax, 25000);
+  check("agri partial integration: totalTax rises by ₹26,000 (incl. cess)", withAgri.totalTax - baseline.totalTax, 26000);
+
+  // Below either threshold, integration must NOT fire.
+  const belowFloor = computeTaxLiability(1500000, "new", "2026-27", "below60", {}, 3000);
+  check("agri income ≤ ₹5,000: no integration", belowFloor.incomeTax, baseline.incomeTax);
+
+  const belowExemption = computeTaxLiability(300000, "new", "2026-27", "below60", {}, 100000);
+  const belowExemptionBaseline = computeTaxLiability(300000, "new", "2026-27", "below60", {}, 0);
+  check("non-agri income ≤ basic exemption limit: no integration", belowExemption.incomeTax, belowExemptionBaseline.incomeTax);
+}
+
 // ─── 15% surcharge cap on special-rate income (re-verify finding A) ────────
 //
 // The proviso caps surcharge on s.111A / s.112A / s.112 tax at 15%, however

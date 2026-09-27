@@ -6,6 +6,13 @@ export interface TaxAdviceInput {
   // User profile
   occupation?: string;
   ageGroup?: string;
+  // Residency and agricultural income change which rules apply (see the
+  // GROUND TRUTH block in the prompt below) — previously missing here, so
+  // the AI had no way to know a user was ineligible for the s.87A/s.156
+  // rebate, or that agricultural income can push their effective rate up
+  // despite being exempt itself.
+  isNonResident?: boolean;
+  agriculturalIncome?: number;
   // Income breakdown
   salaryIncome: number;
   housePropertyIncome: number;
@@ -61,6 +68,16 @@ function buildFallbackTips(input: TaxAdviceInput): TaxAdviceResult {
   const tax30pct = income > 1500000;
   const tax20pct = income > 1000000;
   const slab = tax30pct ? 0.30 : tax20pct ? 0.20 : 0.05;
+
+  // Non-residents get no s.87A/s.156 rebate at all — surface this before any
+  // deduction tip, since every other tip below assumes a rebate might apply.
+  if (input.isNonResident) {
+    tips.push({
+      title: 'No Section 87A/156 rebate as a non-resident',
+      detail: `As a non-resident, you are not eligible for the Section 87A/156 rebate that gives residents nil tax below a threshold — you pay tax on your full slab-computed income regardless of how low it is.`,
+      priority: 'high'
+    });
+  }
 
   // 80C gap
   const max80C = 150000;
@@ -184,10 +201,14 @@ GROUND TRUTH — CURRENT LAW (treat as authoritative; do not contradict these ev
 - UNDER THE NEW REGIME (115BAC), THESE ARE NOT AVAILABLE: Section 80C, Section 80D (self/family/parents), HRA exemption u/s 10(13A), LTA u/s 10(5), home loan interest on self-occupied property u/s 24(b), and the extra NPS u/s 80CCD(1B). Only the standard deduction (₹75,000) and employer NPS contribution u/s 80CCD(2) remain available under the New Regime.
 - If the user's RECOMMENDED REGIME below is "new", do NOT suggest investing more in 80C/80D/NPS-80CCD(1B), claiming HRA, or claiming home loan interest as ways to reduce THIS YEAR's tax — those deductions do not apply to their New Regime computation. You may still note that switching to Old Regime could unlock those deductions if their numbers support it, but do not present them as available alongside the New Regime tax figure already shown.
 - Under the OLD REGIME: Section 80C cap ₹1,50,000; Section 80D cap ₹25,000 (below 60) or ₹50,000 (60+, including parents' premium); NPS 80CCD(1B) additional ₹50,000 on top of 80C; home loan interest u/s 24(b) up to ₹2,00,000/year for a self-occupied property.
+- RESIDENCY: The Section 87A / Section 156 rebate (the "nil tax up to ₹X lakh" rule above) is available ONLY to RESIDENT INDIVIDUALS. If USER PROFILE below says the user is a NON-RESIDENT, they get NO rebate at all, however low their total income — they pay full tax on the entire slab-computed amount plus cess. Do NOT tell a non-resident their tax is nil or reduced by a rebate.
+- AGRICULTURAL INCOME: Exempt under Section 10(1), but if net agricultural income exceeds ₹5,000 AND the user's non-agricultural income exceeds the basic exemption limit, the "partial integration" rate-schedule mechanism pushes their non-agricultural income into higher slabs even though the agricultural income itself is never taxed. Mention this if AGRICULTURAL INCOME below is non-zero and material.
 
 USER PROFILE:
 - Occupation: ${occupationLabel[input.occupation || ''] || 'Not specified'}
 - Age Group: ${input.ageGroup || 'below60'}
+- Residency: ${input.isNonResident ? 'NON-RESIDENT (no s.87A/156 rebate available)' : 'Resident Individual'}
+- Agricultural Income: ₹${(input.agriculturalIncome || 0).toLocaleString('en-IN')}
 
 INCOME BREAKDOWN (₹):
 - Salary Income: ${input.salaryIncome.toLocaleString('en-IN')}

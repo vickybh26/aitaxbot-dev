@@ -312,11 +312,40 @@ export function computeTaxLiability(
   regime: TaxRegime,
   financialYear: string,
   ageGroup: AgeGroup = "below60",
-  special: SpecialRateIncome = {}
+  special: SpecialRateIncome = {},
+  /**
+   * Net agricultural income (s.10(1) exempt, but not tax-free in effect once
+   * it is large — see the partial-integration block below).
+   */
+  agriculturalIncome: number = 0,
+  /**
+   * Resident individuals only get the s.87A / s.156 rebate. A non-resident
+   * (or RNOR) pays full slab tax with no rebate and no cliff-relief, however
+   * low their income — this was previously ungated, so a non-resident with
+   * ₹6L of Indian-source income was shown ₹0 tax under the old regime.
+   */
+  isResident: boolean = true
 ): TaxLiabilityResult {
   const income = Math.max(0, taxableIncome);
   const slabs = getTaxSlabs(regime, financialYear, ageGroup);
-  const { totalTax: incomeTax, breakdown } = calculateTaxForSlab(income, slabs);
+  const { totalTax: slabOnlyTax, breakdown } = calculateTaxForSlab(income, slabs);
+
+  // ── Agricultural income: partial integration ────────────────────────────
+  // Agricultural income itself stays exempt under s.10(1) — it never joins
+  // "total income" for the rebate/surcharge tests below. But the Finance Act's
+  // rate schedule still uses it to push non-agricultural income into higher
+  // slabs, via: tax(non-agri + agri) − tax(basic exemption limit + agri).
+  // Applies only when net agricultural income exceeds ₹5,000 AND
+  // non-agricultural income exceeds the basic exemption limit for this
+  // regime/ageGroup — below either threshold there is nothing to integrate.
+  const agriIncome = Math.max(0, agriculturalIncome);
+  const basicExemptionLimit = slabs[0]?.max ?? 0;
+  let incomeTax = slabOnlyTax;
+  if (agriIncome > 5000 && income > basicExemptionLimit) {
+    const taxOnIncomePlusAgri = calculateTaxForSlab(income + agriIncome, slabs).totalTax;
+    const taxOnExemptionPlusAgri = calculateTaxForSlab(basicExemptionLimit + agriIncome, slabs).totalTax;
+    incomeTax = Math.max(0, taxOnIncomePlusAgri - taxOnExemptionPlusAgri);
+  }
 
   // Rebate eligibility is a TOTAL INCOME test, not a slab-income test, and
   // total income includes capital gains in full. The ₹1,25,000 under s.112A is
@@ -354,7 +383,16 @@ export function computeTaxLiability(
   let cess = 0;
   let finalTax = 0;
 
-  if (regime === "new" && (financialYear === "2025-26" || financialYear === "2026-27")) {
+  if (!isResident) {
+    // No s.87A / s.156 rebate, and therefore no cliff marginal relief either
+    // — that relief only exists to smooth the rebate's own cutoff. A
+    // non-resident pays cess on the full slab tax regardless of how low
+    // totalIncomeAll is.
+    rebate = 0;
+    taxAfterRebate = incomeTax;
+    cess = taxAfterRebate * 0.04;
+    finalTax = taxAfterRebate + cess;
+  } else if (regime === "new" && (financialYear === "2025-26" || financialYear === "2026-27")) {
     if (totalIncomeAll <= 1200000) {
       // Full rebate u/s 156 (ITA 2025) — tax is NIL up to ₹12 lakh
       rebate = incomeTax;
@@ -426,7 +464,7 @@ export function computeTaxLiability(
   const taxBeforeSurcharge = taxAfterRebate + sr.total;
 
   const taxAtThreshold = (threshold: number) => {
-    const t = computeTaxLiability(threshold, regime, financialYear, ageGroup);
+    const t = computeTaxLiability(threshold, regime, financialYear, ageGroup, {}, 0, isResident);
     return t.incomeTax - t.rebate - t.marginalRelief;
   };
 

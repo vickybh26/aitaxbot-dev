@@ -361,7 +361,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
 
     // Calculate tax using slabs
     const slabs = getTaxSlabs(regime, formData.financialYear, formData.ageGroup);
-    const { totalTax: incomeTax, breakdown: taxBreakdown } = calculateTaxForSlab(taxableAmount, slabs);
+    const { breakdown: taxBreakdown } = calculateTaxForSlab(taxableAmount, slabs);
 
     // Statutory sequence. It is identical under both Acts; only the section
     // numbers differ, so the year decides which citation is correct:
@@ -397,7 +397,9 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
       regime,
       formData.financialYear,
       formData.ageGroup as AgeGroup,
-      { ltcgEquity: ltcgEquityIncome, stcgEquity: stcgEquityIncome }
+      { ltcgEquity: ltcgEquityIncome, stcgEquity: stcgEquityIncome },
+      parseFloat(formData.agriculturalIncome) || 0,
+      !formData.isNonResident
     );
 
     const rebate87A = liability.rebate;
@@ -426,7 +428,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
       standardDeduction,
       totalDeductions,
       taxableIncome,
-      incomeTax,
+      incomeTax: liability.incomeTax,
       cess: cessAmount,
       rebate87A,
       marginalRelief,
@@ -537,6 +539,8 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
     getClientTaxAdvice({
       occupation: userProfile?.occupation || '',
       ageGroup: formData.ageGroup,
+      isNonResident: formData.isNonResident,
+      agriculturalIncome: parseFloat(formData.agriculturalIncome) || 0,
       salaryIncome: parseFloat(formData.salaryIncome) || 0,
       housePropertyIncome: parseFloat(formData.housePropertyIncome) || 0,
       businessIncome: parseFloat(formData.businessIncome) || 0,
