@@ -127,8 +127,15 @@ router.get("/stats", adminL3, async (req: any, res) => {
         .orderBy("createdAt", "asc")
         .select("createdAt")
         .get(),
-      // Fetch only userId + createdAt for retention calc — capped for safety
-      db.collection(COLLECTIONS.TOOL_USAGE).select("userId", "createdAt").limit(5000).get(),
+      // Tool-usage events use ISO timestamps. Restrict retention metrics to the
+      // same rolling 30-day window shown by the dashboard, and read the newest
+      // events first so the safety cap cannot be consumed by old activity.
+      db.collection(COLLECTIONS.TOOL_USAGE)
+        .where("createdAt", ">=", thirtyDaysAgo.toISOString())
+        .orderBy("createdAt", "desc")
+        .select("userId", "createdAt", "tool")
+        .limit(5000)
+        .get(),
     ]);
 
     const totalUsers         = usersSnap.data().count;
@@ -139,26 +146,38 @@ router.get("/stats", adminL3, async (req: any, res) => {
     const profileCompletionRate = totalUsers > 0
       ? Math.round((completedProfiles / totalUsers) * 100) : 0;
 
-    // Returning users = signed-in users with calculator activity on 2+ distinct
-    // calendar days. Now that sign-in is required to view any calculator result,
-    // toolUsage reliably captures every calculation by every registered user —
-    // this is the funding/traction metric (real users, real repeat usage).
+    // Active users = signed-in users with at least one tracked tool event in
+    // the last 30 days. Returning users have events on 2+ distinct days in
+    // that same window. If 5,000 events are reached, these unique-user metrics
+    // are lower bounds and the dashboard must say so.
     const daysByUser: Record<string, Set<string>> = {};
+    const usageByTool: Record<string, { uses: number; userIds: Set<string> }> = {};
     toolUsageSnap.docs.forEach((doc: any) => {
       const d = doc.data();
       const uid = d.userId;
-      if (!uid) return;
       const raw = d.createdAt;
       const dt = raw?.toDate ? raw.toDate() : new Date(raw);
       if (isNaN(dt.getTime())) return;
       const dayKey = dt.toISOString().split("T")[0];
-      if (!daysByUser[uid]) daysByUser[uid] = new Set();
-      daysByUser[uid].add(dayKey);
+      if (uid) {
+        if (!daysByUser[uid]) daysByUser[uid] = new Set();
+        daysByUser[uid].add(dayKey);
+      }
+
+      const toolName = typeof d.tool === "string" && d.tool.trim() ? d.tool.trim() : "Other tools";
+      if (!usageByTool[toolName]) usageByTool[toolName] = { uses: 0, userIds: new Set() };
+      usageByTool[toolName].uses++;
+      if (uid) usageByTool[toolName].userIds.add(uid);
     });
     const activeUsers = Object.keys(daysByUser).length;
     const returningUsers = Object.values(daysByUser).filter((days) => days.size >= 2).length;
     const returningUserRate = activeUsers > 0
       ? Math.round((returningUsers / activeUsers) * 100) : 0;
+    const usageMetricsCapped = toolUsageSnap.size >= 5000;
+    const topTools = Object.entries(usageByTool)
+      .map(([name, usage]) => ({ name, uses: usage.uses, users: usage.userIds.size }))
+      .sort((a, b) => b.uses - a.uses || a.name.localeCompare(b.name))
+      .slice(0, 5);
 
     // Build 30-day trend
     const signupsByDay: Record<string, number> = {};
@@ -179,6 +198,7 @@ router.get("/stats", adminL3, async (req: any, res) => {
       totalUsers, newUsersWeek, newUsersMonth, totalCalculations,
       completedProfiles, profileCompletionRate, signupTrend,
       activeUsers, returningUsers, returningUserRate,
+      topTools, usageMetricsCapped, usageEventsScanned: toolUsageSnap.size,
     };
     setCache("admin:stats", result, 5 * 60 * 1000); // 5 min TTL
     res.json(result);
