@@ -9,6 +9,11 @@
  * All three calls run in parallel (Promise.all).
  * If GOOGLE_API_KEY is absent, all three gracefully return empty objects.
  * Text regex (parse26ASFromText, parseForm16FromText) kept as dead code for reference.
+ *
+ * Privacy boundary: logs in this module must contain fixed diagnostic messages
+ * only. Never log document fields, model responses, PDF passwords, or caught
+ * error objects/messages (provider errors can embed input/output payloads).
+ * scripts/test-reconcile-log-privacy.mjs guards this rule without taxpayer data.
  */
 
 import { createRequire } from "module";
@@ -20,7 +25,7 @@ try {
   pdfParse = _require("pdf-parse");
   console.log("[taxReconcileService] pdf-parse loaded OK");
 } catch (e) {
-  console.warn("[taxReconcileService] pdf-parse not available:", e);
+  console.warn("[taxReconcileService] pdf-parse not available");
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -545,19 +550,19 @@ function inferITRFormRecommendation(
 
 async function extractText(buffer: Buffer, label: string): Promise<string> {
   if (!pdfParse) {
-    console.warn(`[extractText] pdf-parse unavailable for ${label}`);
+    console.warn("[extractText] pdf-parse unavailable");
     return "";
   }
   try {
     const result = await pdfParse(buffer);
     const text = result.text || "";
-    console.log(`[extractText] ${label}: extracted ${text.length} chars`);
+    console.log("[extractText] Text extraction completed");
     if (text.length < 50) {
-      console.warn(`[extractText] ${label}: very short text — may be image PDF`);
+      console.warn("[extractText] Very short text — may be image PDF");
     }
     return text;
   } catch (err) {
-    console.error(`[extractText] ${label} error:`, err);
+    console.error("[extractText] Text extraction failed");
     return "";
   }
 }
@@ -624,14 +629,14 @@ function parse26ASFromText(text: string): Extracted26AS {
       totalTDS += numOrNull(row[3]) ?? 0;  // deposited (3rd number)
     }
     result.tdsSalary = totalTDS;
-    console.log(`[parse26AS] Section 192: ${sec192Rows.length} rows, paid=${totalPaid.toFixed(2)}, TDS deposited=${totalTDS.toFixed(2)}`);
+    console.log("[parse26AS] Section 192 parsed");
   } else {
     // Fallback: look for employer summary line with large TDS amounts
     // Typical line: "2 J P MORGAN SERVICES INDIA PRIVATE LIMITED MUMJ05980C 1730648.49 136374.78 136374.78"
     const employerTDSMatch = text.match(/(?:SERVICES|PRIVATE)\s+LIMITED\s+[A-Z]{4}\d{5}[A-Z]\s+([\d,]+\.\d+)\s+([\d,]+\.\d+)\s+([\d,]+\.\d+)/);
     if (employerTDSMatch) {
       result.tdsSalary = numOrNull(employerTDSMatch[3]);
-      console.log(`[parse26AS] Employer TDS (fallback): ${result.tdsSalary}`);
+      console.log("[parse26AS] Employer TDS fallback used");
     }
   }
 
@@ -644,7 +649,7 @@ function parse26ASFromText(text: string): Extracted26AS {
       totalNonSalary += numOrNull(row[3]) ?? 0;
     }
     result.tdsNonSalary = totalNonSalary;
-    console.log(`[parse26AS] Non-salary TDS: ${totalNonSalary.toFixed(2)}`);
+    console.log("[parse26AS] Non-salary TDS parsed");
   }
 
   // ── TCS (Part VI — LRS, remittances) ─────────────────────────────────────
@@ -656,7 +661,7 @@ function parse26ASFromText(text: string): Extracted26AS {
       totalTCS += numOrNull(row[3]) ?? 0;
     }
     result.tcsPaid = totalTCS;
-    console.log(`[parse26AS] TCS collected: ${totalTCS.toFixed(2)}`);
+    console.log("[parse26AS] TCS parsed");
   }
 
   // ── Advance Tax (Part C) ──────────────────────────────────────────────────
@@ -664,7 +669,7 @@ function parse26ASFromText(text: string): Extracted26AS {
   const advTaxMatch = text.match(/(?:PART[\s-]*III|Advance Tax)[\s\S]{0,2000}?(?:Major Head|0021)[^\d]*([\d,]+\.\d+)/);
   if (advTaxMatch) {
     result.advanceTaxPaid = numOrNull(advTaxMatch[1]);
-    console.log(`[parse26AS] Advance tax: ${result.advanceTaxPaid}`);
+    console.log("[parse26AS] Advance tax parsed");
   } else {
     // Try simpler pattern
     const atMatch = text.match(/Advance\s+Tax[\s\S]{0,500}?([\d,]+\.\d+)/i);
@@ -675,7 +680,7 @@ function parse26ASFromText(text: string): Extracted26AS {
   const satMatch = text.match(/Self.?Assessment\s*Tax[\s\S]{0,500}?([\d,]+\.\d+)/i);
   if (satMatch) {
     result.selfAssessmentTax = numOrNull(satMatch[1]);
-    console.log(`[parse26AS] Self-assessment tax: ${result.selfAssessmentTax}`);
+    console.log("[parse26AS] Self-assessment tax parsed");
   }
 
   // ── Total TDS credits ─────────────────────────────────────────────────────
@@ -687,7 +692,7 @@ function parse26ASFromText(text: string): Extracted26AS {
   if (empMatch) {
     result.employerName = empMatch[1].trim();
     result.employerTAN = empMatch[2];
-    console.log(`[parse26AS] Employer: ${result.employerName}, TAN: ${result.employerTAN}`);
+    console.log("[parse26AS] Employer fields parsed");
   }
 
   result.rawText = text.slice(0, 500);
@@ -744,7 +749,7 @@ function parseForm16FromText(text: string): ExtractedForm16 {
   if (partATotalMatch) {
     result.tdsDeposited = numOrNull(partATotalMatch[3]);
     result.totalTaxDeducted = numOrNull(partATotalMatch[2]);
-    console.log(`[parseForm16] Part A total: paid=${partATotalMatch[1]}, TDS deducted=${partATotalMatch[2]}, deposited=${partATotalMatch[3]}`);
+    console.log("[parseForm16] Part A totals parsed");
   }
 
   // ── Part B: Salary details ────────────────────────────────────────────────
@@ -860,7 +865,7 @@ function parseForm16FromText(text: string): ExtractedForm16 {
   if (text.match(/115BAC\s*\(1A\).*?No/i)) result.newRegime = true;
   else if (text.match(/115BAC\s*\(1A\).*?Yes/i)) result.newRegime = false;
 
-  console.log(`[parseForm16] Extracted: grossSalary=${result.grossSalary}, stdDeduction=${result.standardDeduction}, taxableIncome=${result.taxableIncome}, TDS=${result.totalTaxDeducted}, regime=${result.newRegime ? "New" : "Old"}`);
+  console.log("[parseForm16] Extraction completed");
 
   result.rawText = text.slice(0, 500);
   return result;
@@ -1049,7 +1054,6 @@ B1, B2 and B7 in the named fields above.`;
     });
 
     const raw = result.text ?? (result.candidates?.[0] as any)?.content?.parts?.[0]?.text ?? "{}";
-    console.log("[parseAISWithGemini] Raw response:", raw.slice(0, 300));
 
     const cleaned = raw.replace(/```json\s*/g, "").replace(/```/g, "").trim();
     const match = cleaned.match(/\{[\s\S]*\}/);
@@ -1058,7 +1062,7 @@ B1, B2 and B7 in the named fields above.`;
       return {};
     }
     const parsed = JSON.parse(match[0]);
-    console.log("[parseAISWithGemini] Parsed:", JSON.stringify(parsed));
+    console.log("[parseAISWithGemini] Response parsed");
 
     // Validate highValueTransactions defensively — same reasoning as
     // nonSalarySections in parse26ASWithGemini: this feeds directly into a
@@ -1090,8 +1094,7 @@ B1, B2 and B7 in the named fields above.`;
       : [];
 
     if (otherIncomeItems.length) {
-      console.log("[parseAISWithGemini] Unmapped income rows captured:",
-        otherIncomeItems.map(o => `${o.code}=${o.amount}`).join(", "));
+      console.log("[parseAISWithGemini] Unmapped income rows captured");
     }
 
     const rawTotals = Array.isArray(parsed.sectionTotals) ? parsed.sectionTotals : [];
@@ -1106,8 +1109,7 @@ B1, B2 and B7 in the named fields above.`;
       }));
 
     if (sectionTotals.length) {
-      console.log("[parseAISWithGemini] Declared sections:",
-        sectionTotals.map(s => `${s.code}=${s.amount}`).join(", "));
+      console.log("[parseAISWithGemini] Declared sections parsed");
     } else {
       console.warn("[parseAISWithGemini] No sectionTotals returned — coverage cannot be verified for this document");
     }
@@ -1117,7 +1119,6 @@ B1, B2 and B7 in the named fields above.`;
     // consumer wants the canonical form.
     const financialYear = normalizeYearLabel(parsed.financialYear);
     const assessmentYear = normalizeYearLabel(parsed.assessmentYear);
-    console.log(`[parseAISWithGemini] Stated period — FY: ${financialYear ?? "not stated"}, AY: ${assessmentYear ?? "not stated"}`);
 
     return {
       ...parsed,
@@ -1129,7 +1130,7 @@ B1, B2 and B7 in the named fields above.`;
       sectionTotals: sectionTotals.length ? sectionTotals : null,
     };
   } catch (err) {
-    console.error("[parseAISWithGemini] Error:", err);
+    console.error("[parseAISWithGemini] Extraction failed");
     return {};
   }
 }
@@ -1209,13 +1210,12 @@ Return ONLY this JSON (no markdown, no text before/after the JSON):
     });
 
     const raw = result.text ?? (result.candidates?.[0] as any)?.content?.parts?.[0]?.text ?? "{}";
-    console.log("[parse26ASWithGemini] Raw response:", raw.slice(0, 400));
 
     const cleaned = raw.replace(/```json\s*/g, "").replace(/```/g, "").trim();
     const match = cleaned.match(/\{[\s\S]*\}/);
     if (!match) { console.warn("[parse26ASWithGemini] No JSON found"); return empty; }
     const parsed = JSON.parse(match[0]);
-    console.log("[parse26ASWithGemini] Parsed:", JSON.stringify(parsed));
+    console.log("[parse26ASWithGemini] Response parsed");
 
     // Validate nonSalarySections defensively — this feeds the ITR form
     // recommendation, so a malformed entry from the model shouldn't crash
@@ -1236,7 +1236,6 @@ Return ONLY this JSON (no markdown, no text before/after the JSON):
 
     const financialYear = normalizeYearLabel(parsed.financialYear);
     const assessmentYear = normalizeYearLabel(parsed.assessmentYear);
-    console.log(`[parse26ASWithGemini] Stated period — FY: ${financialYear ?? "not stated"}, AY: ${assessmentYear ?? "not stated"}`);
 
     return {
       financialYear,
@@ -1252,7 +1251,7 @@ Return ONLY this JSON (no markdown, no text before/after the JSON):
       employerTAN: parsed.employerTAN ?? undefined,
     };
   } catch (err) {
-    console.error("[parse26ASWithGemini] Error:", err);
+    console.error("[parse26ASWithGemini] Extraction failed");
     return empty;
   }
 }
@@ -1351,16 +1350,14 @@ Extract all values and return ONLY this JSON (no markdown):
     });
 
     const raw = result.text ?? (result.candidates?.[0] as any)?.content?.parts?.[0]?.text ?? "{}";
-    console.log("[parseForm16WithGemini] Raw response:", raw.slice(0, 400));
 
     const cleaned = raw.replace(/```json\s*/g, "").replace(/```/g, "").trim();
     const match = cleaned.match(/\{[\s\S]*\}/);
     if (!match) { console.warn("[parseForm16WithGemini] No JSON found"); return empty; }
     const parsed = JSON.parse(match[0]);
-    console.log("[parseForm16WithGemini] Parsed:", JSON.stringify(parsed));
+    console.log("[parseForm16WithGemini] Response parsed");
     const financialYear = normalizeYearLabel(parsed.financialYear);
     const assessmentYear = normalizeYearLabel(parsed.assessmentYear);
-    console.log(`[parseForm16WithGemini] Stated period — FY: ${financialYear ?? "not stated"}, AY: ${assessmentYear ?? "not stated"}`);
 
     return {
       financialYear,
@@ -1388,7 +1385,7 @@ Extract all values and return ONLY this JSON (no markdown):
       newRegime: parsed.newRegime ?? null,
     };
   } catch (err) {
-    console.error("[parseForm16WithGemini] Error:", err);
+    console.error("[parseForm16WithGemini] Extraction failed");
     return empty;
   }
 }
@@ -2248,7 +2245,7 @@ Respond ONLY in this JSON (no markdown, no leading/trailing text):
     const cleaned = raw.replace(/```json\s*/g, "").replace(/```/g, "").trim();
     const match = cleaned.match(/\{[\s\S]*\}/);
     if (!match) {
-      console.warn("[generateAIInsights] No JSON found in response:", raw.slice(0, 300));
+      console.warn("[generateAIInsights] No JSON found in response");
       return tempErrorFallback;
     }
     const parsed = JSON.parse(match[0]);
@@ -2258,7 +2255,7 @@ Respond ONLY in this JSON (no markdown, no leading/trailing text):
       itrImpact: parsed.itrImpact || tempErrorFallback.itrImpact,
     };
   } catch (err) {
-    console.error("[generateAIInsights] Error:", err);
+    console.error("[generateAIInsights] Insight generation failed");
     return tempErrorFallback;
   }
 }
@@ -2342,7 +2339,7 @@ export async function reconcileTaxDocuments(
   if (!provided.ais && !provided.form26as && !provided.form16) {
     throw new Error("At least one document (AIS, Form 26AS, or Form 16) is required");
   }
-  console.log(`[reconcileTaxDocuments] Starting reconciliation — AIS: ${provided.ais}, 26AS: ${provided.form26as}, Form 16s: ${form16PdfBuffers.length}`);
+  console.log("[reconcileTaxDocuments] Starting reconciliation");
 
   // ── Step 1: Extract text (for logging/debugging only) ─────────────────────
   const aisText = aisPdfBuffer ? await extractText(aisPdfBuffer, "AIS") : "";
@@ -2365,11 +2362,7 @@ export async function reconcileTaxDocuments(
   // resolveTaxPeriod(). Must run before combineForm16s, which needs the FY to
   // pick the right slab table for its liability estimate.
   const taxPeriod = resolveTaxPeriod(aisPartial as ExtractedAIS, form26as, form16Employers, provided);
-  console.log(
-    `[reconcileTaxDocuments] Tax period resolved: FY ${taxPeriod.financialYear} / AY ${taxPeriod.assessmentYear}` +
-    (taxPeriod.assumed ? " (ASSUMED — no document stated a year)" : "") +
-    (taxPeriod.conflict ? ` (CONFLICT — ${taxPeriod.perDocument.map(d => `${d.document}: ${d.financialYear}`).join(", ")})` : "")
-  );
+  console.log("[reconcileTaxDocuments] Tax period resolved");
 
   const { combined: form16, flags: multiEmployerFlags } = combineForm16s(
     form16Employers,
@@ -2411,11 +2404,7 @@ export async function reconcileTaxDocuments(
   }
 
 
-  console.log("[reconcileTaxDocuments] Final extracted data:", {
-    ais: { salary: ais.salaryIncome, interest: ais.interestFromSavings, div: ais.dividendIncome },
-    form26as: { tdsSalary: form26as.tdsSalary, advTax: form26as.advanceTaxPaid },
-    form16: { gross: form16.grossSalary, taxable: form16.taxableIncome, tds: form16.totalTaxDeducted },
-  });
+  console.log("[reconcileTaxDocuments] Extraction completed");
 
   // ── Step 4.5: Detect documents that yielded nothing ──────────────────────
   // A document that was uploaded but produced an all-null extract almost
@@ -2447,7 +2436,7 @@ export async function reconcileTaxDocuments(
   };
   const anyParseFailure = parseFailures.ais || parseFailures.form26as || parseFailures.form16;
   if (anyParseFailure) {
-    console.error("[reconcileTaxDocuments] PARSE FAILURE — uploaded document(s) yielded no data:", parseFailures);
+    console.error("[reconcileTaxDocuments] PARSE FAILURE — uploaded document(s) yielded no data");
   }
 
   // ── Step 5: Build reconciliation ─────────────────────────────────────────
@@ -2476,7 +2465,7 @@ export async function reconcileTaxDocuments(
   // ── Coverage: does what we extracted account for what the AIS declares? ──
   const coverage = provided.ais ? buildCoverageReport(ais) : null;
   if (coverage) {
-    if (!coverage.complete) console.warn("[reconcileTaxDocuments] Coverage incomplete:", coverage.summary);
+    if (!coverage.complete) console.warn("[reconcileTaxDocuments] Coverage incomplete");
     // The claim this tool can actually defend: not "these numbers are right",
     // but "these numbers account for everything the document says it contains".
     checks.push({

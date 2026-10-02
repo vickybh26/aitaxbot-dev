@@ -491,10 +491,11 @@ export function registerTaxReconcileRoutes(app: Express): void {
         //
         // What goes to Firestore: the status, how many issues were found, and
         // the first few action items as plain sentences. What does NOT: the
-        // uploaded PDFs (already discarded — they only ever existed in memory
-        // via multer), the extracted figure set, or the AI narrative. The
-        // tool's promise that documents are not stored therefore still holds
-        // exactly as written.
+        // uploaded PDFs, the full extracted figure set, or the AI narrative.
+        // PDF buffers stay in request memory until eligible for garbage
+        // collection; the service also sends them to Gemini for processing.
+        // Action sentences can include figures, so this is a personal-data
+        // summary, not anonymised data or proof of zero provider retention.
         //
         // Awaited rather than fire-and-forget so a returning user never lands
         // on the dashboard microseconds later and sees a stale card, but it
@@ -541,7 +542,8 @@ export function registerTaxReconcileRoutes(app: Express): void {
 
         return res.json({ success: true, report });
       } catch (err) {
-        console.error("[tax-reconcile] Error:", err);
+        // Provider/parser errors can contain document text or response bodies.
+        console.error("[tax-reconcile] Document processing failed");
         return res.status(500).json({ error: "Failed to process documents. Please try again." });
       }
     }
@@ -565,7 +567,7 @@ export function registerTaxReconcileRoutes(app: Express): void {
         res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
         return res.send(pdfBuffer);
       } catch (err) {
-        console.error("[tax-reconcile/pdf] Error:", err);
+        console.error("[tax-reconcile/pdf] Report generation failed");
         return res.status(500).json({ error: "Failed to generate PDF report." });
       }
     }
