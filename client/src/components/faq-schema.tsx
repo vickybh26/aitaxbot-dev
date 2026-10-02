@@ -55,7 +55,7 @@ export const taxFAQs: FAQItem[] = [
   },
   {
     question: "How accurate is the AiTaxBot tax calculator?",
-    answer: "Our AI tax calculator uses official government tax slabs and rates for FY 2026-27 (AY 2027-28). It includes all applicable deductions, rebates, and cess calculations. The results are verified by certified tax experts for maximum accuracy."
+    answer: "Our AI tax calculator uses official government tax slabs and rates for FY 2026-27 (AY 2027-28). It includes all applicable deductions, rebates, and cess calculations. Results are estimates; verify eligibility, inputs and the applicable tax year before relying on them."
   },
   {
     question: "What documents do I need for tax calculation?",

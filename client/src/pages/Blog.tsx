@@ -176,12 +176,12 @@ export default function Blog() {
         <title>Tax & Finance Blog — Expert Guides for Indian Taxpayers | AiTaxBot</title>
         <meta
           name="description"
-          content="In-depth guides on Indian taxation, ITR filing, tax saving, capital gains, GST, SIP, and the new Income Tax Act 2025. CA-verified articles updated for FY 2026-27 & Tax Year 2026-27."
+          content="In-depth guides on Indian taxation, ITR filing, tax saving, capital gains, GST, SIP, and the new Income Tax Act 2025. Educational articles updated for FY 2026-27 & Tax Year 2026-27."
         />
         <meta name="keywords" content="income tax blog India, tax saving tips, IT act 2025, capital gains tax, GST guide, SIP calculator, AiTaxBot blog" />
         <link rel="canonical" href="https://www.aitaxbot.co.in/blog" />
         <meta property="og:title" content="AiTaxBot Blog — Tax & Finance Insights for India" />
-        <meta property="og:description" content="CA-verified guides on income tax, investments, GST, and the new Income Tax Act 2025. Trusted by Indian taxpayers." />
+        <meta property="og:description" content="Educational guides on income tax, investments, GST, and the new Income Tax Act 2025. Trusted by Indian taxpayers." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://www.aitaxbot.co.in/blog" />
         <meta property="og:image" content="https://www.aitaxbot.co.in/images/aitaxbot-logo.png" />
@@ -200,7 +200,7 @@ export default function Blog() {
               Tax & Finance Insights
             </h1>
             <p className="text-lg text-ink/65 max-w-2xl mb-8">
-              CA-verified guides on income tax, ITR filing, investments, and the new Income Tax Act 2025 — written for Indian taxpayers.
+              Educational guides on income tax, ITR filing, investments, and the new Income Tax Act 2025 — written for Indian taxpayers.
             </p>
 
             {/* Search Bar */}
@@ -377,7 +377,7 @@ export default function Blog() {
           <div className="mt-16 bg-ink rounded-2xl p-8 md:p-10 text-white text-center">
             <h3 className="text-2xl font-bold mb-2">Have a tax question?</h3>
             <p className="text-paper/80 mb-6 max-w-md mx-auto">
-              Ask AiTaxBot and get instant, CA-verified answers on ITR filing, deductions, capital gains, and more.
+              Ask AiTaxBot and get instant, Educational answers on ITR filing, deductions, capital gains, and more.
             </p>
             <Link href="/">
               <button className="bg-card text-ink font-bold px-6 py-3 rounded-xl hover:bg-paper transition-colors inline-flex items-center gap-2">

@@ -1320,15 +1320,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Save a new tax calculation — userId always overridden from the token.
   app.post("/api/tax-calculations", authenticateFirebaseToken, async (req: AuthenticatedRequest, res) => {
     try {
-      const thirtyDaysFromNow = new Date();
-      thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
-
       // Spread FIRST, then overwrite — a malicious client sending `userId`
       // in the body cannot smuggle another user's id past us.
       const calculationData = {
         ...req.body,
         userId: req.userId!,
-        expiresAt: thirtyDaysFromNow,
+        // Saved figures remain until user deletion. Null also prevents a
+        // Firestore TTL policy from expiring newly saved history records.
+        expiresAt: null,
       };
 
       const calculation = await storage.createTaxCalculation(calculationData);

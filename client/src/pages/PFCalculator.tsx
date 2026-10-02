@@ -70,7 +70,7 @@ export default function PFCalculatorPage() {
     <>
       <Helmet>
         <title>PF Calculator India FY 2026-27 - EPF VPF PPF Corpus | AiTaxBot</title>
-        <meta name="description" content="Free PF Calculator India FY 2026-27. Calculate EPF, VPF and PPF corpus with employer split, 8.25% tax-free interest, withdrawal guide, and retirement planning. CA verified." />
+        <meta name="description" content="Free PF Calculator India FY 2026-27. Calculate EPF, VPF and PPF corpus with employer split, 8.25% tax-free interest, withdrawal guide, and retirement planning. Educational." />
         <meta name="keywords" content="PF calculator, EPF calculator, VPF calculator, PPF calculator, provident fund calculator, EPF interest rate 2026-27, PF withdrawal rules, employee pension scheme, PF tax rules" />
         <link rel="canonical" href="https://www.aitaxbot.co.in/calculators/pf" />
         <meta property="og:title" content="PF Calculator India FY 2026-27 - EPF VPF PPF Corpus & Withdrawal Guide" />

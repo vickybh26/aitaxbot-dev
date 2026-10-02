@@ -1,4 +1,5 @@
 // Google Analytics utility functions
+import { hasAnalyticsConsent, isPublisherContentPath } from './publisherConsent';
 declare global {
   interface Window {
     gtag: (command: string, targetId: string, config?: any) => void;
@@ -8,7 +9,7 @@ declare global {
 
 // Track page views
 export const trackPageView = (path: string, title?: string) => {
-  if (typeof window !== 'undefined' && window.gtag) {
+  if (typeof window !== 'undefined' && window.gtag && hasAnalyticsConsent() && isPublisherContentPath(window.location.pathname)) {
     window.gtag('config', 'G-9NMYMNBYFV', {
       page_path: path,
       page_title: title
@@ -18,7 +19,7 @@ export const trackPageView = (path: string, title?: string) => {
 
 // Track custom events
 export const trackEvent = (action: string, category: string, label?: string, value?: number) => {
-  if (typeof window !== 'undefined' && window.gtag) {
+  if (typeof window !== 'undefined' && window.gtag && hasAnalyticsConsent() && isPublisherContentPath(window.location.pathname)) {
     window.gtag('event', action, {
       event_category: category,
       event_label: label,

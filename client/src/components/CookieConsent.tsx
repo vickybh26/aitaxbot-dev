@@ -1,14 +1,17 @@
 import { useState, useEffect } from "react";
 import { X, Cookie } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useLocation } from 'wouter';
+import { applyPublisherConsent, isPublisherContentPath, publisherScriptsLoaded } from '@/lib/publisherConsent';
 
 export default function CookieConsent() {
+  const [location] = useLocation();
   const [isVisible, setIsVisible] = useState(false);
   const [showPreferences, setShowPreferences] = useState(false);
   const [preferences, setPreferences] = useState({
     essential: true, // Always true, cannot be disabled
-    analytics: true,
-    advertising: true,
+    analytics: false,
+    advertising: false,
   });
 
   useEffect(() => {
@@ -16,19 +19,44 @@ export default function CookieConsent() {
     const consentStatus = localStorage.getItem('cookieConsent');
     if (!consentStatus) {
       // Show banner after a short delay for better UX
-      setTimeout(() => setIsVisible(true), 1000);
+      const timer = setTimeout(() => setIsVisible(true), 1000);
+      return () => clearTimeout(timer);
     } else {
       // Load saved preferences
       try {
         const saved = JSON.parse(consentStatus);
+        if (!saved || typeof saved.analytics !== 'boolean' || typeof saved.advertising !== 'boolean') {
+          setIsVisible(true);
+          return;
+        }
         setPreferences(saved);
         // CRITICAL: Re-apply saved consent to Google Tag Manager on return visits
         enableTracking(saved);
       } catch (e) {
         console.error('Error loading cookie preferences:', e);
+        setIsVisible(true);
       }
     }
   }, []);
+
+  useEffect(() => {
+    const open = () => { setShowPreferences(true); setIsVisible(true); };
+    window.addEventListener('open-cookie-preferences', open);
+    return () => window.removeEventListener('open-cookie-preferences', open);
+  }, []);
+
+  useEffect(() => {
+    // A script cannot be unloaded by deleting its element. Start a clean
+    // document when leaving editorial content for account or financial tools.
+    if (!isPublisherContentPath(location) && publisherScriptsLoaded()) {
+      window.location.reload();
+      return;
+    }
+    try {
+      const saved = JSON.parse(localStorage.getItem('cookieConsent') || 'null');
+      if (saved) applyPublisherConsent(saved, location);
+    } catch { /* Invalid preferences never grant consent. */ }
+  }, [location]);
 
   const handleAcceptAll = () => {
     const allAccepted = {
@@ -67,50 +95,20 @@ export default function CookieConsent() {
     enableTracking(preferences);
   };
 
-  // adsbygoogle.js is intentionally NOT loaded in index.html anymore (DPDP:
-  // consent before processing). Inject it only once the user actually
-  // grants advertising consent, and only once per page load.
-  const loadAdSenseScript = () => {
-    if (typeof document === 'undefined') return;
-    if (document.getElementById('adsbygoogle-script')) return;
-    const script = document.createElement('script');
-    script.id = 'adsbygoogle-script';
-    script.async = true;
-    script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6497933645628124';
-    script.crossOrigin = 'anonymous';
-    document.head.appendChild(script);
-  };
-
   const enableTracking = (prefs: typeof preferences) => {
-    // Store preferences for use by analytics scripts
-    if (typeof window !== 'undefined') {
-      (window as any).cookiePreferences = prefs;
-
-      // Google Analytics / Ads — Consent Mode v2. index.html sets the
-      // default to 'denied' before gtag/Clarity/AdSense ever load, so
-      // nothing collects data until this update actually runs.
-      if (window.gtag) {
-        window.gtag('consent', 'update', {
-          'analytics_storage': prefs.analytics ? 'granted' : 'denied',
-        } as any);
-        window.gtag('consent', 'update', {
-          'ad_storage': prefs.advertising ? 'granted' : 'denied',
-          'ad_user_data': prefs.advertising ? 'granted' : 'denied',
-          'ad_personalization': prefs.advertising ? 'granted' : 'denied',
-        } as any);
+    if (publisherScriptsLoaded() && (!prefs.analytics || !prefs.advertising)) {
+      // Saved choice has already changed; reload stops previously loaded SDKs.
+      window.gtag?.('consent', 'update', {
+        analytics_storage: prefs.analytics ? 'granted' : 'denied',
+        ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied',
+      });
+      if (!prefs.analytics) {
+        (window as any).clarity?.('consentv2', { ad_Storage: 'denied', analytics_Storage: 'denied' });
       }
-
-      // Microsoft Clarity — separate consent API, not covered by gtag.
-      if (typeof (window as any).clarity === 'function') {
-        (window as any).clarity('consent', prefs.analytics);
-      }
-
-      // Google AdSense — only start requesting/serving ads once the user
-      // has actually opted in to advertising cookies.
-      if (prefs.advertising) {
-        loadAdSenseScript();
-      }
+      window.location.reload();
+      return;
     }
+    applyPublisherConsent(prefs, location);
   };
 
   if (!isVisible) return null;
@@ -154,7 +152,7 @@ export default function CookieConsent() {
                         consent..."), which is length without notice. The purpose,
                         the essential/non-essential split the preferences panel
                         implements, and the policy link all survive. */}
-                    We use cookies to analyse traffic and to personalise content and ads.
+                    Optional cookies support traffic analysis and advertising on public editorial pages.
                     Essential cookies always run; the rest only with your consent. Read our{" "}
                     <a 
                       href="/privacy-policy" 
@@ -288,8 +286,8 @@ export default function CookieConsent() {
                       Advertising Cookies
                     </h4>
                     <p className="text-sm text-ink/65">
-                      These cookies are used by Google AdSense and other advertising partners 
-                      to display relevant ads based on your browsing history. You can opt out 
+                      Advertising is currently disabled pending consent-setup verification.
+                      Enabling this preference does not authorise personalised ads. You can also review
                       via{" "}
                       <a 
                         href="https://www.google.com/settings/ads" 

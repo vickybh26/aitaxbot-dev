@@ -216,11 +216,11 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
     <>
       <Helmet>
         <title>AiTaxBot - Income Tax Calculator India FY 2026-27 | AY 2027-28</title>
-        <meta name="description" content="AI-powered tax calculator for India. Compare old vs new regime, ₹12L tax-free under Section 87A. Free SIP, SWP, HRA, PF calculators. CA-reviewed. FY 2026-27 & AY 2027-28 ready." />
+        <meta name="description" content="Tax calculators for India. Compare old and new regimes using your income and deductions. Free SIP, SWP, HRA and PF tools. FY 2026-27 and AY 2027-28 supported." />
         <meta name="keywords" content="income tax calculator, tax calculator India, new tax regime, old tax regime, SIP calculator, HRA calculator, AY 2027-28, Income Tax Act 2025" />
         <link rel="canonical" href="https://www.aitaxbot.co.in/" />
         <meta property="og:title" content="AiTaxBot - Income Tax Calculator India FY 2026-27 | AY 2027-28" />
-        <meta property="og:description" content="AI-powered income tax calculator with ₹12L tax-free limit. CA-reviewed calculators for salaried, freelancers & investors. Income Tax Act 2025 ready." />
+        <meta property="og:description" content="Indian income tax and financial planning tools. Compare regimes, inspect calculation assumptions and check the tax year before relying on results." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://www.aitaxbot.co.in/" />
         <meta property="og:image" content="https://www.aitaxbot.co.in/images/aitaxbot-logo.png" />
@@ -294,9 +294,9 @@ export default function Landing({ activeModal, setActiveModal }: LandingProps) {
           <h2 className="font-display text-2xl font-bold">How the numbers are checked</h2>
           <div className="mt-7 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             <div>
-              <h3 className="font-display text-base font-bold">Reviewed by CAs</h3>
+              <h3 className="font-display text-base font-bold">Check the assumptions</h3>
               <p className="mt-2 text-sm leading-relaxed text-ink/65">
-                Each computation is signed off against the bare Act and the current Finance Act before it ships.
+                Check the selected tax year, inputs and applicable provisions before relying on a computation.
               </p>
             </div>
             <div>

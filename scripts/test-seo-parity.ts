@@ -63,8 +63,18 @@ function check(label: string, ok: boolean, detail = ""): void {
  */
 const NO_CRAWLER_CONTENT = new Set([...PRIVATE_ROUTES, ...NOINDEX_ROUTES]);
 
-/** The fallback title in client/index.html. Any route still serving it has no entry. */
-const GENERIC_TITLE_FRAGMENT = "Free ITR Filing & Income Tax Calculator";
+/** Read the shell title so this guard cannot silently drift after a copy edit. */
+const shellHtml = readFileSync(resolve(root, "client/index.html"), "utf8");
+const genericTitle = shellHtml.match(/<title>([^<]+)<\/title>/i)?.[1].replace(/&amp;/g, "&");
+check("the shell has a title", Boolean(genericTitle));
+check(
+  "the shell does not advertise an ITR-filing service",
+  !/free\s+itr\s+filing|file your itr/i.test(shellHtml),
+);
+check(
+  "the shell explains that AiTaxBot does not file returns",
+  shellHtml.includes("does not file income tax returns"),
+);
 
 /** Words of injected copy a public page must carry, excluding nav and boilerplate. */
 const MIN_WORDS = 120;
@@ -104,7 +114,7 @@ check(
 );
 
 const generic = Object.entries(SEO_CONTENT_BY_PATH)
-  .filter(([, p]) => p.title.includes(GENERIC_TITLE_FRAGMENT))
+  .filter(([, p]) => p.title === genericTitle)
   .map(([path]) => path);
 check(
   "no route reuses the index.html fallback title",

@@ -12,6 +12,7 @@
 import { Router, Request, Response } from "express";
 import { runRAGQuery, checkRAGHealth } from "./ragService";
 import { evaluateAnswerPair } from "./aiAnswerEvaluator";
+import { isAIReviewCurrent } from "./aiReviewRetention";
 import { verifyFirebaseToken, getFirestore } from "./firebase";
 
 const router = Router();
@@ -195,6 +196,7 @@ router.get("/admin/queries", requireAdminL1, async (req: Request, res: Response)
         .get();
       queries = snapshot.docs
         .map((doc: any) => ({ id: doc.id, ...doc.data() }))
+        .filter(row => isAIReviewCurrent(row))
         .sort((a: any, b: any) => String(b.timestamp || "").localeCompare(String(a.timestamp || "")))
         .slice(0, limit);
     } else {
@@ -205,7 +207,8 @@ router.get("/admin/queries", requireAdminL1, async (req: Request, res: Response)
         .orderBy("timestamp", "desc")
         .limit(limit)
         .get();
-      queries = snapshot.docs.map((doc: any) => ({ id: doc.id, ...doc.data() }));
+      queries = snapshot.docs.map((doc: any) => ({ id: doc.id, ...doc.data() }))
+        .filter(row => isAIReviewCurrent(row));
     }
 
     return res.json({ queries, total: queries.length });
@@ -234,7 +237,7 @@ router.post("/admin/queries/:id/grade", requireAdminL1, async (req: Request, res
 
     const docRef = getFirestore().collection("ai_queries").doc(req.params.id);
     const doc = await docRef.get();
-    if (!doc.exists) {
+    if (!doc.exists || !isAIReviewCurrent(doc.data() || {})) {
       return r.apiError(404, "QUERY_NOT_FOUND", "No query found with that ID.");
     }
 
@@ -261,7 +264,7 @@ router.post("/admin/queries/:id/auto-grade", requireAdminL1, async (req: Request
   try {
     const docRef = getFirestore().collection("ai_queries").doc(req.params.id);
     const doc = await docRef.get();
-    if (!doc.exists) return r.apiError(404, "QUERY_NOT_FOUND", "No query found with that ID.");
+    if (!doc.exists || !isAIReviewCurrent(doc.data() || {})) return r.apiError(404, "QUERY_NOT_FOUND", "No current query found with that ID.");
 
     const data = doc.data() as any;
     const isAllowedSource = data.source === "admin-eval" || data.comparison_type === "production_vs_rag";
@@ -332,6 +335,7 @@ router.get("/admin/eval-stats", requireAdminL1, async (_req: Request, res: Respo
     };
     snapshot.docs.forEach(doc => {
       const row = doc.data() as any;
+      if (!isAIReviewCurrent(row)) return;
       const status = (row.match_status as string) || "pending";
       stats.total++;
       if (status in stats) (stats as any)[status]++;

@@ -444,7 +444,7 @@ export default function AIS26ASForm16Tool() {
     <>
       <Helmet>
         <title>AIS vs 26AS vs Form 16 Reconciliation — AiTaxBot</title>
-        <meta name="description" content="Upload your AIS, Form 26AS, and Form 16 to instantly detect mismatches, get AI-powered explanations, and prepare for error-free ITR filing." />
+        <meta name="description" content="Compare your AIS, Form 26AS and Form 16 for potential mismatches and get AI-assisted explanations before preparing your ITR. AiTaxBot does not file returns or guarantee error-free filing." />
         <link rel="canonical" href="https://www.aitaxbot.co.in/tools/ais-26as-form16" />
       </Helmet>
 
@@ -455,7 +455,7 @@ export default function AIS26ASForm16Tool() {
           <div className="max-w-4xl mx-auto px-6 py-10 text-center">
             <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
               <span className="inline-flex items-center gap-1.5 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">
-                <Clock className="w-3 h-3" /> ITR Deadline: July 31, 2026
+                <Clock className="w-3 h-3" /> Check your applicable filing deadline
               </span>
               <span className="inline-flex items-center gap-1.5 bg-card/15 text-white/90 text-xs font-medium px-3 py-1 rounded-full">
                 <Shield className="w-3 h-3" /> Secure · Never Stored · Free
@@ -465,7 +465,7 @@ export default function AIS26ASForm16Tool() {
               AIS vs 26AS vs Form 16
             </h1>
             <p className="text-blue-100 text-base max-w-xl mx-auto mb-5">
-              Upload your tax documents — AI reads them, spots every mismatch, explains it in plain English, and tells you exactly what to fix before filing. Changed jobs mid-year? Upload each employer's Form 16.
+              Upload your tax documents to identify potential mismatches and receive AI-generated explanations. Extraction can be incomplete — verify the figures against your originals before filing. Changed jobs mid-year? Upload each employer's Form 16.
             </p>
             <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-xs text-blue-200">
               {["Salary reconciliation", "TDS mismatch detection", "Capital gains alert", "AI filing guidance"].map((f) => (
@@ -666,8 +666,8 @@ export default function AIS26ASForm16Tool() {
                 <div className="mt-5 bg-red-50 border border-red-100 rounded-xl p-4 flex items-start gap-3">
                   <Clock className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
                   <p className="text-sm">
-                    <strong className="text-red-800">ITR filing deadline: July 31, 2026.</strong>
-                    {" "}<span className="text-red-700">Reconcile now to avoid notices, penalties, or missing TDS credits.</span>
+                    <strong className="text-red-800">Filing deadlines depend on your tax year and return type.</strong>
+                    {" "}<span className="text-red-700">Check current deadlines and extensions on the Income Tax Portal. Reconciliation does not guarantee that a return will avoid scrutiny.</span>
                   </p>
                 </div>
               </div>

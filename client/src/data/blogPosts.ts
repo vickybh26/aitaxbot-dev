@@ -44,7 +44,6 @@ export const blogPosts = ([
       "datePublished": "2025-01-15",
       "dateModified": "2026-03-18",
       "wordCount": 1007,
-      "reviewedBy": {"@type": "Person", "name": "Certified Tax Expert", "jobTitle": "Chartered Accountant"}
     },
     bodySections: [
       {
@@ -141,7 +140,6 @@ export const blogPosts = ([
       "datePublished": "2025-01-29",
       "dateModified": "2026-03-18",
       "wordCount": 1667,
-      "reviewedBy": {"@type": "Person", "name": "Certified Tax Expert", "jobTitle": "Chartered Accountant"}
     },
     bodySections: [
       {
@@ -242,7 +240,6 @@ export const blogPosts = ([
       "datePublished": "2025-02-12",
       "dateModified": "2026-03-18",
       "wordCount": 1081,
-      "reviewedBy": {"@type": "Person", "name": "Certified Tax Expert", "jobTitle": "Chartered Accountant"}
     },
     bodySections: [
       {
@@ -323,7 +320,6 @@ export const blogPosts = ([
       "datePublished": "2025-02-26",
       "dateModified": "2026-03-18",
       "wordCount": 926,
-      "reviewedBy": {"@type": "Person", "name": "Certified Tax Expert", "jobTitle": "Chartered Accountant"}
     },
     bodySections: [
       {
@@ -404,7 +400,6 @@ export const blogPosts = ([
       "datePublished": "2025-03-12",
       "dateModified": "2026-03-18",
       "wordCount": 963,
-      "reviewedBy": {"@type": "Person", "name": "Certified Tax Expert", "jobTitle": "Chartered Accountant"}
     },
     bodySections: [
       {
@@ -484,7 +479,6 @@ export const blogPosts = ([
       "datePublished": "2025-03-26",
       "dateModified": "2026-03-18",
       "wordCount": 914,
-      "reviewedBy": {"@type": "Person", "name": "Certified Tax Expert", "jobTitle": "Chartered Accountant"}
     },
     bodySections: [
       {
@@ -559,7 +553,6 @@ export const blogPosts = ([
       "datePublished": "2025-04-09",
       "dateModified": "2026-03-18",
       "wordCount": 915,
-      "reviewedBy": {"@type": "Person", "name": "Certified Tax Expert", "jobTitle": "Chartered Accountant"}
     },
     bodySections: [
       {
@@ -633,7 +626,6 @@ export const blogPosts = ([
       "datePublished": "2025-04-23",
       "dateModified": "2026-03-18",
       "wordCount": 942,
-      "reviewedBy": {"@type": "Person", "name": "Certified Tax Expert", "jobTitle": "Chartered Accountant"}
     },
     bodySections: [
       {
@@ -718,7 +710,6 @@ export const blogPosts = ([
       "datePublished": "2025-05-07",
       "dateModified": "2026-03-18",
       "wordCount": 908,
-      "reviewedBy": {"@type": "Person", "name": "Certified Tax Expert", "jobTitle": "Chartered Accountant"}
     },
     bodySections: [
       {
@@ -798,7 +789,6 @@ export const blogPosts = ([
       "datePublished": "2025-05-21",
       "dateModified": "2026-03-18",
       "wordCount": 920,
-      "reviewedBy": {"@type": "Person", "name": "Certified Tax Expert", "jobTitle": "Chartered Accountant"}
     },
     bodySections: [
       {
@@ -878,7 +868,6 @@ export const blogPosts = ([
       "datePublished": "2025-06-04",
       "dateModified": "2026-03-18",
       "wordCount": 991,
-      "reviewedBy": {"@type": "Person", "name": "Certified Tax Expert", "jobTitle": "Chartered Accountant"}
     },
     bodySections: [
       {
@@ -960,7 +949,6 @@ export const blogPosts = ([
       "datePublished": "2025-06-18",
       "dateModified": "2026-03-18",
       "wordCount": 991,
-      "reviewedBy": {"@type": "Person", "name": "Certified Tax Expert", "jobTitle": "Chartered Accountant"}
     },
     bodySections: [
       {
@@ -1050,7 +1038,6 @@ export const blogPosts = ([
       "datePublished": "2025-07-02",
       "dateModified": "2026-03-18",
       "wordCount": 981,
-      "reviewedBy": {"@type": "Person", "name": "Certified Tax Expert", "jobTitle": "Chartered Accountant"}
     },
     bodySections: [
       {
@@ -1140,7 +1127,6 @@ export const blogPosts = ([
       "datePublished": "2025-07-16",
       "dateModified": "2026-03-18",
       "wordCount": 906,
-      "reviewedBy": {"@type": "Person", "name": "Certified Tax Expert", "jobTitle": "Chartered Accountant"}
     },
     bodySections: [
       {
@@ -1236,7 +1222,6 @@ export const blogPosts = ([
       "datePublished": "2025-07-30",
       "dateModified": "2026-03-18",
       "wordCount": 923,
-      "reviewedBy": {"@type": "Person", "name": "Certified Tax Expert", "jobTitle": "Chartered Accountant"}
     },
     bodySections: [
       {
@@ -1337,7 +1322,6 @@ export const blogPosts = ([
       "datePublished": "2025-08-13",
       "dateModified": "2026-03-18",
       "wordCount": 992,
-      "reviewedBy": {"@type": "Person", "name": "Certified Tax Expert", "jobTitle": "Chartered Accountant"}
     },
     bodySections: [
       {
@@ -1443,7 +1427,6 @@ export const blogPosts = ([
       "datePublished": "2025-08-27",
       "dateModified": "2026-03-18",
       "wordCount": 995,
-      "reviewedBy": {"@type": "Person", "name": "Certified Tax Expert", "jobTitle": "Chartered Accountant"}
     },
     bodySections: [
       {
@@ -1549,7 +1532,6 @@ export const blogPosts = ([
       "datePublished": "2025-09-10",
       "dateModified": "2026-03-18",
       "wordCount": 977,
-      "reviewedBy": {"@type": "Person", "name": "Certified Tax Expert", "jobTitle": "Chartered Accountant"}
     },
     bodySections: [
       {
@@ -1651,7 +1633,6 @@ export const blogPosts = ([
       "datePublished": "2025-09-24",
       "dateModified": "2026-03-18",
       "wordCount": 2380,
-      "reviewedBy": {"@type": "Person", "name": "Certified Tax Expert", "jobTitle": "Chartered Accountant"}
     },
     bodySections: [
       {
@@ -1743,7 +1724,7 @@ export const blogPosts = ([
     metaDescription: "What is marginal relief in income tax? How does it work at ₹12L, ₹50L, ₹1Cr, ₹2Cr and ₹5Cr thresholds? Detailed CA guide with worked examples, surcharge rates and tax-saving strategies.",
     keywords: ["marginal relief income tax", "surcharge on income tax", "marginal relief 50 lakh", "marginal relief 12 lakh", "income tax surcharge thresholds", "tax planning high income", "marginal relief calculation"],
     ogTitle: "Marginal Relief on Income Tax — Most Calculators Get This Wrong",
-    ogDescription: "If your income is ₹12.1 lakh, your tax is ₹10,400 — not ₹63,960. Here's how marginal relief works at every threshold, with CA-verified examples.",
+    ogDescription: "If your income is ₹12.1 lakh, your tax is ₹10,400 — not ₹63,960. Here's how marginal relief works at every threshold, with Educational examples.",
     tags: ["tax", "marginal relief", "surcharge", "high income", "CA tips"],
     readingTimeMinutes: 14,
     publishedAt: "February 20, 2026",
@@ -1758,7 +1739,6 @@ export const blogPosts = ([
       "datePublished": "2025-10-08",
       "dateModified": "2026-03-18",
       "wordCount": 1318,
-      "reviewedBy": {"@type": "Person", "name": "Certified Tax Expert", "jobTitle": "Chartered Accountant"}
     },
     bodySections: [
       {
@@ -1834,7 +1814,7 @@ export const blogPosts = ([
     slug: "income-tax-act-1961-vs-income-tax-act-2025",
     status: "published",
     metaTitle: "Income Tax Act 1961 vs Income Tax Act 2025 — What Is Changing | AiTaxBot",
-    metaDescription: "Complete comparison of Income Tax Act 1961 vs Income Tax Act 2025. What changes from Tax Year 2026-27, benefits, drawbacks, caution points, and impact on salaried, business, capital gains & house property. CA-verified guide.",
+    metaDescription: "Complete comparison of Income Tax Act 1961 vs Income Tax Act 2025. What changes from Tax Year 2026-27, benefits, drawbacks, caution points, and impact on salaried, business, capital gains & house property. Educational guide.",
     keywords: [
       "income tax act 2025", "income tax act 1961 vs 2025", "tax year 2026-27",
       "income tax act changes", "new income tax act India", "assessment year abolished",
@@ -1842,7 +1822,7 @@ export const blogPosts = ([
       "VDA reclassification 2025", "income tax simplification", "IT act 2025 benefits"
     ],
     ogTitle: "Income Tax Act 1961 vs Income Tax Act 2025 — Full Comparison, Benefits & Caution Points",
-    ogDescription: "India's biggest tax law overhaul in 60 years. What changes from April 1, 2026 (Tax Year 2026-27)? Salaried, business, capital gains, house property impact — CA-verified.",
+    ogDescription: "India's biggest tax law overhaul in 60 years. What changes from April 1, 2026 (Tax Year 2026-27)? Salaried, business, capital gains, house property impact — Educational.",
     tags: ["Tax Planning", "Income Tax Act 2025", "Tax Year 2026-27", "India"],
     readingTimeMinutes: 14,
     publishedAt: "March 5, 2026",
@@ -1857,7 +1837,6 @@ export const blogPosts = ([
       "datePublished": "2025-10-22",
       "dateModified": "2026-03-18",
       "wordCount": 1157,
-      "reviewedBy": {"@type": "Person", "name": "Certified Tax Expert", "jobTitle": "Chartered Accountant"}
     },
     bodySections: [
       {
@@ -1967,7 +1946,6 @@ export const blogPosts = ([
       "datePublished": "2025-11-05",
       "dateModified": "2026-03-18",
       "wordCount": 2156,
-      "reviewedBy": {"@type": "Person", "name": "Certified Tax Expert", "jobTitle": "Chartered Accountant"}
     },
     bodySections: [
       {
@@ -2105,7 +2083,6 @@ export const blogPosts = ([
       "datePublished": "2026-04-01",
       "dateModified": "2026-04-02",
       "wordCount": 2100,
-      "reviewedBy": { "@type": "Organization", "name": "AiTaxBot Editorial Team" }
     },
     bodySections: [
       {
@@ -2244,7 +2221,6 @@ export const blogPosts = ([
       "datePublished": "2026-04-02",
       "dateModified": "2026-04-02",
       "wordCount": 1300,
-      "reviewedBy": { "@type": "Organization", "name": "AiTaxBot Editorial Team" }
     },
     bodySections: [
       {
@@ -2331,7 +2307,6 @@ export const blogPosts = ([
       "datePublished": "2026-03-29",
       "dateModified": "2026-04-02",
       "wordCount": 1350,
-      "reviewedBy": { "@type": "Organization", "name": "AiTaxBot Editorial Team" }
     },
     bodySections: [
       {
@@ -2428,7 +2403,6 @@ export const blogPosts = ([
       "datePublished": "2026-04-02",
       "dateModified": "2026-04-02",
       "wordCount": 1400,
-      "reviewedBy": { "@type": "Organization", "name": "AiTaxBot Editorial Team" }
     },
     bodySections: [
       {
@@ -2520,7 +2494,6 @@ export const blogPosts = ([
       "datePublished": "2026-04-02",
       "dateModified": "2026-04-02",
       "wordCount": 1350,
-      "reviewedBy": { "@type": "Organization", "name": "AiTaxBot Editorial Team" }
     },
     bodySections: [
       {
@@ -2607,7 +2580,6 @@ export const blogPosts = ([
       "datePublished": "2026-03-30",
       "dateModified": "2026-04-02",
       "wordCount": 1050,
-      "reviewedBy": { "@type": "Organization", "name": "AiTaxBot Editorial Team" }
     },
     bodySections: [
       {
@@ -2700,7 +2672,6 @@ export const blogPosts = ([
       "datePublished": "2026-03-28",
       "dateModified": "2026-04-02",
       "wordCount": 980,
-      "reviewedBy": { "@type": "Organization", "name": "AiTaxBot Editorial Team" }
     },
     bodySections: [
       {
@@ -2802,7 +2773,6 @@ export const blogPosts = ([
       "datePublished": "2026-04-28",
       "dateModified": "2026-04-28",
       "wordCount": 1050,
-      "reviewedBy": { "@type": "Organization", "name": "AiTaxBot Tax Research Team" }
     },
     bodySections: [
       {
@@ -2904,7 +2874,6 @@ export const blogPosts = ([
       "datePublished": "2026-04-28",
       "dateModified": "2026-04-28",
       "wordCount": 1100,
-      "reviewedBy": { "@type": "Organization", "name": "AiTaxBot Tax Research Team" }
     },
     bodySections: [
       {
@@ -3001,7 +2970,6 @@ export const blogPosts = ([
       "datePublished": "2026-04-28",
       "dateModified": "2026-04-28",
       "wordCount": 1200,
-      "reviewedBy": { "@type": "Organization", "name": "AiTaxBot Tax Research Team" }
     },
     bodySections: [
       {
@@ -3098,7 +3066,6 @@ export const blogPosts = ([
       "datePublished": "2026-04-28",
       "dateModified": "2026-04-28",
       "wordCount": 1150,
-      "reviewedBy": { "@type": "Organization", "name": "AiTaxBot Tax Research Team" }
     },
     bodySections: [
       {
@@ -3189,7 +3156,6 @@ export const blogPosts = ([
       "datePublished": "2026-05-01",
       "dateModified": "2026-05-01",
       "wordCount": 1100,
-      "reviewedBy": { "@type": "Organization", "name": "AiTaxBot CA Team" }
     },
     bodySections: [
       {
@@ -3287,7 +3253,6 @@ export const blogPosts = ([
       "datePublished": "2026-06-25",
       "dateModified": "2026-06-25",
       "wordCount": 1200,
-      "reviewedBy": { "@type": "Organization", "name": "AiTaxBot Tax Research Team" }
     },
     bodySections: [
       {
@@ -3394,7 +3359,6 @@ export const blogPosts = ([
       "datePublished": "2026-07-14",
       "dateModified": "2026-07-14",
       "wordCount": 1050,
-      "reviewedBy": { "@type": "Organization", "name": "AiTaxBot Tax Research Team" }
     },
     bodySections: [
       {

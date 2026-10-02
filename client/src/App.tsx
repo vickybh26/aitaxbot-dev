@@ -133,6 +133,15 @@ function AdminRoute({ component: Component, minLevel = 3 }: { component: any; mi
   return <Component />;
 }
 
+// Mounted inside Suspense: its effect runs only once the route content has
+// committed, so a slow or failed lazy import cannot erase the static fallback.
+function StaticContentHandoff() {
+  useEffect(() => {
+    document.getElementById('seo-static-content')?.remove();
+  }, []);
+  return null;
+}
+
 function Router() {
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [location] = useLocation();
@@ -228,6 +237,7 @@ function Router() {
           <Route path="/terms-of-service" component={TermsOfService} />
           <Route component={NotFound} />
         </Switch>
+        <StaticContentHandoff />
       </Suspense>
     </Layout>
   );

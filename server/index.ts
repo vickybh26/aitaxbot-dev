@@ -5,7 +5,8 @@ import rateLimit from "express-rate-limit";
 import { randomBytes } from "crypto";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
-import { initializeFirebase } from "./firebase";
+import { initializeFirebase, getFirestore } from "./firebase";
+import { startAIReviewCleanup } from "./aiReviewRetention";
 import { cleanStalePdfs } from "./pdfGenerator";
 
 // Initialize Firebase on startup
@@ -275,5 +276,7 @@ app.use((req, res, next) => {
     reusePort: process.platform !== "win32",
   }, () => {
     log(`serving on port ${port}`);
+    const stopReviewCleanup = startAIReviewCleanup(getFirestore);
+    server.once("close", stopReviewCleanup);
   });
 })();

@@ -909,7 +909,7 @@ export class FirestoreStorage implements IStorage {
 
   async getTaxCalculationHistory(userId: string): Promise<TaxCalculationHistory[]> {
     try {
-      await this.deleteExpiredTaxCalculations(userId);
+      // User-owned history is retained until explicit deletion, not inactivity.
       
       const snapshot = await this.db.collection('taxCalculationHistory')
         .where('userId', '==', userId)
@@ -926,11 +926,10 @@ export class FirestoreStorage implements IStorage {
       });
 
       return results
-        .sort((a, b) => new Date(b.calculatedAt as string).getTime() - new Date(a.calculatedAt as string).getTime())
-        .slice(0, 10);
+        .sort((a, b) => new Date(b.calculatedAt as string).getTime() - new Date(a.calculatedAt as string).getTime());
     } catch (error) {
       console.error('Error getting tax calculation history:', error);
-      return [];
+      throw error;
     }
   }
 
@@ -954,29 +953,12 @@ export class FirestoreStorage implements IStorage {
 
   async createTaxCalculation(data: InsertTaxCalculationHistory): Promise<TaxCalculationHistory> {
     try {
-      const existingCalcs = await this.db.collection('taxCalculationHistory')
-        .where('userId', '==', data.userId)
-        .get();
-      
-      if (existingCalcs.docs.length >= 10) {
-        const sortedDocs = existingCalcs.docs
-          .map(doc => ({ doc, data: doc.data() as Record<string, any> }))
-          .sort((a, b) => {
-            const dateA = a.data['createdAt']?.toDate?.() || new Date(a.data['createdAt']);
-            const dateB = b.data['createdAt']?.toDate?.() || new Date(b.data['createdAt']);
-            return dateB.getTime() - dateA.getTime();
-          });
-        
-        const toDelete = sortedDocs.slice(9);
-        for (const item of toDelete) {
-          await item.doc.ref.delete();
-        }
-      }
-      
       const id = randomUUID();
       const calculation: TaxCalculationHistory = {
         id,
         ...data,
+        // Also override expiry for internal callers, not only HTTP requests.
+        expiresAt: null,
         createdAt: new Date(),
       } as unknown as TaxCalculationHistory;
       
@@ -998,28 +980,9 @@ export class FirestoreStorage implements IStorage {
   }
 
   async deleteExpiredTaxCalculations(userId: string): Promise<number> {
-    try {
-      const now = new Date();
-      const snapshot = await this.db.collection('taxCalculationHistory')
-        .where('userId', '==', userId)
-        .where('expiresAt', '<', now)
-        .get();
-      
-      let deleted = 0;
-      for (const doc of snapshot.docs) {
-        await doc.ref.delete();
-        deleted++;
-      }
-      
-      if (deleted > 0) {
-        console.log(`Deleted ${deleted} expired tax calculations for user ${userId}`);
-      }
-      
-      return deleted;
-    } catch (error) {
-      console.error('Error deleting expired tax calculations:', error);
-      return 0;
-    }
+    // Compatibility entry point: historical callers must not erase saved data.
+    // Existing Firestore TTL configuration requires a separate deployment check.
+    return 0;
   }
 }
 

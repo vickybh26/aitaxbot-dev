@@ -129,7 +129,7 @@ export default function About() {
                   </div>
                   <div>
                     <h3 className="text-xl font-semibold text-ink mb-2">CA-Backed Accuracy</h3>
-                    <p className="text-ink/80">Every calculator and article is reviewed by a qualified Chartered Accountant. We cite the relevant sections of the Income Tax Act so you can verify every figure yourself.</p>
+                    <p className="text-ink/80">Use the cited provisions and the selected tax year to check results. Automated calculations and AI explanations are not a substitute for a qualified professional reviewing your facts.</p>
                   </div>
                 </div>
 
@@ -197,9 +197,8 @@ export default function About() {
                     <p className="text-ink/80 leading-relaxed">
                       AiTaxBot was founded by a qualified Chartered Accountant who saw firsthand how confusing
                       India's tax system can be for ordinary taxpayers. The platform was built to bridge that gap
-                      — giving individuals the same clarity that CA clients receive, for free. Every calculator,
-                      tool, and article is verified against the latest provisions of the Income Tax Act 2025 and
-                      IT Rules 2026 before publication.
+                      — helping individuals understand their calculation inputs and compare planning scenarios.
+                      Always check the applicable tax year and official provisions before relying on a result.
                     </p>
                   </div>
                 </div>

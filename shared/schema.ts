@@ -220,7 +220,7 @@ export interface TaxCalculationHistory {
   savings?: number | null;
   recommendedRegime?: string | null;
   calculatedAt?: Date | string;
-  expiresAt?: Date | string;
+  expiresAt?: Date | string | null;
 }
 
 export type InsertTaxCalculationHistory = Omit<TaxCalculationHistory, "id" | "calculatedAt">;

@@ -81,13 +81,10 @@
       })();
     </script>
 
-    <!-- DPDP consent gate: default every category to DENIED before any tag
-         library initializes. This must run before gtag/Clarity/AdSense are
-         loaded — Google Consent Mode v2 only limits data collection if the
-         default is set ahead of 'config'. CookieConsent.tsx calls
-         gtag('consent','update',...) and window.__setClarityConsent(...)
-         once the user actually makes a choice; until then, nothing here
-         should collect or transmit personal data. -->
+    <!-- Consent bootstrap only: no optional SDK or config call here.
+         publisherConsent.ts loads publisher SDKs after affirmative consent
+         and only on editorial routes. Denied Consent Mode alone would not
+         guarantee that a loaded SDK sends no cookieless requests. -->
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
@@ -99,31 +96,8 @@
         'wait_for_update': 500
       });
 
-      // Clarity queues calls made before its script loads, so this is safe
-      // to call immediately — it starts Clarity in consent-required mode,
-      // meaning it won't send data until window.clarity('consent') is
-      // called (done in CookieConsent.tsx once the user opts in).
-      (function(c,l,a,r,i,t,y){
-          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-      })(window, document, "clarity", "script", "rdz8mw3fw4");
-      window.clarity("consent", false);
-
-      // adsbygoogle.js itself has no consent-gate API — whether it fires
-      // (and requests personalized vs. non-personalized ads) is controlled
-      // entirely by CookieConsent.tsx, which only pushes ad requests after
-      // the user opts in. Not loaded here; see CookieConsent.tsx.
     </script>
-
-    <!-- Google tag (gtag.js) — loaded after the consent default above, so
-         it starts in denied mode until the user consents. -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-9NMYMNBYFV"></script>
-    <script>
-      gtag('js', new Date());
-      gtag('config', 'G-9NMYMNBYFV');
-      gtag('config', 'AW-17983211580');
-    </script>
+    <!-- Optional publisher SDKs load only after consent on editorial pages. -->
 
     <!-- Google AdSense account verification tag (does not itself serve ads
          or set cookies — safe to declare unconditionally). Ad script
@@ -132,8 +106,8 @@
     
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AiTaxBot - Free ITR Filing &amp; Income Tax Calculator India FY 2026-27 | AY 2027-28</title>
-    <meta name="description" content="File your ITR for AY 2027-28 (FY 2026-27) with free AI-powered tools. Compare old vs new tax regime, calculate HRA, SIP, SWP, NPS. India's free tax calculator platform.">
+    <title>AiTaxBot - Income Tax Calculator &amp; Tax Planning India FY 2026-27 | AY 2027-28</title>
+    <meta name="description" content="Estimate Indian income tax for FY 2026-27 (AY 2027-28), compare old and new tax regimes, and reconcile AIS, Form 26AS and Form 16. AiTaxBot does not file income tax returns.">
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
@@ -158,7 +132,7 @@
          index.css). IBM Plex Sans stays loaded above as the fallback in both
          font stacks, not removed. -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap">
-    <meta property="og:title" content="AiTaxBot - Free ITR Filing &amp; Income Tax Calculator India FY 2026-27 | AY 2027-28">
+    <meta property="og:title" content="AiTaxBot - Income Tax Calculator &amp; Tax Planning India FY 2026-27 | AY 2027-28">
     <meta property="og:description" content="Free income tax calculator, old vs new regime comparison, HRA, SIP, SWP, NPS calculators. Built for India.">
     <meta property="og:image" content="/apple-touch-icon.png">
     <meta property="og:type" content="website">
@@ -167,7 +141,7 @@
     
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="AiTaxBot - Free ITR Filing &amp; Income Tax Calculator India FY 2026-27 | AY 2027-28">
+    <meta name="twitter:title" content="AiTaxBot - Income Tax Calculator &amp; Tax Planning India FY 2026-27 | AY 2027-28">
     <meta name="twitter:description" content="Free income tax calculator, old vs new regime comparison, HRA, SIP, SWP, NPS calculators.">
     <meta name="twitter:image" content="/apple-touch-icon.png">
     
@@ -182,8 +156,8 @@
   <body>
     <!-- Fallback H1 for non-JS crawlers (Semrush, Googlebot with JS disabled) -->
     <noscript>
-      <h1>AiTaxBot – Free ITR Filing &amp; Income Tax Calculator India FY 2026-27 / AY 2027-28</h1>
-      <p>Compare Old vs New Tax Regime, calculate HRA exemption, SIP returns, and NRI taxes. Free AI-powered tax tools for India.</p>
+      <h1>AiTaxBot – Income Tax Calculator &amp; Tax Planning India FY 2026-27 / AY 2027-28</h1>
+      <p>Compare Old vs New Tax Regime, estimate HRA exemption and investment returns, and reconcile tax documents. AiTaxBot provides calculation and preparation assistance; it does not file income tax returns.</p>
     </noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>

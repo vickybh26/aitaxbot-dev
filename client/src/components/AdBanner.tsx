@@ -1,4 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useLocation } from 'wouter';
+import { canRequestAds } from '@/lib/publisherConsent';
 
 interface AdBannerProps {
   slot: string;
@@ -22,9 +24,17 @@ export function AdBanner({
   className = ""
 }: AdBannerProps) {
   const isPlaceholder = slot === "1234567890" || slot === "2345678901" || slot === "3456789012";
+  const [location] = useLocation();
+  const [eligible, setEligible] = useState(() => canRequestAds(location));
+  useEffect(() => {
+    const update = () => setEligible(canRequestAds(location));
+    update();
+    window.addEventListener('publisher-consent-changed', update);
+    return () => window.removeEventListener('publisher-consent-changed', update);
+  }, [location]);
 
   useEffect(() => {
-    if (isPlaceholder) return;
+    if (isPlaceholder || !eligible || !canRequestAds(location)) return;
     // DPDP: the adsbygoogle.js script itself is only injected after the
     // user grants advertising consent (see CookieConsent.tsx) — it may not
     // exist yet when this component mounts. Queueing onto
@@ -41,9 +51,9 @@ export function AdBanner({
     } catch (error) {
       console.log('AdSense error:', error);
     }
-  }, [isPlaceholder]);
+  }, [isPlaceholder, eligible, location]);
 
-  if (isPlaceholder) return null;
+  if (isPlaceholder || !eligible || !canRequestAds(location)) return null;
 
   return (
     /**

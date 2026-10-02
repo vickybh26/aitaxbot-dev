@@ -66,7 +66,7 @@ export default function HomeLoanCalculatorPage() {
     <>
       <Helmet>
         <title>Home Loan Calculator India FY 2026-27 — Eligibility, EMI & Tax Benefit | AiTaxBot</title>
-        <meta name="description" content="Free Home Loan Affordability Calculator India. Check how much loan you can get on your salary, calculate EMI, total interest and Section 24 + 80C tax savings. CA verified." />
+        <meta name="description" content="Free Home Loan Affordability Calculator India. Check how much loan you can get on your salary, calculate EMI, total interest and Section 24 + 80C tax savings. Educational." />
         <meta name="keywords" content="home loan calculator, home loan eligibility calculator, EMI calculator, housing loan calculator India, Section 24 tax benefit, home loan tax saving, affordability calculator" />
         <link rel="canonical" href="https://www.aitaxbot.co.in/calculators/home-loan" />
         <meta property="og:title" content="Home Loan Calculator India — Eligibility, EMI & Tax Benefits FY 2026-27" />

@@ -320,7 +320,7 @@ export default function BlogPost() {
                   Written by AiTaxBot Editorial Team
                 </p>
                 <p className="text-xs text-ink/65">
-                  Reviewed by a Chartered Accountant · Updated {post.publishedAt || "2025"} · All tax figures follow CBDT guidelines for FY 2026-27
+                  Published by AiTaxBot · {post.publishedAt || "2025"} · Check the tax year and official sources before relying on figures
                 </p>
               </div>
             </div>
@@ -489,7 +489,7 @@ export default function BlogPost() {
                   This article is intended for general informational purposes only and does not constitute professional tax, legal, or financial advice. Tax laws and rates may change — always verify figures with the latest CBDT notifications or consult a qualified Chartered Accountant before making tax or investment decisions. AiTaxBot does not accept liability for decisions made based on this content.
                 </p>
                 <p className="text-xs text-ink/65 mt-2">
-                  Last reviewed by AiTaxBot Editorial Team · {post.publishedAt || "2025"} · Figures based on Income Tax Act, 1961 &amp; Union Budget 2025 provisions.
+                  Publication date: {post.publishedAt || "2025"} · The applicable Act and tax year depend on the period discussed in this article.
                 </p>
               </div>
             </div>

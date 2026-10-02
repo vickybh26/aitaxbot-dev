@@ -5,6 +5,7 @@ import { Globe, ChevronRight, AlertCircle, CreditCard, TrendingUp, BookOpen } fr
 import AuthorBox from "@/components/AuthorBox";
 import { AdBanner, ResponsiveAd, RectangleAd } from "@/components/AdBanner";
 import { NAVY, SLATE_200 } from "@/lib/chartColors";
+import { NRI_ACCOUNT_FAQS, NRI_ACCOUNT_SOURCES } from '@shared/nriAccountGuidance';
 
 export default function NRONREComparison() {
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
@@ -13,57 +14,26 @@ export default function NRONREComparison() {
     1: {
       account: "NRO Account",
       benefit: "Perfect for collecting rent, salary, pension and other Indian-source income",
-      note: "TDS will apply at 30% (may reduce to 15% under DTAA). You must have an NRO account if you have any Indian income.",
+      note: "NRO interest is generally subject to withholding at 30% plus applicable surcharge and cess. Treaty relief depends on eligibility and the particular treaty; TDS is not the final tax liability.",
     },
     2: {
       account: "NRE Account",
-      benefit: "100% tax-free interest and returns on your foreign earnings invested in India",
+      benefit: "Eligible NRE deposit interest can be exempt in India; investment returns are assessed separately",
       note: "Ideal for building long-term wealth in India. Funds are always freely repatriable to any country.",
     },
     3: {
       account: "FCNR Account",
-      benefit: "Preserve foreign currency value without forex risk. Interest is tax-free.",
-      note: "Lock your USD/GBP/EUR for 1-5 years with guaranteed tax-free returns. Perfect for medium-term parking.",
+      benefit: "Hold a deposit in foreign currency; Indian interest exemption depends on eligibility.",
+      note: "Compare the deposit terms and currency needs with your bank. Exemption conditions differ from NRE; foreign-country taxation may also apply.",
     },
     4: {
       account: "NRE Account",
-      benefit: "100% tax-free interest means you keep all your earnings. No TDS whatsoever.",
-      note: "This is the single biggest tax advantage for NRIs. Transfer funds from NRO to NRE strategically each year.",
+      benefit: "Eligible NRE deposit interest is exempt in India; this is not an exemption for all earnings.",
+      note: "Check account eligibility, permitted transfers and source-income taxes with your bank before moving funds.",
     },
   };
 
-  const faqData = [
-    {
-      question: "Can I have both NRO and NRE accounts simultaneously?",
-      answer:
-        "Yes, absolutely. In fact, most NRIs should have both. Use NRO for Indian-source income (rent, salary, pension) and NRE for foreign-source income and investments. You can hold both accounts at the same bank or different banks.",
-    },
-    {
-      question: "What happens to my existing savings account when I become an NRI?",
-      answer:
-        "Your resident rupee savings account automatically converts to an NRO account. You cannot maintain a regular resident savings account once you become an NRI. The conversion happens automatically, but you should inform your bank about your NRI status to avoid complications.",
-    },
-    {
-      question: "Can I invest in Indian mutual funds through NRE account?",
-      answer:
-        "Yes, you can invest in Indian mutual funds through NRE account and all returns are tax-free. However, if you're investing a lump sum that will mature and be repatriated, you may face higher forex compliance. SIPs (Systematic Investment Plans) from NRE accounts are excellent — no TDS on returns.",
-    },
-    {
-      question: "Is NRE interest really 100% tax-free?",
-      answer:
-        "Yes, completely. NRE account interest, dividend income, and capital gains are all 100% tax-free under Income Tax Act Section 115E. This applies only to non-residents. Interest is credited directly to your account — no TDS deduction.",
-    },
-    {
-      question: "What documents do I need to open an NRI account?",
-      answer:
-        "You'll need: (1) Valid passport, (2) Proof of overseas residence (rental agreement, utility bill, work contract), (3) PAN card, (4) Address proof in India (if you own property). Different banks may have slightly different requirements. NRI status needs to be established through your Income Tax records or self-declaration with supporting documents.",
-    },
-    {
-      question: "Can I use NRO/NRE accounts for UPI payments?",
-      answer:
-        "Most banks restrict UPI access from NRI accounts due to RBI regulations around resident vs non-resident fund flows. You can use net banking and international wire transfers. For domestic payments, you may need to convert NRE to NRO funds (which has tax implications). Always check with your bank before attempting UPI transactions.",
-    },
-  ];
+  const faqData = NRI_ACCOUNT_FAQS;
 
   return (
     <>
@@ -128,7 +98,7 @@ export default function NRONREComparison() {
                 Most NRIs Use Only NRO — And Overpay Tax by ₹1,50,000+ Every Year
               </h2>
               <p className="text-ink leading-relaxed">
-                NRO account interest is taxed at 30% TDS. NRE account interest is 100% tax-free in India. Yet most NRIs park all their Indian savings in NRO accounts because their bank didn't explain the difference. Simply moving fixed deposits to an NRE account can save ₹1.5 lakh or more in annual TDS for a ₹50 lakh deposit.
+                Eligible NRE deposit interest can be exempt in India, while NRO interest is generally taxable. Moving funds does not erase tax on income already earned, and NRE-funded investments do not automatically receive the deposit-interest exemption. Check FEMA eligibility and any foreign-country tax before comparing accounts.
               </p>
             </div>
           </div>
@@ -214,9 +184,9 @@ export default function NRONREComparison() {
                 </tr>
                 <tr className="bg-secondary border-b hover:bg-secondary">
                   <td className="px-4 md:px-6 py-4 font-semibold text-ink">Tax on Interest</td>
-                  <td className="px-4 md:px-6 py-4 text-red-600 font-semibold">30% TDS (may reduce via DTAA)</td>
-                  <td className="px-4 md:px-6 py-4 text-green-600 font-semibold">Completely tax-free in India</td>
-                  <td className="px-4 md:px-6 py-4 text-green-600 font-semibold">Completely tax-free in India</td>
+                  <td className="px-4 md:px-6 py-4 text-red-600 font-semibold">Withholding; treaty relief may apply</td>
+                  <td className="px-4 md:px-6 py-4 text-green-600 font-semibold">Exempt only if conditions are met</td>
+                  <td className="px-4 md:px-6 py-4 text-green-600 font-semibold">Exempt only if conditions are met</td>
                 </tr>
                 <tr className="bg-card border-b hover:bg-secondary">
                   <td className="px-4 md:px-6 py-4 font-semibold text-ink">Repatriation</td>
@@ -233,7 +203,7 @@ export default function NRONREComparison() {
                 <tr className="bg-card border-b hover:bg-secondary">
                   <td className="px-4 md:px-6 py-4 font-semibold text-ink">Mutual Fund Investment</td>
                   <td className="px-4 md:px-6 py-4 text-ink/80">Yes (but subject to TDS)</td>
-                  <td className="px-4 md:px-6 py-4 text-ink/80">Yes (tax-free returns)</td>
+                  <td className="px-4 md:px-6 py-4 text-ink/80">Yes (gains/dividends may be taxable)</td>
                   <td className="px-4 md:px-6 py-4 text-ink/80">Yes</td>
                 </tr>
                 <tr className="bg-secondary hover:bg-secondary">
@@ -264,7 +234,7 @@ export default function NRONREComparison() {
               </div>
               <div className="p-6">
                 <p className="text-ink leading-relaxed">
-                  Use for collecting Indian-source income: rent from property, dividends, pension, salary if still employed in India part-time. Every NRI who has Indian income needs an NRO account. Interest taxed at 30% + surcharge (may reduce under DTAA).
+                  Commonly used for Indian-source receipts such as rent, dividends and pension. Interest is generally taxable; withholding and treaty relief depend on your facts. Ask your bank about permitted credits.
                 </p>
               </div>
             </div>
@@ -279,7 +249,7 @@ export default function NRONREComparison() {
               </div>
               <div className="p-6">
                 <p className="text-ink leading-relaxed">
-                  Ideal for NRIs who want to invest their foreign earnings in India — FDs, mutual funds, stocks. Interest is completely tax-free. Funds can be freely moved back abroad. Best choice for growing Indian corpus with foreign money.
+                  Used for eligible repatriable rupee funds. Qualifying deposit interest is exempt in India, but dividends and investment gains are not exempt merely because the investment was funded from NRE.
                 </p>
               </div>
             </div>
@@ -294,7 +264,7 @@ export default function NRONREComparison() {
               </div>
               <div className="p-6">
                 <p className="text-ink leading-relaxed">
-                  Fixed deposits in foreign currency (USD, GBP, EUR, AUD, CAD, JPY, SGD). Eliminates currency risk since you deposit and withdraw in the same currency. Interest tax-free. Tenure: 1 to 5 years. Best for long-term parking of foreign funds without forex exposure.
+                  Foreign-currency term deposits can avoid conversion into rupees, but currency risk remains relative to your spending currency. Check the bank's terms and the separate conditions for Indian interest exemption, especially after returning to India.
                 </p>
               </div>
             </div>
@@ -303,66 +273,27 @@ export default function NRONREComparison() {
       </section>
 
       {/* Worked Examples */}
-      <section className="py-12 md:py-16 px-4 md:px-6">
+      <section className="py-12 px-4 md:px-6">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center">Real-World Examples: How Much Can You Save?</h2>
-
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Example 1 */}
-            <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg shadow-md p-8 border-l-4 border-orange-500">
-              <h3 className="text-2xl font-bold text-orange-700 mb-6">Example 1: ₹50 Lakh FD</h3>
-
-              <div className="bg-card rounded-lg p-4 mb-4 border-l-4 border-red-500">
-                <p className="text-sm font-semibold text-red-600 uppercase mb-2">Scenario A: All in NRO</p>
-                <p className="text-ink mb-2">₹50L FD at 7% interest</p>
-                <p className="text-ink/80 text-sm">Interest earned: ₹3.5L</p>
-                <p className="text-ink/80 text-sm">TDS at 30%: ₹1.05L</p>
-                <p className="text-lg font-bold text-red-600">Net received: ₹2.45L</p>
-              </div>
-
-              <div className="bg-card rounded-lg p-4 mb-6 border-l-4 border-green-500">
-                <p className="text-sm font-semibold text-green-600 uppercase mb-2">Scenario B: Move to NRE</p>
-                <p className="text-ink mb-2">Same ₹50L at 7% interest</p>
-                <p className="text-ink/80 text-sm">Interest earned: ₹3.5L</p>
-                <p className="text-ink/80 text-sm">TDS: ₹0 (100% tax-free)</p>
-                <p className="text-lg font-bold text-green-600">Net received: ₹3.5L</p>
-              </div>
-
-              <div className="bg-yellow-50 rounded-lg p-4 border-l-4 border-yellow-600">
-                <p className="text-sm font-semibold text-yellow-700 uppercase mb-1">Annual Savings by Switching:</p>
-                <p className="text-2xl font-bold text-yellow-700">₹1.05 Lakh per year</p>
-              </div>
-            </div>
-
-            {/* Example 2 */}
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg shadow-md p-8 border-l-4 border-blue-500">
-              <h3 className="text-2xl font-bold text-ink mb-6">Example 2: Rental Income</h3>
-
-              <div className="bg-card rounded-lg p-4 mb-4">
-                <p className="text-ink font-semibold mb-3">Monthly rent: ₹40,000</p>
-                <p className="text-ink/80 text-sm mb-2">Annual rental income: ₹4.8L</p>
-
-                <div className="bg-red-50 p-3 rounded border-l-4 border-red-500 my-4">
-                  <p className="text-sm text-red-700 font-semibold">Must go to NRO Account</p>
-                  <p className="text-xs text-red-600 mt-1">Indian income cannot be credited to NRE account</p>
-                </div>
-
-                <p className="text-ink/80 text-sm mb-2">TDS deducted by tenant at 30% (on income above threshold)</p>
-                <p className="text-ink/80 text-sm mb-4">Potential TDS: ~₹1.44L</p>
-
-                <div className="bg-green-50 p-3 rounded border-l-4 border-green-500">
-                  <p className="text-sm text-green-700 font-semibold">DTAA Benefit</p>
-                  <p className="text-xs text-green-600 mt-1">If you're a resident of US, UK, Canada, Singapore — you can submit Form 10F + Tax Residency Certificate to reduce TDS to 15%</p>
-                  <p className="text-sm font-bold text-green-700 mt-2">Potential savings: ₹72,000 per year</p>
-                </div>
-              </div>
-
-              <div className="bg-secondary rounded-lg p-4 border-l-4 border-blue-600 mt-4">
-                <p className="text-sm font-semibold text-ink uppercase mb-1">Repatriation</p>
-                <p className="text-sm text-ink">Can repatriate NRO balance up to USD 1 million/year with Form 15CA/15CB + CA certificate</p>
-              </div>
-            </div>
-          </div>
+          <h2 className="text-2xl font-bold mb-4">Compare interest, withholding and final tax separately</h2>
+          <p className="text-ink/80 mb-4">
+            At an illustrative 7% rate, a <span className="money">₹50,00,000</span> deposit earns
+            <span className="money"> ₹3,50,000</span> annually. A base 30% withholding illustration is
+            <span className="money"> ₹1,05,000</span>, before applicable surcharge and cess.
+            Withholding is not the final tax payable: treaty relief, other income and return calculations matter.
+            Eligible NRE deposit interest can be exempt in India, but changing accounts cannot remove tax on prior income.
+          </p>
+          <p className="text-ink/80 mb-4">
+            Rental income and mutual-fund gains follow their own tax rules. Do not apply an interest-article
+            treaty rate to rent or assume that receiving investment proceeds in NRE makes them exempt.
+          </p>
+          <h3 className="text-lg font-semibold mb-2">Official references</h3>
+          <ul className="list-disc pl-5 space-y-2">
+            {NRI_ACCOUNT_SOURCES.map((source) => (
+              <li key={source.href}><a className="text-interactive-blue underline" href={source.href}
+                target="_blank" rel="noopener noreferrer">{source.label}</a></li>
+            ))}
+          </ul>
         </div>
       </section>
 
@@ -375,27 +306,27 @@ export default function NRONREComparison() {
             {[
               {
                 title: "Convert NRO to NRE Strategically",
-                description: "You can transfer up to USD 1 million/year from NRO to NRE after paying applicable taxes — effectively converting taxable funds to tax-free ones going forward.",
+                description: "Permitted NRO-to-NRE transfers require bank checks and applicable tax compliance. A transfer does not exempt past income or future dividends and capital gains.",
               },
               {
                 title: "Submit Form 15G/15H Carefully",
                 description: "NRIs CANNOT submit Form 15G/15H to avoid TDS on NRO accounts (only residents can). Don't let your bank mislead you — NRO TDS is mandatory.",
               },
               {
-                title: "DTAA Can Reduce NRO TDS to 15%",
-                description: "US, UK, Canada, Singapore NRIs can submit Form 10F + Tax Residency Certificate to reduce NRO interest TDS from 30% to 15%.",
+                title: "Check the applicable treaty",
+                description: "Treaty relief varies by country, income type and eligibility. Ask about the applicable article, tax-residency certificate, Form 10F and any further documentation; do not assume a universal 15% rate.",
               },
               {
                 title: "NRE Account for SIPs and Mutual Funds",
-                description: "Systematic Investment Plans in equity mutual funds from NRE account means tax-free SIP returns (no TDS on redemption if NRE-funded). Significantly better than NRO-funded investments.",
+                description: "NRE funding does not exempt mutual-fund dividends or redemption gains. Check fund classification, holding period, tax rates and NRI withholding before investing.",
               },
               {
                 title: "Joint NRO with Resident Parents",
-                description: "You can open a joint NRO account with resident Indian family members (parents, spouse). Useful for giving them access to manage funds in your absence.",
+                description: "Ask the bank about eligible resident-relative joint holders, the required account mandate and permitted operations. Joint access is subject to banking rules.",
               },
               {
                 title: "Repatriation Deadline",
-                description: "There's no time limit on repatriating NRE funds — they're always freely repatriable. NRO repatriation requires CA certificate (Form 15CA/15CB) and is capped at USD 1 million per financial year.",
+                description: "NRE balances are repatriable subject to account rules. NRO current-income remittances and capital-balance transfers have different conditions; the USD 1 million facility is not a universal limit for every remittance. Check which tax forms and bank documents your transaction actually needs.",
               },
             ].map((tip, index) => (
               <div key={index} className="bg-card rounded-lg shadow-md p-6 border-l-4 border-amber-500 hover:shadow-lg transition">

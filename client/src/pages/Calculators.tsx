@@ -27,7 +27,7 @@ const hubFAQs = [
   },
   {
     question: "Who reviews the calculator accuracy?",
-    answer: "All calculators are prepared and reviewed by our team of Chartered Accountants (CAs) and tax professionals to ensure compliance with Indian tax laws and financial regulations."
+    answer: "These are automated educational tools. Verify the applicable law, tax year and assumptions with official sources or a qualified professional."
   },
   {
     question: "Which calculator should I use first?",
@@ -273,11 +273,11 @@ export default function Calculators() {
     <>
       <Helmet>
         <title>Free Tax & Financial Calculators India FY 2026-27 | AiTaxBot</title>
-        <meta name="description" content="Free tax & financial calculators for India, updated for FY 2026-27 (AY 2027-28). Income Tax, HRA, SIP, SWP & PF calculators. Reviewed by Chartered Accountant." />
+        <meta name="description" content="Free tax & financial calculators for India, updated for FY 2026-27 (AY 2027-28). Income Tax, HRA, SIP, SWP & PF calculators. For educational use." />
         <meta name="keywords" content="tax calculators india, income tax calculator, HRA calculator, SIP calculator, SWP calculator, PF calculator, EPF calculator, financial planning tools india, FY 2026-27" />
         <link rel="canonical" href="https://www.aitaxbot.co.in/calculators" />
         <meta property="og:title" content="Free Tax & Financial Calculators India FY 2026-27 | AiTaxBot" />
-        <meta property="og:description" content="Free tax & financial calculators for India. Income Tax, HRA, SIP, SWP & PF calculators updated for FY 2026-27. Reviewed by CA." />
+        <meta property="og:description" content="Free tax & financial calculators for India. Income Tax, HRA, SIP, SWP & PF calculators updated for FY 2026-27. For educational use." />
         <meta property="og:url" content="https://www.aitaxbot.co.in/calculators" />
         <meta property="og:type" content="website" />
         <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>
@@ -389,7 +389,7 @@ export default function Calculators() {
             <h2 className="font-display text-xl font-bold text-ink text-center mb-10">Why Use Our Calculators?</h2>
             <div className="grid gap-8 md:grid-cols-3">
               {[
-                { icon: Award,      title: "CA Reviewed",          body: "All calculations are reviewed by a Chartered Accountant and follow the latest Income Tax Act provisions for maximum accuracy." },
+                { icon: Award,      title: "Check assumptions",          body: "Check calculation assumptions and the applicable tax year with official provisions." },
                 { icon: PiggyBank,  title: "Always Free",          body: "Use all our calculators unlimited times at no cost. No hidden fees — just a free account so you can view your result and access it later." },
                 { icon: TrendingUp, title: "Updated for FY 2026-27", body: "We update our calculators immediately when tax laws or interest rates change so you always get current information." },
               ].map(({ icon: Icon, title, body }) => (

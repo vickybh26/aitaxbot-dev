@@ -10,6 +10,7 @@
 
 import { QdrantClient } from "@qdrant/js-client-rest";
 import { getFirestore } from "./firebase";
+import { aiReviewLoggingEnabled, aiReviewRetentionFields } from "./aiReviewRetention";
 import taxTopicGraph from "./taxTopicGraph.json";
 
 // ─── Clients ────────────────────────────────────────────────────────────────
@@ -530,10 +531,11 @@ async function logComparison(
   geminiAnswer: string | null,
   graphAnswer: string | null
 ): Promise<void> {
+  if (!aiReviewLoggingEnabled()) return;
   try {
     const graphAvailable = graphAnswer !== null;
     await getFirestore().collection("ai_queries").add({
-      question,                    // The query text (no user PII stored)
+      question,                    // Free-text queries can contain personal data.
       concepts_triggered: concepts,
       session_id: sessionId || null,
       source: source || "unknown",
@@ -542,12 +544,12 @@ async function logComparison(
       graph_answer: graphAnswer,   // null when no graph concept matched
       graph_available: graphAvailable,
       match_status: graphAvailable ? "pending" : null, // admin grades this once both answers exist
-      timestamp: new Date().toISOString(),
-      // No user ID, email, or identifying information
+      ...aiReviewRetentionFields(),
+      // No account ID or email field; this does not make free text anonymous.
     });
   } catch (err) {
     // Non-fatal — log failure doesn't break the response
-    console.error("[RAG] Comparison log failed:", err);
+    console.error("[RAG] Comparison log failed");
   }
 }
 
@@ -683,6 +685,8 @@ export async function runProductionShadowComparison(opts: {
   financialYear?: string;
 }): Promise<void> {
   const { question, productionAnswer, source, financialYear } = opts;
+  // Switching off internal review also avoids its extra embedding/generation cost.
+  if (!aiReviewLoggingEnabled()) return;
   try {
     const initialConcepts = extractConcepts(question);
     const allConcepts = expandConceptGraph(initialConcepts);
@@ -711,7 +715,7 @@ export async function runProductionShadowComparison(opts: {
       graph_answer: ragAnswer,              // the RAG pipeline's candidate replacement
       graph_available: true,                // ensures it appears in the /admin/ai-review list
       match_status: "pending",
-      timestamp: new Date().toISOString(),
+      ...aiReviewRetentionFields(),
       // No user ID, email, PAN, or identifying information — question is a
       // synthesized summary of figures only.
     });

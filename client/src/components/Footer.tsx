@@ -50,7 +50,7 @@ export default function Footer() {
               <span className="ml-2 font-display text-lg font-bold text-paper tracking-tight">AiTaxBot</span>
             </Link>
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-paper/65">
-              Indian tax computation, reviewed by practising Chartered Accountants — for FY 2026-27
+              Indian tax calculation and planning tools — for FY 2026-27
               (AY 2027-28) under the Income Tax Act 2025.
             </p>
             <a
@@ -101,7 +101,13 @@ export default function Footer() {
             against your Form 16, AIS and 26AS, or consult a qualified Chartered Accountant, before
             filing. AiTaxBot is not affiliated with the Income Tax Department or CBDT.
           </p>
-          <p>© {new Date().getFullYear()} AiTaxBot</p>
+          <div>
+            <button type="button" className="min-h-[44px] underline text-paper/70"
+              onClick={() => window.dispatchEvent(new Event('open-cookie-preferences'))}>
+              Cookie preferences
+            </button>
+            <p>© {new Date().getFullYear()} AiTaxBot</p>
+          </div>
         </div>
       </div>
     </footer>

@@ -7,6 +7,9 @@ import viteConfig from "../vite.config";
 import { nanoid } from "nanoid";
 import { SEO_CONTENT_BY_PATH, SITE_NAV, type SeoPageContent } from "@shared/seoContent";
 import { isKnownRoute, isNoIndexRoute } from "@shared/routes";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { PrivacyPolicyContent, TermsOfServiceContent } from "@shared/legalContent";
 
 const viteLogger = createLogger();
 
@@ -46,13 +49,10 @@ function escapeAttr(s: string): string {
  *     ~300-800 words depending on the route) before <div id="root">, plus a
  *     matching FAQPage JSON-LD block
  *
- * The static block is removed by an inline, non-module <script> immediately
- * after it in the markup. Classic inline scripts execute synchronously as
- * the parser reaches them — before the deferred `type="module"` React entry
- * point ever runs — so a JS-enabled browser never shows duplicate content
- * once React mounts its own copy of the same FAQ. A crawler that doesn't
- * execute JS (the actual problem here) sees the full static block, because
- * it never runs the removal script in the first place.
+ * The static block remains until StaticContentHandoff in App.tsx runs after
+ * the route's Suspense boundary commits. A delayed or failed module load must
+ * not erase the readable fallback. Legal pages render shared React content;
+ * other page summaries still require explicit parity maintenance.
  *
  * Routes with no entry in SEO_CONTENT_BY_PATH (blog posts, /login,
  * /dashboard, admin pages, etc.) are returned unchanged — deliberately out
@@ -150,16 +150,21 @@ export function injectSeoContent(html: string, pathname: string): string {
     (l) => `<li><a href="${escapeAttr(l.href)}">${escapeHtml(l.label)}</a></li>`,
   ).join("")}</ul></nav>`;
 
+  // Legal disclosures must be complete without JS, not a separate summary.
+  const legalBody = page.path === "/privacy-policy"
+    ? renderToStaticMarkup(createElement(PrivacyPolicyContent))
+    : page.path === "/terms-of-service"
+      ? renderToStaticMarkup(createElement(TermsOfServiceContent))
+      : null;
   const staticBlock = `
     <div id="seo-static-content" style="max-width:960px;margin:0 auto;padding:24px 16px;font-family:system-ui,sans-serif;line-height:1.6;">
       <h1>${escapeHtml(page.h1)}</h1>
-      <p>${escapeHtml(page.intro)}</p>
+      ${legalBody ?? `<p>${escapeHtml(page.intro)}</p>
       ${sectionsHtml}
-      ${page.faqs.length > 0 ? `<h2>Frequently Asked Questions</h2>\n      ${faqItemsHtml}` : ""}
+      ${page.faqs.length > 0 ? `<h2>Frequently Asked Questions</h2>\n      ${faqItemsHtml}` : ""}`}
       ${pageLinksHtml}
       ${navHtml}
     </div>
-    <script>document.getElementById('seo-static-content')?.remove();</script>
     <script type="application/ld+json">${JSON.stringify(faqJsonLd)}</script>
     <!-- Fallback H1 for non-JS crawlers (Semrush, Googlebot with JS disabled) -->`;
 
