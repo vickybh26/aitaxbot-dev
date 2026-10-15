@@ -98,7 +98,8 @@ router.get("/me", adminL3, async (req: any, res) => {
 
 router.get("/stats", adminL3, async (req: any, res) => {
   try {
-    // Cache stats for 5 minutes — avoids re-running 6 Firestore queries on every dashboard load
+    // Briefly cache shared stats to limit repeated scans while allowing minute polling.
+    res.setHeader("Cache-Control", "no-store");
     const cached = getCache<object>("admin:stats");
     if (cached) return res.json(cached);
 
@@ -106,27 +107,15 @@ router.get("/stats", adminL3, async (req: any, res) => {
     const sevenDaysAgo  = new Date(Date.now() -  7 * 24 * 60 * 60 * 1000);
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
-    // Run all count queries in parallel — each uses Firestore count aggregation (no doc reads)
+    // Fetch projected user fields, the counter, and recent activity in parallel.
     const [
       usersSnap,
-      newUsersWeekSnap,
-      newUsersMonthSnap,
-      completedSnap,
       counterDoc,
-      trendSnap,
       toolUsageSnap,
     ] = await Promise.all([
-      db.collection("users").count().get(),
-      db.collection("users").where("createdAt", ">=", sevenDaysAgo).count().get(),
-      db.collection("users").where("createdAt", ">=", thirtyDaysAgo).count().get(),
-      db.collection("users").where("isProfileComplete", "==", true).count().get(),
+      // Normalize legacy ISO strings and Firestore timestamps in one projected scan.
+      db.collection("users").select("createdAt", "isProfileComplete").get(),
       db.collection("counters").doc("taxCalculations").get(),
-      // Fetch only createdAt field for trend — minimises bytes transferred
-      db.collection("users")
-        .where("createdAt", ">=", thirtyDaysAgo)
-        .orderBy("createdAt", "asc")
-        .select("createdAt")
-        .get(),
       // Tool-usage events use ISO timestamps. Restrict retention metrics to the
       // same rolling 30-day window shown by the dashboard, and read the newest
       // events first so the safety cap cannot be consumed by old activity.
@@ -138,11 +127,17 @@ router.get("/stats", adminL3, async (req: any, res) => {
         .get(),
     ]);
 
-    const totalUsers         = usersSnap.data().count;
-    const newUsersWeek       = newUsersWeekSnap.data().count;
-    const newUsersMonth      = newUsersMonthSnap.data().count;
-    const completedProfiles  = completedSnap.data().count;
-    const totalCalculations  = counterDoc.exists ? (counterDoc.data()?.count ?? 0) : 0;
+    const datedUsers = usersSnap.docs.map((doc: any) => {
+      const data = doc.data();
+      const raw = data.createdAt;
+      return { ...data, date: raw?.toDate ? raw.toDate() : new Date(raw ?? NaN) };
+    });
+    const totalUsers = usersSnap.size;
+    const newUsersWeek = datedUsers.filter((u: any) => u.date >= sevenDaysAgo).length;
+    const newUsersMonth = datedUsers.filter((u: any) => u.date >= thirtyDaysAgo).length;
+    const completedProfiles = datedUsers.filter((u: any) => u.isProfileComplete === true).length;
+    const counterData = counterDoc.data() as { count?: number } | undefined;
+    const totalCalculations = counterDoc.exists ? (counterData?.count ?? 0) : 0;
     const profileCompletionRate = totalUsers > 0
       ? Math.round((completedProfiles / totalUsers) * 100) : 0;
 
@@ -181,9 +176,9 @@ router.get("/stats", adminL3, async (req: any, res) => {
 
     // Build 30-day trend
     const signupsByDay: Record<string, number> = {};
-    trendSnap.docs.forEach((doc: any) => {
-      const raw = doc.data().createdAt;
-      const createdAt = raw?.toDate?.() ?? new Date(raw);
+    datedUsers.forEach((user: any) => {
+      const createdAt = user.date;
+      if (!Number.isFinite(createdAt.getTime()) || createdAt < thirtyDaysAgo) return;
       const dateKey = createdAt.toISOString().split("T")[0];
       signupsByDay[dateKey] = (signupsByDay[dateKey] ?? 0) + 1;
     });
@@ -195,12 +190,13 @@ router.get("/stats", adminL3, async (req: any, res) => {
     }
 
     const result = {
+      generatedAt: new Date().toISOString(),
       totalUsers, newUsersWeek, newUsersMonth, totalCalculations,
       completedProfiles, profileCompletionRate, signupTrend,
       activeUsers, returningUsers, returningUserRate,
       topTools, usageMetricsCapped, usageEventsScanned: toolUsageSnap.size,
     };
-    setCache("admin:stats", result, 5 * 60 * 1000); // 5 min TTL
+    setCache("admin:stats", result, 30 * 1000); // shorter than the client polling interval
     res.json(result);
   } catch (err) {
     console.error("[Admin] Stats error:", err);

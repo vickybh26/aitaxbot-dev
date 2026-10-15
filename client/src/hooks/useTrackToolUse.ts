@@ -75,8 +75,8 @@ export function useTrackToolUse() {
       try {
         const token = await getIdToken();
         if (!token) return;
-        // Fire-and-forget — don't await the response
-        fetch("/api/tool-usage", {
+        // The caller does not await send; inspect the response here without blocking the UI.
+        const response = await fetch("/api/tool-usage", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -88,9 +88,10 @@ export function useTrackToolUse() {
             summary: summary ?? null,
             ...(saved ? { saved: { ...saved, toolName: tool } } : {}),
           }),
-        }).catch(() => {}); // swallow network errors silently
-      } catch {
-        // Auth errors are non-fatal
+        });
+        if (!response.ok) console.error("[ToolUsage] Tracking rejected", response.status);
+      } catch (error) {
+        console.error("[ToolUsage] Tracking failed", error);
       }
     },
     [getIdToken]

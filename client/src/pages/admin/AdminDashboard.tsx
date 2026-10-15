@@ -40,6 +40,7 @@ interface AdminStats {
   topTools: { name: string; uses: number; users: number }[];
   usageMetricsCapped: boolean;
   usageEventsScanned: number;
+  generatedAt: string;
 }
 
 function MetricCard({
@@ -100,7 +101,7 @@ function LoadingDashboard() {
 export default function AdminDashboard() {
   const { getIdToken, adminLevel } = useAuth();
 
-  const { data: stats, isLoading, isError } = useQuery<AdminStats>({
+  const { data: stats, isLoading, isError, isFetching, refetch } = useQuery<AdminStats>({
     queryKey: ["/api/admin/stats"],
     queryFn: async () => {
       const token = await getIdToken();
@@ -114,6 +115,8 @@ export default function AdminDashboard() {
       return res.json();
     },
     staleTime: 2 * 60 * 1000,
+    refetchInterval: 60_000,
+    refetchOnWindowFocus: true,
   });
 
   if (isLoading) return <LoadingDashboard />;
@@ -148,6 +151,10 @@ export default function AdminDashboard() {
     <AdminLayout>
       <div className="mx-auto max-w-7xl space-y-6 lg:space-y-7">
         <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+          <button type="button" onClick={() => void refetch()} disabled={isFetching}
+            className="min-h-11 rounded-xl border border-rule px-4 text-sm text-ink disabled:opacity-50">
+            {isFetching ? "Refreshing…" : "Refresh metrics"}
+          </button>
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-ink/65">Owner overview</p>
             <h1 className="mt-2 text-3xl font-bold tracking-tight text-ink">Dashboard</h1>
@@ -342,7 +349,7 @@ export default function AdminDashboard() {
         <div className="flex flex-col gap-2 border-t border-rule pt-4 text-xs text-ink/60 sm:flex-row sm:items-center sm:justify-between">
           <span>Activity and signup trends use a rolling 30-day window. Totals are all-time unless noted.</span>
           <span>{(stats?.totalCalculations ?? 0).toLocaleString("en-IN")} all-time calculations</span>
-          <span>Stats refresh within about 5 minutes.</span>
+          <span>Checks every minute. {stats?.generatedAt ? `Data generated ${new Date(stats.generatedAt).toLocaleString("en-IN")}.` : ""}</span>
         </div>
 
         {adminLevel === 1 && (
