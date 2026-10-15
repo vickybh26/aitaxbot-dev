@@ -57,3 +57,6 @@ __pycache__/
 # These contain PAN, masked Aadhaar, home addresses and bank account numbers.
 # They must NEVER be committed — see scripts/test-reconcile-parsers.mjs.
 test-fixtures/
+
+# Local database snapshots; never publish knowledge-base backups to GitHub.
+.local-backups/

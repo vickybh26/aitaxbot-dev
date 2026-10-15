@@ -225,7 +225,7 @@ async function searchQdrant(
   lawVersion?: "ita_2025" | "ita_1961"
 ): Promise<RAGChunk[]> {
   const buildParams = (opts: { law: boolean; concepts: boolean }): any => {
-    const params: any = { vector, limit: TOP_K, with_payload: true };
+    const params: any = { query: vector, limit: TOP_K, with_payload: true };
     const filter: any = {};
     // Hard exclusion of the wrong statute's chunks. Verified 2026-08-31 that
     // all 3023 points carry law_version (1725 ita_1961 / 1298 ita_2025, 0
@@ -253,14 +253,14 @@ async function searchQdrant(
   // semantic search instead of failing the query: worse ranking, still useful.
   let results;
   try {
-    results = await qdrant.search(COLLECTION, buildParams({ law: true, concepts: true }));
+    results = (await qdrant.query(COLLECTION, buildParams({ law: true, concepts: true }))).points;
   } catch (err) {
     console.warn(
       "[RAG] Filtered Qdrant search failed — retrying unfiltered. If this " +
       "recurs, recreate the keyword payload indexes on 'concepts' / 'law_version':",
       err instanceof Error ? err.message : err
     );
-    results = await qdrant.search(COLLECTION, buildParams({ law: false, concepts: false }));
+    results = (await qdrant.query(COLLECTION, buildParams({ law: false, concepts: false }))).points;
   }
 
   // A law filter that narrows the candidate set to nothing is worse than no
@@ -273,7 +273,7 @@ async function searchQdrant(
       `[RAG] No chunks matched law_version=${lawVersion} for this query — ` +
       `retrying without the statute filter (answer will rely on the prompt's transition rule).`
     );
-    results = await qdrant.search(COLLECTION, buildParams({ law: false, concepts: true }));
+    results = (await qdrant.query(COLLECTION, buildParams({ law: false, concepts: true }))).points;
   }
 
   return results.map(r => ({
