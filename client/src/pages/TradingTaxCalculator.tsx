@@ -290,12 +290,6 @@ export default function TradingTaxCalculatorPage() {
                   <p className="text-xs text-ink/65 mt-1">Add trading income to your salary and compute total tax liability</p>
                 </div>
               </Link>
-              <Link href="/nri/dtaa-calculator">
-                <div className="bg-card border border-rule hover:border-credit hover:shadow-sm rounded-lg p-4 transition-all cursor-pointer">
-                  <p className="font-semibold text-ink text-sm">DTAA Calculator</p>
-                  <p className="text-xs text-ink/65 mt-1">Compute Double Tax Avoidance Agreement relief on foreign income</p>
-                </div>
-              </Link>
               <Link href="/blog/capital-gains-itr-where-to-report">
                 <div className="bg-card border border-rule hover:border-credit hover:shadow-sm rounded-lg p-4 transition-all cursor-pointer">
                   <p className="font-semibold text-ink text-sm">Capital Gains in ITR — Where to Report</p>

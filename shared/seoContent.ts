@@ -31,7 +31,6 @@
  */
 import { blogPosts, type BlogPost } from "@/data/blogPosts";
 import { SWP_FAQS, SWP_SOURCES } from "./swpGuidance";
-import { NRI_ACCOUNT_FAQS, NRI_ACCOUNT_SOURCES } from "./nriAccountGuidance";
 export interface SeoFaq {
   question: string;
   answer: string;
@@ -260,88 +259,6 @@ export const SEO_CONTENT: SeoPageContent[] = [
       { question: "What is 'turnover' for F&O trading and when does the tax audit apply?", answer: "For F&O trading, turnover is the absolute sum of all profits and losses — not net P&L. Example: Trade 1 = +₹50,000, Trade 2 = −₹30,000, Trade 3 = +₹80,000. Turnover = ₹50,000 + ₹30,000 + ₹80,000 = ₹1,60,000 (not ₹1,00,000 net). A tax audit under Section 44AB is mandatory if your F&O turnover exceeds ₹10 crore (or ₹1 crore if profit is less than 6% of turnover). You need to maintain books of accounts and file ITR-3." },
       { question: "What is Schedule FA and do I need to disclose my US stocks there?", answer: "Schedule FA (Foreign Assets) must be disclosed in your ITR if you hold any foreign assets at any time during the year — even if you made no gains. You must report US stocks held on December 31 of the relevant tax year, including the cost of acquisition, peak value, and closing value. Non-disclosure of foreign assets is treated as a violation of the Black Money (Undisclosed Foreign Income and Assets) Act, 2015, with a penalty of ₹10 lakh per account. Always disclose, even if value is small." },
       { question: "Which ITR form should I use if I have US stock gains and Indian F&O income?", answer: "If you have US stock capital gains only, file ITR-2. If you have Indian F&O income (which is business income), file ITR-3 — this is mandatory even if F&O was your only income. If you have both US stocks AND F&O, file ITR-3. ITR-1 cannot be used if you have capital gains from foreign assets or business income. Also file Form 67 (for Foreign Tax Credit on US dividend withholding) before submitting the ITR." },
-    ],
-  },
-  {
-    path: "/nri",
-    title: "NRI Tax Corner — DTAA, NRO/NRE Accounts, Repatriation | AiTaxBot",
-    description: "Complete NRI tax resource: DTAA calculator, NRO vs NRE account comparison, NRI income tax calculator, and repatriation planner. Tax tools for Indians living abroad.",
-    canonical: "https://www.aitaxbot.co.in/nri",
-    h1: "NRI Tax Corner — DTAA, NRO/NRE Accounts, Repatriation",
-    intro: "AiTaxBot's NRI Tax Corner covers Indian tax obligations for Non-Resident Indians: DTAA relief calculation, NRO vs NRE vs FCNR account taxation, NRI-specific income tax computation (including the fact that NRIs cannot claim the Section 87A/156 rebate available to residents), and a repatriation planner covering FEMA remittance limits. All figures are computed in Indian Rupees under the Income Tax Act, 2025 and current FEMA regulations, cross-checked against CBDT guidance where applicable. Residential status is decided by days of physical presence in India under the residence tests, not by citizenship, visa or where a salary is paid, and it is tested afresh every financial year. That single determination drives everything else: a resident is taxed in India on worldwide income, while a non-resident is taxed only on income that accrues in, arises in, or is received in India. Where the same income is taxable in two countries, relief comes from the Double Taxation Avoidance Agreement with the country concerned, either by exempting the income or by allowing credit for the foreign tax paid, and claiming it needs a Tax Residency Certificate plus Form 10F. The tools in this section work through those questions in order — status first, then the India tax charge, then treaty relief, then how much can actually be remitted abroad and under what documentation.",
-    faqs: [
-      { question: "Who is an NRI for Indian tax purposes?", answer: "An individual is an NRI (Non-Resident Indian) if they stay in India for less than 182 days in a financial year, or less than 60 days in the current year AND less than 365 days in the preceding 4 years. NRIs are taxed only on income earned or accrued in India." },
-      { question: "Do NRIs need to file ITR in India?", answer: "NRIs must file ITR if their Indian income exceeds ₹2.5 lakh (basic exemption), or if they want to claim a refund of excess TDS, or to carry forward capital losses. Filing is also recommended for visa and loan applications." },
-      { question: "Is NRE account interest taxable?", answer: "No. Interest earned on NRE savings and fixed deposit accounts is completely exempt from Indian income tax under Section 10(4) of the Income Tax Act. However, if you return to India and become a resident, NRE interest becomes taxable." },
-      { question: "Can NRIs invest in Indian mutual funds?", answer: "Yes. NRIs can invest in Indian mutual funds through NRE or NRO accounts. NRE-funded investments have no TDS on redemption (profits are freely repatriable). NRO-funded investments are subject to TDS. US and Canada-based NRIs face restrictions with some fund houses due to FATCA." },
-      { question: "What is the FEMA annual repatriation limit?", answer: "NRIs can repatriate up to USD 1 million per financial year from their NRO accounts (combining all sources including property sale, NRO FDs, rental income). NRE and FCNR account funds are freely repatriable with no annual limit." },
-      { question: "When does an NRI become RNOR (Resident but Not Ordinarily Resident)?", answer: "When an NRI returns to India, they initially get RNOR status for 2-3 years. RNOR individuals are taxed like NRIs on foreign income — only Indian-source income is taxable. After RNOR period, they become full Residents and global income becomes taxable in India." },
-    ],
-    links: [
-      { href: "/nri/income-tax-calculator", label: "NRI Income Tax Calculator" },
-      { href: "/nri/dtaa-calculator", label: "DTAA Relief Calculator" },
-      { href: "/nri/nro-nre-comparison", label: "NRO vs NRE Account Comparison" },
-      { href: "/nri/repatriation-planner", label: "Repatriation Planner" },
-      { href: "/calculators/trading-tax", label: "Trading Tax Calculator" },
-      { href: "/blog/us-stock-trading-tax-india", label: "US Stock Trading Tax in India" },
-    ],
-  },
-  {
-    path: "/nri/dtaa-calculator",
-    title: "DTAA Calculator — Avoid Double Taxation | NRI Tax Relief India | AiTaxBot",
-    description: "Calculate your DTAA tax relief as an NRI. See how much tax you save under India's Double Taxation Avoidance Agreements with USA, UK, UAE, Canada and 90+ countries.",
-    canonical: "https://www.aitaxbot.co.in/nri/dtaa-calculator",
-    h1: "DTAA Calculator — Avoid Double Taxation | NRI Tax Relief India",
-    intro: "This calculator estimates the tax relief available to NRIs under India's Double Taxation Avoidance Agreements (DTAA) with over 90 countries. DTAA relief is not automatic — it requires submitting Form 10F and a Tax Residency Certificate to the Indian payer to secure a reduced TDS rate, or claiming Foreign Tax Credit when filing your return in your country of residence. NRE account interest is separately exempt under Section 10(4) regardless of DTAA; NRO account interest is taxable and DTAA applies to it.",
-    faqs: [
-      { question: "What is Form 10F and why do I need it?", answer: "Form 10F is a Certificate for Lower/Nil Deduction of TDS. As an NRI, you need it to claim reduced DTAA rates of TDS instead of the default 30%. Submit it to Indian payers (banks, employers, etc.) along with your Tax Residency Certificate." },
-      { question: "Can I get a refund if excess TDS was deducted in India?", answer: "Yes. If TDS deducted exceeds your tax liability, you can file Form 10F in advance to claim lower rates, or file an income tax return to claim refunds for excess TDS. Keep Form 16A/26AS as proof." },
-      { question: "Does DTAA apply to NRE account interest?", answer: "NRE account interest is exempt under Section 10(4) of the Income Tax Act. No TDS is deducted and no DTAA relief is needed. However, NRO interest is taxable and DTAA applies." },
-      { question: "What if my country doesn't have a DTAA with India?", answer: "If your country lacks a DTAA with India, you cannot claim foreign tax credit under a treaty. However, some countries allow unilateral credits under their domestic law. Consult a tax advisor in your country." },
-      { question: "Is DTAA benefit automatic or do I need to apply?", answer: "DTAA benefits are NOT automatic. You must proactively submit Form 10F and Tax Residency Certificate to claim reduced TDS rates in India, and file your foreign tax return to claim Foreign Tax Credit." },
-      { question: "Do I need to report Indian income in my foreign country?", answer: "Yes. Most countries tax their residents on worldwide income. You must report your Indian income in your country's tax return and claim Foreign Tax Credit for taxes paid in India to avoid double taxation." },
-    ],
-  },
-  {
-    path: "/nri/nro-nre-comparison",
-    title: "NRO vs NRE vs FCNR Account — Complete Comparison | AiTaxBot",
-    description: "Complete guide comparing NRO, NRE and FCNR accounts for NRIs. Understand tax treatment, repatriation rules, and which account saves the most tax.",
-    canonical: "https://www.aitaxbot.co.in/nri/nro-nre-comparison",
-    h1: "NRO vs NRE vs FCNR Account — Complete Comparison",
-    intro: "Compare NRO, NRE and FCNR deposit accounts by source of funds, currency, repatriability and exemption conditions. Eligible NRE deposit interest can be exempt in India, but this does not exempt NRE-funded mutual-fund returns, dividends or capital gains. NRO interest is generally taxable; withholding is not the final tax liability. FCNR has separate conditions, particularly after returning to India. Confirm FEMA eligibility, bank documentation and any foreign-country tax before choosing an account.",
-    faqs: NRI_ACCOUNT_FAQS,
-    links: NRI_ACCOUNT_SOURCES,
-  },
-  {
-    path: "/nri/income-tax-calculator",
-    title: "NRI Income Tax Calculator FY 2026-27 — No 87A Rebate | AiTaxBot",
-    description: "Calculate your Indian income tax as an NRI for FY 2026-27. NRIs cannot claim Section 87A rebate. Includes NRO TDS, DTAA benefits, and capital gains calculation.",
-    canonical: "https://www.aitaxbot.co.in/nri/income-tax-calculator",
-    h1: "NRI Income Tax Calculator FY 2026-27 — No 87A Rebate",
-    intro: "This calculator computes an NRI's Indian income tax liability for FY 2026-27, covering NRO interest, dividends, rental income, and capital gains taxed at Indian slab and special rates. Unlike resident taxpayers, NRIs cannot claim the Section 87A/156 rebate regardless of income level, so tax is payable on income above the basic exemption even at modest levels. Surcharge (10%–37% depending on income and regime) and marginal relief apply exactly as for residents, with the special 15% surcharge cap on Section 111A/112A gains applied separately from slab income.",
-    faqs: [
-      { question: "Which ITR form should NRIs file?", answer: "NRIs should file ITR-2 if they have income from house property, capital gains, or other income sources. File ITR-1 if you have only salary income." },
-      { question: "Is NRE account interest taxable when I return to India?", answer: "No, NRE account interest remains exempt even after you become a resident. However, any repatriation of principal on a foreign trip becomes taxable if you return to India and this is interpreted as breaking your NRE status." },
-      { question: "Can NRIs invest in PPF?", answer: "No, NRIs cannot invest in or open new PPF accounts. They can only continue existing PPF accounts opened when they were residents." },
-      { question: "What is the last date for NRI ITR filing?", answer: "The ITR filing deadline is 31st July for the previous financial year. Filing before 31st December allows you to avoid certain penalties." },
-      { question: "Do NRIs need to pay advance tax?", answer: "Yes, if the total tax liability exceeds ₹10,000, NRIs must pay advance tax in four quarterly installments." },
-      { question: "Can NRI claim HRA deduction?", answer: "No, NRIs cannot claim HRA deduction. HRA is only applicable to resident individuals." },
-    ],
-  },
-  {
-    path: "/nri/repatriation-planner",
-    title: "NRI Repatriation Planner — Transfer Money from India Abroad | AiTaxBot",
-    description: "Step-by-step guide and calculator for NRI money repatriation. Understand FEMA limits, Form 15CA/15CB requirements, and how to transfer NRO account funds abroad legally.",
-    canonical: "https://www.aitaxbot.co.in/nri/repatriation-planner",
-    h1: "NRI Repatriation Planner — Transfer Money from India Abroad",
-    intro: "This tool walks NRIs through the FEMA rules for repatriating funds from India abroad: the USD 1 million per financial year scheme for NRO account balances (subject to tax clearance), unrestricted repatriation of NRE account balances, and the Form 15CA/15CB certification a Chartered Accountant must issue before a bank will process an outward remittance above the prescribed threshold. All limits are stated in the currencies FEMA itself specifies (USD for the repatriation ceiling, Indian Rupees for the underlying account balances).",
-    faqs: [
-      { question: "What is the maximum amount an NRI can repatriate per year?", answer: "USD 1 million per financial year (April to March) from NRO accounts. NRE and FCNR accounts have no limit. The limit applies to both current account income (rent, pension, dividends) and capital account (property sale proceeds) combined." },
-      { question: "Is Form 15CA required for all NRO remittances?", answer: "Form 15CA is required for all NRO remittances. However, Form 15CB (CA certificate) may not be required for remittances below approximately ₹5 lakh. Confirm with your Chartered Accountant based on the specific transaction." },
-      { question: "Can I repatriate money if I have outstanding Indian taxes?", answer: "No. All Indian taxes on the source income must be paid and cleared before you can obtain Form 15CB from a CA. Outstanding tax liability will prevent the CA from certifying Form 15CB, blocking the entire remittance." },
-      { question: "How long does NRO to foreign account transfer take?", answer: "After submitting Form 15CA and Form 15CB to your bank, the transfer typically takes 3–7 working days for the bank to verify documents and initiate a SWIFT transfer. The foreign bank receives the funds within the same window." },
-      { question: "Can I repatriate money from sale of agricultural land?", answer: "Agricultural land located in India is not always freely repatriable. If you sold agricultural land as an NRI resident of another country, repatriation may require special FEMA approval. Consult a Chartered Accountant and your RBI-registered money changer for guidance." },
-      { question: "What happens if I repatriate without Form 15CA?", answer: "The bank will refuse to process the remittance. If you somehow bypass the bank, the foreign recipient's bank may flag the transfer as non-compliant with Indian tax regulations, leading to financial penalties, account freezes, or legal scrutiny from Indian tax authorities." },
     ],
   },
   {
@@ -686,7 +603,6 @@ export const SITE_NAV: SeoLink[] = [
   { href: "/tools/ais-26as-form16", label: "AIS / 26AS / Form 16 Reconciliation" },
   { href: "/tools/rent-receipt", label: "Rent Receipt Generator" },
   { href: "/blog", label: "Tax Blog" },
-  { href: "/nri", label: "NRI Corner" },
   { href: "/find-ca", label: "Find a Chartered Accountant" },
   { href: "/about", label: "About AiTaxBot" },
   { href: "/contact", label: "Contact" },

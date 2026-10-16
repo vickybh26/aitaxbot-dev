@@ -62,6 +62,12 @@ check("trailing slash normalises", isKnownRoute("/calculators/hra/"));
 check("unknown path is rejected", !isKnownRoute("/this-page-does-not-exist-xyz"));
 check("unknown nested path is rejected", !isKnownRoute("/calculators/not-a-calculator"));
 
+// NRI tools are temporarily withdrawn; saved links must get a real 404,
+// and no route may accidentally reappear in the generated sitemap.
+for (const path of ["/nri", "/nri/dtaa-calculator", "/nri/nro-nre-comparison", "/nri/income-tax-calculator", "/nri/repatriation-planner"]) {
+  check(`${path} is unavailable`, !isKnownRoute(path) && !isKnownRoute(`${path}/`));
+}
+
 // /blog/:slug resolves against real post slugs rather than accepting anything —
 // a made-up slug renders the not-found view, so it must not answer 200.
 const realSlug = (readFileSync(resolve(root, "client/src/data/blogPosts.ts"), "utf-8")

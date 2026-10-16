@@ -120,12 +120,6 @@ const TOOLS: ToolMatch[] = [
     url: `${BASE_URL}/calculators/income-tax`,
     intent: "Income Tax",
   },
-  {
-    pattern: /\bnri\b|dtaa|nro|nre|repatri/i,
-    label: "NRI Corner",
-    url: `${BASE_URL}/nri`,
-    intent: "NRI",
-  },
 ];
 
 // ── FAQ engine ────────────────────────────────────────────────────────────────
@@ -258,7 +252,7 @@ export async function handleIncomingMessage(body: any): Promise<void> {
 
       await sendMessage(
         from,
-        `Nice to meet you, *${name}!*\n\nJust type what you need:\n\n*Calculators:* HRA · SIP · SWP · NPS · PF · Income Tax\n*Tools:* Rent Receipt · NRI Corner\n*Questions:* 80C limit · ITR deadline · Advance tax · Tax slabs · Crypto tax · Form 16\n\nOr ask me anything — I'll do my best to answer!`
+        `Nice to meet you, *${name}!*\n\nJust type what you need:\n\n*Calculators:* HRA · SIP · SWP · NPS · PF · Income Tax\n*Tools:* Rent Receipt\n*Questions:* 80C limit · ITR deadline · Advance tax · Tax slabs · Crypto tax · Form 16\n\nOr ask me anything — I'll do my best to answer!`
       );
       return;
     }
@@ -271,7 +265,7 @@ export async function handleIncomingMessage(body: any): Promise<void> {
       await upsertLead(from, { queryType: "menu" });
       await sendMessage(
         from,
-        `Hi *${name}!* Here's what I can help with:\n\n*Free Calculators:*\n• HRA\n• SIP\n• SWP\n• NPS\n• PF\n• Income Tax (New vs Old Regime)\n\n*Free Tools:*\n• Rent Receipt Generator\n• NRI Corner (DTAA, NRO/NRE)\n\n*Just type the name* of what you need, or ask a tax question!\n\nAll tools are free at ${BASE_URL}`
+        `Hi *${name}!* Here's what I can help with:\n\n*Free Calculators:*\n• HRA\n• SIP\n• SWP\n• NPS\n• PF\n• Income Tax (New vs Old Regime)\n\n*Free Tools:*\n• Rent Receipt Generator\n\n*Just type the name* of what you need, or ask a tax question!\n\nAll tools are free at ${BASE_URL}`
       );
       return;
     }

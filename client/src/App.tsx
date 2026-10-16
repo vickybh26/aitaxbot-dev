@@ -40,11 +40,6 @@ const NPSCalculator = lazy(() => import("@/pages/NPSCalculator"));
 const HomeLoanCalculator = lazy(() => import("@/pages/HomeLoanCalculator"));
 const VehicleLoanCalculator = lazy(() => import("@/pages/VehicleLoanCalculator"));
 const TradingTaxCalculatorPage = lazy(() => import("@/pages/TradingTaxCalculator"));
-const NRICorner = lazy(() => import("@/pages/NRICorner"));
-const DTAACalculator = lazy(() => import("@/pages/nri/DTAACalculator"));
-const NRONREComparison = lazy(() => import("@/pages/nri/NRONREComparison"));
-const NRIIncomeTaxCalculator = lazy(() => import("@/pages/nri/NRIIncomeTaxCalculator"));
-const RepatriationPlanner = lazy(() => import("@/pages/nri/RepatriationPlanner"));
 const RentReceiptGenerator = lazy(() => import("@/pages/RentReceiptGenerator"));
 const Tools = lazy(() => import("@/pages/Tools"));
 const AIS26ASForm16Tool = lazy(() => import("@/pages/AIS26ASForm16Tool"));
@@ -218,11 +213,6 @@ function Router() {
           <Route path="/calculators/home-loan" component={HomeLoanCalculator} />
           <Route path="/calculators/vehicle-loan" component={VehicleLoanCalculator} />
           <Route path="/calculators/trading-tax" component={TradingTaxCalculatorPage} />
-          <Route path="/nri" component={NRICorner} />
-          <Route path="/nri/dtaa-calculator" component={DTAACalculator} />
-          <Route path="/nri/nro-nre-comparison" component={NRONREComparison} />
-          <Route path="/nri/income-tax-calculator" component={NRIIncomeTaxCalculator} />
-          <Route path="/nri/repatriation-planner" component={RepatriationPlanner} />
           {/* Index page must be declared before the nested /tools/* routes so
               wouter matches the exact path rather than falling through. */}
           <Route path="/tools" component={Tools} />

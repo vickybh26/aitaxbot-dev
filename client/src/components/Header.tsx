@@ -7,7 +7,7 @@ import { logout } from "@/lib/firebase";
 import logoIcon from "@assets/aitaxbot-icon.png";
 import {
   Menu, X, Calculator, LogOut, User, LayoutDashboard,
-  Globe, Shield, ChevronDown, UserCheck, FileText,
+  Shield, ChevronDown, UserCheck, FileText,
 } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
 
@@ -125,14 +125,6 @@ export default function Header({ showModal }: HeaderProps = {}) {
               data-testid="link-header-calculators"
             >
               Calculators
-            </Link>
-            <Link
-              href="/nri"
-              onClick={() => trackButtonClick("NRI Corner", "Header Navigation")}
-              className={navLink}
-              data-testid="link-header-nri"
-            >
-              NRI
             </Link>
             <Link
               href="/blog"
@@ -286,9 +278,6 @@ export default function Header({ showModal }: HeaderProps = {}) {
             )}
             <Link href="/calculators" onClick={() => { trackButtonClick("Calculators", "Mobile Header"); setMobileMenuOpen(false); }} aria-current={mobileNavLink("/calculators")["aria-current"]} className={`flex items-center gap-2 py-2.5 text-sm font-medium ${mobileNavLink("/calculators").className}`}>
               <Calculator className="w-4 h-4" />Calculators
-            </Link>
-            <Link href="/nri" onClick={() => { trackButtonClick("NRI", "Mobile Header"); setMobileMenuOpen(false); }} aria-current={mobileNavLink("/nri")["aria-current"]} className={`flex items-center gap-2 py-2.5 text-sm font-medium ${mobileNavLink("/nri").className}`}>
-              <Globe className="w-4 h-4" />NRI
             </Link>
             <Link href="/tools/ais-26as-form16" onClick={() => { trackButtonClick("AIS Reconciliation", "Mobile Header"); setMobileMenuOpen(false); }} aria-current={mobileNavLink("/tools/ais-26as-form16")["aria-current"]} className={`flex items-center gap-2 py-2.5 text-sm font-medium ${mobileNavLink("/tools/ais-26as-form16").className}`}>
               <FileText className="w-4 h-4" />AIS Reconciliation

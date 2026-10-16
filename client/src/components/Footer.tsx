@@ -29,7 +29,6 @@ export default function Footer() {
     ["AIS / 26AS / Form 16", "/tools/ais-26as-form16"],
     ["Rent Receipts", "/tools/rent-receipt"],
     ["CA Directory", "/find-ca"],
-    ["NRI Corner", "/nri"],
   ];
 
   const company: [string, string][] = [

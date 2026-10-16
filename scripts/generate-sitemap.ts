@@ -38,7 +38,6 @@ function weightFor(path: string): { priority: string; changefreq: string } {
   if (path.startsWith("/calculators") || path.startsWith("/tools")) return { priority: "0.9", changefreq: "monthly" };
   if (path === "/blog") return { priority: "0.8", changefreq: "weekly" };
   if (path.startsWith("/blog/")) return { priority: "0.7", changefreq: "monthly" };
-  if (path.startsWith("/nri")) return { priority: "0.7", changefreq: "monthly" };
   if (["/privacy-policy", "/terms-of-service"].includes(path)) return { priority: "0.3", changefreq: "yearly" };
   return { priority: "0.6", changefreq: "monthly" };
 }

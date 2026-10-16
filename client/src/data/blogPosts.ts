@@ -2461,7 +2461,6 @@ export const blogPosts = ([
         content_md: "**Macro events affect your personal finances — plan smarter.**\n\nUse AiTaxBot's free calculators to understand your tax liability, optimise your regime choice, and make informed decisions for Tax Year 2026-27.",
         internal_links: [
           { label: "Income Tax Calculator FY 2026-27", href: "/calculators/income-tax" },
-          { label: "NRI Tax Guide", href: "/nri" },
           { label: "Why the Rupee Is Falling", href: "/blog/why-indian-rupee-is-falling-2026" }
         ]
       }
@@ -2547,7 +2546,6 @@ export const blogPosts = ([
         content_md: "**Your financial decisions should account for macro risks.**\n\nUse AiTaxBot's free Income Tax Calculator to understand your tax position for FY 2026-27 and make informed decisions about your savings and investments.",
         internal_links: [
           { label: "Income Tax Calculator FY 2026-27", href: "/calculators/income-tax" },
-          { label: "NRI Tax Corner", href: "/nri" },
           { label: "Strait of Hormuz Impact on India", href: "/blog/strait-of-hormuz-closure-impact-india-2026" }
         ]
       }
@@ -2687,11 +2685,6 @@ export const blogPosts = ([
         type: "h2",
         heading: "Free Tools Available on AiTaxBot",
         content_md: "**Income Tax Calculator**: Compute your exact tax liability under both the New and Old Tax Regime for Tax Year 2026-27. Enter your salary, other income, and deductions to see a side-by-side comparison and the recommended regime for your situation.\n\n**HRA Calculator**: Calculate your HRA exemption based on your city (now including 8 metros — Bengaluru, Pune, Hyderabad, and Ahmedabad have been added under the new Act), actual HRA received, and rent paid.\n\n**SIP Calculator**: Estimate the future value of your monthly Systematic Investment Plan (SIP) investments, factoring in assumed returns and investment horizon. Plan your wealth creation targets.\n\n**SWP Calculator**: Plan your Systematic Withdrawal Plan — how much you can withdraw monthly from a corpus without depleting it over your target period.\n\n**NPS Calculator**: Calculate your National Pension System retirement corpus and the additional Section 80CCD(1B) tax saving of Rs.50,000 available under the Old Regime.\n\n**PF Calculator**: Estimate your Provident Fund corpus at retirement based on current salary, contribution rate, and projected salary growth.\n\n**Rent Receipt Generator**: Generate professional, stamped-ready rent receipts with your landlord and tenant details, for any month of the year. Download as PDF and email directly — useful for HRA claims."
-      },
-      {
-        type: "h2",
-        heading: "NRI Corner",
-        content_md: "AiTaxBot has a dedicated NRI section covering the unique tax situations faced by Non-Resident Indians:\n\n- **DTAA (Double Taxation Avoidance Agreement)**: How to avoid being taxed twice on the same income in India and your country of residence\n- **NRO vs NRE Accounts**: The tax implications of each account type and how to choose\n- **Repatriation**: Rules for moving funds from India to your country of residence\n\nThe NRI section is designed to answer practical questions without legal jargon."
       },
       {
         type: "h2",

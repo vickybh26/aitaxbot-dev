@@ -54,7 +54,7 @@ export function PrivacyPolicyContent() {
               <p className="text-ink/80 mb-3">
                 You do not need an account to use a calculator or to see your headline result. A free
                 account unlocks the detailed breakdown, regime comparison, saved history and PDF download.
-                Educational content — blog articles and the NRI Corner — is open to everyone. When you
+                Educational content — including blog articles — is open to everyone. When you
                 create an account, we collect and store in Firebase:
               </p>
               <ul className="list-disc pl-6 mb-4 text-ink/80 space-y-1">
@@ -482,7 +482,6 @@ export function TermsOfServiceContent() {
                 <li>Trading Tax Calculator (equity, F&amp;O, crypto, US stocks)</li>
                 <li>HRA, SIP, SWP, NPS, PF, Home Loan, and Vehicle Loan calculators</li>
                 <li>Rent Receipt Generator (PDF + email delivery)</li>
-                <li>NRI Corner (DTAA, NRO/NRE, Repatriation)</li>
                 <li>Tax blog and educational articles</li>
                 <li>CA Directory — free listing and enquiry service</li>
                 <li>WhatsApp tax assistant</li>
