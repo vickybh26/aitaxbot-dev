@@ -442,7 +442,7 @@ export const insertCAProfileSchema = z.object({
   email: z.string().email("Valid email required"),
   whatsappNumber: optStr,
   bio: z.string().max(2000, "Bio must be under 2000 characters").optional().nullable(),
-  agreeToEthics: z.literal(true, { errorMap: () => ({ message: "You must confirm compliance with ICAI Code of Ethics" }) }),
+  agreeToEthics: z.literal(true, { error: "You must confirm compliance with ICAI Code of Ethics" }),
 });
 
 // ─── CA Contact Request ────────────────────────────────────────────────────

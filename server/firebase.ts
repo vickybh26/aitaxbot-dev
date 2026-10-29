@@ -1,6 +1,9 @@
-import admin from 'firebase-admin';
+import { initializeApp, cert, type App } from 'firebase-admin/app';
+import { getAuth, type DecodedIdToken } from 'firebase-admin/auth';
+import { getAppCheck, type VerifyAppCheckTokenResponse } from 'firebase-admin/app-check';
+import { getFirestore as sdkFirestore, FieldValue } from 'firebase-admin/firestore';
 
-let firebaseApp: admin.app.App;
+let firebaseApp: App;
 
 export function initializeFirebase() {
   if (!firebaseApp) {
@@ -13,8 +16,8 @@ export function initializeFirebase() {
     try {
       const serviceAccountJSON = JSON.parse(serviceAccount);
       
-      firebaseApp = admin.initializeApp({
-        credential: admin.credential.cert(serviceAccountJSON),
+      firebaseApp = initializeApp({
+        credential: cert(serviceAccountJSON),
         storageBucket: 'aitaxbot-e5c0e.firebasestorage.app'
       });
       
@@ -32,15 +35,15 @@ export function getFirestore() {
   if (!firebaseApp) {
     initializeFirebase();
   }
-  return admin.firestore();
+  return sdkFirestore(firebaseApp);
 }
 
-export async function verifyFirebaseToken(token: string): Promise<admin.auth.DecodedIdToken | null> {
+export async function verifyFirebaseToken(token: string): Promise<DecodedIdToken | null> {
   try {
     if (!firebaseApp) {
       initializeFirebase();
     }
-    const decodedToken = await admin.auth().verifyIdToken(token);
+    const decodedToken = await getAuth(firebaseApp).verifyIdToken(token);
     return decodedToken;
   } catch (error) {
     console.error('Error verifying Firebase token:', error);
@@ -56,16 +59,21 @@ export async function verifyFirebaseToken(token: string): Promise<admin.auth.Dec
  */
 export async function verifyAppCheckToken(
   token: string
-): Promise<admin.appCheck.VerifyAppCheckTokenResponse | null> {
+): Promise<VerifyAppCheckTokenResponse | null> {
   try {
     if (!firebaseApp) {
       initializeFirebase();
     }
-    return await admin.appCheck().verifyToken(token);
+    return await getAppCheck(firebaseApp).verifyToken(token);
   } catch (error) {
     console.error('Error verifying Firebase App Check token:', error);
     return null;
   }
 }
 
-export { admin };
+// Small compatibility facade for existing internal consumers. All SDK calls
+// use the supported modular entry points; no legacy namespace import remains.
+export const admin = {
+  auth: () => getAuth(initializeFirebase()),
+  firestore: Object.assign(getFirestore, { FieldValue }),
+};

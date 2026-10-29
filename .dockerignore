@@ -5,3 +5,19 @@ dist
 *.log
 .env
 .env.*
+
+# Backups, taxpayer regression documents and development/agent artifacts must
+# never enter a Docker build context, regardless of Git ignore settings.
+.local-backups
+test-fixtures
+tmp
+.agents
+.claude
+.codex
+.grok
+brag-output*
+config/credentials.json
+config/secrets.json
+*.snapshot
+*.pem
+*.key

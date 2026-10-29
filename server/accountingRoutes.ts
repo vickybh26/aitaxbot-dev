@@ -173,19 +173,17 @@ router.get("/firms/:id", authenticateFirebaseToken, async (req: AuthenticatedReq
 // Create a new firm
 router.post("/firms", authenticateFirebaseToken, async (req: AuthenticatedRequest, res) => {
   try {
-    console.log("Creating firm with data:", req.body);
-    console.log("User ID:", req.userId);
     const validatedData = insertFirmSchema.parse({
       ...req.body,
       userId: req.userId,
     });
-    console.log("Validated data:", validatedData);
     const firm = await storage.createFirm(validatedData);
-    console.log("Firm created successfully:", firm);
     res.status(201).json(firm);
   } catch (error: any) {
-    console.error("Error creating firm:", error);
-    console.error("Error details:", error.message, error.stack);
+    // Validation/provider errors can embed taxpayer inputs. Keep logs content-free.
+    console.error("[Accounting] Firm creation failed", {
+      category: error instanceof z.ZodError ? "validation" : "storage",
+    });
     if (error instanceof z.ZodError) {
       // Don't echo Zod's internal `errors` array — it can expose schema shape.
       return res.status(400).json({ error: "Invalid data" });

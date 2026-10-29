@@ -8,6 +8,7 @@ import { setupVite, serveStatic, log } from "./vite";
 import { initializeFirebase, getFirestore } from "./firebase";
 import { startAIReviewCleanup } from "./aiReviewRetention";
 import { cleanStalePdfs } from "./pdfGenerator";
+import { createJsonBodyParser, createFormBodyParser } from "./requestBodyParsers";
 
 // Initialize Firebase on startup
 try {
@@ -195,23 +196,7 @@ app.use(compression({
   level: 6 // Compression level (0-9, 6 is default)
 }));
 
-// JSON body size limit reduces DOS surface — tax payloads are small.
-// `verify` captures the raw request body for the WhatsApp webhook so we can
-// validate Meta's X-Hub-Signature-256 HMAC before trusting any of it.
-app.use(express.json({
-  limit: '1mb',
-  verify: (req: Request, _res, buf) => {
-    if (req.url && req.url.startsWith('/api/webhook/whatsapp')) {
-      (req as any).rawBody = Buffer.from(buf);
-    }
-  },
-}));
-app.use(express.urlencoded({ extended: false, limit: '1mb' }));
-
-// ─────────────────────────────────────────────────────────────────────
-// Rate limiting — applied globally to /api, with stricter caps on
-// expensive endpoints (AI, email send, external proxies).
-// ─────────────────────────────────────────────────────────────────────
+// Rate-limit before body parsing so rejected API requests never reach a decoder.
 const apiLimiter = rateLimit({
   windowMs: 60_000,
   max: 120,
@@ -220,6 +205,11 @@ const apiLimiter = rateLimit({
   message: { error: "Too many requests — please slow down." },
 });
 app.use("/api", apiLimiter);
+
+// Bounded, uncompressed request bodies; exact webhook bytes remain available
+// for HMAC validation. Shared factories are exercised by the security tests.
+app.use(createJsonBodyParser());
+app.use(createFormBodyParser());
 
 // Request logger — records method/path/status/duration only.
 // Response bodies are NOT logged — they contain PII (email, PAN, salary, etc.)

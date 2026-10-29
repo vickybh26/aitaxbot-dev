@@ -3,7 +3,8 @@
 # With NODE_ENV=production, npm 9.x skips devDependencies (including vite), causing
 # `vite: not found`. This Dockerfile installs all deps first, then builds cleanly.
 
-FROM node:20-slim
+# Supported runtime with the October 2026 TLS/trust-store security fixes.
+FROM node:24.22.2-bookworm-slim
 
 WORKDIR /app
 

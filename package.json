@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "type": "module",
   "license": "MIT",
+  "engines": {
+    "node": ">=24.22.2 <25"
+  },
   "scripts": {
     "dev": "node --env-file=.env node_modules/tsx/dist/cli.mjs server/index.ts",
     "build": "npm run sitemap && vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
@@ -13,14 +16,13 @@
     "test:calc": "node node_modules/tsx/dist/cli.mjs scripts/test-tax-calculations.ts",
     "test:routes": "node node_modules/tsx/dist/cli.mjs scripts/test-routes.ts",
     "test:seo": "node node_modules/tsx/dist/cli.mjs scripts/test-seo-parity.ts",
-    "sitemap": "node node_modules/tsx/dist/cli.mjs scripts/generate-sitemap.ts"
+    "sitemap": "node node_modules/tsx/dist/cli.mjs scripts/generate-sitemap.ts",
+    "test:security": "node node_modules/tsx/dist/cli.mjs scripts/test-security-hardening.ts"
   },
   "dependencies": {
-    "@adobe/pdfservices-node-sdk": "^4.1.0",
     "@anthropic-ai/sdk": "^0.37.0",
-    "@google-cloud/storage": "^7.18.0",
-    "@google/genai": "^1.13.0",
-    "@hookform/resolvers": "^3.10.0",
+    "@google/genai": "^1.52.0",
+    "@hookform/resolvers": "^6.0.2",
     "@jridgewell/trace-mapping": "^0.3.25",
     "@qdrant/js-client-rest": "^1.14.0",
     "@radix-ui/react-accordion": "^1.2.4",
@@ -77,7 +79,7 @@
     "express": "^4.21.2",
     "express-rate-limit": "^7.4.1",
     "firebase": "^12.4.0",
-    "firebase-admin": "^13.5.0",
+    "firebase-admin": "^14.5.0",
     "framer-motion": "^12.42.0",
     "google-auth-library": "^10.5.0",
     "helmet": "^8.0.0",
@@ -90,7 +92,6 @@
     "memoizee": "^0.4.17",
     "multer": "^2.2.0",
     "next-themes": "^0.4.6",
-    "node-cron": "^3.0.3",
     "nodemailer": "^10.0.10",
     "pdf-parse": "^2.4.5",
     "pdfkit": "^0.17.2",
@@ -109,26 +110,23 @@
     "vaul": "^1.1.2",
     "wouter": "^3.3.5",
     "ws": "^8.21.0",
-    "zod": "^3.24.2",
-    "zod-validation-error": "^3.4.0"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.15",
-    "@tailwindcss/vite": "^4.1.3",
     "@types/express": "4.17.21",
-    "@types/node": "20.16.11",
-    "@types/node-cron": "^3.0.11",
+    "@types/node": "^24.0.0",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.1",
     "@types/ws": "^8.5.13",
-    "@vitejs/plugin-react": "^4.3.2",
+    "@vitejs/plugin-react": "^5.2.0",
     "autoprefixer": "^10.4.20",
     "esbuild": "^0.25.0",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.17",
     "tsx": "^4.21.0",
     "typescript": "5.6.3",
-    "vite": "5.4.21"
+    "vite": "7.3.7"
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.8"
@@ -141,7 +139,8 @@
     "dompurify": "^3.4.11",
     "@grpc/grpc-js": "^1.14.4",
     "fast-xml-parser": "^5.9.3",
-    "vite": "5.4.21",
+    "vite": "7.3.7",
+    "postcss-selector-parser": "^6.1.5",
     "rollup": "^4.62.2",
     "flatted": "^3.4.2",
     "form-data": "^4.0.6",

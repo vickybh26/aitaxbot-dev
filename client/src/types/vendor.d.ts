@@ -44,14 +44,14 @@ declare module 'jspdf' {
 
 // ── @hookform/resolvers/zod ────────────────────────────────────────────────
 declare module '@hookform/resolvers/zod' {
-  import type { ZodType, ZodTypeDef } from 'zod';
+  import type { ZodType } from 'zod';
   import type { Resolver, FieldValues } from 'react-hook-form';
 
   export function zodResolver<
     TFieldValues extends FieldValues = FieldValues,
     TContext = unknown
   >(
-    schema: ZodType<TFieldValues, ZodTypeDef, unknown>,
+    schema: ZodType<TFieldValues, unknown>,
     schemaOptions?: object,
     factoryOptions?: { mode?: 'async' | 'sync'; raw?: boolean }
   ): Resolver<TFieldValues, TContext>;

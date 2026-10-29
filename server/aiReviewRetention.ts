@@ -1,4 +1,4 @@
-import type { firestore } from "firebase-admin";
+import type { Firestore } from "firebase-admin/firestore";
 
 export const AI_REVIEW_RETENTION_MS = 30 * 24 * 60 * 60 * 1000;
 export const AI_REVIEW_COLLECTION = "ai_queries";
@@ -24,7 +24,7 @@ export function isAIReviewCurrent(row: { timestamp?: unknown }, now = Date.now()
  * index. Bounded batches avoid monopolising the server; subsequent sweeps drain
  * a large backlog. Only ai_queries is ever touched, never savedResults.
  */
-export async function purgeExpiredAIReviews(db: firestore.Firestore, now = Date.now()): Promise<number> {
+export async function purgeExpiredAIReviews(db: Firestore, now = Date.now()): Promise<number> {
   const cutoff = new Date(now - AI_REVIEW_RETENTION_MS).toISOString();
   let deleted = 0;
   for (let page = 0; page < 20; page++) {
@@ -40,7 +40,7 @@ export async function purgeExpiredAIReviews(db: firestore.Firestore, now = Date.
   return deleted;
 }
 
-export function startAIReviewCleanup(getDb: () => firestore.Firestore): () => void {
+export function startAIReviewCleanup(getDb: () => Firestore): () => void {
   let running = false;
   const sweep = async () => {
     if (running) return;
