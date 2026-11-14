@@ -54,9 +54,9 @@ function escapeAttr(s: string): string {
  * not erase the readable fallback. Legal pages render shared React content;
  * other page summaries still require explicit parity maintenance.
  *
- * Routes with no entry in SEO_CONTENT_BY_PATH (blog posts, /login,
- * /dashboard, admin pages, etc.) are returned unchanged — deliberately out
- * of scope for this pass; see the note in shared/seoContent.ts.
+ * Routes with no entry in SEO_CONTENT_BY_PATH (/login, /dashboard, admin
+ * pages, etc.) are returned unchanged. Blog posts DO have entries — they are
+ * generated from blogPosts.ts in shared/seoContent.ts.
  */
 export function injectSeoContent(html: string, pathname: string): string {
   // Normalize: strip trailing slash except for the root path itself.
@@ -69,42 +69,42 @@ export function injectSeoContent(html: string, pathname: string): string {
   let out = html;
 
   // <title>
-  out = out.replace(/<title>.*?<\/title>/s, `<title>${escapeHtml(page.title)}</title>`);
+  out = out.replace(/<title>.*?<\/title>/s, () => `<title>${escapeHtml(page.title)}</title>`);
 
   // meta description
   out = out.replace(
     /<meta\s+name="description"\s+content="[^"]*"\s*\/?>/,
-    `<meta name="description" content="${escapeAttr(page.description)}">`,
+    () => `<meta name="description" content="${escapeAttr(page.description)}">`,
   );
 
   // canonical — the static template hardcodes this to the homepage; replace
   // it with the route's real canonical rather than appending a second tag.
   out = out.replace(
     /<link\s+rel="canonical"\s+href="[^"]*"\s*\/?>/,
-    `<link rel="canonical" href="${escapeAttr(page.canonical)}" />`,
+    () => `<link rel="canonical" href="${escapeAttr(page.canonical)}" />`,
   );
 
   // OG / Twitter — same drift risk as canonical if left pointing at the
   // homepage on every subpage, so keep them in sync with the same data.
   out = out.replace(
     /<meta\s+property="og:title"\s+content="[^"]*"\s*\/?>/,
-    `<meta property="og:title" content="${escapeAttr(page.title)}">`,
+    () => `<meta property="og:title" content="${escapeAttr(page.title)}">`,
   );
   out = out.replace(
     /<meta\s+property="og:description"\s+content="[^"]*"\s*\/?>/,
-    `<meta property="og:description" content="${escapeAttr(page.description)}">`,
+    () => `<meta property="og:description" content="${escapeAttr(page.description)}">`,
   );
   out = out.replace(
     /<meta\s+property="og:url"\s+content="[^"]*"\s*\/?>/,
-    `<meta property="og:url" content="${escapeAttr(page.canonical)}">`,
+    () => `<meta property="og:url" content="${escapeAttr(page.canonical)}">`,
   );
   out = out.replace(
     /<meta\s+name="twitter:title"\s+content="[^"]*"\s*\/?>/,
-    `<meta name="twitter:title" content="${escapeAttr(page.title)}">`,
+    () => `<meta name="twitter:title" content="${escapeAttr(page.title)}">`,
   );
   out = out.replace(
     /<meta\s+name="twitter:description"\s+content="[^"]*"\s*\/?>/,
-    `<meta name="twitter:description" content="${escapeAttr(page.description)}">`,
+    () => `<meta name="twitter:description" content="${escapeAttr(page.description)}">`,
   );
 
   const faqItemsHtml = page.faqs
@@ -173,7 +173,7 @@ export function injectSeoContent(html: string, pathname: string): string {
   // case than "bot never executes JS").
   out = out.replace(
     /<!-- Fallback H1 for non-JS crawlers[\s\S]*?-->/,
-    staticBlock,
+    () => staticBlock,
   );
 
   return out;
@@ -272,17 +272,6 @@ function injectNonce(html: string, nonce: string): string {
 }
 
 /**
- * Rewrite the <title> and add a robots noindex for a path the app does not
- * serve.
- *
- * Status alone is not enough. Before this, every invalid URL answered 200 AND
- * carried the generic site title, so Googlebot saw an unbounded set of distinct
- * URLs all claiming to be "AiTaxBot - Free ITR Filing & Income Tax Calculator
- * India..." — duplicate titles at infinite scale. The 404 status stops it being
- * indexed; the title stops it looking like the homepage while it is still in
- * the index.
- */
-/**
  * Set the robots directive, replacing the one client/index.html already ships.
  *
  * The template carries `<meta name="robots" content="index, follow">`. An
@@ -314,6 +303,17 @@ function markNoIndex(html: string): string {
   return setRobots(html, "noindex, follow");
 }
 
+/**
+ * Rewrite the <title> and add a robots noindex for a path the app does not
+ * serve.
+ *
+ * Status alone is not enough. Before this, every invalid URL answered 200 AND
+ * carried the generic site title, so Googlebot saw an unbounded set of distinct
+ * URLs all claiming to be "AiTaxBot - Free ITR Filing & Income Tax Calculator
+ * India..." — duplicate titles at infinite scale. The 404 status stops it being
+ * indexed; the title stops it looking like the homepage while it is still in
+ * the index.
+ */
 function markNotFound(html: string): string {
   return setRobots(
     html.replace(/<title>[\s\S]*?<\/title>/i, "<title>Page not found — AiTaxBot</title>"),

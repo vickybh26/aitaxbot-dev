@@ -43,6 +43,7 @@ import { resolve } from "path";
 import { SEO_CONTENT_BY_PATH, SITE_NAV } from "../shared/seoContent";
 import { STATIC_ROUTES, PRIVATE_ROUTES, NOINDEX_ROUTES, isNoIndexRoute, indexableRoutes } from "../shared/routes";
 import { blogPosts } from "../client/src/data/blogPosts";
+import { injectSeoContent } from "../server/vite";
 
 const root = resolve(import.meta.dirname, "..");
 let failed = 0;
@@ -65,6 +66,22 @@ const NO_CRAWLER_CONTENT = new Set([...PRIVATE_ROUTES, ...NOINDEX_ROUTES]);
 
 /** Read the shell title so this guard cannot silently drift after a copy edit. */
 const shellHtml = readFileSync(resolve(root, "client/index.html"), "utf8");
+// String.replace interprets $& and $1 in replacement strings. A callback
+// must be used when injecting page-authored text into HTML metadata and body.
+const replacementProbe = "/__replacement_probe__";
+SEO_CONTENT_BY_PATH[replacementProbe] = {
+  ...SEO_CONTENT_BY_PATH["/"],
+  title: "Tax $& $1 Guide",
+  description: "Financial $& $1 details",
+  h1: "Tax $& $1 Guide",
+  intro: "Financial $& $1 details",
+};
+const probeHtml = injectSeoContent(shellHtml, replacementProbe);
+delete SEO_CONTENT_BY_PATH[replacementProbe];
+check("metadata and static copy preserve literal replacement markers",
+  probeHtml.includes("<title>Tax $&amp; $1 Guide</title>")
+  && probeHtml.includes("Financial $&amp; $1 details")
+  && !probeHtml.includes("Tax <title>"));
 const genericTitle = shellHtml.match(/<title>([^<]+)<\/title>/i)?.[1].replace(/&amp;/g, "&");
 check("the shell has a title", Boolean(genericTitle));
 check(
