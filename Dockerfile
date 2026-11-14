@@ -3,10 +3,13 @@
 # With NODE_ENV=production, npm 9.x skips devDependencies (including vite), causing
 # `vite: not found`. This Dockerfile installs all deps first, then builds cleanly.
 
-# Supported runtime with the October 2026 TLS/trust-store security fixes.
+# Pin a supported runtime containing the October 2026 TLS/trust-store fixes.
 FROM node:24.22.2-bookworm-slim
 
 WORKDIR /app
+
+# Local PDF reading/OCR: source documents must never go to an AI provider.
+RUN apt-get update && apt-get install -y --no-install-recommends poppler-utils tesseract-ocr tesseract-ocr-eng && rm -rf /var/lib/apt/lists/*
 
 # ── Build-time args for Vite (baked into client bundle at build time) ──────────
 ARG VITE_FIREBASE_API_KEY

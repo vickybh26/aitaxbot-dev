@@ -42,12 +42,19 @@ export function PrivacyPolicyContent() {
 
               <h3 className="text-xl font-semibold text-ink mb-3 mt-6">Uploaded tax documents</h3>
               <p className="text-ink/80 mb-3">
-                The current reconciliation service sends uploaded AIS, Form 26AS and Form 16 PDFs to
-                Google Gemini for extraction. A PDF can contain identifiers and other personal data,
-                not just financial figures. We process uploads in memory and do not save the source
-                PDFs in our database. This does not mean processing stays on your device or that the
-                AI provider keeps no data. Local extraction with figures-only AI input is planned but
-                is not yet implemented.
+                We read uploaded AIS, Form 26AS and Form 16 PDFs on our server, using local OCR for
+                scanned pages. Only allowlisted financial amounts, tax categories and tax years are
+                sent to Google Gemini for analysis. We do not send your source PDFs, extracted text,
+                name, PAN, Aadhaar, address, contact details or account identifiers to Gemini.
+                Financial facts may still be personal data; this is not a promise of anonymity or
+                zero provider retention. Google's applicable processing and retention terms apply.
+                Temporary PDF, image and OCR files are removed after processing, including on
+                handled errors. An unexpected server interruption may delay removal until host
+                cleanup. Source documents are not saved in our database or served publicly.
+                Unsupported or unreadable documents fail without a full-document AI fallback.
+                Local extraction and OCR can omit or misread figures: verify results against the
+                originals. We save the latest report summary and a notice-version consent receipt
+                to your account. Document analysis is not sent for background AI-answer review.
               </p>
 
               <h3 className="text-xl font-semibold text-ink mb-3 mt-6">1b. Account Registration (Optional)</h3>
@@ -179,7 +186,7 @@ export function PrivacyPolicyContent() {
               <ul className="list-disc pl-6 mb-4 text-ink/80 space-y-2">
                 <li><strong>Calculator inputs &amp; results (signed out):</strong> Never stored — cleared immediately on session end</li>
                 <li><strong>Calculator inputs &amp; results (signed in):</strong> Your most recent result for each calculator is saved to your account so it is waiting for you on your dashboard next time. Each new calculation replaces the previous one for that calculator. You can clear any of them from your dashboard at any time, and all of them are erased when you delete your account.</li>
-                <li><strong>AIS / 26AS / Form 16 documents:</strong> Never stored. Your uploaded PDFs are processed in memory and discarded as soon as your report is produced — they are never written to disk or to our database.</li>
+                <li><strong>AIS / 26AS / Form 16 documents:</strong> Processed locally using private temporary PDF, image and OCR files, removed after processing or handled errors. Unexpected server interruptions can delay removal until host cleanup. Source documents are not saved in our database.</li>
                 <li><strong>AIS / 26AS / Form 16 report summary (signed in):</strong> We save only the outcome of your most recent check — the status, how many items need attention, and the short action list. This lets your dashboard remind you of what is still outstanding before you file. It is replaced each time you run a new check, and erased when you delete your account.</li>
                 <li><strong>User accounts:</strong> Retained until you delete your account</li>
                 <li><strong>Explicitly saved tax-calculation history:</strong> Retained until you delete the saved calculation or your account. Unlike the latest-result dashboard card, saving another history entry does not replace older entries.</li>
@@ -196,7 +203,7 @@ export function PrivacyPolicyContent() {
                 <p>
                   We keep the <strong>figures we calculated for you</strong>, so that your dashboard is useful when
                   you return. We do not keep the <strong>documents you uploaded</strong>. Your AIS, Form 26AS and
-                  Form 16 files exist only for the few seconds it takes to read them, and are never saved.
+                  Form 16 files are used temporarily for local reading and OCR, then removed as described above.
                 </p>
               </div>
             </section>

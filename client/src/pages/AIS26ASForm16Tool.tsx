@@ -13,6 +13,7 @@ import { Progress } from "@/components/ui/progress";
 import AuthModal from "@/components/AuthModal";
 import type { ITRFormResult } from "@shared/itrFormSelector";
 import { buildSummaryRows } from "@shared/reconcileSummaryRows";
+import { TAX_DOCUMENT_NOTICE_VERSION } from "@shared/taxDocumentNotice";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -246,6 +247,7 @@ export default function AIS26ASForm16Tool() {
   const [aisPassword, setAisPassword] = useState("");
   const [form26asPassword, setForm26asPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [financialDataConsent, setFinancialDataConsent] = useState(false);
   const [progress, setProgress] = useState(0);
   const [progressLabel, setProgressLabel] = useState("");
   const [report, setReport] = useState<ReconciliationReport | null>(null);
@@ -299,6 +301,7 @@ export default function AIS26ASForm16Tool() {
     // state settles instead.
     if (authLoading) return;
     if (!isAuthenticated) { setAuthModalTab("login"); return; }
+    if (!financialDataConsent) return;
     if (!anyFileReady) {
       toast({ title: "Upload at least one document", description: "Add your AIS, Form 26AS, or Form 16 — any one is enough for a summary report. All three give the full cross-check.", variant: "destructive" });
       return;
@@ -306,7 +309,7 @@ export default function AIS26ASForm16Tool() {
 
     setLoading(true);
     setProgress(8);
-    setProgressLabel("Uploading documents…");
+    setProgressLabel("Reading documents privately…");
     setReport(null);
 
     try {
@@ -328,21 +331,11 @@ export default function AIS26ASForm16Tool() {
       });
 
       setProgress(20);
-      setProgressLabel(
-        filledForm16.length > 1
-          // Deliberately does not name the underlying model provider — the
-          // value here is AiTaxBot's tax-specific extraction and reconciliation
-          // logic, not the model itself. Naming it invites users to skip the
-          // product and paste documents into a general chatbot instead.
-          ? `Reading ${filledForm16.length} Form 16s + documents with AiTaxBot AI…`
-          : uploadedCount === 1
-          ? "Reading your document with AiTaxBot AI…"
-          : "Reading your documents with AiTaxBot AI…"
-      );
+      setProgressLabel("Reading PDFs and scanned pages on our server; analysing financial facts…");
 
       const resp = await fetch("/api/tools/tax-reconcile", {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}`, "X-Tax-Document-Notice": TAX_DOCUMENT_NOTICE_VERSION },
         body: formData,
       });
 
@@ -458,7 +451,7 @@ export default function AIS26ASForm16Tool() {
                 <Clock className="w-3 h-3" /> Check your applicable filing deadline
               </span>
               <span className="inline-flex items-center gap-1.5 bg-card/15 text-white/90 text-xs font-medium px-3 py-1 rounded-full">
-                <Shield className="w-3 h-3" /> Secure · Never Stored · Free
+                <Shield className="w-3 h-3" /> Local document reading · Financial facts to Gemini
               </span>
             </div>
             <h1 className="text-3xl md:text-4xl font-bold mb-3">
@@ -612,10 +605,19 @@ export default function AIS26ASForm16Tool() {
                     </div>
                   )}
 
+                  <div className="mt-4 rounded-xl border border-rule bg-secondary p-4 text-sm text-ink">
+                    <p>We read your PDFs and scanned pages on our server. Only recognized financial amounts, tax categories and tax years go to Google Gemini for this analysis. We do not send your PDFs, document text, name, PAN, Aadhaar or contact details to Gemini.</p>
+                    <p className="mt-2">Temporary PDF and OCR files are removed after processing. A summary is saved to your dashboard. Financial figures may still be personal data; Google's processing and retention terms apply.</p>
+                    <p className="mt-2">Verify the results against your originals. Clear a saved summary from your dashboard or email <a className="text-credit underline" href="mailto:admin@aitaxbot.co.in">admin@aitaxbot.co.in</a> to withdraw consent for future processing. See our <a className="text-credit underline" href="/privacy-policy">Privacy Policy</a> for details.</p>
+                    <label className="mt-3 flex min-h-11 cursor-pointer items-start gap-3 py-2">
+                      <input type="checkbox" className="mt-1 h-5 w-5 shrink-0" checked={financialDataConsent} disabled={loading} onChange={event => setFinancialDataConsent(event.target.checked)} />
+                      <span>I consent to local document reading, financial-facts analysis by Google Gemini and saving the report summary.</span>
+                    </label>
+                  </div>
                   <Button
                     onClick={handleAnalyse}
-                    disabled={loading || !anyFileReady}
-                    className="mt-4 w-full bg-ink hover:bg-blue-800 text-white font-semibold py-3 text-base rounded-xl"
+                    disabled={loading || !anyFileReady || !financialDataConsent}
+                    className="mt-4 min-h-11 w-full bg-ink hover:bg-ink/90 text-white font-semibold py-3 text-base rounded-xl"
                   >
                     {loading ? (
                       <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Analysing with AI…</>
@@ -637,7 +639,7 @@ export default function AIS26ASForm16Tool() {
                   )}
 
                   <div className="flex items-center justify-center gap-1.5 mt-2 text-xs text-ink/65">
-                    <Shield className="w-3 h-3" /> Files are uploaded for processing and deleted once your report is generated
+                    <Shield className="w-3 h-3" /> PDFs stay on our server; only financial facts go to Gemini
                   </div>
                 </div>
               </div>
@@ -650,7 +652,7 @@ export default function AIS26ASForm16Tool() {
                   <div className="hidden md:block absolute top-5 left-[calc(16.7%+20px)] right-[calc(16.7%+20px)] h-px bg-secondary" />
                   {[
                     { n: "1", title: "Upload your PDFs", desc: "AIS and Form 26AS from the Income Tax portal, plus Form 16 from each employer — changed jobs? Add up to 3.", color: "bg-ink" },
-                    { n: "2", title: "AI Reads & Extracts", desc: "AiTaxBot AI parses every page of your uploaded documents and pulls every salary, TDS, and income figure — even one document gives you a summary", color: "bg-paper0" },
+                    { n: "2", title: "Private Reading & OCR", desc: "Our server reads text and scanned pages. Only recognized financial facts go to Gemini; review extracted figures against your originals.", color: "bg-ink" },
                     { n: "3", title: "Get Your Report", desc: "Instant mismatches with severity ratings, Indian tax law explanations, and exact action steps", color: "bg-green-600" },
                   ].map((s) => (
                     <div key={s.n} className="flex-1 flex flex-col items-center text-center px-4 relative">

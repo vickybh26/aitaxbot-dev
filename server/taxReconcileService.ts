@@ -1,14 +1,10 @@
 /**
  * Tax Reconciliation Service — v3
  *
- * Strategy: All three PDFs are parsed via Gemini 2.5 Flash inline PDF.
- *  • AIS     → Gemini inline (image-heavy IT-portal PDF — no text layer)
- *  • 26AS    → Gemini inline (TRACES PDF — text encoding is unreliable for regex)
- *  • Form 16 → Gemini inline (TRACES PDF — same reason)
- *
- * All three calls run in parallel (Promise.all).
- * If GOOGLE_API_KEY is absent, all three gracefully return empty objects.
- * Text regex (parse26ASFromText, parseForm16FromText) kept as dead code for reference.
+ * Strategy: Poppler/Tesseract extract text on our server. An allowlist
+ * converts it to financial observations before any Gemini request.
+ * PDFs, OCR text and identifiers never go to Gemini. Extraction is partial
+ * and the report always requires verification against the originals.
  *
  * Privacy boundary: logs in this module must contain fixed diagnostic messages
  * only. Never log document fields, model responses, PDF passwords, or caught
@@ -16,30 +12,20 @@
  * scripts/test-reconcile-log-privacy.mjs guards this rule without taxpayer data.
  */
 
-import { createRequire } from "module";
-const _require = createRequire(import.meta.url);
-
-// pdf-parse is CJS-only — must load via createRequire in an ESM bundle
-let pdfParse: ((buf: Buffer) => Promise<{ text: string }>) | null = null;
-try {
-  pdfParse = _require("pdf-parse");
-  console.log("[taxReconcileService] pdf-parse loaded OK");
-} catch (e) {
-  console.warn("[taxReconcileService] pdf-parse not available");
-}
+import { extractPrivateTaxText, PrivateExtractionError } from "./localTaxDocument";
+import { extractTaxFacts, financialFactsPrompt } from "./taxDocumentFacts";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Gemini (optional — for AIS image-PDF reading)
+// Gemini (optional — financial facts only)
 // ─────────────────────────────────────────────────────────────────────────────
 import { GoogleGenAI } from "@google/genai";
 import { computeTaxLiability } from "@shared/taxLiability";
-import { runProductionShadowComparison } from "./ragService";
 import { recommendITRForm, type ITRFormInput, type ITRFormResult } from "@shared/itrFormSelector";
 
 function buildAI(): InstanceType<typeof GoogleGenAI> | null {
   const key = process.env.GOOGLE_API_KEY;
   if (!key) {
-    console.warn("[taxReconcileService] GOOGLE_API_KEY not set — AIS will not be parsed");
+    console.warn("[taxReconcileService] GOOGLE_API_KEY not set — AI analysis unavailable");
     return null;
   }
   return new GoogleGenAI({ apiKey: key });
@@ -548,381 +534,8 @@ function inferITRFormRecommendation(
 // PDF text extraction helper
 // ─────────────────────────────────────────────────────────────────────────────
 
-async function extractText(buffer: Buffer, label: string): Promise<string> {
-  if (!pdfParse) {
-    console.warn("[extractText] pdf-parse unavailable");
-    return "";
-  }
-  try {
-    const result = await pdfParse(buffer);
-    const text = result.text || "";
-    console.log("[extractText] Text extraction completed");
-    if (text.length < 50) {
-      console.warn("[extractText] Very short text — may be image PDF");
-    }
-    return text;
-  } catch (err) {
-    console.error("[extractText] Text extraction failed");
-    return "";
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Numeric helpers
-// ─────────────────────────────────────────────────────────────────────────────
-
-function numOrNull(s: string | undefined | null): number | null {
-  if (!s) return null;
-  const n = parseFloat(s.replace(/,/g, ""));
-  return isNaN(n) ? null : n;
-}
-
-function firstNum(text: string, ...patterns: RegExp[]): number | null {
-  for (const pat of patterns) {
-    const m = text.match(pat);
-    if (m) {
-      // find first capture group that's a number string
-      for (let i = 1; i < m.length; i++) {
-        if (m[i]) return numOrNull(m[i]);
-      }
-    }
-  }
-  return null;
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Parse Form 26AS from extracted text
-// TRACES PDFs are plain-text and very consistently formatted
-// ─────────────────────────────────────────────────────────────────────────────
-
-function parse26ASFromText(text: string): Extracted26AS {
-  console.log("[parse26AS] Parsing TRACES 26AS from text");
-
-  const result: Extracted26AS = {
-    // Same dead-code caveat as nonSalarySections below: the year is extracted
-    // by parse26ASWithGemini, not by this legacy text path.
-    financialYear: null,
-    assessmentYear: null,
-    tdsSalary: null,
-    tdsNonSalary: null,
-    nonSalarySections: null, // dead-code path (see file header) — not extended, live parsing is parse26ASWithGemini below
-    advanceTaxPaid: null,
-    selfAssessmentTax: null,
-    totalTdsCredits: null,
-    tcsPaid: null,
-  };
-
-  if (!text || text.length < 100) {
-    console.warn("[parse26AS] Text too short — possible image PDF");
-    return result;
-  }
-
-  // ── Salary TDS (Section 192) ──────────────────────────────────────────────
-  // Strategy: find all "192" transaction rows, sum up TDS deposited column
-  // Row format: "1  192  31-Mar-2026  F  22-Apr-2026  -  221266.67  39847.78  39847.78"
-  const sec192Rows = Array.from(text.matchAll(/\b192\b\s+\d{2}-\w{3}-\d{4}\s+[A-Z]\s+\d{2}-\w{3}-\d{4}\s+-\s+([\d,]+\.\d+)\s+([\d,]+\.\d+)\s+([\d,]+\.\d+)/g));
-  if (sec192Rows.length > 0) {
-    let totalPaid = 0;
-    let totalTDS = 0;
-    for (const row of sec192Rows) {
-      totalPaid += numOrNull(row[1]) ?? 0;
-      totalTDS += numOrNull(row[3]) ?? 0;  // deposited (3rd number)
-    }
-    result.tdsSalary = totalTDS;
-    console.log("[parse26AS] Section 192 parsed");
-  } else {
-    // Fallback: look for employer summary line with large TDS amounts
-    // Typical line: "2 J P MORGAN SERVICES INDIA PRIVATE LIMITED MUMJ05980C 1730648.49 136374.78 136374.78"
-    const employerTDSMatch = text.match(/(?:SERVICES|PRIVATE)\s+LIMITED\s+[A-Z]{4}\d{5}[A-Z]\s+([\d,]+\.\d+)\s+([\d,]+\.\d+)\s+([\d,]+\.\d+)/);
-    if (employerTDSMatch) {
-      result.tdsSalary = numOrNull(employerTDSMatch[3]);
-      console.log("[parse26AS] Employer TDS fallback used");
-    }
-  }
-
-  // ── Non-salary TDS (194S crypto, 194A interest, etc.) ────────────────────
-  // Find 194S / 194A / 194 rows
-  const nonSalaryRows = Array.from(text.matchAll(/\b194[A-Z0-9]*\b\s+\d{2}-\w{3}-\d{4}\s+[A-Z]\s+\d{2}-\w{3}-\d{4}\s+-\s+([\d,]+\.\d+)\s+([\d,]+\.\d+)\s+([\d,]+\.\d+)/g));
-  if (nonSalaryRows.length > 0) {
-    let totalNonSalary = 0;
-    for (const row of nonSalaryRows) {
-      totalNonSalary += numOrNull(row[3]) ?? 0;
-    }
-    result.tdsNonSalary = totalNonSalary;
-    console.log("[parse26AS] Non-salary TDS parsed");
-  }
-
-  // ── TCS (Part VI — LRS, remittances) ─────────────────────────────────────
-  // Kotak / bank TCS rows: "206CQ 21-Mar-2026 F ... 1153.09 0.00 0.00"
-  const tcsRows = Array.from(text.matchAll(/\b206[A-Z]+\b\s+\d{2}-\w{3}-\d{4}\s+[A-Z]\s+\d{2}-\w{3}-\d{4}\s+-\s+([\d,]+\.\d+)\s+([\d,]+\.\d+)\s+([\d,]+\.\d+)/g));
-  if (tcsRows.length > 0) {
-    let totalTCS = 0;
-    for (const row of tcsRows) {
-      totalTCS += numOrNull(row[3]) ?? 0;
-    }
-    result.tcsPaid = totalTCS;
-    console.log("[parse26AS] TCS parsed");
-  }
-
-  // ── Advance Tax (Part C) ──────────────────────────────────────────────────
-  // Pattern: "PART-III" or "PART C" section with challan amounts
-  const advTaxMatch = text.match(/(?:PART[\s-]*III|Advance Tax)[\s\S]{0,2000}?(?:Major Head|0021)[^\d]*([\d,]+\.\d+)/);
-  if (advTaxMatch) {
-    result.advanceTaxPaid = numOrNull(advTaxMatch[1]);
-    console.log("[parse26AS] Advance tax parsed");
-  } else {
-    // Try simpler pattern
-    const atMatch = text.match(/Advance\s+Tax[\s\S]{0,500}?([\d,]+\.\d+)/i);
-    if (atMatch) result.advanceTaxPaid = numOrNull(atMatch[1]);
-  }
-
-  // ── Self-Assessment Tax ───────────────────────────────────────────────────
-  const satMatch = text.match(/Self.?Assessment\s*Tax[\s\S]{0,500}?([\d,]+\.\d+)/i);
-  if (satMatch) {
-    result.selfAssessmentTax = numOrNull(satMatch[1]);
-    console.log("[parse26AS] Self-assessment tax parsed");
-  }
-
-  // ── Total TDS credits ─────────────────────────────────────────────────────
-  result.totalTdsCredits =
-    (result.tdsSalary ?? 0) + (result.tdsNonSalary ?? 0);
-
-  // ── Employer name from first 192-deductor ─────────────────────────────────
-  const empMatch = text.match(/([A-Z][A-Z\s&.'-]{5,50}(?:LIMITED|LLP|PVT\.?\s*LTD|BANK|PVTLTD))\s+([A-Z]{4}\d{5}[A-Z])\s+[\d,]+\.\d+\s+[\d,]+\.\d+/i);
-  if (empMatch) {
-    result.employerName = empMatch[1].trim();
-    result.employerTAN = empMatch[2];
-    console.log("[parse26AS] Employer fields parsed");
-  }
-
-  result.rawText = text.slice(0, 500);
-  return result;
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Parse Form 16 from extracted text
-// TRACES-generated Form 16 PDFs are consistently structured
-// ─────────────────────────────────────────────────────────────────────────────
-
-function parseForm16FromText(text: string): ExtractedForm16 {
-  console.log("[parseForm16] Parsing Form 16 from text");
-
-  const result: ExtractedForm16 = {
-    // Legacy text path — the year is extracted by parseForm16WithGemini.
-    financialYear: null, assessmentYear: null,
-    employerName: null, employerTAN: null, employeePAN: null,
-    tdsDeposited: null, grossSalary: null, salaryU17_1: null,
-    perquisites: null, hraExempt: null, standardDeduction: null,
-    professionalTax: null, netSalary: null, deduction80C: null,
-    deduction80D: null, totalDeductionsVI_A: null, taxableIncome: null,
-    taxOnIncome: null, rebate87A: null, cess: null,
-    totalTaxPayable: null, totalTaxDeducted: null, newRegime: null,
-  };
-
-  if (!text || text.length < 100) {
-    console.warn("[parseForm16] Text too short — possible image PDF");
-    return result;
-  }
-
-  // ── Employer / Employee identifiers ──────────────────────────────────────
-  // TAN pattern
-  const tanMatch = text.match(/TAN of (?:the )?Deductor\s*[:\s]*([A-Z]{4}\d{5}[A-Z])/i)
-    || text.match(/\b([A-Z]{4}\d{5}[A-Z])\b/);
-  if (tanMatch) result.employerTAN = tanMatch[1];
-
-  // Employer name — look for name before TAN
-  const empMatch = text.match(/(?:Name.*?Employer[^A-Z]*)(J\s*P\s*MORGAN|[A-Z][A-Z\s]+(?:LIMITED|LLP|BANK|PVT))/i)
-    || text.match(/(J\s*P\s*MORGAN[\w\s]+(?:LIMITED|LLP))/i)
-    || text.match(/([\w\s]+(?:PRIVATE LIMITED|PVT LTD|LLP))/);
-  if (empMatch) result.employerName = empMatch[1].trim();
-
-  // Employee PAN
-  const panMatch = text.match(/PAN of (?:the )?Employee[^A-Z]*([A-Z]{5}\d{4}[A-Z])/i)
-    || text.match(/\b([A-Z]{5}\d{4}[A-Z])\b/);
-  if (panMatch) result.employeePAN = panMatch[1];
-
-  // ── Part A: Total TDS deposited ───────────────────────────────────────────
-  // Form 16 Part A has a summary table:
-  // "Total (Rs.) 1730648.49 136374.78 136374.78"
-  // The 3rd number is TDS deposited
-  const partATotalMatch = text.match(/Total\s*\(Rs\.\)\s*([\d,]+\.\d{2})\s+([\d,]+\.\d{2})\s+([\d,]+\.\d{2})/);
-  if (partATotalMatch) {
-    result.tdsDeposited = numOrNull(partATotalMatch[3]);
-    result.totalTaxDeducted = numOrNull(partATotalMatch[2]);
-    console.log("[parseForm16] Part A totals parsed");
-  }
-
-  // ── Part B: Salary details ────────────────────────────────────────────────
-  // 1(a) Salary u/s 17(1)
-  result.salaryU17_1 = firstNum(text,
-    /17\s*\(1\)\s*([\d,]+\.?\d*)/,
-    /section\s+17\s*\(1\)\s*([\d,]+\.?\d*)/i,
-  );
-
-  // 1(b) Perquisites u/s 17(2)
-  result.perquisites = firstNum(text,
-    /17\s*\(2\)[^\d]*([\d,]+\.?\d*)/,
-    /perquisite[^(]*17\s*\(2\)[^\d]*([\d,]+\.?\d*)/i,
-  );
-
-  // 1(d) Gross Total Salary
-  // Look for "Total" line in Gross Salary section = 1(d) value
-  result.grossSalary = firstNum(text,
-    /\(d\)\s+Total\s+([\d,]+\.?\d*)/,
-    /1\s*\(d\)\s*\n?\s*Total\s*([\d,]+\.?\d*)/i,
-    // fallback: Part A "Total (Rs.)" first number = amount paid = gross salary
-    /Total\s*\(Rs\.\)\s*([\d,]+\.\d{2})/,
-  );
-
-  // 2. HRA exemption u/s 10(13A)
-  result.hraExempt = firstNum(text,
-    /10\s*\(13A\)[^\d]*([\d,]+\.?\d*)/,
-    /House rent allowance[^\d]*([\d,]+\.?\d*)/i,
-  );
-
-  // 4(a) Standard deduction u/s 16(ia)
-  result.standardDeduction = firstNum(text,
-    /16\s*\(ia\)[^\d]*([\d,]+\.?\d*)/,
-    /Standard deduction[^\d]*([\d,]+\.?\d*)/i,
-  );
-
-  // 4(c) Professional tax u/s 16(iii)
-  result.professionalTax = firstNum(text,
-    /16\s*\(iii\)[^\d]*([\d,]+\.?\d*)/,
-    /Tax on employment[^\d]*([\d,]+\.?\d*)/i,
-  );
-
-  // 6. Income chargeable under salaries (net salary after deductions)
-  result.netSalary = firstNum(text,
-    /Income chargeable[^¶]*Salaries[^¶]*\[(3\+1|3.1)[^\d]*([\d,]+\.?\d*)/i,
-    // "6. 1655648.00"
-    /6\.\s+([\d,]+\.\d{2})\s*\n/,
-  );
-  // Extra fallback: (grossSalary - standardDeduction)
-  if (!result.netSalary && result.grossSalary && result.standardDeduction) {
-    result.netSalary = result.grossSalary - result.standardDeduction;
-  }
-
-  // 10(a) 80C deductions
-  result.deduction80C = firstNum(text,
-    /80C[^\d]*([\d,]+\.?\d*)/i,
-  );
-
-  // 10(g) 80D deductions
-  result.deduction80D = firstNum(text,
-    /80D[^\d]*([\d,]+\.?\d*)/i,
-  );
-
-  // 11. Total VI-A deductions
-  result.totalDeductionsVI_A = firstNum(text,
-    /Aggregate of deductible[^\d]*([\d,]+\.?\d*)/i,
-    /(?:11\.|total.*VI.?A)[^\d]*([\d,]+\.?\d*)/i,
-  );
-
-  // 12. Total taxable income
-  result.taxableIncome = firstNum(text,
-    /Total taxable income[^¶]*\(9-11\)[^\d]*([\d,]+\.?\d*)/i,
-    /12\.\s+Total taxable income[^\d]*([\d,]+\.?\d*)/i,
-    // fallback: net salary if no VI-A deductions
-  );
-  if (!result.taxableIncome && result.netSalary) {
-    result.taxableIncome = result.netSalary - (result.totalDeductionsVI_A ?? 0);
-  }
-
-  // 13. Tax on total income (before cess)
-  result.taxOnIncome = firstNum(text,
-    /13\.\s+Tax on total income\s+([\d,]+\.?\d*)/i,
-    /Tax on total income[^\d]*([\d,]+\.\d{2})/,
-  );
-
-  // 14. Rebate u/s 87A
-  result.rebate87A = firstNum(text,
-    /87A[^\d]*([\d,]+\.?\d*)/i,
-    /Rebate[^\d]*([\d,]+\.?\d*)/i,
-  );
-
-  // 16. Cess
-  result.cess = firstNum(text,
-    /(?:Health and education|education)\s+cess[^\d]*([\d,]+\.?\d*)/i,
-    /16\.[^\d]*([\d,]+\.?\d*)/,
-  );
-
-  // 17. Tax payable
-  result.totalTaxPayable = firstNum(text,
-    /Tax payable[^\d]*([\d,]+\.?\d*)/i,
-    /17\.[^\d]*([\d,]+\.?\d*)/,
-  );
-
-  // 21. Net tax payable = total TDS (same as totalTaxDeducted normally)
-  const netTaxMatch = text.match(/(?:Net tax payable|21\.)[^\d]*([\d,]+\.\d{2})/i);
-  if (netTaxMatch && !result.totalTaxDeducted) {
-    result.totalTaxDeducted = numOrNull(netTaxMatch[1]);
-  }
-
-  // Tax Regime — Form 16 Part B has: "Whether opting out of taxation u/s 115BAC(1A)? No"
-  // "No" = NOT opting out = New Regime
-  // "Yes" = opting out = Old Regime
-  if (text.match(/115BAC\s*\(1A\).*?No/i)) result.newRegime = true;
-  else if (text.match(/115BAC\s*\(1A\).*?Yes/i)) result.newRegime = false;
-
-  console.log("[parseForm16] Extraction completed");
-
-  result.rawText = text.slice(0, 500);
-  return result;
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Parse AIS from text (regex fallback — works if text is extractable)
-// ─────────────────────────────────────────────────────────────────────────────
-
-function parseAISFromText(text: string): Partial<ExtractedAIS> {
-  const result: Partial<ExtractedAIS> = {};
-  if (!text || text.length < 100) return result;
-
-  // Salary (TDS-192)
-  result.salaryIncome = firstNum(text,
-    /TDS-192[^\d]*([\d,]+)/,
-    /Salary received.*?192[^\d]*([\d,]+)/i,
-  );
-
-  // Savings interest (SFT-016(SB))
-  const savingsRows = Array.from(text.matchAll(/SFT-016\(SB\)[^\d]*([\d,]+)/gi));
-  if (savingsRows.length > 0) {
-    result.interestFromSavings = savingsRows.reduce((s, m) => s + (numOrNull(m[1]) ?? 0), 0);
-  }
-
-  // FD interest (SFT-016(FD))
-  const fdRows = Array.from(text.matchAll(/SFT-016\(FD\)[^\d]*([\d,]+)/gi));
-  if (fdRows.length > 0) {
-    result.interestFromFD = fdRows.reduce((s, m) => s + (numOrNull(m[1]) ?? 0), 0);
-  }
-
-  // Dividend (SFT-015)
-  const divRows = Array.from(text.matchAll(/SFT-015[^\d]*([\d,]+)/gi));
-  if (divRows.length > 0) {
-    result.dividendIncome = divRows.reduce((s, m) => s + (numOrNull(m[1]) ?? 0), 0);
-  }
-
-  // Securities (SFT-17-LS(M))
-  result.securitiesTransactions = firstNum(text, /SFT-17-LS[^\d]*([\d,]+)/i);
-
-  // Mutual Fund (SFT-18-4MF)
-  result.mutualFundTransactions = firstNum(text, /SFT-18-4MF[^\d]*([\d,]+)/i);
-
-  // Crypto VDA (TDS-194S)
-  result.cryptoIncome = firstNum(text, /TDS-194S[^\d]*([\d,]+)/i);
-
-  // LRS (TCS-206CQ)
-  result.lrsRemittance = firstNum(text, /TCS-206CQ[^\d]*([\d,]+)/i);
-
-  return result;
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Parse AIS via Gemini inline PDF (image-heavy IT-portal PDF)
-// ─────────────────────────────────────────────────────────────────────────────
-
-async function parseAISWithGemini(pdfBuffer: Buffer): Promise<Partial<ExtractedAIS>> {
+// Parse locally extracted financial facts; source documents never leave the server.
+async function parseAISWithGemini(facts: string): Promise<Partial<ExtractedAIS>> {
   if (!ai) {
     console.warn("[parseAISWithGemini] No API key — skipping");
     return {};
@@ -1036,19 +649,13 @@ otherIncomeItems unless you have genuinely accounted for every row in Parts
 B1, B2 and B7 in the named fields above.`;
 
   try {
-    console.log("[parseAISWithGemini] Sending AIS PDF to Gemini...");
+    console.log("[parseAISWithGemini] Sending allowlisted AIS facts to Gemini...");
     const result = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: [{
         role: "user",
         parts: [
-          {
-            inlineData: {
-              mimeType: "application/pdf",
-              data: pdfBuffer.toString("base64"),
-            },
-          },
-          { text: prompt },
+          { text: facts + "\n\nInterpret these facts using the following tax schema. Any reference below to reading a PDF means interpreting ONLY these supplied facts; you cannot inspect the original.\n" + prompt },
         ],
       }],
     });
@@ -1136,10 +743,10 @@ B1, B2 and B7 in the named fields above.`;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Parse Form 26AS via Gemini inline PDF
+// Interpret allowlisted Form 26AS facts
 // ─────────────────────────────────────────────────────────────────────────────
 
-async function parse26ASWithGemini(pdfBuffer: Buffer): Promise<Extracted26AS> {
+async function parse26ASWithGemini(facts: string): Promise<Extracted26AS> {
   const empty: Extracted26AS = {
     financialYear: null, assessmentYear: null,
     tdsSalary: null, tdsNonSalary: null, nonSalarySections: null, advanceTaxPaid: null,
@@ -1197,14 +804,13 @@ Return ONLY this JSON (no markdown, no text before/after the JSON):
 }`;
 
   try {
-    console.log("[parse26ASWithGemini] Sending 26AS PDF to Gemini...");
+    console.log("[parse26ASWithGemini] Sending allowlisted 26AS facts to Gemini...");
     const result = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: [{
         role: "user",
         parts: [
-          { inlineData: { mimeType: "application/pdf", data: pdfBuffer.toString("base64") } },
-          { text: prompt },
+          { text: facts + "\n\nInterpret these facts using the following tax schema. Any reference below to reading a PDF means interpreting ONLY these supplied facts; you cannot inspect the original.\n" + prompt },
         ],
       }],
     });
@@ -1247,8 +853,8 @@ Return ONLY this JSON (no markdown, no text before/after the JSON):
       selfAssessmentTax: parsed.selfAssessmentTax ?? null,
       totalTdsCredits: (parsed.tdsSalary ?? 0) + (tdsNonSalary ?? 0) || null,
       tcsPaid: parsed.tcsPaid ?? null,
-      employerName: parsed.employerName ?? undefined,
-      employerTAN: parsed.employerTAN ?? undefined,
+      employerName: undefined,
+      employerTAN: undefined,
     };
   } catch (err) {
     console.error("[parse26ASWithGemini] Extraction failed");
@@ -1257,10 +863,10 @@ Return ONLY this JSON (no markdown, no text before/after the JSON):
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Parse Form 16 via Gemini inline PDF
+// Interpret allowlisted Form 16 facts
 // ─────────────────────────────────────────────────────────────────────────────
 
-async function parseForm16WithGemini(pdfBuffer: Buffer): Promise<ExtractedForm16> {
+async function parseForm16WithGemini(facts: string): Promise<ExtractedForm16> {
   const empty: ExtractedForm16 = {
     financialYear: null, assessmentYear: null,
     employerName: null, employerTAN: null, employeePAN: null, tdsDeposited: null,
@@ -1337,14 +943,13 @@ Extract all values and return ONLY this JSON (no markdown):
 }`;
 
   try {
-    console.log("[parseForm16WithGemini] Sending Form 16 PDF to Gemini...");
+    console.log("[parseForm16WithGemini] Sending allowlisted Form 16 facts to Gemini...");
     const result = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: [{
         role: "user",
         parts: [
-          { inlineData: { mimeType: "application/pdf", data: pdfBuffer.toString("base64") } },
-          { text: prompt },
+          { text: facts + "\n\nInterpret these facts using the following tax schema. Any reference below to reading a PDF means interpreting ONLY these supplied facts; you cannot inspect the original.\n" + prompt },
         ],
       }],
     });
@@ -1362,9 +967,9 @@ Extract all values and return ONLY this JSON (no markdown):
     return {
       financialYear,
       assessmentYear,
-      employerName: parsed.employerName ?? null,
-      employerTAN: parsed.employerTAN ?? null,
-      employeePAN: parsed.employeePAN ?? null,
+      employerName: null,
+      employerTAN: null,
+      employeePAN: null,
       tdsDeposited: parsed.tdsDeposited ?? null,
       grossSalary: parsed.grossSalary ?? null,
       salaryU17_1: parsed.salaryU17_1 ?? null,
@@ -2103,12 +1708,12 @@ function generateSummary(
     if (missingNames.length > 0) {
       return `✅ No issues found in ${providedNames.join(" + ")}${emp}.${itrNote}${partialNote}`;
     }
-    return `✅ Tax documents look clean${emp}.${itrNote} Form 16, 26AS, and AIS are consistent. You can proceed to file ITR.`;
+    return `No mismatches found in the recognized figures${emp}.${itrNote} Extraction may be incomplete. Verify all figures and missing fields against the originals before filing.`;
   }
   if (status === "CRITICAL") {
     return `⚠️ Critical issues found${emp}. ${mismatches.filter(m => m.severity === "HIGH").length} high-severity item(s) must be resolved before filing ITR.${itrNote}${partialNote}`;
   }
-  return `${mismatches.length} item(s) need attention${emp}.${itrNote}${partialNote} Review all items and resolve before filing ITR by July 31, 2026.`;
+  return `${mismatches.length} item(s) need attention${emp}.${itrNote}${partialNote} Review all items before filing and check the applicable filing deadline for your assessment year and taxpayer category.`;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -2134,11 +1739,11 @@ async function generateAIInsights(
   // `ai` client still saw "ensure Google API key is configured", which is simply
   // false in that case and just confuses/alarms users.
   const noKeyFallback = {
-    insights: "Upload all three documents and ensure a Google API key is configured for AI-powered insights.",
+    insights: "AI-powered insights are unavailable. Cross-check the recognized figures and missing fields against your original documents before relying on this report.",
     actionItems: [
       "Cross-check Form 16, 26AS, and AIS figures manually",
       "Declare all interest income, dividends, and capital gains in ITR",
-      "File ITR by July 31, 2026",
+      "Check the applicable filing deadline for your assessment year and taxpayer category",
     ],
     itrImpact: "Review all extracted data above and resolve mismatches before filing your Income Tax Return.",
   };
@@ -2149,87 +1754,31 @@ async function generateAIInsights(
 
   if (!ai) return noKeyFallback;
 
-  const mismatchText = mismatches.filter(m => m.severity !== "OK")
-    .map(m => `- [${m.severity}] ${m.title}: ${m.description}`)
-    .join("\n");
-
-  const providedNames = [
-    provided.ais && "AIS",
-    provided.form26as && "Form 26AS",
-    provided.form16 && "Form 16",
-  ].filter(Boolean) as string[];
-  const missingNames = [
-    !provided.ais && "AIS",
-    !provided.form26as && "Form 26AS",
-    !provided.form16 && "Form 16",
-  ].filter(Boolean) as string[];
-  const singleDoc = providedNames.length === 1;
-
-  const docContextNote = missingNames.length === 0
-    ? ""
-    : singleDoc
-    ? `\nIMPORTANT DOCUMENT CONTEXT: The taxpayer uploaded ONLY their ${providedNames[0]} — no other documents. Treat any figure shown as "N/A" for the missing documents (${missingNames.join(", ")}) as UNKNOWN, not zero. Your job for this response: (1) summarise clearly what this one document shows, (2) list the specific things from THIS document that must not be missed when filing the ITR (incomes to declare, TDS credits to claim, deductions visible), and (3) tell them what the missing documents (${missingNames.join(", ")}) would add and why cross-checking all three before filing matters. Do NOT invent or guess figures for the missing documents.`
-    : `\nIMPORTANT DOCUMENT CONTEXT: The taxpayer uploaded ${providedNames.join(" and ")} but NOT ${missingNames.join(" or ")}. Treat "N/A" figures from the missing document(s) as UNKNOWN, not zero. Compare the uploaded documents against each other, call out what shouldn't be missed when filing based on what IS available, and note what the missing document(s) would add.`;
-
-  // The year comes from the uploaded documents (resolveTaxPeriod), not a
-  // hardcoded literal — the same prompt has to serve a FY 2024-25 document set
-  // correctly, and from April 2026 the year is also what decides which Act
-  // governs at all.
-  const prompt = `You are an expert Indian Chartered Accountant helping taxpayer file ITR for FY ${taxPeriod.financialYear} (AY ${taxPeriod.assessmentYear}).${
-    taxPeriod.assumed
-      ? `\nNOTE: none of the uploaded documents stated their tax year, so FY ${taxPeriod.financialYear} is an assumption. Say so explicitly in your insights and tell the taxpayer to confirm the year on their documents.`
-      : ""
-  }${
-    taxPeriod.conflict
-      ? `\nWARNING: the uploaded documents state DIFFERENT tax years (${taxPeriod.perDocument.map(d => `${d.document}: FY ${d.financialYear}`).join("; ")}). Lead your insights with this problem — the figures below may be mixing two tax years, and the taxpayer must re-upload matching documents before relying on any of it.`
-      : ""
-  }
-
-GROUND TRUTH — CURRENT LAW (do not contradict these, even if your training data suggests otherwise; tax rules changed in recent Budgets and your recollection may be out of date):
-- Standard deduction u/s 16(ia), New Tax Regime (115BAC), FY 2024-25 AND FY 2025-26: ₹75,000 (raised from ₹50,000 by Budget 2024, effective FY 2024-25 onwards — this is NOT an error to flag or correct).
-- Standard deduction, Old Tax Regime, all these years: ₹50,000 (unchanged).
-- Do NOT tell the taxpayer to "add back" or "rectify" a standard deduction amount that matches one of the figures above — it is already correct.
-- New Regime Section 87A rebate: full rebate (tax = nil) up to ₹12,00,000 total income for FY 2025-26/2026-27 (with marginal relief above that up to ~₹12.7L); up to ₹7,00,000 for FY 2023-24/2024-25 (also with marginal relief).
-- HRA exemption u/s 10(13A) and LTA u/s 10(5) are NOT available under the New Regime — do not suggest claiming them there.
-- If the Form 16 standard deduction figure conflicts with the rule above for its stated regime and year, flag it as a specific numeric mismatch (state both numbers) rather than a generic "rectify" instruction — but for FY 2024-25/2025-26 New Regime, ₹75,000 is the correct, current figure.
-
-Tax Document Summary:
-- Gross Salary (Form 16): ${fmt(f16.grossSalary)}
-- Standard Deduction (Form 16): ${fmt(f16.standardDeduction)}
-- Taxable Income (Form 16): ${fmt(f16.taxableIncome)}
-- Total TDS (Form 16 = 26AS): ${fmt(f16.totalTaxDeducted)}
-- Tax Regime: ${f16.newRegime === true ? "New Tax Regime (115BAC)" : f16.newRegime === false ? "Old Tax Regime" : "Unknown"}
-- Savings Interest (AIS): ${fmt(ais.interestFromSavings)}
-- FD Interest (AIS): ${fmt(ais.interestFromFD)}
-- Dividend Income (AIS): ${fmt(ais.dividendIncome)}
-- VDA/Crypto Income (AIS): ${fmt(ais.cryptoIncome)}
-- Securities Sold (AIS): ${fmt(ais.securitiesTransactions)}
-- Mutual Fund Sold (AIS): ${fmt(ais.mutualFundTransactions)}
-- LRS Remittance (AIS): ${fmt(ais.lrsRemittance)}
-- TDS on Salary (26AS): ${fmt(f26as.tdsSalary)}
-- TDS Non-Salary e.g. interest (26AS): ${fmt(f26as.tdsNonSalary)}
-- Total TDS Credit Available (26AS): ${fmt(f26as.totalTdsCredits)}
-- Advance/Self-Assessment Tax Paid (26AS): ${fmt((f26as.advanceTaxPaid ?? 0) + (f26as.selfAssessmentTax ?? 0) || null)}
-${ais.highValueTransactions?.length
-  ? `- High-Value Transactions on record (AIS, not taxable income by itself but reported to IT dept): ${ais.highValueTransactions.map(t => `${t.code} ${t.description} ${fmt(t.amount)}`).join("; ")} — mention this so the taxpayer is aware it's on file, even though it doesn't need to be declared as income.`
-  : ""}
-${ais.otherIncomeItems?.length
-  ? `- OTHER INCOME reported in the AIS that does not fall under salary/interest/dividend/capital-gains: ${ais.otherIncomeItems.map(o => `${o.code} ${o.description}${o.source ? ` from ${o.source}` : ""} — gross ${fmt(o.amount)}${o.tdsDeducted != null ? `, TDS ${fmt(o.tdsDeducted)}` : ""}`).join("; ")}. This is REAL TAXABLE INCOME already on record with the department. You MUST tell the taxpayer which head it belongs under (e.g. 194C/194J/194H receipts are business or professional income, 194I is rent, 192A is EPF withdrawal) and which ITR schedule it goes in. Do not ignore it, and do not describe the return as complete without it.`
-  : ""}
-
-${docContextNote}
-Issues Found:
-${mismatchText || (missingNames.length > 0 ? "No issues found in the uploaded document(s) — a full cross-check needs all three documents." : "No major mismatches — documents appear consistent.")}
-${multiEmployerFlags && multiEmployerFlags.employerCount > 1
-  ? `\nNote: The taxpayer had ${multiEmployerFlags.employerCount} employers this FY (mid-year job change). The figures above are already combined across employers with the standard deduction counted once. ${multiEmployerFlags.regimeConsistent ? "" : "Their employers used inconsistent tax regimes, so treat any regime-specific advice as provisional."} Specifically mention that job-changers are commonly under-withheld because each employer applies slabs independently, and that Form 12B could have prevented this at the new employer.`
-  : ""}
-
-Respond ONLY in this JSON (no markdown, no leading/trailing text):
-{
-  "insights": "<2-3 paragraphs explaining what the numbers mean, key ITR filing points, and whether ITR-1 or ITR-2 is needed. Mention specific Indian tax laws and AY ${taxPeriod.assessmentYear} context.>",
-  "actionItems": ["<specific action 1>", "<specific action 2>", "<specific action 3>", "<specific action 4>"],
-  "itrImpact": "<1 paragraph on which ITR form to use, which schedules to fill, and the key things to declare>"
-}`;
+  const fields = ["salaryIncome", "interestFromSavings", "interestFromFD", "dividendIncome",
+    "securitiesTransactions", "mutualFundTransactions", "cryptoIncome", "lrsRemittance",
+    "taxPaidSelfAssessment", "tdsSalary", "tdsNonSalary", "advanceTaxPaid", "selfAssessmentTax",
+    "totalTdsCredits", "tcsPaid", "tdsDeposited", "grossSalary", "salaryU17_1", "perquisites",
+    "hraExempt", "standardDeduction", "professionalTax", "netSalary", "deduction80C",
+    "deduction80D", "totalDeductionsVI_A", "taxableIncome", "taxOnIncome", "rebate87A",
+    "cess", "totalTaxPayable", "totalTaxDeducted", "newRegime"] as const;
+  const project = (input: object) => Object.fromEntries(fields.flatMap(key => {
+    const value = (input as Record<string, unknown>)[key];
+    return (typeof value === "number" && Number.isFinite(value)) || (key === "newRegime" && typeof value === "boolean")
+      ? [[key, value]] : [];
+  }));
+  const safeYear = (value: string) => /^20\d{2}-\d{2}$/.test(value) ? value : null;
+  const facts = {
+    financialYear: safeYear(taxPeriod.financialYear), assessmentYear: safeYear(taxPeriod.assessmentYear),
+    yearAssumed: taxPeriod.assumed, documentsProvided: provided,
+    ais: project(ais), form26as: project(f26as), form16: project(f16),
+    employerCount: multiEmployerFlags?.employerCount ?? 1,
+    extractionComplete: false,
+  };
+  const prompt = `Explain these locally extracted Indian tax figures. Missing fields are unknown, never zero.
+Extraction is partial and OCR can misread numbers: do not say the return is complete or ready to file.
+Use only the stated tax year; if assumed, ask the taxpayer to confirm it. Never invent identifiers or income.
+Return JSON with insights (2 short paragraphs), actionItems (array of specific checks), and itrImpact (string).
+Financial facts: ${JSON.stringify(facts)}`;
 
   try {
     const result = await ai.models.generateContent({
@@ -2264,50 +1813,6 @@ Respond ONLY in this JSON (no markdown, no leading/trailing text):
 // Main entry point
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Synthesizes a PII-free question describing the taxpayer's situation from
-// the extracted figures — this is what gets fed to the RAG pipeline for the
-// production-vs-RAG shadow comparison. Figures only; no names/PAN/TAN.
-function buildReconcileShadowQuestion(
-  ais: ExtractedAIS,
-  f26as: Extracted26AS,
-  f16: ExtractedForm16,
-  mismatches: ReconciliationMismatch[],
-  provided: DocumentsProvided,
-  taxPeriod: TaxPeriodResolution,
-): string {
-  const parts: string[] = [];
-  if (f16.grossSalary != null) parts.push(`gross salary ${fmt(f16.grossSalary)}`);
-  if (f16.newRegime != null) parts.push(f16.newRegime ? "New Tax Regime (115BAC)" : "Old Tax Regime");
-  const interest = (ais.interestFromSavings ?? 0) + (ais.interestFromFD ?? 0);
-  if (interest > 0) parts.push(`bank/FD interest ${fmt(interest)}`);
-  if (ais.dividendIncome) parts.push(`dividend income ${fmt(ais.dividendIncome)}`);
-  const cg = (ais.securitiesTransactions ?? 0) + (ais.mutualFundTransactions ?? 0);
-  if (cg > 0) parts.push(`securities/MF sale proceeds ${fmt(cg)}`);
-  if (ais.cryptoIncome) parts.push(`VDA/crypto receipts ${fmt(ais.cryptoIncome)}`);
-  if (f26as.tdsSalary != null) parts.push(`TDS on salary ${fmt(f26as.tdsSalary)} per 26AS`);
-  if ((f26as.tdsNonSalary ?? 0) > 0) parts.push(`non-salary TDS (e.g. interest) ${fmt(f26as.tdsNonSalary)} per 26AS`);
-  if ((f26as.advanceTaxPaid ?? 0) > 0) parts.push(`advance tax paid ${fmt(f26as.advanceTaxPaid)}`);
-  if (ais.highValueTransactions?.length) parts.push(`high-value transactions on record: ${ais.highValueTransactions.map(t => `${t.code} ${fmt(t.amount)}`).join(", ")}`);
-
-  const issueTitles = mismatches
-    .filter(m => m.severity === "HIGH" || m.severity === "MEDIUM")
-    .map(m => m.title)
-    .slice(0, 4);
-
-  const docNames = [
-    provided.ais && "AIS",
-    provided.form26as && "Form 26AS",
-    provided.form16 && "Form 16",
-  ].filter(Boolean).join(", ");
-
-  return (
-    `A salaried Indian taxpayer is filing ITR for FY ${taxPeriod.financialYear} (AY ${taxPeriod.assessmentYear}) using ${docNames}. ` +
-    (parts.length ? `Their figures: ${parts.join("; ")}. ` : "") +
-    (issueTitles.length ? `Issues found in reconciliation: ${issueTitles.join("; ")}. ` : "") +
-    `What should they verify, declare, and resolve before filing, and which ITR form applies?`
-  );
-}
-
 const EMPTY_AIS: ExtractedAIS = {
   financialYear: null, assessmentYear: null,
   salaryIncome: null, interestFromSavings: null, interestFromFD: null,
@@ -2329,7 +1834,7 @@ export async function reconcileTaxDocuments(
   aisPdfBuffer: Buffer | null,
   form26asPdfBuffer: Buffer | null,
   form16PdfBuffers: Buffer[],
-  _passwords?: { ais?: string; form26as?: string; form16?: string[] },
+  passwords?: { ais?: string; form26as?: string; form16?: string[] },
 ): Promise<ReconciliationReport> {
   const provided: DocumentsProvided = {
     ais: aisPdfBuffer != null,
@@ -2341,20 +1846,24 @@ export async function reconcileTaxDocuments(
   }
   console.log("[reconcileTaxDocuments] Starting reconciliation");
 
-  // ── Step 1: Extract text (for logging/debugging only) ─────────────────────
-  const aisText = aisPdfBuffer ? await extractText(aisPdfBuffer, "AIS") : "";
-
-  // ── Step 2: Parse the uploaded documents with Gemini inline PDF ────────────
-  //    AIS is an image PDF (IT portal) — always needs Gemini
-  //    26AS and Form 16 are TRACES PDFs — Gemini is more reliable than regex
-  //    Form 16 may be multiple files (mid-year job change) — parsed in parallel
-  //    Missing documents are skipped and represented as all-null extracts
-  //    (null = unknown, never zero). Everything present runs in parallel.
-  console.log("[reconcileTaxDocuments] Parsing uploaded PDFs with Gemini...");
+  // Finish ALL local extraction before the first provider request. One unreadable
+  // upload aborts the request; there is no fallback that sends PDFs/OCR text.
+  const localFacts = async (buffer: Buffer, password?: string) => {
+    const text = await extractPrivateTaxText(buffer, password);
+    try { return financialFactsPrompt(extractTaxFacts(text)); }
+    catch { throw new PrivateExtractionError(); }
+  };
+  // Bound simultaneous OCR processes per request; document contents stay local.
+  const aisFacts = aisPdfBuffer ? await localFacts(aisPdfBuffer, passwords?.ais) : null;
+  const form26asFacts = form26asPdfBuffer ? await localFacts(form26asPdfBuffer, passwords?.form26as) : null;
+  const form16Facts: string[] = [];
+  for (let i = 0; i < form16PdfBuffers.length; i++) {
+    form16Facts.push(await localFacts(form16PdfBuffers[i], passwords?.form16?.[i]));
+  }
   const [aisPartial, form26as, form16Employers] = await Promise.all([
-    aisPdfBuffer ? parseAISWithGemini(aisPdfBuffer) : Promise.resolve({ ...EMPTY_AIS }),
-    form26asPdfBuffer ? parse26ASWithGemini(form26asPdfBuffer) : Promise.resolve({ ...EMPTY_26AS }),
-    Promise.all(form16PdfBuffers.map((buf) => parseForm16WithGemini(buf))),
+    aisFacts ? parseAISWithGemini(aisFacts) : Promise.resolve({ ...EMPTY_AIS }),
+    form26asFacts ? parse26ASWithGemini(form26asFacts) : Promise.resolve({ ...EMPTY_26AS }),
+    Promise.all(form16Facts.map(facts => parseForm16WithGemini(facts))),
   ]);
 
   // ── Step 2.5: Resolve which tax year these documents actually cover ───────
@@ -2369,13 +1878,7 @@ export async function reconcileTaxDocuments(
     taxPeriod.financialYear
   );
 
-  // ── Step 3: Fallback — try text regex for AIS if Gemini returned nothing ──
-  let aisFinal = aisPartial;
-  const aisHasData = Object.values(aisFinal).some(v => v != null);
-  if (!aisHasData && aisText.length > 200) {
-    console.log("[reconcileTaxDocuments] AIS Gemini returned empty — trying text regex");
-    aisFinal = parseAISFromText(aisText);
-  }
+  const aisFinal = aisPartial;
 
   const ais: ExtractedAIS = {
     financialYear: aisFinal.financialYear ?? null,
@@ -2393,7 +1896,6 @@ export async function reconcileTaxDocuments(
     otherIncomeItems: aisFinal.otherIncomeItems ?? null,
     sectionsSeen: aisFinal.sectionsSeen ?? null,
     sectionTotals: aisFinal.sectionTotals ?? null,
-    rawText: aisText.slice(0, 300),
   };
 
   // ── Step 4: Supplement AIS salary from 26AS if still missing ─────────────
@@ -2479,6 +1981,16 @@ export async function reconcileTaxDocuments(
   }
 
   const mismatches = buildMismatches(ais, form26as, form16, checks, multiEmployerFlags);
+  // A locally recognized subset is not proof that every source row was read.
+  // Keep this visible even when the extracted figures happen to reconcile.
+  mismatches.unshift({
+    id: "private-extraction-review", category: "Extraction coverage", severity: "MEDIUM",
+    title: "Verify the extracted figures against your originals",
+    description: "Private extraction includes only recognized financial fields. Other rows may be omitted, and OCR can misread amounts.",
+    aisValue: null, form16Value: null, form26asValue: null, difference: null,
+    ruleExplanation: "Matching extracted figures does not establish complete document coverage.",
+    suggestedAction: "Compare all income, deductions and tax credits with every page of the original documents before filing.",
+  });
 
   // An unaccounted-for section is a real filing risk, not a footnote: the
   // department already holds that figure. Surface it as an issue so it
@@ -2570,35 +2082,9 @@ export async function reconcileTaxDocuments(
     ais, form26as, form16, mismatches, multiEmployerFlags, provided, taxPeriod
   );
 
-  // ── Step 6.5: Shadow-compare production insights against the RAG pipeline ─
-  // The long-term plan is to replace generateAIInsights' ad-hoc Gemini prompt
-  // with the RAG pipeline (Tax Topic Graph + Qdrant-grounded generation).
-  // Every real production analysis gets re-run through the RAG pipeline in
-  // shadow and logged side by side for grading on /admin/ai-review.
-  // Fire-and-forget — must never delay or break the user's report.
-  const insightsAreReal =
-    !insights.startsWith("Upload all three documents") &&
-    !insights.startsWith("AI-powered insights are temporarily unavailable");
-  if (insightsAreReal) {
-    const q = buildReconcileShadowQuestion(ais, form26as, form16, mismatches, provided, taxPeriod);
-    const productionText = [
-      insights,
-      actionItems.length ? "Action items: " + actionItems.join(" | ") : "",
-      itrImpact ? "ITR impact: " + itrImpact : "",
-    ].filter(Boolean).join("\n\n");
-    void runProductionShadowComparison({
-      question: q,
-      productionAnswer: productionText,
-      source: "reconcile-insights",
-      // Read off the uploaded documents, not assumed — decides which statute
-      // the RAG side is allowed to retrieve from.
-      financialYear: taxPeriod.financialYear,
-    });
-  }
-
-  const aisNote = provided.ais && !process.env.GOOGLE_API_KEY
-    ? "AIS data (dividends, interest, capital gains) requires a Google Gemini API key to parse. Form 16 and 26AS data shown above is complete. Add GOOGLE_API_KEY to your server .env to enable AIS parsing."
-    : undefined;
+  // No shadow evaluation or internal review logging for document analysis.
+  // Only the requested provider analysis receives the financial facts.
+  const aisNote = "Documents are read locally, including scanned pages. Only recognized financial facts are sent to Gemini. Extraction may omit fields: verify every figure against the originals before filing.";
 
   const creditedTax = multiEmployerFlags.employerCount > 1
     ? (form26as.tdsSalary ?? 0) + (form26as.tdsNonSalary ?? 0) + (form26as.advanceTaxPaid ?? 0) + (form26as.selfAssessmentTax ?? 0)

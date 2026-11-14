@@ -8,5 +8,8 @@
 # Fix: override the build phase to skip the re-install and just build.
 # The install phase (`npm ci`) already installs all deps including devDependencies.
 
+[phases.setup]
+aptPkgs = ["poppler-utils", "tesseract-ocr", "tesseract-ocr-eng"]
+
 [phases.build]
 cmds = ["npm run build"]

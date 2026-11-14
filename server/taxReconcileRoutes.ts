@@ -13,6 +13,9 @@ import { logoWhiteBuffer, watermarkBuffer } from "./assets/logoAssets.js";
 import { fontRegular, fontBold } from "./assets/pdfFonts.js";
 import { saveLastResult } from "./savedResults.js";
 import { buildSummaryRows, type SummaryRow } from "@shared/reconcileSummaryRows";
+import { PrivateExtractionError } from "./localTaxDocument";
+import { TAX_DOCUMENT_NOTICE_VERSION } from "@shared/taxDocumentNotice";
+import { getFirestore } from "./firebase";
 
 // ─── Multer: memory storage, up to 5 PDFs (AIS + 26AS + up to 3 Form 16s), 10 MB each ──
 const upload = multer({
@@ -441,6 +444,14 @@ export function registerTaxReconcileRoutes(app: Express): void {
     "/api/tools/tax-reconcile",
     reconcileLimiter,
     authenticateFirebaseToken,
+    (req, res, next) => {
+      // Reject before Multer reads PDFs. A stale client cannot bypass the notice.
+      if (req.get("X-Tax-Document-Notice") !== TAX_DOCUMENT_NOTICE_VERSION) {
+        res.status(400).json({ error: "Please read and accept the financial-data processing notice before uploading documents." });
+        return;
+      }
+      next();
+    },
     upload.fields([
       { name: "ais", maxCount: 1 },
       { name: "form26as", maxCount: 1 },
@@ -485,6 +496,15 @@ export function registerTaxReconcileRoutes(app: Express): void {
           form16: form16Passwords,
         };
 
+        // Keep a minimal consent receipt on the existing user document so the
+        // account-deletion path also removes it. Never store PDFs or amounts.
+        await getFirestore().collection("users").doc(req.userId!).set({
+          taxDocumentConsent: {
+            noticeVersion: TAX_DOCUMENT_NOTICE_VERSION,
+            acceptedAt: new Date().toISOString(),
+            purpose: "local-extraction-financial-facts-analysis-and-summary",
+          },
+        }, { merge: true });
         const report = await reconcileTaxDocuments(aisBuf, form26asBuf, form16Bufs, passwords);
 
         // Persist a summary card for the dashboard.
@@ -492,8 +512,8 @@ export function registerTaxReconcileRoutes(app: Express): void {
         // What goes to Firestore: the status, how many issues were found, and
         // the first few action items as plain sentences. What does NOT: the
         // uploaded PDFs, the full extracted figure set, or the AI narrative.
-        // PDF buffers stay in request memory until eligible for garbage
-        // collection; the service also sends them to Gemini for processing.
+        // Local OCR uses private, temporary files removed after processing.
+        // Gemini receives only allowlisted financial facts, never the PDFs.
         // Action sentences can include figures, so this is a personal-data
         // summary, not anonymised data or proof of zero provider retention.
         //
@@ -542,6 +562,9 @@ export function registerTaxReconcileRoutes(app: Express): void {
 
         return res.json({ success: true, report });
       } catch (err) {
+        if (err instanceof PrivateExtractionError) {
+          return res.status(422).json({ error: err.message });
+        }
         // Provider/parser errors can contain document text or response bodies.
         console.error("[tax-reconcile] Document processing failed");
         return res.status(500).json({ error: "Failed to process documents. Please try again." });
