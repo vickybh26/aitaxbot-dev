@@ -3,7 +3,11 @@
  *
  * POST /api/ai/query          — Ask the AI a tax question
  * GET  /api/ai/health         — Check Qdrant + Gemini connectivity
- * GET  /api/ai/admin/queries  — Admin: view recent anonymous queries (for training)
+ * POST /api/ai/admin/test-query            — Admin: run a query with full diagnostics
+ * GET  /api/ai/admin/queries               — Admin: view recent anonymous queries
+ * POST /api/ai/admin/queries/:id/grade     — Admin: record a human grade
+ * POST /api/ai/admin/queries/:id/auto-grade — Admin: run the LLM evaluator
+ * GET  /api/ai/admin/eval-stats            — Admin: grading summary
  *
  * Error shape (all routes): { error: { code, message, requestId } }
  * Timeout errors return 504; auth errors 401/403; bad input 400; server 500.
@@ -89,8 +93,10 @@ router.post("/query", async (req: Request, res: Response) => {
       return r.apiError(504, "AI_TIMEOUT", "The AI is taking too long to respond. Please try a shorter or simpler question.");
     }
 
-    // Return actual error message in requestId field so we can debug without Railway access
-    return r.apiError(500, "AI_UNAVAILABLE", `The AI service is temporarily unavailable. (${msg})`);
+    // The real error is in the log line above. It used to
+    // be appended to this public message, which handed provider error bodies
+    // (Gemini/Qdrant responses, stringified by ragService) to any caller.
+    return r.apiError(500, "AI_UNAVAILABLE", "The AI service is temporarily unavailable. Please try again shortly.");
   }
 });
 
