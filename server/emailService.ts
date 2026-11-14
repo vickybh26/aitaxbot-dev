@@ -240,7 +240,7 @@ export async function sendEmail(params: SendEmailParams): Promise<{ sent: boolea
 // intentionally not honoured by this signature scheme.
 // ─────────────────────────────────────────────────────────────────────────
 
-export function unsubToken(uid: string, type: string = "digest"): string {
+function unsubscribeSigningSecret(): string | null {
   // BREVO_API_KEY stays in this chain even though Brevo is gone: the 146
   // unsubscribe links sent on 2026-09-07 were signed with it, and dropping it
   // would silently reject every one of them. Keep the old key set in the
@@ -248,11 +248,17 @@ export function unsubToken(uid: string, type: string = "digest"): string {
   // and accept that the already-sent links stop working. SMTP_PASSWORD is
   // deliberately NOT in this chain — rotating a mail credential must not
   // invalidate every unsubscribe link in every inbox.
-  const secret = process.env.EMAIL_TOKEN_SECRET || process.env.BREVO_API_KEY || "aitaxbot-unsub";
+  return process.env.EMAIL_TOKEN_SECRET || process.env.BREVO_API_KEY || null;
+}
+
+export function unsubToken(uid: string, type: string = "digest"): string {
+  const secret = unsubscribeSigningSecret();
+  if (!secret) throw new Error("Unsubscribe signing secret is not configured");
   return createHmac("sha256", secret).update(`unsub:${type}:${uid}`).digest("hex").slice(0, 32);
 }
 
 export function verifyUnsubToken(uid: string, token: string, type: string = "digest"): boolean {
+  if (!unsubscribeSigningSecret()) return false;
   const expected = unsubToken(uid, type);
   if (token.length !== expected.length) return false;
   // Constant-time compare — avoids leaking the correct token through timing.
