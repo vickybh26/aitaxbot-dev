@@ -191,7 +191,7 @@ export function PrivacyPolicyContent() {
                 <li><strong>User accounts:</strong> Retained until you delete your account</li>
                 <li><strong>Explicitly saved tax-calculation history:</strong> Retained until you delete the saved calculation or your account. Unlike the latest-result dashboard card, saving another history entry does not replace older entries.</li>
                 <li><strong>Internal AI-answer review records:</strong> Retained for 30 days from creation, not from the last review. Expired records are excluded from the review interface and evaluation endpoints. A cleanup job runs at server startup and hourly while the service is running; physical deletion may be delayed by downtime or cleanup failures. These records may contain questions, financial summaries and AI answers, so we do not describe them as anonymous.</li>
-                <li><strong>Download leads:</strong> Retained for 90 days, then archived or deleted</li>
+                <li><strong>Earlier calculator contact records:</strong> Earlier records linked to a matching verified email are removed when you delete your account. If your account email is unverified, email us to verify ownership and request removal. Other earlier records remain until a verified removal request is handled; routine expiry is not currently guaranteed. CA enquiries are handled separately.</li>
                 <li><strong>CA profiles:</strong> Retained while active; deleted within 7 days of removal request</li>
                 <li><strong>WhatsApp records:</strong> Retained for 90 days</li>
                 <li><strong>Tax computation PDFs:</strong> Auto-deleted from our servers within 60 seconds of generation</li>

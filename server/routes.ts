@@ -14,6 +14,7 @@ import leadRoutes from "./leadRoutes";
 import toolUsageRoutes from "./toolUsageRoutes";
 import savedResultsRoutes from "./savedResultsRoutes";
 import { deleteAllSavedResults } from "./savedResults";
+import { createDeleteAccountHandler } from "./accountDeletion";
 import { registerTaxReconcileRoutes } from "./taxReconcileRoutes.js";
 import ragRoutes from "./ragRoutes";
 import { getFirestore, verifyFirebaseToken, admin } from "./firebase";
@@ -578,59 +579,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
 
-  // DELETE /api/user/account — DPDP Right to Erasure, self-service.
-  // A user can only ever delete their OWN account: the uid comes from the
-  // verified Firebase ID token (req.userId), never from the request body or
-  // params, so there's no way to point this at someone else's account.
-  // Deletes: the Firestore user profile, profile change logs, saved tax
-  // calculation history, the "last result" dashboard cards, per-tool usage
-  // events, admin CRM notes about this user, and the actual Firebase Auth
-  // account (so the person can no longer sign back in — the admin-side delete
-  // at DELETE /api/admin/users/:id previously missed this last step and should
-  // be reconciled to match).
-  //
-  // IMPORTANT: any new per-user collection must be added here as well. Erasure
-  // that misses a collection is worse than no erasure feature, because we have
-  // told the user in the Privacy Policy that their data is gone.
-  app.delete("/api/user/account", authenticateFirebaseToken, async (req: AuthenticatedRequest, res) => {
-    const uid = req.userId!;
-    try {
-      const db = getFirestore();
-
-      const logsSnap = await db.collection("userProfileLogs").where("userId", "==", uid).get();
-      const calcSnap = await db.collection("taxCalculationHistory").where("userId", "==", uid).get();
-      const usageSnap = await db.collection("toolUsage").where("userId", "==", uid).get();
-
-      const batch = db.batch();
-      logsSnap.docs.forEach((d) => batch.delete(d.ref));
-      calcSnap.docs.forEach((d) => batch.delete(d.ref));
-      usageSnap.docs.forEach((d) => batch.delete(d.ref));
-      batch.delete(db.collection("crmNotes").doc(uid));
-      batch.delete(db.collection("users").doc(uid));
-      await batch.commit();
-
-      // Saved dashboard results — includes the reconciliation summary, which
-      // is the most sensitive thing we retain, so it goes in the same pass.
-      await deleteAllSavedResults(uid);
-
-      // Remove the Firebase Auth account itself last, so a failure above
-      // leaves the person still able to log in (fail-safe) rather than
-      // deleted-but-orphaned in a half-cleaned state.
-      try {
-        await admin.auth().deleteUser(uid);
-      } catch (authErr: any) {
-        // If the auth user is already gone (e.g. retried request), that's
-        // fine — the Firestore data is what mattered and it's cleaned up.
-        if (authErr?.code !== "auth/user-not-found") throw authErr;
-      }
-
-      console.log(`[User] Self-service account deletion: ${uid}`);
-      res.json({ success: true });
-    } catch (error) {
-      console.error("Error deleting user account:", error);
-      res.status(500).json({ error: "Failed to delete account. Please try again or email us." });
-    }
-  });
+  // Authenticated self-service erasure. The handler uses the current Firebase
+  // identity for legacy calculator contacts, never a body/profile email.
+  app.delete("/api/user/account", authenticateFirebaseToken, createDeleteAccountHandler({
+    getDb: getFirestore,
+    getAuth: () => admin.auth(),
+    deleteSavedResults: deleteAllSavedResults,
+  }));
 
 
   // Contact Form API - Save to Firebase Firestore

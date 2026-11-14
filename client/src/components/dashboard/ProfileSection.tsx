@@ -150,8 +150,11 @@ export default function ProfileSection() {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error();
+      const result = await res.json();
       await logout();
-      toast({ title: "Account deleted", description: "Your account and data have been removed." });
+      toast({ title: "Account deleted", description: result.calculatorContactsErased
+        ? "Your account data and earlier calculator contact records linked to your verified email have been removed."
+        : "Your account data has been removed. For earlier calculator contact records, email admin@aitaxbot.co.in so we can verify ownership." });
       setLocation("/");
     } catch {
       toast({
@@ -365,6 +368,11 @@ export default function ProfileSection() {
             <p className="text-sm text-ink/80">
               You are about to <strong>permanently delete</strong> your AiTaxBot account
               and all data linked to it — profile, saved calculations, and profile history.
+            </p>
+            <p className="text-sm text-ink/80">
+              Earlier calculator contact records matching your verified account email are also
+              deleted. If your email is not verified, contact admin@aitaxbot.co.in to request
+              removal of those records. CA enquiries are handled separately.
             </p>
             <p className="text-sm font-medium text-debit">
               This action cannot be undone. You will be signed out immediately.
