@@ -91,6 +91,17 @@ function clip(v: unknown, max = MAX_STR): string {
 }
 
 /**
+ * The route is client-supplied and is later appended to
+ * "https://www.aitaxbot.co.in" to build the link in the result email
+ * (emailService.ts). Unvalidated, a value such as ".evil.example/x" would turn
+ * that into a link to another host. Accept a plain site path only.
+ */
+function safeRoute(v: unknown): string {
+  const route = clip(v, 120);
+  return /^\/[A-Za-z0-9\-_/]*$/.test(route) && !route.startsWith("//") ? route : "/dashboard";
+}
+
+/**
  * Strip anything that isn't a primitive. Guards against a caller accidentally
  * passing a whole report object (or a file buffer) through to Firestore, which
  * would both blow the 1 MiB document limit and store far more than we've told
@@ -147,7 +158,7 @@ export async function saveLastResult(
       userId,
       toolKey: clip(input.toolKey, 40),
       toolName: clip(input.toolName, 80),
-      route: clip(input.route, 120),
+      route: safeRoute(input.route),
       kind: input.kind === "reconciliation" ? "reconciliation" : "calculator",
       headline: {
         label: clip(input.headline?.label, 60),

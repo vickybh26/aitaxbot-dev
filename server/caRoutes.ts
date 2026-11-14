@@ -10,7 +10,7 @@ import { Router, type Request, type Response } from "express";
 import { randomUUID, randomBytes, createHash, timingSafeEqual } from "crypto";
 import { getFirestore, verifyFirebaseToken } from "./firebase";
 import { COLLECTIONS } from "./firestoreHelper";
-import { sendEmail } from "./emailService";
+import { sendEmail, escapeHtml } from "./emailService";
 import {
   insertCAProfileSchema,
   insertCAContactRequestSchema,
@@ -135,7 +135,7 @@ router.post("/register", async (req: Request, res: Response) => {
         ex.status === "pending"   ? "is already under review" :
                                     "was previously submitted";
       return res.status(409).json({
-        error: `ICAI membership number ${profileData.icaiMembershipNumber} ${statusLabel}. To update your profile or resolve an issue, email support@aitaxbot.co.in`,
+        error: `ICAI membership number ${profileData.icaiMembershipNumber} ${statusLabel}. To update your profile or resolve an issue, email admin@aitaxbot.co.in`,
       });
     }
 
@@ -144,7 +144,7 @@ router.post("/register", async (req: Request, res: Response) => {
       const statusLabel =
         ex.status === "approved" ? "is already active" : "is already under review";
       return res.status(409).json({
-        error: `A CA profile with this email address ${statusLabel}. To update your details, email support@aitaxbot.co.in`,
+        error: `A CA profile with this email address ${statusLabel}. To update your details, email admin@aitaxbot.co.in`,
       });
     }
     // ── End duplicate checks ─────────────────────────────────────────────────
@@ -172,15 +172,15 @@ router.post("/register", async (req: Request, res: Response) => {
         htmlContent: `
           <h2>New CA Profile Pending Approval</h2>
           <table style="border-collapse:collapse;width:100%">
-            <tr><td style="padding:8px;border:1px solid #ddd"><b>Name</b></td><td style="padding:8px;border:1px solid #ddd">${profileData.fullName}</td></tr>
-            <tr><td style="padding:8px;border:1px solid #ddd"><b>ICAI No.</b></td><td style="padding:8px;border:1px solid #ddd">${profileData.icaiMembershipNumber}</td></tr>
-            <tr><td style="padding:8px;border:1px solid #ddd"><b>Firm</b></td><td style="padding:8px;border:1px solid #ddd">${profileData.firmName || "—"}</td></tr>
-            <tr><td style="padding:8px;border:1px solid #ddd"><b>City</b></td><td style="padding:8px;border:1px solid #ddd">${profileData.city}, ${profileData.state}</td></tr>
-            <tr><td style="padding:8px;border:1px solid #ddd"><b>Email</b></td><td style="padding:8px;border:1px solid #ddd">${profileData.email}</td></tr>
-            <tr><td style="padding:8px;border:1px solid #ddd"><b>WhatsApp</b></td><td style="padding:8px;border:1px solid #ddd">${profileData.whatsappNumber || "—"}</td></tr>
-            <tr><td style="padding:8px;border:1px solid #ddd"><b>Practice Areas</b></td><td style="padding:8px;border:1px solid #ddd">${profileData.practiceAreas.join(", ")}</td></tr>
-            <tr><td style="padding:8px;border:1px solid #ddd"><b>Years</b></td><td style="padding:8px;border:1px solid #ddd">${profileData.yearsOfPractice}</td></tr>
-            <tr><td style="padding:8px;border:1px solid #ddd"><b>Bio</b></td><td style="padding:8px;border:1px solid #ddd">${profileData.bio || "—"}</td></tr>
+            <tr><td style="padding:8px;border:1px solid #ddd"><b>Name</b></td><td style="padding:8px;border:1px solid #ddd">${escapeHtml(profileData.fullName)}</td></tr>
+            <tr><td style="padding:8px;border:1px solid #ddd"><b>ICAI No.</b></td><td style="padding:8px;border:1px solid #ddd">${escapeHtml(profileData.icaiMembershipNumber)}</td></tr>
+            <tr><td style="padding:8px;border:1px solid #ddd"><b>Firm</b></td><td style="padding:8px;border:1px solid #ddd">${escapeHtml(profileData.firmName || "—")}</td></tr>
+            <tr><td style="padding:8px;border:1px solid #ddd"><b>City</b></td><td style="padding:8px;border:1px solid #ddd">${escapeHtml(profileData.city)}, ${escapeHtml(profileData.state)}</td></tr>
+            <tr><td style="padding:8px;border:1px solid #ddd"><b>Email</b></td><td style="padding:8px;border:1px solid #ddd">${escapeHtml(profileData.email)}</td></tr>
+            <tr><td style="padding:8px;border:1px solid #ddd"><b>WhatsApp</b></td><td style="padding:8px;border:1px solid #ddd">${escapeHtml(profileData.whatsappNumber || "—")}</td></tr>
+            <tr><td style="padding:8px;border:1px solid #ddd"><b>Practice Areas</b></td><td style="padding:8px;border:1px solid #ddd">${escapeHtml(profileData.practiceAreas.join(", "))}</td></tr>
+            <tr><td style="padding:8px;border:1px solid #ddd"><b>Years</b></td><td style="padding:8px;border:1px solid #ddd">${escapeHtml(profileData.yearsOfPractice)}</td></tr>
+            <tr><td style="padding:8px;border:1px solid #ddd"><b>Bio</b></td><td style="padding:8px;border:1px solid #ddd">${escapeHtml(profileData.bio || "—")}</td></tr>
           </table>
           <p style="margin-top:16px">
             <a href="https://aitaxbot.co.in/admin/cas" style="background:#2563eb;color:white;padding:10px 20px;border-radius:6px;text-decoration:none">
@@ -200,13 +200,13 @@ router.post("/register", async (req: Request, res: Response) => {
         to: [{ email: profileData.email, name: profileData.fullName }],
         subject: "Your AiTaxBot CA profile is under review",
         htmlContent: `
-          <h2>Thank you, ${profileData.fullName}!</h2>
+          <h2>Thank you, ${escapeHtml(profileData.fullName)}!</h2>
           <p>Your profile has been submitted and is currently under review. We typically approve profiles within 1–2 business days after verifying your ICAI membership number.</p>
           <p>Once approved, your profile will appear in our <b>Find a CA</b> directory at <a href="https://aitaxbot.co.in/find-ca">aitaxbot.co.in/find-ca</a>.</p>
           <p><b>What you submitted:</b><br/>
-          ICAI No.: ${profileData.icaiMembershipNumber}<br/>
-          City: ${profileData.city}, ${profileData.state}</p>
-          <p style="color:#888;font-size:12px">If you have questions, reply to this email or contact us at support@aitaxbot.co.in</p>
+          ICAI No.: ${escapeHtml(profileData.icaiMembershipNumber)}<br/>
+          City: ${escapeHtml(profileData.city)}, ${escapeHtml(profileData.state)}</p>
+          <p style="color:#888;font-size:12px">If you have questions, reply to this email or contact us at admin@aitaxbot.co.in</p>
         `,
       });
     } catch (e) {
@@ -292,12 +292,32 @@ router.post("/contact", async (req: Request, res: Response) => {
       return res.status(400).json({ error: parsed.error.flatten().fieldErrors });
     }
 
-    const data = parsed.data;
     const db = getFirestore();
+
+    // The recipient comes from the stored, approved profile — never from the
+    // request. caEmail/caName used to be taken from the body, which made this
+    // public endpoint an open relay: anyone could have AiTaxBot's own mailbox
+    // send an arbitrary address a message containing their own HTML.
+    const caDoc = await db.collection(COLLECTIONS.CA_PROFILES).doc(parsed.data.caId).get();
+    const ca = caDoc.exists ? (caDoc.data() as CAProfile) : null;
+    if (!ca || ca.status !== "approved" || !ca.email) {
+      return res.status(404).json({ error: "This CA profile is not available." });
+    }
+    const data = { ...parsed.data, caEmail: ca.email, caName: ca.fullName };
+
     const id = randomUUID();
     const now = new Date().toISOString();
 
     const contactReq: CAContactRequest = { id, ...data, createdAt: now };
+    // Escaped copies for the two HTML bodies below; the stored record keeps
+    // the raw text.
+    const h = {
+      userName: escapeHtml(data.userName),
+      userEmail: escapeHtml(data.userEmail),
+      userPhone: escapeHtml(data.userPhone || ""),
+      taxIssue: escapeHtml(data.taxIssue),
+      caName: escapeHtml(data.caName),
+    };
     await db
       .collection(COLLECTIONS.CA_CONTACT_REQUESTS)
       .doc(id)
@@ -312,10 +332,10 @@ router.post("/contact", async (req: Request, res: Response) => {
           <h2>New Introduction from AiTaxBot</h2>
           <p>A user has requested an introduction to you through <a href="https://aitaxbot.co.in">AiTaxBot</a>.</p>
           <table style="border-collapse:collapse;width:100%;max-width:500px">
-            <tr><td style="padding:8px;border:1px solid #ddd"><b>Name</b></td><td style="padding:8px;border:1px solid #ddd">${data.userName}</td></tr>
-            <tr><td style="padding:8px;border:1px solid #ddd"><b>Email</b></td><td style="padding:8px;border:1px solid #ddd"><a href="mailto:${data.userEmail}">${data.userEmail}</a></td></tr>
-            <tr><td style="padding:8px;border:1px solid #ddd"><b>Phone</b></td><td style="padding:8px;border:1px solid #ddd">${data.userPhone || "Not provided"}</td></tr>
-            <tr><td style="padding:8px;border:1px solid #ddd"><b>Tax Issue</b></td><td style="padding:8px;border:1px solid #ddd">${data.taxIssue}</td></tr>
+            <tr><td style="padding:8px;border:1px solid #ddd"><b>Name</b></td><td style="padding:8px;border:1px solid #ddd">${h.userName}</td></tr>
+            <tr><td style="padding:8px;border:1px solid #ddd"><b>Email</b></td><td style="padding:8px;border:1px solid #ddd"><a href="mailto:${h.userEmail}">${h.userEmail}</a></td></tr>
+            <tr><td style="padding:8px;border:1px solid #ddd"><b>Phone</b></td><td style="padding:8px;border:1px solid #ddd">${h.userPhone || "Not provided"}</td></tr>
+            <tr><td style="padding:8px;border:1px solid #ddd"><b>Tax Issue</b></td><td style="padding:8px;border:1px solid #ddd">${h.taxIssue}</td></tr>
           </table>
           <p style="margin-top:16px">Please reach out to them directly at your earliest convenience.</p>
           <hr style="border:none;border-top:1px solid #eee;margin:16px 0"/>
@@ -337,9 +357,9 @@ router.post("/contact", async (req: Request, res: Response) => {
         subject: `Your introduction request to ${data.caName} has been sent`,
         htmlContent: `
           <h2>Introduction Sent!</h2>
-          <p>Hi ${data.userName},</p>
-          <p>We've sent your introduction request to <b>${data.caName}</b>. They will reach out to you directly at <b>${data.userEmail}</b>${data.userPhone ? ` or <b>${data.userPhone}</b>` : ""}.</p>
-          <p><b>Your request summary:</b><br/>${data.taxIssue}</p>
+          <p>Hi ${h.userName},</p>
+          <p>We've sent your introduction request to <b>${h.caName}</b>. They will reach out to you directly at <b>${h.userEmail}</b>${h.userPhone ? ` or <b>${h.userPhone}</b>` : ""}.</p>
+          <p><b>Your request summary:</b><br/>${h.taxIssue}</p>
           <hr style="border:none;border-top:1px solid #eee;margin:16px 0"/>
           <p style="color:#888;font-size:12px">
             <b>Disclaimer:</b> AiTaxBot is a technology platform and not a tax practice. We do not recommend, endorse, or certify any Chartered Accountant.
@@ -379,7 +399,7 @@ router.patch("/:id/approve", requireAdmin, async (req: Request, res: Response) =
           <h2>Congratulations, ${profile.fullName}!</h2>
           <p>Your CA profile has been approved and is now live on <a href="https://aitaxbot.co.in/find-ca">AiTaxBot Find a CA</a>.</p>
           <p>Users looking for help with ${profile.practiceAreas.join(", ")} in ${profile.city} can now reach you directly.</p>
-          <p style="color:#888;font-size:12px">To update or remove your profile, contact support@aitaxbot.co.in</p>
+          <p style="color:#888;font-size:12px">To update or remove your profile, contact admin@aitaxbot.co.in</p>
         `,
       });
     } catch (e) {
