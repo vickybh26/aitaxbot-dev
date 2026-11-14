@@ -68,8 +68,9 @@ Add these to your `.env` file on the server:
 ```
 WHATSAPP_PHONE_NUMBER_ID=   # from Step 4
 WHATSAPP_ACCESS_TOKEN=      # permanent token from Step 5
-WHATSAPP_VERIFY_TOKEN=aitaxbot_wh_verify_2026
-ADMIN_KEY=choose_any_secret_string
+WHATSAPP_APP_SECRET=        # Meta app secret used to verify incoming message signatures
+WHATSAPP_VERIFY_TOKEN=<unique-random-secret>
+ADMIN_KEY=<unique-random-secret>
 VITE_WHATSAPP_NUMBER=91XXXXXXXXXX   # your number in E.164 (no + or spaces)
 ```
 
@@ -82,7 +83,7 @@ Your server must be live at `https://www.aitaxbot.co.in` before this step.
 1. In Meta App Dashboard → WhatsApp → Configuration
 2. Under **Webhook**, click **Edit**
 3. Set **Callback URL**: `https://www.aitaxbot.co.in/api/webhook/whatsapp`
-4. Set **Verify token**: `aitaxbot_wh_verify_2026` (must match your env var)
+4. Set **Verify token** to the same unique value as `WHATSAPP_VERIFY_TOKEN` in your server environment. If you used the old example token, replace it in both places.
 5. Click **Verify and Save**
 6. Under **Webhook fields**, enable: `messages`
 7. Click **Subscribe**
@@ -108,7 +109,7 @@ Your server must be live at `https://www.aitaxbot.co.in` before this step.
 To see everyone who has messaged AiTaxBot on WhatsApp:
 
 ```
-GET https://www.aitaxbot.co.in/api/whatsapp/leads?key=YOUR_ADMIN_KEY
+curl -H "Authorization: Bearer YOUR_ADMIN_KEY" https://www.aitaxbot.co.in/api/whatsapp/leads
 ```
 
 Returns JSON with all leads sorted by most recent contact.

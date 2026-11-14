@@ -295,9 +295,15 @@ export function verifyWebhook(req: any, res: any): void {
   const token     = req.query["hub.verify_token"];
   const challenge = req.query["hub.challenge"];
 
-  if (mode === "subscribe" && token === process.env.WHATSAPP_VERIFY_TOKEN) {
+  // Fail closed when the token is not configured: with the env var unset, a
+  // request that simply omitted hub.verify_token compared undefined === undefined
+  // and was accepted.
+  const expected = process.env.WHATSAPP_VERIFY_TOKEN;
+  if (mode === "subscribe" && !!expected && token === expected) {
     console.log("[WhatsApp] Webhook verified successfully.");
-    res.status(200).send(challenge);
+    // text/plain: the challenge is attacker-controlled and was being reflected
+    // as text/html.
+    res.status(200).type("text/plain").send(String(challenge ?? ""));
   } else {
     console.warn("[WhatsApp] Webhook verification failed. Check WHATSAPP_VERIFY_TOKEN.");
     res.sendStatus(403);
