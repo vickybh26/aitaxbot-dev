@@ -1,23 +1,10 @@
 import { Choice, CountInput, Field, StringMoneyInput, ToggleCard } from "@/components/calc/Field";
 import { AlertTriangle } from "lucide-react";
-import { computeBusinessIncome, toAmount, type BusinessDetails, type BusinessScheme } from "../types";
+import { computeBusinessIncome, toAmount, type BusinessDetails, type BusinessScheme } from "@/features/income-tax/model";
 
 interface BusinessStepProps {
   value: BusinessDetails;
   onChange: (next: BusinessDetails) => void;
-}
-
-export function isBusinessStepValid(value: BusinessDetails): boolean {
-  if (!value.scheme) return false;
-  if (value.scheme === "44AD" || value.scheme === "44ADA") {
-    return toAmount(value.digitalReceipts) + toAmount(value.cashReceipts) > 0;
-  }
-  // 44AE
-  const count = toAmount(value.vehicleCount);
-  const months = toAmount(value.monthsHeld);
-  if (count <= 0 || months <= 0 || months > 12) return false;
-  if (value.isHeavyVehicle && toAmount(value.avgTonnageMT) <= 0) return false;
-  return true;
 }
 
 const SCHEME_OPTIONS: { value: BusinessScheme; label: string }[] = [
@@ -36,7 +23,7 @@ export default function BusinessStep({ value, onChange }: BusinessStepProps) {
   const result = computeBusinessIncome(value);
 
   function updateAmount(key: keyof BusinessDetails, raw: string) {
-    onChange({ ...value, [key]: raw.replace(/[^\d.]/g, "") });
+    onChange({ ...value, [key]: raw });
   }
 
   return (
@@ -116,7 +103,7 @@ export default function BusinessStep({ value, onChange }: BusinessStepProps) {
             <CountInput
               id="biz-vehicle-count"
               value={value.vehicleCount}
-              onChange={(v) => onChange({ ...value, vehicleCount: v.replace(/\D/g, "") })}
+              onChange={(v) => onChange({ ...value, vehicleCount: v })}
             />
           </Field>
 
@@ -124,7 +111,7 @@ export default function BusinessStep({ value, onChange }: BusinessStepProps) {
             <CountInput
               id="biz-months"
               value={value.monthsHeld}
-              onChange={(v) => onChange({ ...value, monthsHeld: v.replace(/\D/g, "").slice(0, 2) })}
+              onChange={(v) => onChange({ ...value, monthsHeld: v })}
             />
           </Field>
 

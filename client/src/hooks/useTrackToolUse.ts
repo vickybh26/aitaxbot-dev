@@ -28,6 +28,8 @@
  */
 
 import { useCallback, useEffect, useRef } from "react";
+import { postToolUsage } from "@/lib/toolUsage";
+import { queryClient } from "@/lib/queryClient";
 import { useAuth } from "@/contexts/AuthContext";
 
 /**
@@ -61,40 +63,27 @@ export function useTrackToolUse() {
   const { getIdToken, user } = useAuth();
   const timers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
-  // Clear any pending sends if the component unmounts mid-typing, so we don't
-  // fire a request against a page the user has already navigated away from.
+  // Clear pending sends on unmount or account change, so an old session
+  // cannot write a delayed result after sign-out or switching accounts.
   useEffect(() => {
     const pending = timers.current;
     return () => {
       Object.values(pending).forEach(clearTimeout);
     };
-  }, []);
+  }, [user?.uid]);
 
   const send = useCallback(
     async (tool: string, summary?: string, saved?: SavedResultPayload) => {
       try {
         const token = await getIdToken();
         if (!token) return;
-        // The caller does not await send; inspect the response here without blocking the UI.
-        const response = await fetch("/api/tool-usage", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            tool,
-            route: window.location.pathname,
-            summary: summary ?? null,
-            ...(saved ? { saved: { ...saved, toolName: tool } } : {}),
-          }),
-        });
-        if (!response.ok) console.error("[ToolUsage] Tracking rejected", response.status);
+        await postToolUsage({ token, tool, route: window.location.pathname, summary, saved });
+        if (saved) void queryClient.invalidateQueries({ queryKey: ["/api/saved-results", user?.uid] });
       } catch (error) {
         console.error("[ToolUsage] Tracking failed", error);
       }
     },
-    [getIdToken]
+    [getIdToken, user?.uid]
   );
 
   const track = useCallback(

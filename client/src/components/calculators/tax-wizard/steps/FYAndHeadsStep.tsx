@@ -1,8 +1,9 @@
+import { hasAtLeastOneIncomeHead } from "@/features/income-tax/validation";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Choice, Field, StringMoneyInput, ToggleCard } from "@/components/calc/Field";
 import type { AgeGroup } from "@shared/taxLiability";
-import { INCOME_HEAD_LABELS, type IncomeHeadKey, type WizardState } from "../types";
+import { INCOME_HEAD_LABELS, type IncomeHeadKey, type WizardState } from "@/features/income-tax/model";
 
 interface FYAndHeadsStepProps {
   financialYear: string;
@@ -22,10 +23,6 @@ const AGE_GROUP_OPTIONS: { value: AgeGroup; label: string }[] = [
   { value: "60to80", label: "60–80" },
   { value: "above80", label: "Above 80" },
 ];
-
-export function hasAtLeastOneIncomeHead(heads: WizardState["incomeHeads"]): boolean {
-  return Object.values(heads).some(Boolean);
-}
 
 const HEAD_ORDER: IncomeHeadKey[] = [
   "salary",
@@ -88,8 +85,8 @@ export default function FYAndHeadsStep({
       <ToggleCard
         checked={isNonResident}
         onClick={() => onIsNonResidentChange(!isNonResident)}
-        title="Non-resident / RNOR (not ordinarily resident)"
-        hint="No Section 87A/156 rebate applies — you're taxed on the full slab amount however low your income is."
+        title="Non-resident"
+        hint="Select only for non-resident tax status. RNOR is a resident category and should leave this unchecked. Non-residents are not eligible for the Section 87A/156 rebate."
       />
 
       <Field

@@ -93,9 +93,13 @@ function buildFallbackTips(input: TaxAdviceInput): TaxAdviceResult {
   }
 
   // 80D
-  const max80D = input.ageGroup === "senior" ? 50_000 : 25_000;
+  // ageGroup is "below60" | "60to80" | "above80" — the old check against
+  // "senior" never matched. Old regime only: 80D is not available under the
+  // new regime (mirrors server/geminiTaxService.ts).
+  const isSenior = input.ageGroup === "60to80" || input.ageGroup === "above80";
+  const max80D = isSenior ? 50_000 : 25_000;
   const gap80D = max80D - Math.min(input.section80D, max80D);
-  if (gap80D > 0) {
+  if (gap80D > 0 && input.recommendedRegime === "old") {
     const saving = Math.round(gap80D * slab);
     maxSaving += saving;
     tips.push({

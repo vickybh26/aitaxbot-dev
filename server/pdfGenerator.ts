@@ -45,108 +45,8 @@ function registerRupeeSafeFonts(doc: PDFKit.PDFDocument): void {
 // INTERFACES
 // ─────────────────────────────────────────────────────────────────────────────
 
-export interface RegimePDFData {
-  // Salary
-  grossSalary: number;
-  basicDA?: number;
-  hraReceived?: number;
-  hraExemption?: number;
-  ltaReceived?: number;
-  ltaExemption?: number;
-  otherAllowances?: number;
-  otherAllowancesExemption?: number;
-  bonus?: number;
-  specialAllowances?: number;
-  // Deductions u/s 16
-  standardDeduction: number;
-  professionalTax?: number;
-  netSalary: number;
-  // Other Income
-  rentalIncome?: number;
-  capitalGainsLTCG?: number;
-  capitalGainsSTC?: number;
-  dividendIncome?: number;
-  otherIncome?: number;
-  grossTotalIncome: number;
-  // Chapter VI-A Deductions (only applicable in old regime)
-  sec80C?: number;
-  sec80D?: number;
-  sec80E?: number;
-  sec80TTA?: number;
-  sec80CCD1B?: number;
-  sec80G?: number;
-  homeLoanInterest?: number;
-  totalChapterVIA: number;
-  // Tax computation
-  taxableIncome: number;
-  incomeTax: number;
-  rebate87A: number;
-  taxAfterRebate: number;
-  surcharge: number;
-  cess: number;
-  totalTax: number;
-  monthlyTDS: number;
-}
-
-export interface TaxComputationData {
-  personalInfo: {
-    name: string;
-    fatherName?: string;
-    pan?: string;
-    aadhaar?: string;
-    address?: string;
-    dateOfBirth?: string;
-    status: string;
-    ageGroup: string;
-    residencyStatus?: string;
-  };
-  assessmentYear: string;
-  financialYear: string;
-  // New detailed both-regime data
-  oldRegimeData?: RegimePDFData;
-  newRegimeData?: RegimePDFData;
-  recommendedRegime?: "old" | "new";
-  savings?: number;
-  // Legacy single-regime fields (kept for backward compat)
-  regime?: "old" | "new";
-  employer?: { name: string; tan?: string; address?: string };
-  salary?: { grossSalary: number; standardDeduction: number; netSalary: number };
-  otherIncome?: {
-    interestIncome?: number;
-    dividendIncome?: number;
-    rentalIncome?: number;
-    capitalGains?: { shortTerm?: number; longTerm?: number };
-    otherSources?: number;
-    total: number;
-  };
-  deductions?: {
-    section80C?: number;
-    section80D?: number;
-    section80E?: number;
-    section80TTA?: number;
-    section80CCD1B?: number;
-    nps80CCD1B?: number;
-    section80G?: number;
-    homeLoanInterest?: number;
-    lta?: number;
-    otherDeductions?: number;
-    totalDeductions: number;
-  };
-  taxBreakdown: {
-    taxableIncome: number;
-    taxOnIncome: number;
-    surcharge: number;
-    cess: number;
-    totalTax: number;
-    tdsDeducted?: number;
-    advanceTaxPaid?: number;
-    selfAssessmentTax?: number;
-    refundDue?: number;
-    taxPayable?: number;
-  };
-  bankDetails?: { bankName: string; accountNumber: string; ifscCode: string };
-  computationDate: Date;
-}
+import type { RegimePDFData, TaxComputationData } from "@shared/taxComputation";
+export type { RegimePDFData, TaxComputationData } from "@shared/taxComputation";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HELPERS
@@ -204,6 +104,7 @@ function generateDetailedComparisonPDF(data: TaxComputationData): Promise<Buffer
     const OLD = data.oldRegimeData!;
     const NEW = data.newRegimeData!;
     const rec = data.recommendedRegime || "new";
+    const residentSenior = data.personalInfo.ageGroup !== "below60" && data.personalInfo.residencyStatus !== "Non-Resident";
     const savings = data.savings || Math.abs(OLD.totalTax - NEW.totalTax);
 
     const L = 36;           // left margin
@@ -265,7 +166,7 @@ function generateDetailedComparisonPDF(data: TaxComputationData): Promise<Buffer
     const recFg = rec === "new" ? GREEN : AMBER;
     doc.rect(L, y, PW, 30).fill(recBg);
     doc.fillColor(recFg).font("NotoSans-Bold").fontSize(11)
-       .text(`✅  RECOMMENDED: ${rec === "new" ? "NEW REGIME" : "OLD REGIME"}`, L + 10, y + 9, { continued: true });
+       .text(`RECOMMENDED: ${rec === "new" ? "NEW REGIME" : "OLD REGIME"}`, L + 10, y + 9, { continued: true });
     doc.font("NotoSans").fontSize(10).fillColor(recFg)
        .text(`   |   Potential Tax Savings: ${fmtCur(savings)}   |   Monthly TDS Savings: ${fmtCur(savings / 12)}`);
     y += 38;
@@ -279,8 +180,8 @@ function generateDetailedComparisonPDF(data: TaxComputationData): Promise<Buffer
        .text("NEW REGIME", COL_NEW, y + 6, { width: C3, align: "center" });
     y += 20;
 
-    // True gross income = salary + all other income sources (BEFORE any deductions)
-    // This is the same for both regimes — the regime only affects which deductions are allowed
+    // Income before salary/Chapter VI-A deductions, using the allowed property result.
+    // Regime-specific property loss set-off can make these columns differ.
     const trueGrossOld = OLD.grossSalary
       + (OLD.rentalIncome     || 0)
       + (OLD.capitalGainsLTCG || 0)
@@ -305,8 +206,8 @@ function generateDetailedComparisonPDF(data: TaxComputationData): Promise<Buffer
     const summaryRows: Array<[string, number, number, boolean?]> = [
       ["Gross Income",                       trueGrossOld,       trueGrossNew],
       ["Total Deductions",                   totalDeductionsOld, totalDeductionsNew],
-      ["Taxable Income",                     OLD.taxableIncome,  NEW.taxableIncome],
-      ["Income Tax (Before Cess)",           OLD.incomeTax,      NEW.incomeTax],
+      ["Income Taxed at Normal Rates",        OLD.taxableIncome,  NEW.taxableIncome],
+      ["Income Tax (Before Cess)",           OLD.totalTax - OLD.cess, NEW.totalTax - NEW.cess],
       ["Less: Rebate u/s 87A",               OLD.rebate87A,      NEW.rebate87A],
       ["Add: Health & Education Cess (4%)",  OLD.cess,           NEW.cess],
       ["NET TAX PAYABLE",                    OLD.totalTax,       NEW.totalTax,    true],
@@ -328,19 +229,19 @@ function generateDetailedComparisonPDF(data: TaxComputationData): Promise<Buffer
       doc.fillColor(oldColor).font(fnt).fontSize(9)
          .text(fmt(oldVal as number), COL_OLD, y + 4, { width: C2, align: "right" });
 
-      // For NET TAX PAYABLE: squeeze "✓ Best" into the recommended column
+      // For NET TAX PAYABLE: squeeze "Best" into the recommended column
       // to avoid text overflowing outside the table boundary
       if (bold && label === "NET TAX PAYABLE" && rec === "new") {
         // Draw value left-aligned with a small gap, then "✓" badge at right edge
         doc.fillColor(newColor).font(fnt).fontSize(9)
            .text(fmt(newVal as number), COL_NEW, y + 4, { width: C3 - 28, align: "right" });
         doc.fillColor(GREEN).font("NotoSans-Bold").fontSize(7.5)
-           .text("✓ Best", COL_NEW + C3 - 26, y + 5, { width: 26, align: "right" });
+           .text("Best", COL_NEW + C3 - 26, y + 5, { width: 26, align: "right" });
       } else if (bold && label === "NET TAX PAYABLE" && rec === "old") {
         doc.fillColor(newColor).font(fnt).fontSize(9)
            .text(fmt(newVal as number), COL_NEW, y + 4, { width: C3, align: "right" });
         doc.fillColor(GREEN).font("NotoSans-Bold").fontSize(7.5)
-           .text("✓ Best", COL_OLD + C2 - 26, y + 5, { width: 26, align: "right" });
+           .text("Best", COL_OLD + C2 - 26, y + 5, { width: 26, align: "right" });
       } else {
         doc.fillColor(newColor).font(fnt).fontSize(9)
            .text(fmt(newVal as number), COL_NEW, y + 4, { width: C3, align: "right" });
@@ -490,7 +391,7 @@ function generateDetailedComparisonPDF(data: TaxComputationData): Promise<Buffer
     detailRow("Net Income from Salary", OLD.netSalary, NEW.netSalary, { bold: true });
 
     // Other income
-    if ((OLD.rentalIncome || 0) + (OLD.capitalGainsLTCG || 0) + (OLD.capitalGainsSTC || 0) + (OLD.otherIncome || 0) > 0) {
+    if ([OLD.rentalIncome, OLD.capitalGainsLTCG, OLD.capitalGainsSTC, OLD.dividendIncome, OLD.otherIncome].some((value) => value !== undefined && value !== 0)) {
       detailRow("OTHER INCOME", null, null, { sectionHeader: true });
       if (OLD.rentalIncome) detailRow("Income from House Property — Sec 24", OLD.rentalIncome, NEW.rentalIncome || 0, { indent: 1 });
       if (OLD.dividendIncome) detailRow("Dividend Income", OLD.dividendIncome, NEW.dividendIncome || 0, { indent: 1 });
@@ -499,6 +400,9 @@ function generateDetailedComparisonPDF(data: TaxComputationData): Promise<Buffer
       if (OLD.otherIncome) detailRow("Income from Other Sources (Interest etc.)", OLD.otherIncome, NEW.otherIncome || 0, { indent: 1 });
     }
 
+    if (OLD.housePropertyLossNotSetOff || NEW.housePropertyLossNotSetOff) {
+      detailRow("House-property loss not set off (info)", OLD.housePropertyLossNotSetOff || "-", NEW.housePropertyLossNotSetOff || "-", { indent: 1 });
+    }
     detailRow("GROSS TOTAL INCOME", OLD.grossTotalIncome, NEW.grossTotalIncome, { bold: true, highlight: "blue" });
 
     // Chapter VI-A
@@ -507,23 +411,30 @@ function generateDetailedComparisonPDF(data: TaxComputationData): Promise<Buffer
     if (OLD.sec80D) detailRow("Sec 80D — Health Insurance Premium", neg(OLD.sec80D), "NIL", { indent: 1 });
     if (OLD.sec80CCD1B) detailRow("Sec 80CCD(1B) — NPS Additional (Max ₹50,000)", neg(OLD.sec80CCD1B), "NIL", { indent: 1 });
     if (OLD.sec80E) detailRow("Sec 80E — Education Loan Interest", neg(OLD.sec80E), "NIL", { indent: 1 });
-    if (OLD.sec80TTA) detailRow("Sec 80TTA — Savings Bank Interest (Max ₹10,000)", neg(OLD.sec80TTA), "NIL", { indent: 1 });
+    if (OLD.sec80TTA) detailRow(residentSenior ? "Sec 80TTB — Eligible Deposit Interest (Max ₹50,000)" : "Sec 80TTA — Savings Bank Interest (Max ₹10,000)", neg(OLD.sec80TTA), "NIL", { indent: 1 });
     if (OLD.sec80G) detailRow("Sec 80G — Donations to NGO / Charitable Trusts", neg(OLD.sec80G), "NIL", { indent: 1 });
-    if (OLD.homeLoanInterest) detailRow("Sec 24(b) — Home Loan Interest (Max ₹2,00,000)", neg(OLD.homeLoanInterest), "NIL", { indent: 1 });
     detailRow("Total Deductions under Chapter VI-A", OLD.totalChapterVIA > 0 ? neg(OLD.totalChapterVIA) : "-", "NIL", { bold: true, indent: 1 });
 
     // Taxable income
-    detailRow("TOTAL TAXABLE INCOME", OLD.taxableIncome, NEW.taxableIncome, { bold: true, highlight: "blue" });
+    detailRow("INCOME TAXED AT NORMAL RATES", OLD.taxableIncome, NEW.taxableIncome, { bold: true, highlight: "blue" });
 
     // Tax computation
     detailRow("TAX COMPUTATION", null, null, { sectionHeader: true });
     detailRow("Tax at Normal Rates (as per slab)", OLD.incomeTax, NEW.incomeTax, { indent: 1 });
-    detailRow("Tax at Special Rates (LTCG / STCG)", OLD.capitalGainsLTCG ? Math.round((OLD.capitalGainsLTCG) * 0.125) : "-", NEW.capitalGainsLTCG ? Math.round((NEW.capitalGainsLTCG) * 0.125) : "-", { indent: 1 });
-    detailRow("Tax Payable (before rebate)", OLD.incomeTax, NEW.incomeTax, { indent: 1 });
+    // Tax belongs to the engine. Never reconstruct it from gross gains here:
+    // that loses the annual exemption, STCG and unused-basic-exemption handling.
+    detailRow("Tax at Special Rates (LTCG / STCG)", OLD.specialRateTax ?? "-", NEW.specialRateTax ?? "-", { indent: 1 });
+    detailRow("Tax Payable (before rebate)", OLD.incomeTax + (OLD.specialRateTax || 0), NEW.incomeTax + (NEW.specialRateTax || 0), { indent: 1 });
     detailRow("Less: Rebate u/s 87A", OLD.rebate87A > 0 ? neg(OLD.rebate87A) : "-", NEW.rebate87A > 0 ? neg(NEW.rebate87A) : "-", { indent: 1 });
-    detailRow("Tax Payable (after rebate)", OLD.taxAfterRebate, NEW.taxAfterRebate, { indent: 1, bold: true });
+    if (OLD.marginalRelief || NEW.marginalRelief) {
+      detailRow("Less: Marginal Relief", OLD.marginalRelief ? neg(OLD.marginalRelief) : "-", NEW.marginalRelief ? neg(NEW.marginalRelief) : "-", { indent: 1 });
+    }
+    // Final engine totals also keep older callers consistent when they omit new optional fields.
+    const oldAfterRelief = Math.max(0, OLD.totalTax - OLD.cess - OLD.surcharge);
+    const newAfterRelief = Math.max(0, NEW.totalTax - NEW.cess - NEW.surcharge);
+    detailRow("Tax Payable (after rebate / relief)", oldAfterRelief, newAfterRelief, { indent: 1, bold: true });
     detailRow("Add: Surcharge", OLD.surcharge > 0 ? OLD.surcharge : "-", NEW.surcharge > 0 ? NEW.surcharge : "-", { indent: 1 });
-    detailRow("Total Tax Including Surcharge", OLD.taxAfterRebate + OLD.surcharge, NEW.taxAfterRebate + NEW.surcharge, { indent: 1 });
+    detailRow("Total Tax Including Surcharge", oldAfterRelief + OLD.surcharge, newAfterRelief + NEW.surcharge, { indent: 1 });
     detailRow("Add: Health & Education Cess @ 4%", OLD.cess, NEW.cess, { indent: 1 });
 
     detailRow("NET TAX PAYABLE", OLD.totalTax, NEW.totalTax, { bold: true, highlight: "green" });
@@ -546,15 +457,18 @@ function generateDetailedComparisonPDF(data: TaxComputationData): Promise<Buffer
     if (!(OLD.sec80CCD1B)) suggestions.push({ section: "80CCD(1B)", desc: "Invest in NPS for an additional ₹50,000 deduction over and above 80C", limit: "Max: ₹50,000" });
     if (!(OLD.sec80D)) suggestions.push({ section: "80D", desc: "Buy health insurance for self, family and parents to claim medical deduction", limit: "Max: ₹25,000–₹1,00,000" });
     if (!(OLD.hraExemption) && OLD.grossSalary > 0) suggestions.push({ section: "HRA", desc: "If you are paying rent, declare it to claim HRA exemption under Sec 10(13A)", limit: "Based on salary & rent paid" });
-    if (!(OLD.sec80TTA)) suggestions.push({ section: "80TTA", desc: "Claim savings bank interest (up to ₹10,000) under Section 80TTA", limit: "Max: ₹10,000" });
+    if (!(OLD.sec80TTA)) suggestions.push(residentSenior ? { section: "80TTB", desc: "Check eligible savings and deposit interest under the Old Regime", limit: "Max: ₹50,000" } : { section: "80TTA", desc: "Check eligible savings bank interest under the Old Regime", limit: "Max: ₹10,000" });
 
     suggestions.slice(0, 5).forEach((s, i) => {
+      const rowHeight = 32;
+      if (y + rowHeight > 770) { doc.addPage(); y = 36; }
       const bg = i % 2 === 0 ? "#FFFFFF" : "#F8FAFC";
-      doc.rect(L, y, PW, 22).fill(bg);
-      doc.font("NotoSans-Bold").fontSize(8.5).fillColor(MID_BLUE).text(`Sec ${s.section}`, L + 6, y + 4, { width: 55 });
-      doc.font("NotoSans").fontSize(8.5).fillColor("#374151").text(s.desc, L + 65, y + 4, { width: PW - 130 });
+      doc.rect(L, y, PW, rowHeight).fill(bg);
+      // Explicit non-overlapping columns; section names and two-line descriptions must fit.
+      doc.font("NotoSans-Bold").fontSize(8.5).fillColor(MID_BLUE).text(`Sec ${s.section}`, L + 6, y + 6, { width: 78 });
+      doc.font("NotoSans").fontSize(8.5).fillColor("#374151").text(s.desc, L + 90, y + 6, { width: PW - 220 });
       doc.font("NotoSans-Bold").fontSize(8).fillColor(GREEN).text(s.limit, L + PW - 120, y + 8, { width: 115, align: "right" });
-      y += 22;
+      y += rowHeight;
     });
 
     y += 10;

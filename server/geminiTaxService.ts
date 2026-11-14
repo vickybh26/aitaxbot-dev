@@ -95,9 +95,15 @@ function buildFallbackTips(input: TaxAdviceInput): TaxAdviceResult {
   }
 
   // 80D health insurance
-  const max80D = input.ageGroup === 'senior' ? 50000 : 25000;
+  // ageGroup is "below60" | "60to80" | "above80" (shared/taxLiability.ts) —
+  // this compared against 'senior', which no caller ever sends, so seniors
+  // were always shown the ₹25,000 cap. Old regime only, like the 80C and NPS
+  // tips: 80D is not available under the new regime, and showing a "potential
+  // saving" there contradicts the prompt's own ground truth below.
+  const isSenior = input.ageGroup === '60to80' || input.ageGroup === 'above80';
+  const max80D = isSenior ? 50000 : 25000;
   const gap80D = max80D - Math.min(input.section80D, max80D);
-  if (gap80D > 0) {
+  if (gap80D > 0 && input.recommendedRegime === 'old') {
     const saving = Math.round(gap80D * slab);
     maxSaving += saving;
     tips.push({
@@ -161,7 +167,6 @@ function buildFallbackTips(input: TaxAdviceInput): TaxAdviceResult {
     });
   }
 
-  const maxPossible80C = Math.round((150000 - Math.min(input.section80C, 150000)) * slab);
   const score = Math.max(0, Math.min(100, Math.round(100 - (maxSaving / (income * 0.05 + 1)) * 100)));
 
   return {

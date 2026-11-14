@@ -100,6 +100,17 @@ export function getTaxSlabs(regime: TaxRegime, financialYear: string, ageGroup: 
         { min: 2400000, max: Infinity, rate: 30 },
       ];
     }
+    if (financialYear === "2024-25") {
+      // Finance (No. 2) Act, 2024 / AY 2025-26; not the FY 2023-24 ladder.
+      return [
+        { min: 0, max: 300000, rate: 0 },
+        { min: 300000, max: 700000, rate: 5 },
+        { min: 700000, max: 1000000, rate: 10 },
+        { min: 1000000, max: 1200000, rate: 15 },
+        { min: 1200000, max: 1500000, rate: 20 },
+        { min: 1500000, max: Infinity, rate: 30 },
+      ];
+    }
     return [
       { min: 0, max: 300000, rate: 0 },
       { min: 300000, max: 600000, rate: 5 },

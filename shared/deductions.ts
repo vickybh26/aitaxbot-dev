@@ -80,7 +80,8 @@ export function computeSection80G(
 // exemptions/deductions like 80C, HRA, and self-occupied home loan interest,
 // not the mechanics of computing a head's own income). The cap that DOES
 // apply is on how much of the resulting LOSS can be set off against OTHER
-// heads in the same year: ₹2,00,000 (s.71(3A)); any excess is carried
+// heads: old regime allows up to ₹2,00,000 (s.71(3A)); new regime allows none
+// (s.115BAC(2)(ii)(b), ITA2025 s.202(2)(b)(ii)). Old-regime excess is carried
 // forward, which a single-year calculator cannot model and does not claim to.
 //
 // Previously: a single unconditional `min(interest, 200000)` regardless of
@@ -101,7 +102,7 @@ export function computeHousePropertyNet(
 
   if (propertyType === "letOut") {
     const net = income - interest;
-    return net < 0 ? Math.max(net, -200000) : net;
+    return regime === "new" ? Math.max(0, net) : Math.max(net, -200000);
   }
 
   const cappedInterest = regime === "old" ? Math.min(interest, 200000) : 0;

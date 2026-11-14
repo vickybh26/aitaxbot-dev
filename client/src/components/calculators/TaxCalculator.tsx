@@ -22,7 +22,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useTrackToolUse } from '@/hooks/useTrackToolUse';
 import { recommendITRForm, type ITRFormResult } from '@shared/itrFormSelector';
-import { computeTaxLiability, type AgeGroup } from '@shared/taxLiability';
+import { computeTaxLiability, getTaxSlabs, type AgeGroup } from '@shared/taxLiability';
 import {
   computeSection80D,
   computeSection80G,
@@ -165,63 +165,7 @@ export default function TaxCalculator({ onClose, onCalculated, onGuestDownload }
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  // Tax slab definitions
-  const getTaxSlabs = (regime: 'old' | 'new', year: string, ageGroup?: string) => {
-    if (regime === 'new') {
-      if (year === '2025-26' || year === '2026-27') {
-        // New Regime, FY 2025-26 and FY 2026-27. Identical slabs, but NOT the
-        // same statute: FY 2025-26 is governed by s.115BAC of the ITA 1961,
-        // while the ITA 2025 (where the new regime is s.202) applies only to
-        // income earned from 1 April 2026 — FY 2026-27 onward. The ladder is
-        // the same either way so no figure changes, but this comment used to
-        // cite ITA 2025 for both years, which is the same year-blind citation
-        // error that put "Rule 280" into production answers.
-        // Same slabs for all ages under new regime
-        return [
-          { min: 0, max: 400000, rate: 0 },
-          { min: 400000, max: 800000, rate: 5 },
-          { min: 800000, max: 1200000, rate: 10 },
-          { min: 1200000, max: 1600000, rate: 15 },
-          { min: 1600000, max: 2000000, rate: 20 },
-          { min: 2000000, max: 2400000, rate: 25 },
-          { min: 2400000, max: Infinity, rate: 30 }
-        ];
-      } else {
-        return [
-          { min: 0, max: 300000, rate: 0 },
-          { min: 300000, max: 600000, rate: 5 },
-          { min: 600000, max: 900000, rate: 10 },
-          { min: 900000, max: 1200000, rate: 15 },
-          { min: 1200000, max: 1500000, rate: 20 },
-          { min: 1500000, max: Infinity, rate: 30 }
-        ];
-      }
-    } else {
-      // Old Regime - Age-based slabs
-      if (ageGroup === 'below60') {
-        return [
-          { min: 0, max: 250000, rate: 0 },
-          { min: 250000, max: 500000, rate: 5 },
-          { min: 500000, max: 1000000, rate: 20 },
-          { min: 1000000, max: Infinity, rate: 30 }
-        ];
-      } else if (ageGroup === '60to80') {
-        return [
-          { min: 0, max: 300000, rate: 0 },
-          { min: 300000, max: 500000, rate: 5 },
-          { min: 500000, max: 1000000, rate: 20 },
-          { min: 1000000, max: Infinity, rate: 30 }
-        ];
-      } else { // above80
-        return [
-          { min: 0, max: 500000, rate: 0 },
-          { min: 500000, max: 1000000, rate: 20 },
-          { min: 1000000, max: Infinity, rate: 30 }
-        ];
-      }
-    }
-  };
-
+  // Slab tables are shared with the wizard/server to prevent year-specific drift.
   const calculateTaxForSlab = (income: number, slabs: any[]) => {
     let totalTax = 0;
     let breakdown: TaxBreakdown[] = [];

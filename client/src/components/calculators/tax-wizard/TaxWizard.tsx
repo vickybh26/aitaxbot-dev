@@ -1,99 +1,30 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import BasicDetailsStep, { isBasicDetailsValid } from "./steps/BasicDetailsStep";
-import FYAndHeadsStep, { hasAtLeastOneIncomeHead } from "./steps/FYAndHeadsStep";
-import SalaryStep, { isSalaryStepValid } from "./steps/SalaryStep";
-import HousePropertyStep, { isHousePropertyStepValid } from "./steps/HousePropertyStep";
-import BusinessStep, { isBusinessStepValid } from "./steps/BusinessStep";
-import CapitalGainsStep, { isCapitalGainsStepValid } from "./steps/CapitalGainsStep";
-import OtherSourcesStep, { isOtherSourcesStepValid } from "./steps/OtherSourcesStep";
-import DeductionsStep, { isDeductionsStepValid } from "./steps/DeductionsStep";
+import BasicDetailsStep from "./steps/BasicDetailsStep";
+import FYAndHeadsStep from "./steps/FYAndHeadsStep";
+import SalaryStep from "./steps/SalaryStep";
+import HousePropertyStep from "./steps/HousePropertyStep";
+import BusinessStep from "./steps/BusinessStep";
+import CapitalGainsStep from "./steps/CapitalGainsStep";
+import OtherSourcesStep from "./steps/OtherSourcesStep";
+import DeductionsStep from "./steps/DeductionsStep";
 import ResultStep from "./steps/ResultStep";
-import { createEmptyWizardState, type WizardState } from "./types";
+import { useIncomeTaxWizard } from "@/features/income-tax/useIncomeTaxWizard";
 
-/**
- * Multi-PR wizard rebuild — see types.ts for the full plan. This has been
- * the live /calculators/income-tax route since the 2026-08-30 cutover.
- *
- * The step LIST is dynamic, not a fixed array: getActiveSteps() below
- * recomputes it from state.incomeHeads on every render, so toggling a head
- * on/off in step 2 immediately adds or removes its step from the flow.
- * Deductions and Result are NOT gated by an income head — both are
- * unconditionally appended at the end, in that order.
- */
-
-type StepId =
-  | "basicDetails"
-  | "fyAndHeads"
-  | "salary"
-  | "houseProperty"
-  | "business"
-  | "capitalGains"
-  | "otherSources"
-  | "deductions"
-  | "result";
-
-function getActiveSteps(incomeHeads: WizardState["incomeHeads"]): { id: StepId; label: string }[] {
-  const steps: { id: StepId; label: string }[] = [
-    { id: "basicDetails", label: "Basic Details" },
-    { id: "fyAndHeads", label: "Year & Income Type" },
-  ];
-  if (incomeHeads.salary) steps.push({ id: "salary", label: "Salary" });
-  if (incomeHeads.houseProperty) steps.push({ id: "houseProperty", label: "House Property" });
-  if (incomeHeads.business) steps.push({ id: "business", label: "Business" });
-  if (incomeHeads.capitalGains) steps.push({ id: "capitalGains", label: "Capital Gains" });
-  if (incomeHeads.otherSources) steps.push({ id: "otherSources", label: "Other Sources" });
-  steps.push({ id: "deductions", label: "Deductions" }); // unconditional
-  steps.push({ id: "result", label: "Result" }); // unconditional, always last
-  return steps;
-}
+/** Presentation for the income-tax feature. Workflow rules live in features/income-tax. */
 
 export default function TaxWizard() {
-  const [state, setState] = useState<WizardState>(createEmptyWizardState());
-  const [stepIndex, setStepIndex] = useState(0);
+  const { state, activeState, setState, steps, safeStepIndex, currentStep, canGoNext, validationMessage, goNext, goBack } = useIncomeTaxWizard();
 
-  const steps = getActiveSteps(state.incomeHeads);
-  // Guards against stepIndex pointing past the end if the user went Back to
-  // step 2 and unchecked a head whose step they'd already moved past.
-  const safeStepIndex = Math.min(stepIndex, steps.length - 1);
-  const currentStep = steps[safeStepIndex];
-
-  const canGoNext =
-    currentStep.id === "basicDetails"
-      ? isBasicDetailsValid(state.basicDetails)
-      : currentStep.id === "fyAndHeads"
-      ? hasAtLeastOneIncomeHead(state.incomeHeads)
-      : currentStep.id === "salary"
-      ? isSalaryStepValid(state.salary)
-      : currentStep.id === "houseProperty"
-      ? isHousePropertyStepValid(state.houseProperty)
-      : currentStep.id === "business"
-      ? isBusinessStepValid(state.business)
-      : currentStep.id === "capitalGains"
-      ? isCapitalGainsStepValid(state.capitalGains)
-      : currentStep.id === "otherSources"
-      ? isOtherSourcesStepValid(state.otherSources)
-      : currentStep.id === "deductions"
-      ? isDeductionsStepValid()
-      : currentStep.id === "result"
-      ? true // nothing to validate — this is the terminal display step
-      : false;
-
-  function goNext() {
-    // The Continue button is hidden entirely on the "result" step (the only
-    // step where there's nowhere left to go), so this never fires past the
-    // end of the steps array.
-    if (!canGoNext) return;
-    setStepIndex(safeStepIndex + 1);
+  function handleNext() {
+    if (!canGoNext || currentStep.id === "result") return;
+    goNext();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
-
-  function goBack() {
-    if (safeStepIndex > 0) {
-      setStepIndex(safeStepIndex - 1);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
+  function handleBack() {
+    if (safeStepIndex === 0) return;
+    goBack();
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   return (
@@ -173,6 +104,7 @@ export default function TaxWizard() {
       {currentStep.id === "capitalGains" && (
         <CapitalGainsStep
           value={state.capitalGains}
+          financialYear={state.financialYear}
           onChange={(capitalGains) => setState((s) => ({ ...s, capitalGains }))}
         />
       )}
@@ -187,19 +119,22 @@ export default function TaxWizard() {
       {currentStep.id === "deductions" && (
         <DeductionsStep
           value={state.deductions}
-          otherSources={state.otherSources}
+          otherSources={activeState.otherSources}
           ageGroup={state.ageGroup}
+          isNonResident={state.isNonResident}
           onChange={(deductions) => setState((s) => ({ ...s, deductions }))}
         />
       )}
 
       {currentStep.id === "result" && <ResultStep state={state} />}
 
+      {validationMessage && <p role="alert" className="mt-4 text-sm text-debit">{validationMessage}</p>}
+
       <div className="flex items-center justify-between mt-8 pt-4 border-t border-rule">
         <Button
           type="button"
           variant="outline"
-          onClick={goBack}
+          onClick={handleBack}
           disabled={safeStepIndex === 0}
           className="gap-1 rounded-full border-rule"
         >
@@ -210,7 +145,7 @@ export default function TaxWizard() {
           // default variant = bg-primary/text-primary-foreground, which now
           // resolves to bg-ink/text-paper exactly (index.css, 2026-09-04) —
           // only rounded-full is added here to get Lovable's pill shape.
-          <Button type="button" onClick={goNext} disabled={!canGoNext} className="gap-1 rounded-full">
+          <Button type="button" onClick={handleNext} disabled={!canGoNext} className="gap-1 rounded-full">
             Continue
             <ChevronRight className="h-4 w-4" />
           </Button>

@@ -1,3 +1,4 @@
+import { registerTaxComputationRoutes } from "./taxComputationRoutes";
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
@@ -319,28 +320,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ==========================================
   
   // Generate and download tax computation PDF
-  app.post("/api/tax-computation/generate-pdf", async (req, res) => {
-    try {
-      const computationData: TaxComputationData = req.body;
-      
-      if (!computationData.personalInfo || !computationData.taxBreakdown) {
-        return res.status(400).json({ error: "Missing required computation data" });
-      }
-      
-      // Ensure computation date is set
-      computationData.computationDate = new Date();
-      
-      const pdfBuffer = await generateTaxComputationPDF(computationData);
-      
-      res.setHeader("Content-Type", "application/pdf");
-      res.setHeader("Content-Disposition", `attachment; filename="Tax_Computation_${computationData.assessmentYear}.pdf"`);
-      res.send(pdfBuffer);
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-      res.status(500).json({ error: "Failed to generate PDF" });
-    }
-  });
-  
+  registerTaxComputationRoutes(app);
+
   // Save tax computation PDF to object storage
   app.post("/api/tax-computation/save-pdf", authenticateFirebaseToken, async (req: AuthenticatedRequest, res) => {
     try {

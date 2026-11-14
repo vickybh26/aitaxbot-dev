@@ -1,23 +1,18 @@
 import { Field, StringMoneyInput } from "@/components/calc/Field";
 import { LTCG_EQUITY_EXEMPTION } from "@shared/taxLiability";
-import { computeCapitalGainsTax, toAmount, type CapitalGainsDetails } from "../types";
+import { computeCapitalGainsTax, toAmount, type CapitalGainsDetails } from "@/features/income-tax/model";
 
 interface CapitalGainsStepProps {
   value: CapitalGainsDetails;
+  financialYear: string;
   onChange: (next: CapitalGainsDetails) => void;
 }
 
-export function isCapitalGainsStepValid(value: CapitalGainsDetails): boolean {
-  return (
-    toAmount(value.stcgEquity) > 0 || toAmount(value.ltcgEquity) > 0 || toAmount(value.debtFundGains) > 0
-  );
-}
-
-export default function CapitalGainsStep({ value, onChange }: CapitalGainsStepProps) {
+export default function CapitalGainsStep({ value, onChange, financialYear }: CapitalGainsStepProps) {
   const result = computeCapitalGainsTax(value);
 
   function update(key: keyof CapitalGainsDetails, raw: string) {
-    onChange({ ...value, [key]: raw.replace(/[^\d.]/g, "") });
+    onChange({ ...value, [key]: raw });
   }
 
   return (
@@ -28,6 +23,12 @@ export default function CapitalGainsStep({ value, onChange }: CapitalGainsStepPr
           Only listed shares and mutual funds — property, gold, and other assets aren't covered here.
         </p>
       </div>
+
+      {financialYear === "2024-25" && (
+        <p role="note" className="rounded-2xl border border-rule bg-paper p-3 text-sm text-ink/75">
+          For FY 2024–25, enter only equity gains from transfers on or after 23 July 2024. Earlier transfers used different rates and are outside this estimate.
+        </p>
+      )}
 
       <div className="bento space-y-4 p-4">
         <p className="text-sm font-medium text-ink">Equity Shares & Equity Mutual Funds</p>

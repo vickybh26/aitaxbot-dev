@@ -1,5 +1,5 @@
 import { Field, StringMoneyInput, ToggleCard } from "@/components/calc/Field";
-import { computeGrossSalary, computeHRAExemption, toAmount, type SalaryDetails } from "../types";
+import { computeGrossSalary, computeHRAExemption, toAmount, type SalaryDetails } from "@/features/income-tax/model";
 
 interface SalaryStepProps {
   value: SalaryDetails;
@@ -17,12 +17,6 @@ interface SalaryStepProps {
 // actually covers, does.
 const METRO_CITIES_FROM_2026_27 = ["Mumbai", "Delhi", "Kolkata", "Chennai", "Hyderabad", "Bengaluru", "Pune", "Ahmedabad"];
 const METRO_CITIES_BEFORE_2026_27 = ["Delhi", "Mumbai", "Kolkata", "Chennai"];
-
-export function isSalaryStepValid(value: SalaryDetails): boolean {
-  // Only Basic Salary is required — everything else is genuinely optional
-  // (most private-sector payslips have no DA; not everyone gets HRA or LTA).
-  return toAmount(value.basicSalary) > 0;
-}
 
 // Excludes isMetroCity (a boolean, rendered separately as a toggle below,
 // not through this string-input field list).
@@ -58,6 +52,11 @@ const FIELDS: FieldDef[] = [
     hint: "Only exempt under the Old Regime, and only against actual travel fare within India.",
   },
   {
+    key: "eligibleLtaExemption",
+    label: "Eligible LTA Exemption (annual)",
+    hint: "Enter the qualifying domestic travel fare after checking journey/block rules with payroll. Leave blank if none qualifies; this cannot exceed LTA received. Hotels and food do not qualify.",
+  },
+  {
     key: "otherAllowances",
     label: "Other Taxable Allowances (annual)",
     hint: "Special allowance, conveyance, or anything else on your payslip not covered above.",
@@ -81,7 +80,7 @@ export default function SalaryStep({ value, onChange, financialYear }: SalarySte
   function update(key: AmountFieldKey, raw: string) {
     // Digits and a single decimal point only — matches the numeric-input
     // discipline from the main calculator's inputMode fix (PR #6).
-    const cleaned = raw.replace(/[^\d.]/g, "");
+    const cleaned = raw;
     onChange({ ...value, [key]: cleaned });
   }
 

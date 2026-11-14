@@ -9,21 +9,14 @@ import {
   SECTION_80CCD1B_CAP,
   type DeductionsDetails,
   type OtherSourcesDetails,
-} from "../types";
+} from "@/features/income-tax/model";
 
 interface DeductionsStepProps {
   value: DeductionsDetails;
   otherSources: OtherSourcesDetails;
   ageGroup: AgeGroup;
+  isNonResident: boolean;
   onChange: (next: DeductionsDetails) => void;
-}
-
-// Deductions are entirely optional — someone with zero Chapter VI-A
-// deductions (a very plausible, correct answer) must still be able to
-// continue, unlike every income-head step where "nothing entered" would
-// mean the step shouldn't have been reached at all.
-export function isDeductionsStepValid(): boolean {
-  return true;
 }
 
 type MoneyFieldKey = "section80C" | "section80D" | "section80DParents" | "section80E" | "section80CCD1B" | "section80G";
@@ -41,8 +34,8 @@ const SECTION_80G_CATEGORY_OPTIONS: { value: Section80GCategory; label: string }
   { value: "50-limit", label: "50% deduction, up to 10% of adjusted income (most registered charitable trusts/NGOs)" },
 ];
 
-export default function DeductionsStep({ value, otherSources, ageGroup, onChange }: DeductionsStepProps) {
-  const result = computeDeductions(value, otherSources, ageGroup);
+export default function DeductionsStep({ value, otherSources, ageGroup, isNonResident, onChange }: DeductionsStepProps) {
+  const result = computeDeductions(value, otherSources, ageGroup, !isNonResident);
   const isSenior = ageGroup === "60to80" || ageGroup === "above80";
 
   const FIELDS: FieldDef[] = [
@@ -79,7 +72,7 @@ export default function DeductionsStep({ value, otherSources, ageGroup, onChange
   ];
 
   function update(key: MoneyFieldKey, raw: string) {
-    onChange({ ...value, [key]: raw.replace(/[^\d.]/g, "") });
+    onChange({ ...value, [key]: raw });
   }
 
   return (
@@ -92,10 +85,10 @@ export default function DeductionsStep({ value, otherSources, ageGroup, onChange
         </p>
       </div>
 
-      {toAmount(otherSources.savingsInterest) > 0 && (
+      {result.section80TTAorTTB > 0 && (
         <div className="rounded-2xl border border-rule bg-paper p-3 flex items-center justify-between">
           <span className="text-sm text-ink/70">
-            Section 80TTA/80TTB (Savings Interest) — applied automatically
+            Section 80TTA/80TTB (Eligible Interest) — applied automatically
           </span>
           <span className="text-sm font-semibold tabular-figures text-ink">
             ₹{Math.round(result.section80TTAorTTB).toLocaleString("en-IN")}

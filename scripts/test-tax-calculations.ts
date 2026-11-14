@@ -138,7 +138,7 @@ const FIXTURES: Fixture[] = [
   {
     name: "New 24-25 · ₹7,10,000 — the marginal-relief bug that was fixed",
     income: 710000, regime: "new", fy: "2024-25",
-    incomeTax: 26000, marginalRelief: 16000, totalTax: 10400,
+    incomeTax: 21000, marginalRelief: 11000, totalTax: 10400,
     why: "Regression lock: this once returned ~₹27,040 instead of ₹10,400.",
   },
   {
@@ -380,9 +380,9 @@ console.log("\nDeduction helpers (audit findings 4, 5, 6)\n" + "─".repeat(60))
     -200000
   );
   check(
-    "24(b): let-out applies identically under the New Regime (not a disallowed deduction)",
+    "115BAC / 202: new regime disallows house-property loss set-off against other heads",
     computeHousePropertyNet(300000, 800000, "letOut", "new"),
-    -200000
+    0
   );
 }
 

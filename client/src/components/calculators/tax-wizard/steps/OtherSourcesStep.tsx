@@ -1,13 +1,9 @@
 import { Field, StringMoneyInput } from "@/components/calc/Field";
-import { computeOtherSourcesIncome, toAmount, type OtherSourcesDetails } from "../types";
+import { computeOtherSourcesIncome, toAmount, type OtherSourcesDetails } from "@/features/income-tax/model";
 
 interface OtherSourcesStepProps {
   value: OtherSourcesDetails;
   onChange: (next: OtherSourcesDetails) => void;
-}
-
-export function isOtherSourcesStepValid(value: OtherSourcesDetails): boolean {
-  return computeOtherSourcesIncome(value) > 0;
 }
 
 interface FieldDef {
@@ -28,9 +24,14 @@ const FIELDS: FieldDef[] = [
     hint: "Up to ₹10,000 (₹50,000 if you're a senior citizen) is deductible later under Section 80TTA/80TTB — we'll apply that automatically when we get to deductions.",
   },
   {
+    key: "depositInterest",
+    label: "Bank / Post Office Deposit Interest (annual)",
+    hint: "Eligible FD/RD interest from banks, qualifying co-operative banks and post offices. For resident senior citizens, this shares the ₹50,000 Section 80TTB cap with savings interest. Do not repeat it below.",
+  },
+  {
     key: "otherInterest",
-    label: "Other Interest — FDs, RDs, Bonds (annual)",
-    hint: "Fully taxable at your slab rate — unlike savings interest, this doesn't qualify for any deduction.",
+    label: "Other Interest — Bonds / Other Sources (annual)",
+    hint: "Interest not included in savings or eligible bank/post-office deposits above. Do not repeat any amount already entered.",
   },
 ];
 
@@ -38,7 +39,7 @@ export default function OtherSourcesStep({ value, onChange }: OtherSourcesStepPr
   const total = computeOtherSourcesIncome(value);
 
   function update(key: keyof OtherSourcesDetails, raw: string) {
-    onChange({ ...value, [key]: raw.replace(/[^\d.]/g, "") });
+    onChange({ ...value, [key]: raw });
   }
 
   return (

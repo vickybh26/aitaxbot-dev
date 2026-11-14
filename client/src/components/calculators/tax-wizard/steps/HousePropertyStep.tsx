@@ -4,23 +4,11 @@ import {
   toAmount,
   SELF_OCCUPIED_INTEREST_CAP,
   type HousePropertyDetails,
-} from "../types";
+} from "@/features/income-tax/model";
 
 interface HousePropertyStepProps {
   value: HousePropertyDetails;
   onChange: (next: HousePropertyDetails) => void;
-}
-
-export function isHousePropertyStepValid(value: HousePropertyDetails): boolean {
-  const totalProperties = toAmount(value.numberOfProperties);
-  const letOutCount = toAmount(value.numberOfLetOut);
-  if (totalProperties < 1) return false;
-  if (letOutCount > totalProperties) return false;
-  // A let-out property with zero rent entered is almost certainly an
-  // in-progress entry, not a real answer — don't let it silently pass as
-  // "income: Rs.0" from a property that's actually earning rent.
-  if (letOutCount > 0 && toAmount(value.annualRentReceived) <= 0) return false;
-  return true;
 }
 
 function formatSignedINR(n: number): string {
@@ -36,11 +24,11 @@ export default function HousePropertyStep({ value, onChange }: HousePropertyStep
   const result = computeHousePropertyIncome(value);
 
   function updateText(key: keyof HousePropertyDetails, raw: string) {
-    onChange({ ...value, [key]: raw.replace(/[^\d.]/g, "") });
+    onChange({ ...value, [key]: raw });
   }
 
   function updateCount(key: "numberOfProperties" | "numberOfLetOut", raw: string) {
-    const digits = raw.replace(/\D/g, "");
+    const digits = raw;
     onChange({ ...value, [key]: digits });
   }
 
@@ -124,8 +112,8 @@ export default function HousePropertyStep({ value, onChange }: HousePropertyStep
       </div>
       {result.totalIncome < 0 && (
         <p className="text-xs text-ink/65">
-          A negative figure is a loss — it reduces your total taxable income (up to ₹2,00,000 can be
-          set off against other income each year).
+          A negative figure is a loss. The Old Regime allows up to ₹2,00,000 to be set off against
+          other heads in this year. The New Regime does not allow that set-off.
         </p>
       )}
     </div>

@@ -1,13 +1,8 @@
-import { useEffect, useRef, useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
-import { useToast } from "@/hooks/use-toast";
-import { useTrackToolUse } from "@/hooks/useTrackToolUse";
-import { getClientTaxAdvice, type TaxAdviceResult } from "@/lib/geminiAIService";
+import { useIncomeTaxResult } from "@/features/income-tax/useIncomeTaxResult";
 import ResultAuthGate from "@/components/ResultAuthGate";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, Download, Info, Loader2, Sparkles, TrendingDown } from "lucide-react";
-import { computeWizardTaxSummary, type RegimeSummary, type WizardState } from "../types";
-import { buildTaxAdviceInput, buildTaxComputationData } from "../resultExport";
+import { type RegimeSummary, type WizardState } from "@/features/income-tax/model";
 
 interface ResultStepProps {
   state: WizardState;
@@ -23,8 +18,7 @@ function formatINR(n: number): string {
 // .bento card for comparison. Rows are inline rather than the shared Line
 // component (calc/Field.tsx) because the emphasis-row-gets-a-top-border and
 // dark/light dual-tone logic here don't fit Line's simpler contract. All
-// figures/logic below are unchanged from before this pass — only the
-// markup changed.
+// Figures come from the feature model; screen markup does not re-derive tax.
 function RegimeCard({ label, summary, isRecommended }: { label: string; summary: RegimeSummary; isRecommended: boolean }) {
   const rows: { label: string; value: number; emphasis?: boolean }[] = [
     { label: "Gross Total Income", value: summary.grossTotalIncome },
@@ -36,7 +30,7 @@ function RegimeCard({ label, summary, isRecommended }: { label: string; summary:
     rows.push({ label: "Professional Tax", value: -summary.professionalTaxDeduction });
   if (summary.chapterVIADeductions > 0)
     rows.push({ label: "Chapter VI-A Deductions (80C, 80D, etc.)", value: -summary.chapterVIADeductions });
-  rows.push({ label: "Taxable Income", value: summary.taxableIncome, emphasis: true });
+  rows.push({ label: "Income Taxed at Normal Rates", value: summary.taxableIncome, emphasis: true });
 
   const { liability } = summary;
   const dark = isRecommended;
@@ -120,110 +114,8 @@ function RegimeCard({ label, summary, isRecommended }: { label: string; summary:
 }
 
 export default function ResultStep({ state }: ResultStepProps) {
-  const { isAuthenticated, user, userProfile } = useAuth();
-  const { toast } = useToast();
-  const trackTool = useTrackToolUse();
-  const [aiAdvice, setAiAdvice] = useState<TaxAdviceResult | null>(null);
-  const [aiLoading, setAiLoading] = useState(false);
-  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
-
-  const summary = computeWizardTaxSummary(state);
-  const recommended = summary[summary.recommendedRegime];
-  const other = summary[summary.recommendedRegime === "old" ? "new" : "old"];
-  const savings = Math.max(0, other.liability.totalTax - recommended.liability.totalTax);
-
-  // Both effects below must run on every render regardless of the
-  // isAuthenticated branch taken further down (Rules of Hooks) — each one
-  // guards itself internally instead of living after an early return.
-
-  // Activation metric: records that this user actually reached a result, not
-  // just that they opened the calculator. Debounced + idempotent per tool
-  // inside useTrackToolUse, so firing it once per mount here is enough — see
-  // that hook's own doc comment. This is the same event the founder's
-  // returning-user/activation KPI on /admin is computed from; the wizard
-  // cutover shipped without this call, which would have silently zeroed out
-  // that metric for every income-tax calculation going forward.
-  useEffect(() => {
-    if (!isAuthenticated) return;
-    const recLabel = summary.recommendedRegime === "new" ? "New Regime" : "Old Regime";
-    const rs = (n: number) => `₹${Math.round(n).toLocaleString("en-IN")}`;
-    trackTool("Income Tax Calculator", `${recLabel}: ${rs(recommended.liability.totalTax)} tax`, {
-      toolKey: "income-tax",
-      route: "/calculators/income-tax",
-      kind: "calculator",
-      headline: {
-        label: `Your tax · ${recLabel}`,
-        value: rs(recommended.liability.totalTax),
-        hint: savings > 0 ? `${rs(savings)} less than the other regime` : undefined,
-      },
-      details: [
-        { label: "Gross income", value: rs(summary.old.grossTotalIncome) },
-        { label: "Old Regime tax", value: rs(summary.old.liability.totalTax) },
-        { label: "New Regime tax", value: rs(summary.new.liability.totalTax) },
-      ],
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, recommended.liability.totalTax, summary.recommendedRegime]);
-
-  // AI tax-saving tips — fetched once per visit to this step, matching how
-  // TaxCalculator.tsx fetched them once per Calculate click rather than on
-  // every keystroke. getClientTaxAdvice() already has its own 3-tier
-  // fallback (client Gemini -> server -> local rule-based), so this never
-  // blocks or breaks the page even if AI is unavailable.
-  useEffect(() => {
-    if (!isAuthenticated) return;
-    let cancelled = false;
-    setAiLoading(true);
-    setAiAdvice(null);
-    getClientTaxAdvice(buildTaxAdviceInput(state, summary))
-      .then((data) => {
-        if (!cancelled) setAiAdvice(data);
-      })
-      .catch(() => {
-        if (!cancelled) setAiAdvice(null);
-      })
-      .finally(() => {
-        if (!cancelled) setAiLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated]);
-
-  async function handleDownloadPDF() {
-    setIsGeneratingPDF(true);
-    try {
-      const displayName =
-        user?.displayName ||
-        [userProfile?.firstName, userProfile?.lastName].filter(Boolean).join(" ").trim() ||
-        state.basicDetails.name;
-      const payload = buildTaxComputationData(state, summary, displayName);
-      const response = await fetch("/api/tax-computation/generate-pdf", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!response.ok) throw new Error("Failed to generate PDF");
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `Tax_Computation_AY${payload.assessmentYear}_${new Date().toISOString().split("T")[0]}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-
-      toast({ title: "PDF Downloaded", description: "Detailed tax computation downloaded successfully!" });
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-      toast({ title: "Error", description: "Failed to generate PDF. Please try again.", variant: "destructive" });
-    } finally {
-      setIsGeneratingPDF(false);
-    }
-  }
+  const { isAuthenticated, summary, recommended, savings, aiAdvice, aiLoading,
+    isGeneratingPDF, handleDownloadPDF } = useIncomeTaxResult(state);
 
   if (!isAuthenticated) {
     return (
